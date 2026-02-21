@@ -40,6 +40,7 @@ import modules.GestionRole;
 
 import utilisateur.ConstanteUtilisateur;
 import utilisateur.HomePageURL;
+import utilisateurAcade.UtilisateurAcade;
 import constanteAcade.ConstanteEtatAcade;
 import utilitaire.ConstanteUser;
 import utilitaire.UtilDB;
@@ -625,6 +626,49 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
 
             // TimingApplication timingApplication = new TimingApplication();
             // timingApplication.addTiming(u);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new Exception(ex.getMessage());
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+    }
+
+    @Override
+    public void testLoginAlumni(String etu, String pass) throws Exception {
+        Connection c = null;
+        try {
+            c = new UtilDB().GetConn();
+
+            // Etape 1 : Trouver le loginuser a partir de l'ETU (colonne id)
+            UtilisateurAcade critere = new UtilisateurAcade();
+            critere.setId(etu);
+            UtilisateurAcade[] users = (UtilisateurAcade[]) CGenUtil.rechercher(critere, null, null, c, "");
+            if (users == null || users.length == 0) {
+                throw new Exception("Numero ETU introuvable");
+            }
+            String loginuser = users[0].getLoginuser();
+
+            // Etape 2 : Deleguer au framework pour TOUTE la validation
+            // (cryptage, verification actif, etc.)
+            u = testeValide(loginuser, pass);
+
+            UtilisateurUtil crt = new UtilisateurUtil();
+            uVue = crt.testeValide("utilisateurVue", loginuser, pass);
+            type = u.getIdrole();
+
+            // Etape 3 : Historique de connexion (meme logique que testLogin)
+            MapHistorique histo = new MapHistorique("login", "login", String.valueOf(u.getRefuser()),
+                    String.valueOf(u.getRefuser()));
+            histo.setObjet("alumni");
+            histo.setAction(histo.getAction());
+            String heure = LocalTime.now().toString();
+            heure = heure.replace(".", ":");
+            histo.setHeure(heure);
+            histo.insertToTable();
 
         } catch (Exception ex) {
             ex.printStackTrace();
