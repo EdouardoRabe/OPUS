@@ -2,3 +2,4 @@ build-file/**
 BDD/**
 /build.xml
 /opus-ejb/src/java/apj.properties
+hs_err_pid8888.log
