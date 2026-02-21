@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="htmlToPdf">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/htmlToPdf.zip!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
