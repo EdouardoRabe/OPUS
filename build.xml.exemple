@@ -1,0 +1,117 @@
+<project name="opus-deploy" default="deploy" basedir="./build-file">
+    <property environment="env"/>
+    <property name="deploy.dir" value="D:/LOGICIEL/wildfly-10.1.0.Final/wildfly-10.1.0.Final/standalone/deployments/"/>
+    <property name="opus-warname" value="opus.war"/>
+    <property name="opus-jarname" value="opus-ejb.jar"/>
+
+    <property name="build-opus-war" value="${basedir}/opus_war" />
+    <property name="build-opus-ejb" value="${basedir}/opus_jar" />
+    <property name="build-opus-lib" value="${basedir}/lib" />
+
+    <property name="buildEar.dir" value="${basedir}/ear"/>
+    <property name="webcontent.dir" value="../opus-war/web"/>
+
+    <property name="srcproperties.dir" value="../opus-ejb/src/java/ressources"/>
+
+    <path id="classpath">
+        <fileset dir="${basedir}/lib">
+            <include name="**/*.jar" />
+        </fileset>
+    </path>
+
+    <target name="clean">
+        <echo>
+            Compilation OPUS [START] ----------------
+        </echo>
+        <echo>JDK ${ant.java.version}  ${ant.version}</echo>
+        <echo> clean </echo>
+
+        <delete dir="${build-opus-ejb}" />
+        <delete dir="${build-opus-war}" />
+
+        <echo> clean done </echo>
+    </target>
+
+    <tstamp>
+        <format property="dateDuJour" pattern="dd/MM/yyyy hh:mm aa" />
+    </tstamp>
+
+    <target name="init" depends="clean">
+        <echo> initialisation ${dateDuJour} </echo>
+
+        <mkdir dir="${build-opus-war}"/>
+        <mkdir dir="${build-opus-war}/WEB-INF"/>
+        <mkdir dir="${build-opus-war}/WEB-INF/lib"/>
+        <mkdir dir="${build-opus-war}/WEB-INF/classes"/>
+        <mkdir dir="${build-opus-war}/WEB-INF/classes/META-INF"/>
+
+        <mkdir dir="${build-opus-ejb}"/>
+
+        <echo file="${webcontent.dir}/dateBuild.txt" append="false" message="${dateDuJour}" />
+
+        <copy todir="${build-opus-war}/">
+            <fileset dir="${webcontent.dir}" excludes="WEB-INF/**"/>
+        </copy>
+        <copy todir="${build-opus-war}/WEB-INF/lib/">
+            <fileset dir="${basedir}/lib" />
+        </copy>
+
+        <copy file="../opus-ejb/src/java/project.properties" tofile="${build-opus-ejb}/project.properties" />
+        <copy file="../opus-ejb/src/java/apj.properties" tofile="${build-opus-ejb}/apj.properties" />
+        <copy file="../opus-ejb/src/java/ressources/text.properties" tofile="${build-opus-ejb}/java/resources/text.properties" />
+        <copy file="../opus-ejb/src/java/ressources/text_zh.properties" tofile="${build-opus-ejb}/java/resources/text_zh.properties" />
+
+        <echo> initialisation done </echo>
+    </target>
+
+    <target name="compile" depends="init">
+        <echo> compilation EJB </echo>
+        <javac srcdir="../opus-ejb/src/java" destdir="${build-opus-ejb}" nowarn="true" debug="on" deprecation="off" classpathref="classpath" includeantruntime="false" encoding="iso-8859-1">
+        </javac>
+        <copy todir="${build-opus-ejb}">
+            <fileset dir="../opus-ejb/src/java">
+                <include name="**/*.template"/>
+                <include name="**/*.txt"/>
+            </fileset>
+        </copy>
+        <echo> compilation EJB done </echo>
+    </target>
+
+    <target name="buildEjbJar" depends="compile">
+        <echo>Build EJB JAR</echo>
+        <jar basedir="${build-opus-ejb}" destfile="${buildEar.dir}/${opus-jarname}" />
+        <copy file="${buildEar.dir}/${opus-jarname}" todir="${build-opus-war}/WEB-INF/lib/" />
+        <echo>End Build EJB JAR</echo>
+    </target>
+
+    <target name="compileWar" depends="buildEjbJar">
+        <echo> compilation WAR </echo>
+        <javac srcdir="../opus-war/src/java" destdir="${build-opus-war}/WEB-INF/classes/" nowarn="true" debug="on" deprecation="off" classpathref="classpath" includeantruntime="false" encoding="iso-8859-1">
+            <classpath>
+                <pathelement location="${buildEar.dir}/${opus-jarname}" />
+            </classpath>
+        </javac>
+        <echo> compilation WAR done </echo>
+    </target>
+
+    <target name="copieProperties" depends="compileWar">
+        <echo> Copie des properties </echo>
+        <copy file="${srcproperties.dir}/text.properties" todir="${build-opus-war}/WEB-INF/classes" />
+        <copy file="${srcproperties.dir}/text_zh.properties" todir="${build-opus-war}/WEB-INF/classes" />
+        <echo> Fin de la copie </echo>
+    </target>
+
+    <target name="deploy" depends="copieProperties">
+        <echo>${env.JBOSS_HOME}</echo>
+        <copy todir="${deploy.dir}/opus.war">
+            <fileset dir="${build-opus-war}">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+        <touch file="${deploy.dir}/opus.war.dodeploy"/>
+        <echo>
+            Compilation OPUS [DONE] ----------------
+        </echo>
+    </target>
+
+</project>

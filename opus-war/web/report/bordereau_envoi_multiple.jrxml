@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="fiche_emargement_mulitple" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="056ce31a-04bc-41d9-94b6-6c072c32e182">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["H:\\BICI\\PDF\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="province" class="java.lang.String"/>
+	<parameter name="NUMERO" class="java.lang.String"/>
+	<field name="centre_examen" class="java.lang.String"/>
+	<field name="date_examen" class="java.util.Date"/>
+	<field name="liste" class="java.util.List"/>
+	<field name="nbCandidat" class="java.lang.String"/>
+	<field name="daty" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="134">
+			<textField isBlankWhenNull="true">
+				<reportElement x="496" y="98" width="306" height="20" uuid="a0160167-923b-45da-804c-28b7750a9ebe"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["- " + $P{province} + " -"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="110" width="60" height="20" uuid="f9b9ccd7-6936-4f6e-9cce-e6e7d2b0805a"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[CENTRE: ]]></text>
+			</staticText>
+			<image>
+				<reportElement x="1" y="3" width="146" height="65" uuid="5f0399a1-a875-4211-97a2-64fd98a4ecb4"/>
+				<imageExpression><![CDATA["logo.jpg"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="496" y="0" width="306" height="43" uuid="94b88f70-6c15-4c87-a1c5-a5757aa6ce08"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<text><![CDATA[Monsieur LE CHEF DE SERVICE PERMIS DE CONDUIRE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="631" y="43" width="28" height="25" uuid="fd59cad0-5916-42e5-89a6-355e99b0d860"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<text><![CDATA[A]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="496" y="68" width="306" height="15" uuid="cd30ac40-0cf7-4738-bc50-bc396b7f9a36"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<text><![CDATA[Monsieur LE CHEF DU CENTRE IMMATRICULATEUR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="496" y="83" width="306" height="15" uuid="921f920d-5af7-4697-baa7-7ff93cdd2446"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<text><![CDATA[DE LA PROVINCE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="222" y="25" width="274" height="33" uuid="79aeddac-8203-41c5-90dd-ce463f5b92bc"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Calibri" size="14" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[BORDEREAU D'ENVOI (BE)]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="61" y="110" width="173" height="20" uuid="2124ea47-1a95-4c42-80d7-abcf95e3e6c8"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{centre_examen}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="93" width="60" height="17" uuid="6a6f7c34-fc8f-42e8-ab2a-a380809c4b1c"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[OBJET:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="61" y="93" width="399" height="17" uuid="e048b7ac-18ce-40f5-abdf-452eba53c66a"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Liste des candidats admis à l'examen technique de Permis de conduire ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="68" width="60" height="27" uuid="b92b55ca-e534-4ccc-a54b-c254189fbe37"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[N°]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="61" y="73" width="239" height="20" uuid="9835467d-015b-495c-ac51-7a83e3c95456"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NUMERO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="207" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="802" height="207" uuid="b06c3b0f-2414-4d13-846d-1309d5a73d21"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{liste})]]></dataSourceExpression>
+				<subreportExpression><![CDATA["bordereau_envoi_simple.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<summary>
+		<band height="139">
+			<textField>
+				<reportElement x="1" y="20" width="536" height="20" uuid="db6d8a10-49bd-4e07-a536-060025d522e7"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Arrêtée la présente fiche au nombre de " + $F{nbCandidat} + " de Permis de conduire"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="496" y="40" width="306" height="20" uuid="adfa29fe-d150-4d29-8aa7-fec85236db8e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{centre_examen} + ", le " + $F{daty}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="496" y="60" width="306" height="15" uuid="70f9122c-97e7-4fce-8f18-04d413d835df"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<text><![CDATA[LE CHEF DU SERVICE DE PERMIS DE CONDUIRE ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="496" y="121" width="306" height="15" uuid="ab2ce555-9f68-4ec3-a414-c53feace0324"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<text><![CDATA[ANDRIANAVALISOLOFO R. Tianasoa]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

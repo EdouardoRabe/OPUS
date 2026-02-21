@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="recap_recette" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="cbf4077b-4a98-412b-8b19-b118fe7c34c5">
+	<property name="ireport.zoom" value="1.771561000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="432"/>
+	<parameter name="COMPTA" class="java.lang.String"/>
+	<parameter name="NUMERO" class="java.lang.String"/>
+	<parameter name="DATE" class="java.lang.String"/>
+	<parameter name="LIEU" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["H:\\BICI\\ATT\\sources\\att-war\\web\\report\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="RECAP_1" class="java.util.List"/>
+	<parameter name="RECAP_2" class="java.util.List"/>
+	<parameter name="RECAP_3" class="java.util.List"/>
+	<parameter name="RECAP_4" class="java.util.List"/>
+	<parameter name="TOTAL_NOMBRE_1" class="java.lang.Double"/>
+	<parameter name="TOTAL_HTVA_1" class="java.lang.Double"/>
+	<parameter name="TOTAL_TVA_1" class="java.lang.Double"/>
+	<parameter name="TOTAL_TTC_1" class="java.lang.Double"/>
+	<parameter name="TOTAL_NOMBRE_2" class="java.lang.Double"/>
+	<parameter name="TOTAL_HTVA_2" class="java.lang.Double"/>
+	<parameter name="TOTAL_TVA_2" class="java.lang.Double"/>
+	<parameter name="TOTAL_TTC_2" class="java.lang.Double"/>
+	<variable name="TOTAL_HTVA_2" class="java.lang.Double"/>
+	<variable name="TOTAL_TVA_2" class="java.lang.Double"/>
+	<variable name="TOTAL_TTC_2" class="java.lang.Double"/>
+	<variable name="TOTAL_HTVA_1" class="java.lang.Double"/>
+	<variable name="TOTAL_TVA_1" class="java.lang.Double"/>
+	<variable name="TOTAL_TTC_1" class="java.lang.Double"/>
+	<variable name="TOTAL_HTVA" class="java.lang.Double">
+		<variableExpression><![CDATA[$P{TOTAL_HTVA_1}+$P{TOTAL_HTVA_2}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_TVA" class="java.lang.Double">
+		<variableExpression><![CDATA[$P{TOTAL_TVA_1}+$P{TOTAL_TVA_2}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_TTC" class="java.lang.Double">
+		<variableExpression><![CDATA[$P{TOTAL_TTC_1}+$P{TOTAL_TTC_2}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="60" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="221" height="15" uuid="bef5c3f6-e43e-417a-b2da-67066cb1c4d1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[AGENCE DES TRANSPORTS TERRESTRES
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="15" width="221" height="15" uuid="ab0ace5d-c080-48c9-813f-6e65929ca79d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[AGENCE COMPTABLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="30" width="221" height="15" uuid="f084dda5-c887-423a-8968-f0814854b7ba"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[DIVISION TRESORERIE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="45" width="221" height="15" uuid="bec468cb-a1d2-405b-86b4-0f838de9475d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[-----------------------------------------
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="299" y="40" width="128" height="20" uuid="90c086e8-8092-4ef4-81bc-c27e707145fb"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Enregistrement comptable : ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="427" y="40" width="128" height="20" uuid="1670562e-382a-4dd5-9017-cd3fc47c0269"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{COMPTA}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="45" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="30" width="29" height="15" uuid="1cb424c9-4997-42d1-b421-ea2834024309"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Lieu:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="15" width="29" height="15" uuid="1ef8bd08-d745-426b-b38f-048517dc0980"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Date:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="299" height="15" uuid="9678cd72-79e8-4bce-86d2-eb250325fc07"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[FICHE DES OPERATIONS DES RECETTES JOURNALIERES
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="311" y="0" width="16" height="15" uuid="86f6de2b-f9f4-48dc-b95b-80b48aeb3a7e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[N:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="327" y="0" width="100" height="15" uuid="37cbb45a-55ab-4b15-b2b9-4bd5f54be4af"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{NUMERO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="29" y="15" width="192" height="15" uuid="49d545b7-2832-4f43-9d6b-3dac2fae800d"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="29" y="30" width="192" height="15" uuid="1e78ceb5-000a-47d5-b48f-95b5ffff56fc"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{LIEU}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="49" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="49" isRemoveLineWhenBlank="true" uuid="9e6d22d0-4e68-4271-a329-d18f955782f1"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{RECAP_1})]]></dataSourceExpression>
+				<subreportExpression><![CDATA["recap_recette_subreport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="42">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="42" isRemoveLineWhenBlank="true" uuid="88bd94b8-45a7-4628-8c86-a4e63e6c33fa"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{RECAP_2})]]></dataSourceExpression>
+				<subreportExpression><![CDATA["recap_recette_subreport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="40">
+			<staticText>
+				<reportElement stretchType="RelativeToTallestObject" x="108" y="0" width="196" height="20" uuid="799fd15e-d251-4b53-8250-13501dda2d83"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Sous-total 1 (Espèces)]]></text>
+			</staticText>
+			<textField pattern="#,###.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="304" y="0" width="48" height="20" uuid="2af65781-18a7-4d83-add8-87c2e1e5c2eb"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_NOMBRE_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="420" y="0" width="68" height="20" uuid="58ba3924-2f4a-432a-b751-affdc7239405"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_TVA_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="488" y="0" width="68" height="20" uuid="facc71dd-dbaf-446f-90cb-26c63aac3023"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_TTC_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="352" y="0" width="68" height="20" uuid="2bcc2668-9398-44d2-aba2-3f51c81e5888"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_HTVA_1}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="35">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="35" isRemoveLineWhenBlank="true" uuid="e78ca30b-3d43-41b4-8ee9-ab8cdf54579d"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{RECAP_3})]]></dataSourceExpression>
+				<subreportExpression><![CDATA["recap_recette_subreport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="46">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="46" isRemoveLineWhenBlank="true" uuid="663287b8-aa53-4d6b-8bca-5b4941cf4311"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{RECAP_4})]]></dataSourceExpression>
+				<subreportExpression><![CDATA["recap_recette_subreport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="39">
+			<staticText>
+				<reportElement stretchType="RelativeToTallestObject" x="108" y="0" width="196" height="20" uuid="30763150-83cf-461e-b3ea-8a6735e646e3"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Sous-total 2 (Banques)]]></text>
+			</staticText>
+			<textField pattern="#,###.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="304" y="0" width="48" height="20" uuid="fccad709-c366-4d99-a203-91166b920378"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_NOMBRE_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="352" y="0" width="68" height="20" uuid="65dfef39-12c6-49b3-b01d-060b37a3339f"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_HTVA_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="420" y="0" width="68" height="20" uuid="91736442-fb5d-4f5c-993d-d0b5c584dd53"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_TVA_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="488" y="0" width="68" height="20" uuid="da226ca0-7839-490b-9ae1-6a23ab0ca0d8"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_TTC_2}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="220" splitType="Stretch">
+			<staticText>
+				<reportElement x="351" y="10" width="204" height="20" uuid="cbfe2a06-3dbb-432b-a2bf-01f348f6f82e"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Recapitulation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="351" y="30" width="68" height="20" uuid="1fe40e56-37ca-4931-b52e-35bd7eeed854"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[HTVA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="419" y="30" width="68" height="20" uuid="365eb5db-19e8-4117-b3cc-b393200eaf99"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[TVA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="487" y="30" width="68" height="20" uuid="b13447a6-2824-4008-8587-6adceba4ca20"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[TTC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="283" y="50" width="68" height="20" uuid="084f548c-aee3-4483-ba0f-e82fb56cd1ae"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Espèces]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="283" y="70" width="68" height="20" uuid="4b4cee9c-d7c5-4325-b605-b3259e956828"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Banques (*)]]></text>
+			</staticText>
+			<textField pattern="#,###.00" isBlankWhenNull="true">
+				<reportElement x="351" y="90" width="68" height="20" uuid="7c4a3988-1828-4881-8e85-82abae56ea0c"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_HTVA_1}+$P{TOTAL_HTVA_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###.00" isBlankWhenNull="true">
+				<reportElement x="419" y="90" width="68" height="20" uuid="56c5850e-d0cc-41b6-a99f-6cb7ce89720d"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_TVA_1}+$P{TOTAL_TVA_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###.00" isBlankWhenNull="true">
+				<reportElement x="487" y="90" width="68" height="20" uuid="124b17c8-a5f1-40dc-bf43-8b0750942fca"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_TTC_1}+$P{TOTAL_TTC_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###.00" isBlankWhenNull="true">
+				<reportElement x="487" y="50" width="68" height="20" uuid="1daee6dd-4734-442d-b6a7-1344f2b3fd09"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_TTC_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###.00" isBlankWhenNull="true">
+				<reportElement x="419" y="70" width="68" height="20" uuid="16ef1295-1036-4248-a744-8592268d35b4"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_TVA_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###.00" isBlankWhenNull="true">
+				<reportElement x="351" y="70" width="68" height="20" uuid="03c759c7-eec5-465b-ae1a-7fda0775b3bb"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_HTVA_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###.00" isBlankWhenNull="true">
+				<reportElement x="419" y="50" width="68" height="20" uuid="674e9209-20a6-474e-a375-4dbeab18863f"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_TVA_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###.00" isBlankWhenNull="true">
+				<reportElement x="487" y="70" width="68" height="20" uuid="9f1889cf-49a1-4eb6-a866-952f4f583228"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_TTC_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###.00" isBlankWhenNull="true">
+				<reportElement x="351" y="50" width="68" height="20" uuid="ac903e6f-5c76-4ce4-b784-1161c2740ac6"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_HTVA_1}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="33" y="135" width="100" height="20" uuid="e6787339-57b1-4cfc-b000-64eaaf008754"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Le caissier]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="412" y="135" width="100" height="20" uuid="1c8617c5-8bd2-4f5e-8c21-62d92af53c97"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[L'Agent Comptable]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="200" width="270" height="20" uuid="4db3f2cf-65c9-459f-b410-3e504b766191"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[(*) Banque: Bordereau de versement reçu auprès de l'ATT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="283" y="90" width="68" height="20" uuid="8bad30a1-e993-4d35-89ac-d3be459c8c40"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

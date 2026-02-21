@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BE-SUPPORT-COMM" pageWidth="595" pageHeight="842" columnWidth="515" leftMargin="40" rightMargin="40" topMargin="20" bottomMargin="20" uuid="e80023a9-31fe-4eb4-98eb-58cc003b0fb5">
+	<property name="ireport.zoom" value="1.0000000000000009"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DATEDUJOUR" class="java.lang.String"/>
+	<field name="numero" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="752" splitType="Stretch">
+			<staticText>
+				<reportElement x="359" y="0" width="156" height="49" uuid="2aa21403-98f3-451d-97eb-2424cc7115d7"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Agence de Transports Terrestres
+Lot II E 2 CG - Iadiambola
+Ampasampito, 101 Antananarivo
+Tél (261) 20 26 213 44 - (261) 34 12 680 09]]></text>
+			</staticText>
+			<image>
+				<reportElement x="0" y="0" width="151" height="60" uuid="4191ad71-ec79-4c5e-b7e8-3fb3852883e7"/>
+				<imageExpression><![CDATA["logo.jpg"]]></imageExpression>
+			</image>
+			<line>
+				<reportElement x="0" y="59" width="515" height="1" uuid="113493bd-f0c3-470d-b18a-e997f69e9698"/>
+			</line>
+			<textField>
+				<reportElement x="0" y="107" width="192" height="20" uuid="13cb58d9-a4d9-4714-92ad-10e82501afbe"/>
+				<textFieldExpression><![CDATA["N°: "+$F{numero}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="259" y="87" width="256" height="20" uuid="200e5b03-87ae-4920-a854-05124bea33fa"/>
+				<textFieldExpression><![CDATA["Antananarivo, le "]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="259" y="127" width="224" height="34" uuid="3fd81eeb-f992-42ab-96ad-d9db73bd4fba"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Le Directeur Général de l’Agence des Transports Terrestres]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="259" y="179" width="224" height="32" uuid="1e130ddd-385e-4c51-96c4-f86e8f523820"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Monsieur le Ministre des Transports, du Tourisme et de la Météorologie]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="259" y="160" width="224" height="20" uuid="92df6406-89bb-48ff-afa4-c603e790d176"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[à]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="228" width="515" height="20" uuid="b7655919-708a-4419-9db7-c5caf183dc88"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BORDEREAU D'ENVOI]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="274" width="259" height="30" uuid="9ce89f31-91a7-47f7-b00e-0ea45bc79baa"/>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Désignation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="259" y="274" width="86" height="30" uuid="ced4b3d7-143d-4b24-939e-34f30e3c335e"/>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Nombre]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="345" y="274" width="170" height="30" uuid="9902cece-bf46-4f7c-b11e-6b9424fe34dd"/>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Observation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="304" width="259" height="176" uuid="99518d76-47aa-4090-8f4e-4f4c5043826c"/>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Top">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[
+    -Dossier de présentation du projet
+    -Copie du contrat
+    -Liste des véhicules
+    -Copie du cahier de charges déjà signé par le promoteur
+    -Copie des quittances de paiement
+    -Copie de la convention entre  l’ATT et le promoteur
+    -Agréments]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="259" y="304" width="86" height="176" uuid="a2241b3e-0877-43af-b410-a667366405bd"/>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="345" y="304" width="170" height="176" uuid="2da23e91-03d0-4666-8f6f-0fde8df27664"/>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[
+Transmis]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="345" y="339" width="170" height="20" uuid="7b9be2d2-9b83-4d1f-a0e1-55b5938d9d16"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[" pour compétence "]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="259" y="518" width="224" height="42" uuid="e5e37557-89f0-4013-93fa-c041ef69f4c4"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Le Directeur Général de l’Agence des Transports Terrestres
+]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DEMANDE_LICENCE" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bd498a7d-cbea-4674-a589-302f032636ac">
+	<property name="ireport.zoom" value="2.662000000000002"/>
+	<property name="ireport.x" value="169"/>
+	<property name="ireport.y" value="1440"/>
+	<parameter name="MENTION_1" class="java.lang.String"/>
+	<parameter name="MENTION_2" class="java.lang.String"/>
+	<parameter name="MENTION_3" class="java.lang.String"/>
+	<parameter name="TITRE_NOM_PRE" class="java.lang.String"/>
+	<parameter name="DATE_DEM" class="java.lang.String"/>
+	<parameter name="LIGNE_I" class="java.lang.String"/>
+	<parameter name="LIGNE_II" class="java.lang.String"/>
+	<parameter name="IMMATRICULATION" class="java.lang.String"/>
+	<parameter name="PUISSANCE" class="java.lang.String"/>
+	<parameter name="ENERGIE" class="java.lang.String"/>
+	<parameter name="DATE_MISE_CIRCULATION" class="java.lang.String"/>
+	<parameter name="AFFILIE" class="java.lang.String"/>
+	<parameter name="DOMICILE" class="java.lang.String"/>
+	<parameter name="DATE_EXPLOITATION" class="java.lang.String"/>
+	<parameter name="DATE_DEBUT" class="java.lang.String"/>
+	<parameter name="DATE_FIN" class="java.lang.String"/>
+	<parameter name="LIEU" class="java.lang.String"/>
+	<parameter name="DATE" class="java.lang.String"/>
+	<parameter name="NUMERO_SERIE" class="java.lang.String"/>
+	<parameter name="NUMERO_MOTEUR" class="java.lang.String"/>
+	<parameter name="NOMBRE_PLACE" class="java.lang.String"/>
+	<parameter name="MARQUE" class="java.lang.String"/>
+	<parameter name="TYPE" class="java.lang.String"/>
+	<parameter name="POID_TOTAL" class="java.lang.String"/>
+	<parameter name="ZONE" class="java.lang.String"/>
+	<parameter name="UTILISATEUR" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="802" splitType="Stretch">
+			<frame>
+				<reportElement x="36" y="37" width="482" height="164" uuid="334d38aa-469c-46f1-b2a2-0db9da5861a1"/>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="11" width="482" height="12" uuid="3fcacbc2-92ad-4114-b85c-90b9adccf652"/>
+					<textElement textAlignment="Center">
+						<font size="8" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{MENTION_2}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="22" width="482" height="12" uuid="aed4b165-5af5-4f98-bdd6-9e1c6d04fc9a"/>
+					<textElement textAlignment="Center">
+						<font size="8" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{MENTION_3}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="35" width="482" height="15" uuid="2b2af638-fbac-48fa-ae40-263f3ec70625"/>
+					<textElement>
+						<font size="11" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Par la présente licence,]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="44" y="50" width="438" height="12" uuid="4880f2ca-6bf8-41a4-868d-b43f1eda0115"/>
+					<textElement>
+						<font size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{TITRE_NOM_PRE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="118" y="62" width="50" height="13" uuid="ce525547-4b18-4580-b640-e3dfc371a345"/>
+					<textElement>
+						<font size="8" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{DATE_DEM}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="80" width="110" height="9" uuid="65ae0a8b-4bf6-498e-a526-10dd344b9690"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<text><![CDATA[Par le véhicule désigné ci-après :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="88" width="37" height="9" uuid="43021419-dd47-48f9-87b2-2b35b69fdcaf"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Véhicule n° :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="96" width="35" height="9" uuid="52465f1c-3a79-49eb-8e65-1ae915763e37"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Puissance :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="104" width="26" height="9" uuid="e8259e93-5eeb-4277-97a7-1d9baac7ba47"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Energie :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="121" width="95" height="9" uuid="56ef7f7c-bb7b-4734-893e-7bf742f007ef"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Affilié à la Coopérative / Société :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="129" width="44" height="9" uuid="21e846c2-6b8b-41d2-acea-6fdb91dc7a2c"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Domiciliée à :]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="145" width="312" height="9" uuid="98cf0b34-1d56-4cc1-aff5-15ff2d6f2646"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["La présente licence est valable du " +  $P{DATE_DEBUT} + " au " + $P{DATE_FIN}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="44" y="88" width="80" height="9" uuid="0f047105-d920-4308-9e96-9fcfc9c0553d"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{IMMATRICULATION}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="44" y="96" width="80" height="9" uuid="91e4de81-3147-49c2-8cad-64eaf8c44bbd"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{PUISSANCE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="32" y="104" width="92" height="9" uuid="12319173-12dd-4606-a867-76c8c379a766"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{ENERGIE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="44" y="129" width="268" height="9" uuid="8ab04ab7-f0db-465c-ad66-9b314a2c69a8"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{DOMICILE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="96" y="121" width="202" height="9" uuid="6dbfe44c-027f-4c99-8e2c-d143931ecf4d"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{AFFILIE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="175" y="137" width="106" height="9" uuid="9bdc25a8-9ffb-450b-a2e5-e0b780c434ad"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{DATE_EXPLOITATION}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="312" y="104" width="85" height="9" uuid="e80f34c6-27fa-4c22-9c98-11e958992af8"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Nombre de places payantes :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="312" y="88" width="52" height="9" uuid="774aa280-8cad-4cc4-b1ae-4497c8babda3"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Numéro de série :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="312" y="96" width="52" height="9" uuid="23ff0fa1-3208-4c62-9ecc-aaeab42c4d43"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Numéro moteur :]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="364" y="88" width="108" height="9" uuid="b433923d-f41c-4d69-a4ed-8eb17f46d1bf"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{NUMERO_SERIE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="364" y="96" width="108" height="9" uuid="fb7603e5-765b-4932-aa2c-fa3cb7f68986"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{NUMERO_MOTEUR}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="397" y="104" width="76" height="9" uuid="243bfb45-1b9e-4763-ab00-537ea4161aee"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{NOMBRE_PLACE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="223" y="104" width="80" height="9" uuid="d0000760-ecba-417a-be6e-90d01b1afc8c"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{POID_TOTAL}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="132" y="104" width="90" height="9" uuid="db768a5d-6957-441e-b10b-89a78ac90370"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Poids total autorisé en charge :]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="162" y="88" width="150" height="9" uuid="c8e6783b-6e20-4395-b549-9210ef9c2751"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{MARQUE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="162" y="96" width="150" height="9" uuid="6d027261-c7f8-4a68-8290-59b875f7ef45"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{TYPE}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="132" y="88" width="30" height="9" uuid="956ad9d8-81cb-433c-a068-92b1d18d559d"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Marque :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="132" y="96" width="20" height="9" uuid="d6619b7e-f0a5-4535-8e27-5c7c40e5217a"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Type :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="50" width="44" height="12" uuid="94ab9f4e-2498-4fb5-9c70-96e1354282a6"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Mr/Mme]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="62" width="118" height="13" uuid="ce162ebf-9bf6-4751-8320-a704d143ac23"/>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Suite à sa demande en date du]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="168" y="62" width="200" height="13" uuid="ad7cf043-7c2d-4719-b6a9-f316f91f114e"/>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[est, autorisé(e) à exploiter la (les) ligne(s) :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="113" width="110" height="8" uuid="9fe64940-e368-4730-9797-63ce9087f6bd"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Date de première mise en circulation :]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="110" y="112" width="100" height="9" uuid="1a6c9f4e-534c-4300-adb0-dec2e87b6890"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{DATE_MISE_CIRCULATION}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<textField isBlankWhenNull="true">
+				<reportElement x="348" y="182" width="170" height="9" uuid="65f9f654-0e00-42f1-b057-bd605e907f3e"/>
+				<textElement textAlignment="Right">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Fait à " +  $P{LIEU} + ", le " + $P{DATE} + " par " + $P{UTILISATEUR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="36" y="37" width="482" height="12" uuid="5d2fbb23-e7b0-4e2a-b75c-7a3591651b31"/>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{MENTION_1}]]></textFieldExpression>
+			</textField>
+			<frame>
+				<reportElement x="36" y="560" width="482" height="164" uuid="dd8cdd59-953b-4ae1-b83e-f0fc962682ae"/>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="11" width="482" height="12" uuid="8f02b0a2-83f1-40ef-a506-3713bf2d538e"/>
+					<textElement textAlignment="Center">
+						<font size="8" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{MENTION_2}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="22" width="482" height="12" uuid="1daad2d1-ffef-422c-a6b7-d2f1a0753531"/>
+					<textElement textAlignment="Center">
+						<font size="8" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{MENTION_3}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="35" width="482" height="15" uuid="f4a70901-bcbe-4e05-b453-1f835e6515ca"/>
+					<textElement>
+						<font size="11" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Par la présente licence,]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="78" width="110" height="9" uuid="0b90b393-7833-4da1-82b3-7805aabbb751"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<text><![CDATA[Par le véhicule désigné ci-après :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="86" width="37" height="9" uuid="c86b8e9e-0f52-4a71-bde2-adcb6e4be2c2"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Véhicule n° :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="94" width="35" height="9" uuid="0d5cc79c-0e2f-4f43-a43f-e1b2ae95020e"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Puissance :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="110" width="110" height="9" uuid="ece49dda-52a2-48a6-8e87-ce18c7d6b450"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Date de première mise en circulation :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="102" width="27" height="9" uuid="433801fa-7cd2-4b8f-b695-5950d377cb68"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Energie :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="118" width="95" height="9" uuid="df61411c-dc15-4c96-ab65-d304dbec1d10"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Affilié à la Coopérative / Société :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="126" width="44" height="9" uuid="a41bff69-9821-4864-a312-5d600c0bc18a"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Domiciliée à :]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="142" width="312" height="9" uuid="ab71981d-827e-4048-a7ca-0c8001c038dc"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["La présente licence est valable du " +  $P{DATE_DEBUT} + " au " + $P{DATE_FIN}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="37" y="86" width="80" height="9" uuid="d9148af3-b97c-48da-a34e-d74af4a157d7"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{IMMATRICULATION}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="35" y="94" width="80" height="9" uuid="a1c50e6f-0ea2-40d0-be43-d1cd9b693b0d"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{PUISSANCE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="27" y="102" width="92" height="9" uuid="47bcb065-0146-4a90-abfa-da2f04d2c8d2"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{ENERGIE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="44" y="126" width="268" height="9" uuid="f3fc75b0-cfc5-40a9-892a-73b4630e3a9a"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{DOMICILE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="110" y="110" width="188" height="9" uuid="80397d1d-811e-465f-a673-139b93113ad3"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{DATE_MISE_CIRCULATION}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="96" y="118" width="202" height="9" uuid="1f7b4e60-8547-42ec-b3d9-93928c772a42"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{AFFILIE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="175" y="134" width="106" height="9" uuid="dd6fc591-0cbf-455d-9d0e-5a038cfa2866"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{DATE_EXPLOITATION}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="312" y="102" width="85" height="9" uuid="a26fc910-625a-41bc-a60c-ff4e793e3d80"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Nombre de places payantes :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="312" y="86" width="52" height="9" uuid="064f9589-cb25-44e7-89c8-12b54e63b95a"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Numéro de série :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="312" y="94" width="52" height="9" uuid="a98eec1e-4c75-423f-a704-7b7c3999f473"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Numéro moteur :]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="364" y="86" width="108" height="9" uuid="bdc9d30d-4589-4d5f-9017-79476991dd88"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{NUMERO_SERIE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="364" y="94" width="108" height="9" uuid="2b1e92cc-c2db-4bb2-b3d6-96ac5c9fbb06"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{NUMERO_MOTEUR}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="397" y="102" width="76" height="9" uuid="0754a016-c669-4aaf-82ef-4d9c1af27ca5"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{NOMBRE_PLACE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="223" y="102" width="80" height="9" uuid="03d86176-87a7-4fa7-b7e9-46b67f6fc3e0"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{POID_TOTAL}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="132" y="102" width="90" height="9" uuid="a4e7efe5-e6b1-4272-8133-9e2fa932e871"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Poids total autorisé en charge :]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="162" y="86" width="150" height="9" uuid="b9ee97bf-97b0-45bc-92ce-4fb2fd6969af"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{MARQUE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="162" y="94" width="150" height="9" uuid="a859dfef-a0e4-4a89-8eb6-71213849f6f4"/>
+					<textElement>
+						<font size="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{TYPE}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="132" y="86" width="30" height="9" uuid="e32ede00-ff6f-40a2-afba-8538da93e870"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Marque :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="132" y="94" width="20" height="9" uuid="7f910163-cf6d-4555-b16c-c2ec522b11a6"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Type :]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="482" height="12" uuid="1f942877-13ac-4e95-98f3-a33fcb90054b"/>
+					<textElement textAlignment="Center">
+						<font size="8" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{MENTION_1}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="312" y="142" width="170" height="9" uuid="1c4eb72e-843c-496d-b2c8-2e40c3f7b50f"/>
+					<textElement textAlignment="Left">
+						<font size="6" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Fait à " +  $P{LIEU} + ", le " + $P{DATE} + " par " + $P{UTILISATEUR}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="134" width="175" height="9" uuid="25d89292-385f-4304-bb7e-a6a5e498f45b"/>
+					<textElement>
+						<font size="6" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Date de la première exploitation dans la " +$P{ZONE} + " :"]]></textFieldExpression>
+				</textField>
+			</frame>
+			<textField isBlankWhenNull="true">
+				<reportElement x="36" y="174" width="175" height="9" uuid="c6100a0f-3f78-4b56-a1fb-c6039742570f"/>
+				<textElement>
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date de la première exploitation dans la " +$P{ZONE} + " :"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="80" y="610" width="438" height="12" uuid="377cbc3b-bbca-4dd1-8030-c66a2f436a8d"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TITRE_NOM_PRE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="36" y="610" width="44" height="12" uuid="7cea9783-9afb-44f1-9881-f74593961a04"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Mr/Mme]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="154" y="622" width="50" height="13" uuid="7ab2018a-a1d8-4682-ab56-363b805b0326"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DATE_DEM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="204" y="622" width="200" height="13" uuid="0aab6d28-3f5a-4f4e-8a62-bcb063ae283a"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[est, autorisé(e) à exploiter la (les) ligne(s) :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="36" y="622" width="118" height="13" uuid="e8052ca1-c5bd-402c-915c-6364f7e56be9"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Suite à sa demande en date du]]></text>
+			</staticText>
+		</band>
+	</title>
+</jasperReport>

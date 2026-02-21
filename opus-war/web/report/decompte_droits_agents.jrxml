@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="decompte_droits_agents" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="36d99819-3d20-4a07-980a-91f7957818cc">
+	<property name="ireport.zoom" value="1.6105100000000008"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="96"/>
+	<parameter name="ANNEE" class="java.lang.String"/>
+	<parameter name="DATE_MIN" class="java.lang.String"/>
+	<parameter name="DATE_MAX" class="java.lang.String"/>
+	<parameter name="AGENT" class="java.lang.String"/>
+	<parameter name="SOMME_LETTRE" class="java.lang.String"/>
+	<field name="datepaiement" class="java.lang.String"/>
+	<field name="id" class="java.lang.String"/>
+	<field name="immatriculation" class="java.lang.String"/>
+	<field name="montant" class="java.lang.Double"/>
+	<field name="montant_30" class="java.lang.Double"/>
+	<field name="agent_verbalisateur" class="java.lang.String"/>
+	<variable name="TOTAL" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{montant}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_30" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{montant_30}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="84" splitType="Stretch">
+			<staticText>
+				<reportElement x="378" y="15" width="177" height="15" uuid="60cd3f34-78f8-47c5-a41c-ccd5bd7154c3"/>
+				<textElement textAlignment="Right" verticalAlignment="Top"/>
+				<text><![CDATA[Lot II E 2 CG Iadiambola]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="378" y="0" width="177" height="15" uuid="a62cf79e-814a-4b5d-8891-065d95dd54ce"/>
+				<textElement textAlignment="Right" verticalAlignment="Top"/>
+				<text><![CDATA[Agence des Transports Terrestres]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="378" y="30" width="177" height="15" uuid="c5267660-d864-4e1e-9ba5-f1092dfa5e8a"/>
+				<textElement textAlignment="Right" verticalAlignment="Top"/>
+				<text><![CDATA[Ampasampito - Antananarivo 101]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="337" y="45" width="218" height="15" uuid="99051ea3-49df-4d10-8f89-11e6150ac36b"/>
+				<textElement textAlignment="Right" verticalAlignment="Top"/>
+				<text><![CDATA[Tél. (261) 20 26 213 44 - (261) 34 12 680 09]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="55" y="60" width="468" height="24" uuid="5ce21716-a2bc-4f1a-a12d-d59be346e950"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[DECOMPTE DES DROITS DES AGENTS VERBALISATEURS]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="63" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="12" width="134" height="17" uuid="8c3d8ca8-b364-4970-afd1-ef5937c1980c"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Année : " + $P{ANNEE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="29" width="319" height="17" uuid="08e138e7-57e1-4948-b836-64b3c326301d"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Période : du " + $P{DATE_MIN} + " au " + $P{DATE_MAX}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="46" width="319" height="17" uuid="a8ca1b32-923b-40eb-a3d7-b3de0d6fc733"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Agent verbalisateur : " + $P{AGENT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="51" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="15" width="97" height="36" uuid="1e4e3a38-c9d0-45a4-bba5-74be29d121ba"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="97" y="15" width="97" height="36" uuid="bbe74989-7eb5-4a5d-a803-cc1f55696f76"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[N° ATT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="194" y="15" width="115" height="36" uuid="cc5f11f4-41ed-43ce-ae2d-e90e188ff8be"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[N° VEHICULE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="309" y="15" width="123" height="36" uuid="862d5fe2-bd78-4a30-aa84-1d2646806585"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[MONTANT (Ar)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="432" y="15" width="123" height="36" uuid="b8baaad6-b48d-414f-9b66-deb360819229"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Agent Verbalisateur 30%]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="97" height="20" uuid="f80d96b7-27d6-481f-8245-62ed533475ed"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{datepaiement}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="97" y="0" width="97" height="20" uuid="13936246-e804-47b8-935b-92d0e0d7ded1"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{id}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="194" y="0" width="115" height="20" uuid="7b69b373-856e-4627-b980-d20689353970"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{immatriculation}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="309" y="0" width="123" height="20" uuid="69fb6a9c-b66a-4a93-9c9d-41380783aed4"/>
+				<box rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{montant}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="432" y="0" width="123" height="20" uuid="3155d5cc-19cf-4fdd-8245-a50028c69899"/>
+				<box rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{montant_30}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="309" height="20" uuid="88b41be9-b04f-45f5-a7eb-bc9aee20b91a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAUX]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="309" y="0" width="123" height="20" uuid="7cbf5d66-6bec-4b30-b5a3-7ea78013998d"/>
+				<box rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="432" y="0" width="123" height="20" uuid="5fc8f728-6ac9-4523-bc7f-4a104aa772d0"/>
+				<box rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL_30}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="66" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="31" width="555" height="35" uuid="1fe6114b-5d0c-490c-8d57-3f4c90fd8474"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Arrêté le présent décompte à la somme de " + $P{SOMME_LETTRE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="187" splitType="Stretch">
+			<staticText>
+				<reportElement x="161" y="23" width="176" height="48" uuid="14c2709c-1734-4db7-b8bc-0be10acc1377"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Le Directeur des Infrastructures et des Normes]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="379" y="23" width="176" height="48" uuid="d8716acd-a9d3-4cc2-a4e0-594d23e9b5b4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Le Directeur Administratif et Financier]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="161" y="139" width="176" height="48" uuid="896788e0-2b51-40df-adfc-26ad425fe379"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[RAZAFIMAHENINA FILS Kotoarivony]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="378" y="139" width="176" height="28" uuid="c58e85f7-abf3-4189-b157-a20b5923baa1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[RAVOAVY A. Faly Miadana]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

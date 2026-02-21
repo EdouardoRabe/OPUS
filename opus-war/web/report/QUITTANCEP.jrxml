@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="QUITTANCEP" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bfa3a6c2-c43e-4f9e-bc32-b1895d870c3f">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="ireport.zoom" value="1.2100000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="daty" class="java.lang.String"/>
+	<parameter name="montant" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="id" class="java.lang.String"/>
+	<field name="idnature" class="java.lang.String"/>
+	<field name="idobjet" class="java.lang.String"/>
+	<field name="idtiers" class="java.lang.String"/>
+	<field name="montant" class="java.lang.Double"/>
+	<field name="datypaiement" class="java.sql.Date"/>
+	<field name="categories" class="java.lang.String"/>
+	<field name="total" class="java.lang.Double"/>
+	<field name="idautoecole" class="java.lang.String"/>
+	<field name="recubni" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="398" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="81" width="555" height="1" uuid="c92cea52-e5ca-4d33-baf8-1d3b6263905f"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="19" y="163" width="112" height="15" uuid="adc92256-5091-48f3-b981-7d841d704c73"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[NOM DU CANDIDAT :]]></text>
+			</staticText>
+			<textField pattern="MGA #,##0.00">
+				<reportElement x="318" y="263" width="191" height="15" uuid="21d7dbaa-a698-4306-9400-581a2cd69c57"/>
+				<textFieldExpression><![CDATA[$F{total} + " MGA"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="251" y="278" width="111" height="15" uuid="776870c1-c328-488d-90ae-a6b058c0c7c1"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ANTANANARIVO, LE :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="19" y="133" width="67" height="15" uuid="8441e8e3-c1a3-4722-b127-7451c057edb0"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[N° DOSSIER :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="262" y="305" width="247" height="15" uuid="7a47738e-b4c2-433d-892c-ff29b9710ea9"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[CACHET ET SIGNATURE DU CAISSIER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="188" y="15" width="156" height="41" uuid="865c775f-99d9-4860-a9bc-52040786f9ed"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Agence de Transports Terrestres
+Lot II E 2 CG - Iadiambola
+Ampasampito, 101 Antananarivo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="251" y="263" width="67" height="15" uuid="980d39fd-d236-442a-ba37-988601efadb9"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[MONTANT :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="241" y="82" width="85" height="15" uuid="589f475e-49dd-4ea0-bdab-539ea6f421a5"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[N° QUITTANCE :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="19" y="148" width="38" height="15" uuid="d1f4abdf-2c44-4a37-908e-f287f7d8983d"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[TYPE :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="86" y="133" width="469" height="15" uuid="4c83fdb6-0957-4030-999f-69667e1b5015"/>
+				<textFieldExpression><![CDATA[$F{id}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="326" y="82" width="186" height="15" uuid="5f8d9985-559e-4a6a-ba17-be92b2598207"/>
+				<textElement markup="html"/>
+				<textFieldExpression><![CDATA[$F{id}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="362" y="278" width="147" height="15" uuid="54811975-1f5b-41fc-a6db-efd5a7ca98a8"/>
+				<textFieldExpression><![CDATA[$F{datypaiement}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="131" y="163" width="424" height="15" uuid="b5693dc5-3022-4629-bc00-ddfa6eefb259"/>
+				<textFieldExpression><![CDATA[$F{idtiers}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="57" y="148" width="498" height="15" uuid="d41c564e-7f7c-4cdf-ba12-df6d0bfacd1f"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{idnature}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="555" height="1" uuid="ad011f2c-54b4-488f-9a48-5b693e9e95c8"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</line>
+			<image>
+				<reportElement x="0" y="1" width="188" height="80" uuid="3f458228-62ab-4325-b386-1a0823b00d40"/>
+				<imageExpression><![CDATA["logo.jpg"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="19" y="178" width="101" height="15" uuid="1b38e455-0b0b-4805-8c93-091e75db3ece"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[PIECE D'IDENTITE :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="120" y="178" width="434" height="15" uuid="b3c28151-f2ad-4179-ab87-cfa9ecef6ec4"/>
+				<textFieldExpression><![CDATA[$F{idobjet}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="19" y="193" width="71" height="15" uuid="77ef5c44-f46c-4135-ad32-6cb8a84e456a"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[CATEGORIE :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="90" y="193" width="464" height="15" uuid="6f7fa352-472c-451b-a186-d499958128ec"/>
+				<textFieldExpression><![CDATA[$F{categories}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="208" width="464" height="15" uuid="dfd9e998-0b45-49c3-b401-62add074a7ff"/>
+				<textFieldExpression><![CDATA[$F{idautoecole}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="19" y="208" width="71" height="15" uuid="b4a1eeb4-64dd-48d6-a759-843156e3f30a"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[AUTO-ECOLE :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="19" y="223" width="71" height="15" uuid="640b34a8-6e1a-4ab2-b54c-22b670bc5ceb"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[N° REÇU BNI :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="90" y="223" width="465" height="15" uuid="c77f408b-cecb-4b5f-814e-c9e98571c4a0"/>
+				<textFieldExpression><![CDATA[$F{recubni}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

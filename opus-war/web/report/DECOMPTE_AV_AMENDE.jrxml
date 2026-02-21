@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DECOMPTE_AV_AMENDE" pageWidth="595" pageHeight="842" columnWidth="515" leftMargin="40" rightMargin="40" topMargin="20" bottomMargin="20" uuid="a155dd2d-ddc6-4350-a61a-4b772c98972f">
+	<property name="ireport.zoom" value="1.1"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="annee" class="java.lang.String"/>
+	<parameter name="periode" class="java.lang.String"/>
+	<parameter name="agent" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\Lecons\\BICI\\ATT\\Workspace\\app\\sources\\att-war\\web\\report\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="totalmontant" class="java.lang.String"/>
+	<parameter name="totalav" class="java.lang.String"/>
+	<parameter name="totalavlettre" class="java.lang.String"/>
+	<field name="details" class="java.util.List"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="99" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="0" width="182" height="76" uuid="bcd66998-ff75-493c-b2b3-fe607e09d721"/>
+				<imageExpression><![CDATA["logo.jpg"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="311" y="0" width="204" height="76" uuid="774c6aa2-6d8e-4ee1-ad78-a6b0287b1632"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Agence de Transports Terrestres
+Lot II E 2 CG - Iadiambola
+Ampasampito, 101 Antananarivo
+Tél. (261) 20 26 213 44 – (261) 34 12 680 09]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="79" width="515" height="20" uuid="b224c719-7507-4697-9d10-89aa294ebf10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[DECOMPTE DES DROITS DES AGENTS VERBALISATEURS]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="135" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="15" width="40" height="20" uuid="72f93ea6-3c24-4645-97aa-6a9baafc127a"/>
+				<text><![CDATA[Année :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="35" width="51" height="20" uuid="ca782106-eb38-4eea-a4c7-852edad7266a"/>
+				<text><![CDATA[Période :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="55" width="98" height="20" uuid="aa80fbcd-6d69-4c15-9106-e35721ce33ef"/>
+				<text><![CDATA[Agent verbalisateur:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="40" y="15" width="475" height="20" uuid="579ad6ee-6d31-4bec-ad45-9c73a9889590"/>
+				<textFieldExpression><![CDATA[$P{annee}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="51" y="35" width="464" height="20" uuid="a96d7d70-a3ed-4148-96c8-0ae4df534de2"/>
+				<textFieldExpression><![CDATA[$P{periode}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="98" y="55" width="417" height="20" uuid="16752db6-56f0-4fb3-a334-f4256b053915"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{agent}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="95" width="100" height="40" uuid="23a7560c-60d5-435c-99af-a8d2cbf9c5bc"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["DATE"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="95" width="100" height="40" uuid="bb041503-14c4-4de6-b176-6cbfcb3d04d0"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["N° ATT"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="95" width="100" height="40" uuid="6c206e65-0cc7-42e2-b3b3-3c6583a7bb67"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["N° VEHICULE"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="300" y="95" width="100" height="40" uuid="6319d3a7-7eeb-4c87-8525-cd8449629372"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["MONTANT (AR)"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="400" y="95" width="115" height="40" uuid="a4033b0f-10ef-49cf-9f0f-296a6f15f79c"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["AGENT VERBALISATEUR (AR)"]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="30">
+			<subreport>
+				<reportElement x="0" y="0" width="515" height="30" uuid="f95d73a8-0386-47f5-b885-d28064533cce"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{details})]]></dataSourceExpression>
+				<subreportExpression><![CDATA["SR_DECOMPTE_AV_AMENDE.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="189">
+			<textField>
+				<reportElement x="300" y="0" width="100" height="30" uuid="8a3ab95f-ad58-4a01-be32-1d1ff6fd13ca"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalmontant}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="300" height="30" uuid="1013f40b-2649-4438-a90d-772cbb988c8a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["TOTAUX"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="400" y="0" width="115" height="30" uuid="5e64c113-1727-482b-bb74-5a42a47b56b8"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalav}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="41" width="515" height="32" uuid="6ec7eaa7-6568-4b96-bf2f-df67ed45aece"/>
+				<textFieldExpression><![CDATA["Arrêté le présent décompte à la somme de :"+$P{totalavlettre}+" Ariary"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="100" y="73" width="142" height="29" uuid="ae76ef68-f41b-4c81-b666-6ca8da33af06"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Le Directeur des Infrastructures et des Normes
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="262" y="73" width="149" height="29" uuid="19d8b95f-092f-491b-b559-2c41fe3ca56e"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Le Directeur Administratif et Financier
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="157" width="142" height="29" uuid="a5277133-28a1-4d61-8cc7-0c0ad6155523"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[RAZAFIMAHENINA Fils Kotoarivony
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="273" y="157" width="138" height="29" uuid="75f0f369-46ca-4ee1-9160-e20f6d235ffe"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[RAVOAVY A.  Faly Miadana]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

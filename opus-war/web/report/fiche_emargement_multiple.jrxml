@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="test" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0d74b51e-353f-41b8-8973-e24743737c5c">
+	<property name="ireport.zoom" value="1.1000000000000008"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Users\\Kiady Bezaka\\Desktop\\"]]></defaultValueExpression>
+	</parameter>
+	<field name="centre_examen" class="java.lang.String"/>
+	<field name="date_examen" class="java.util.Date"/>
+	<field name="type_examen" class="java.lang.String"/>
+	<field name="nom_examinateur" class="java.lang.String"/>
+	<field name="listeEmargement" class="java.util.List"/>
+	<field name="salle" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="353" splitType="Stretch">
+			<image>
+				<reportElement x="16" y="0" width="108" height="36" uuid="35bb52d8-1564-4571-b25c-445918cb19f7"/>
+				<imageExpression><![CDATA["logo.jpg"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="367" y="0" width="100" height="12" uuid="f696063c-6a4c-4126-aba1-3b23fa2d7644"/>
+				<textElement>
+					<font size="8" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[CENTRE D'EXAMEN]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="481" y="0" width="100" height="12" uuid="d2457bac-0cf3-47d6-ba77-64fcb506881a"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{centre_examen}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="367" y="12" width="100" height="12" uuid="a84a30cf-6690-43fa-95ea-45b0f92f2698"/>
+				<textElement>
+					<font size="8" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[DATE]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="481" y="12" width="100" height="12" uuid="a06d534b-d63c-4da3-8183-36508fd6ffe9"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{date_examen}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="367" y="24" width="100" height="12" uuid="afee428e-b801-4e2a-85d7-2bf1513ca64e"/>
+				<textElement>
+					<font size="8" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Type d'examen]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="481" y="24" width="100" height="12" uuid="46258d5e-2da5-42e2-b2b5-a8bfaea7c93f"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{type_examen}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="581" y="12" width="89" height="20" uuid="97406ca3-cf6e-4848-a875-06f28bb611f6"/>
+				<textElement>
+					<font size="8" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Nom de l'examinateur:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="670" y="12" width="132" height="20" uuid="e1b30cd5-79de-4ea8-925d-3abdd0029f68"/>
+			</textField>
+			<subreport>
+				<reportElement x="16" y="48" width="743" height="193" uuid="5dbcbaa3-166e-47be-986d-5efb8d5ed14f"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{listeEmargement})]]></dataSourceExpression>
+				<subreportExpression><![CDATA["fiche_emargement_simple.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement x="626" y="0" width="56" height="12" uuid="d21a094a-9ba8-495a-b708-eda8601827b9"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[SALLE N°:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="184" y="16" width="151" height="20" uuid="13fb93b9-fd5c-408e-9c3a-cdc415e56063"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[FICHE D'EMARGEMENT]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="682" y="0" width="100" height="12" uuid="b9bc49b7-831e-4d02-8def-ea358359d1a0"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{salle}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

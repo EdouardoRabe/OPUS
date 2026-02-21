@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FICHEVERIFICATION" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e9c44792-20db-4520-ae11-6acf107ff1fc">
+	<property name="ireport.zoom" value="0.9090909090909095"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#FFBFBF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Table Dataset 1" uuid="7763472d-9796-448c-81e4-3532a58be352"/>
+	<subDataset name="Table Dataset 2" uuid="6c7407d9-6f64-4b40-a84a-a2f50fb0b15b"/>
+	<parameter name="ID" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="802">
+			<staticText>
+				<reportElement x="399" y="3" width="156" height="76" uuid="158b32a0-92fe-4757-bc32-27cc705efe61"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Agence de Transports Terrestres
+Lot II E 2 CG - Iadiambola
+Ampasampito, 101 Antananarivo]]></text>
+			</staticText>
+			<image>
+				<reportElement x="0" y="0" width="162" height="79" uuid="e853ff0a-1d63-44a7-b059-ba251793900e"/>
+				<imageExpression><![CDATA["logo.jpg"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="0" y="110" width="555" height="35" uuid="fd1ea158-bbfd-4568-aff2-c18b72b432ca"/>
+				<textElement textAlignment="Center">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["FICHE DE VERIFICATION N°"+$P{ID}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="table" x="0" y="165" width="521" height="34" uuid="86c0b705-924a-4552-9f9b-ec4b61924f4e"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[  Dossier détaillé du projet]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="0" y="199" width="521" height="38" uuid="857da590-ee0f-4740-a1da-a4bce6c5d132"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[  Demande de promoteur auprès de MTTM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="0" y="237" width="521" height="38" uuid="49c661fe-1c8a-4c87-ab10-b905a4bf2ab0"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[  Copie des contrats du promoteur avec l’organisme de transport]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="0" y="275" width="521" height="38" uuid="245bdf62-98ed-4eb3-bce4-09d9a206f28b"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[  Copie des contrats du promoteur avec le propriétaire de véhicules ou le gérant de l’infrastructure]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="0" y="313" width="521" height="38" uuid="5da32bf4-587c-4fef-bb81-32839c4dc011"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[  Copie de cartes grises des véhicules]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="0" y="351" width="521" height="38" uuid="833e864a-1ff5-43c7-be67-745c8dc0184a"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[  Copie de Licences des véhicules]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="521" y="165" width="34" height="34" uuid="9fba8dcf-ce8c-4d14-9c2d-7cc8da2f03d9"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="521" y="199" width="34" height="38" uuid="ffd9960f-4459-46ff-a17f-cecd4192c7f2"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="521" y="237" width="34" height="38" uuid="93496bc9-2034-40b2-8cd2-5d9f957de25d"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="521" y="275" width="34" height="38" uuid="822f7fb5-6bf0-4f32-9291-2cd117844594"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="521" y="313" width="34" height="38" uuid="105ac3e1-11c7-4ccb-b920-8e7fcb382c4e"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="521" y="351" width="34" height="38" uuid="4100a04e-af44-4126-ab68-eca94d471688"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="90" width="555" height="1" uuid="9ac51226-6e5a-4750-a5b7-59a3d4daf4df"/>
+			</line>
+			<staticText>
+				<reportElement style="table" x="0" y="389" width="521" height="38" uuid="5c961387-2d7d-4dd8-bbae-1a5b69d2647d"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[  Liste des véhicules ou des infrastructures à utiliser]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="521" y="389" width="34" height="38" uuid="b0e0aa6f-2fd0-4d61-841c-1f4e7d88ef50"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="0" y="427" width="521" height="38" uuid="0866fcbb-786e-42ba-bd92-6eaf890d799c"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[  Cahier des charges]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="521" y="427" width="34" height="38" uuid="85cc32e4-41be-46e4-8752-fbfa0de314d6"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="0" y="465" width="521" height="38" uuid="cdcc4a33-b457-4321-b8eb-7458e168bc6f"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[  Copie du PV d’approbation des gestionnaires d’infrastructures]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="521" y="465" width="34" height="38" uuid="69bbac41-2101-4d2a-8701-a75b39b2d702"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

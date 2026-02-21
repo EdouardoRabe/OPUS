@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="QUITTANCE" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="dcd0b64a-2467-4953-9512-d50f53c2570a">
+	<property name="ireport.zoom" value="1.6105100000000008"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="48"/>
+	<parameter name="QUITTANCE" class="java.lang.String"/>
+	<parameter name="NUMERO_DOSSIER" class="java.lang.String"/>
+	<parameter name="TYPE_ACTE" class="java.lang.String"/>
+	<parameter name="NOM_PROPRIO" class="java.lang.String"/>
+	<parameter name="TYPE_DEMANDE" class="java.lang.String"/>
+	<parameter name="TYPE_REMARQUE" class="java.lang.String"/>
+	<parameter name="REMARQUE" class="java.lang.String"/>
+	<parameter name="PIECE_IDENTITE" class="java.lang.String"/>
+	<parameter name="MONTANT" class="java.lang.String"/>
+	<parameter name="DATE" class="java.lang.String"/>
+	<field name="quittance" class="java.lang.String"/>
+	<field name="numero_dossier" class="java.lang.String"/>
+	<field name="type_acte" class="java.lang.String"/>
+	<field name="nom_proprio" class="java.lang.String"/>
+	<field name="type_demande" class="java.lang.String"/>
+	<field name="type_remarque" class="java.lang.String"/>
+	<field name="remarque" class="java.lang.String"/>
+	<field name="piece_identite" class="java.lang.String"/>
+	<field name="montant" class="java.lang.String"/>
+	<field name="date" class="java.lang.String"/>
+	<field name="autre" class="java.lang.String"/>
+	<field name="demande" class="java.lang.String"/>
+	<field name="autre1" class="java.lang.String"/>
+	<field name="autre2" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="374">
+			<line>
+				<reportElement x="0" y="81" width="555" height="1" uuid="d858df1a-ec29-4f7a-8e10-64451cc9b8d1"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="19" y="163" width="130" height="15" uuid="eea9ebe5-69ad-4e16-b4d0-8c532933dbd4"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[NOM DU PROPRIETAIRE :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="318" y="263" width="191" height="15" uuid="0308267e-86bf-4c23-8dc4-77649520b02a"/>
+				<textFieldExpression><![CDATA[$F{montant} + " MGA"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="251" y="278" width="111" height="15" uuid="81117ae1-23be-45af-bf50-094211e84321"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ANTANANARIVO, LE :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="19" y="133" width="67" height="15" uuid="1aa24a86-ce93-4c96-85bc-dd9afeef2e87"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[N° DOSSIER :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="262" y="305" width="247" height="15" uuid="e95619ed-e14c-4e04-acc8-cc4605f20fe2"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[CACHET ET SIGNATURE DU CAISSIER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="188" y="15" width="156" height="41" uuid="fb025124-f24c-498f-b3da-7d308f18f9bf"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Agence de Transports Terrestres
+Lot II E 2 CG - Iadiambola
+Ampasampito, 101 Antananarivo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="251" y="263" width="67" height="15" uuid="bf108ba7-4607-4e9a-8727-19a0e798f5cd"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[MONTANT :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="241" y="82" width="85" height="15" uuid="e3ced964-88fd-4627-9936-504d6f53e6d5"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[N° QUITTANCE :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="19" y="148" width="67" height="15" uuid="df90357d-5ccc-42c0-9139-ee971907bde6"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[TYPE ACTE :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="86" y="133" width="469" height="15" uuid="6bba2032-1998-47c7-a881-1a0bd8295934"/>
+				<textFieldExpression><![CDATA[$F{numero_dossier}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="19" y="223" width="536" height="15" uuid="6329f6a9-3afa-4edd-9191-500b32cdb0d4"/>
+				<textElement markup="html"/>
+				<textFieldExpression><![CDATA[$F{type_demande}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="326" y="82" width="186" height="15" uuid="f086561d-b27a-4fd0-9e53-32b542c6334a"/>
+				<textElement markup="html"/>
+				<textFieldExpression><![CDATA[$F{quittance}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="96" y="178" width="459" height="15" uuid="7c47757b-ad42-4bef-a071-40f1f78e5581"/>
+				<textFieldExpression><![CDATA[$F{remarque}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="19" y="178" width="77" height="15" uuid="00abca64-8164-4f68-a886-b36a7e91b209"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{type_remarque} + " :"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="362" y="278" width="147" height="15" uuid="caf2f709-a092-4f69-8f6b-ddb1b2490d88"/>
+				<textFieldExpression><![CDATA[$F{date}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="149" y="163" width="406" height="15" uuid="0a6023c0-a027-4545-be73-1d4b4b2e66f7"/>
+				<textFieldExpression><![CDATA[$F{nom_proprio}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="86" y="148" width="469" height="15" uuid="32d932c1-4a8b-4806-9494-379fc849673f"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{type_acte}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="555" height="1" uuid="b3580167-0fcc-435e-bcd2-3f47ead3912d"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</line>
+			<image>
+				<reportElement x="0" y="1" width="188" height="80" uuid="fd20d9f8-84ce-446a-98d4-f8c7c524119b"/>
+				<imageExpression><![CDATA["logo.jpg"]]></imageExpression>
+			</image>
+			<textField isBlankWhenNull="true">
+				<reportElement x="19" y="193" width="536" height="15" uuid="e7fdc3b3-bd53-4413-952f-35c99ed5e75c"/>
+				<textElement markup="html">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{autre}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="19" y="208" width="536" height="15" uuid="87bc00cf-191a-4746-a6fe-f388db5e9189"/>
+				<textElement markup="html">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{autre1}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="19" y="238" width="536" height="15" uuid="48774153-2214-4bfe-be5d-4ff874f26008"/>
+				<textElement markup="html"/>
+				<textFieldExpression><![CDATA[$F{autre2}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

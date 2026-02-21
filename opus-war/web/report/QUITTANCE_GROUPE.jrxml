@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="QUITTANCE_GROUPE" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ac8f83ee-5c40-4a21-8ccc-4ef3802d386e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["H:\\BICI\\ATT\\sources\\att-war\\web\\report\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="QUITTANCE_FICHE" class="java.util.List"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="125" uuid="d5b4c86b-6fd3-4a55-99bf-b4035bcac50e"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{QUITTANCE_FICHE})]]></dataSourceExpression>
+				<subreportExpression><![CDATA["QUITTANCE.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="125">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="125" uuid="a7f34b66-bdd4-43cd-93ca-0af1651e1b1b"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{QUITTANCE_FICHE})]]></dataSourceExpression>
+				<subreportExpression><![CDATA["QUITTANCE.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

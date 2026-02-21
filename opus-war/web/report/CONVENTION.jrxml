@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CONVENTION" pageWidth="595" pageHeight="842" columnWidth="515" leftMargin="40" rightMargin="40" topMargin="20" bottomMargin="20" uuid="43127b59-5376-41f7-a032-91b8e5d3ac24">
+	<property name="ireport.zoom" value="1.6105100000000312"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="656"/>
+	<parameter name="DATE" class="java.lang.String"/>
+	<field name="adresse" class="java.lang.String"/>
+	<field name="dg" class="java.lang.String"/>
+	<field name="societepromoteur" class="java.lang.String"/>
+	<field name="adressepromoteur" class="java.lang.String"/>
+	<field name="promoteur" class="java.lang.String"/>
+	<field name="id" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="802">
+			<staticText>
+				<reportElement x="0" y="97" width="515" height="20" uuid="f0269402-88b6-439a-b646-fa1eb3c7802c"/>
+				<text><![CDATA[Entre les soussignés:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="117" width="515" height="41" uuid="af48e0a7-fab7-471b-8b68-306d27cc508c"/>
+				<textElement textAlignment="Justified">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["L'Agence des Transports Terrestres (ATT), sise au "+$F{adresse}+", représentée par "+$F{dg}+", en sa qualité de Directeur Général, d'une part, ici désignée \" l'ATT \"."]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="158" width="515" height="18" uuid="2e5ee7c4-266b-4dae-9015-369341408c23"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Et]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="176" width="515" height="44" uuid="cdaf633c-3f06-420d-9b29-1b374d673d15"/>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA["La Société " + $F{societepromoteur} + ", sise au lot " + $F{adressepromoteur} + ", représenté par son Directeur Général/Gérant, Monsieur " + $F{promoteur} + " ici dénommé \" Le promoteur \"."]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="220" width="515" height="18" uuid="b80ac0b2-83e9-4828-aff1-615c943db6b5"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[IL A ETE ARRETE ET CONVENU CE QUI SUIT:]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Transparent" x="0" y="269" width="515" height="90" uuid="312f53ea-5c2a-4484-a1fb-1c612552c76a"/>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA["Dans le cadre du développement du transport routier en commun de voyageurs, I'utilisation des véhicules et des infrastructures de transport routier comme support de communication a été adoptée, Outre la considération de ces moyens comme vecteur de messages, cette politique apporte des ressources pérennes aux différentes entités concernées. \nLe Décret n°2016-125 du 23/02/2016 et l\'Arrêté n°8499/2018 du 11/04/2018 ont été ainsi promulgués afin de règlementer l'utilisation des véhicules et les infrastructures de transport routier comme support de communication."]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="249" width="515" height="20" uuid="f4ba5696-e5e7-49a5-a720-334ba3bc10d4"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[PREAMBULE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="359" width="515" height="16" uuid="61db31be-b414-4f10-b7d3-eddb1932cc7a"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[A- DE L'OBJET DE LA CONVENTION:]]></text>
+			</staticText>
+			<textField pattern="">
+				<reportElement x="0" y="375" width="515" height="50" uuid="2861cf21-bf3b-4b8b-8139-bdb6ab12a040"/>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA["Article 1: La présente convention a pour objet de définir les engagements réciproques de l\'ATT et de "+$F{promoteur}+" dans l'habillage publicitaire des véhicules de transport en commun de voyageurs, et cela au vu des : contrats passés par le promoteur et les propriétaires de véhicules, listes des véhicules, du dossier détaillé du projet."]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="386" width="40" height="1" uuid="a342d6ee-7cd5-4962-aed0-d871d6848b44"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="425" width="515" height="16" uuid="5186de34-c5d6-4a64-bf81-1874e2d2bf5c"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[B- DE LA DUREE DE LA CONVENTION:]]></text>
+			</staticText>
+			<textField pattern="">
+				<reportElement x="0" y="441" width="515" height="61" uuid="54a6f47c-5f56-415b-8226-77b6eaab30a3"/>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA["Article 2: La présente convention est conclue pour une période de un (01) an renouvelable. \n\tL'apposition de la date de validité de l\'agrément fait office d\'attestation à l\'arrière du véhicule.\n\tLe renouvellement de la présente fera l\'objet d\'un Avenant."]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="452" width="40" height="1" uuid="25d5bd5c-fc55-490b-ac08-c6298c8e7847"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="502" width="515" height="17" uuid="10528936-0d09-4176-a9d8-3990aadcf31b"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[C- DE L'ENTREE EN VIGUEUR DE LA CONVENTION:]]></text>
+			</staticText>
+			<textField pattern="">
+				<reportElement x="0" y="519" width="515" height="24" uuid="22c2f1e6-3550-4dd9-84bc-e0a55c1902b4"/>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA["Article 3: La présente convention entre en vigueur à la date de sa signature par les parties."]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="530" width="40" height="1" uuid="e6a07e23-cfd6-4f50-a903-85a1bc224003"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="543" width="515" height="16" uuid="d221d61b-7bab-42a9-87ae-102f6be61e57"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[D- DE L'OBLIGATION DES PARTIES:]]></text>
+			</staticText>
+			<textField pattern="">
+				<reportElement x="0" y="559" width="515" height="15" uuid="59f2d2ff-39f1-44ae-9823-992396495725"/>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA["Article 4: L\'ATT a pour obligation de:"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="570" width="40" height="1" uuid="717487c2-7f52-4c7d-9411-5e71de12ef29"/>
+			</line>
+			<staticText>
+				<reportElement x="40" y="574" width="475" height="26" uuid="d553273d-e9d2-4498-8f74-731fb8fb5fc2"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Effectuer la visite de conformité des véhicules à utiliser comme support de communication par le promoteur.]]></text>
+			</staticText>
+			<ellipse>
+				<reportElement x="25" y="579" width="5" height="5" backcolor="#000000" uuid="ca76212d-31c0-42b4-a665-3e640731a005"/>
+			</ellipse>
+			<staticText>
+				<reportElement x="40" y="600" width="475" height="26" uuid="89ffe264-0a0d-4af3-9b6e-31b5ae09580b"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Traiter les dossiers de demande d'utilisation de véhicules comme supports de communication formulés par le promoteur.]]></text>
+			</staticText>
+			<ellipse>
+				<reportElement x="25" y="605" width="5" height="5" backcolor="#000000" uuid="c9526417-048e-4785-901a-2579e6aa2422"/>
+			</ellipse>
+			<ellipse>
+				<reportElement x="25" y="631" width="5" height="5" backcolor="#000000" uuid="20dbab33-34b0-4b0b-a975-ae1810e9c8ee"/>
+			</ellipse>
+			<staticText>
+				<reportElement x="40" y="626" width="475" height="21" uuid="f965d344-469f-402d-a103-e7f18cda2c7e"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Transmettre les dossiers traités du promoteur au Ministère en charge du Transport.]]></text>
+			</staticText>
+			<ellipse>
+				<reportElement x="25" y="652" width="5" height="5" backcolor="#000000" uuid="e51abd9d-9174-4908-a46a-0bb223df04cc"/>
+			</ellipse>
+			<staticText>
+				<reportElement x="40" y="647" width="475" height="32" uuid="3b706315-70ee-4a6f-b547-a5e343959516"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Contrôler Ie respect par le promoteur de la régularité de I'apposition des annonces sur les véhicules et les infrastructures de transport. ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="40" y="679" width="475" height="43" uuid="879af5fb-7158-45ae-b2d9-e15ac8fd8820"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Envoyer un rapport au Ministère des Transports, du Tourisme et de la Météorologie (MTTM) en cas de non respect par le promoteur des conditions d'installation du support de communication sur les véhicules et les infrastructures de transport.]]></text>
+			</staticText>
+			<ellipse>
+				<reportElement x="25" y="684" width="5" height="5" backcolor="#000000" uuid="1037d008-c6ca-43a0-a936-55425a60f8ee"/>
+			</ellipse>
+			<textField pattern="">
+				<reportElement x="0" y="733" width="515" height="15" uuid="2a62546e-065c-408b-bb5a-e8ba4d565685"/>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA["Article 5: Le promoteur s\'engage à:"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="40" y="748" width="475" height="32" uuid="16686b23-6db8-4f35-babc-d5b9a8e32241"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Respecter les procédures de demande d'utilisation des véhicules de transport de voyageurs comme support de communication.]]></text>
+			</staticText>
+			<ellipse>
+				<reportElement x="25" y="753" width="5" height="5" backcolor="#000000" uuid="3701f8c3-89eb-4cb0-9229-1817cb416722"/>
+			</ellipse>
+			<line>
+				<reportElement x="0" y="744" width="40" height="1" uuid="5d5106f1-328b-421d-a46f-8d23565c2205"/>
+			</line>
+			<staticText>
+				<reportElement x="40" y="780" width="475" height="22" uuid="7e3ed277-a55e-4aa3-97a0-0b1548d29ae7"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[S'acquitter de redevance de publicité.]]></text>
+			</staticText>
+			<ellipse>
+				<reportElement x="25" y="785" width="5" height="5" backcolor="#000000" uuid="da67369b-d65c-4bb0-9f3c-3566a758c98f"/>
+			</ellipse>
+			<textField>
+				<reportElement x="0" y="70" width="515" height="27" uuid="44b291b9-31c6-4932-b2d5-d34945f56110"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["CONVENTION N° "+$F{id}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="0" y="0" width="151" height="60" uuid="90f2851e-a5c4-4a1c-8eba-51fae2b9b271"/>
+				<imageExpression><![CDATA["logo.jpg"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="359" y="0" width="156" height="49" uuid="2d06d298-77fb-43ec-b8a4-eaab1b017ec1"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Agence de Transports Terrestres
+Lot II E 2 CG - Iadiambola
+Ampasampito, 101 Antananarivo
+Tél (261) 20 26 213 44 - (261) 34 12 680 09]]></text>
+			</staticText>
+		</band>
+		<band height="802">
+			<staticText>
+				<reportElement x="40" y="25" width="475" height="33" uuid="3ce58dda-8f15-4c8f-910f-e0d525c291a0"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Installer et entretenir les supports de communication sur les véhicules et les infrastructures de transport, conformément au cahier de charges.]]></text>
+			</staticText>
+			<ellipse>
+				<reportElement x="25" y="30" width="5" height="5" backcolor="#000000" uuid="3275d5e0-a911-4f11-8b6b-f19156f035b6"/>
+			</ellipse>
+			<staticText>
+				<reportElement x="40" y="58" width="475" height="33" uuid="1750f2d1-88bc-4fd9-982e-219c0aeff248"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Respecter le cahier de charges relatif à l'installation des annonces publicitaires sur les véhicules de transports.]]></text>
+			</staticText>
+			<ellipse>
+				<reportElement x="25" y="63" width="5" height="5" backcolor="#000000" uuid="a9e54f60-0383-4a75-9ad5-aa3f36934a03"/>
+			</ellipse>
+			<staticText>
+				<reportElement x="40" y="91" width="475" height="21" uuid="0421568d-c3b8-4fc4-a67e-f806cfcc1a5c"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Marquer à l'arrière du véhicule la date de validité de I'agrément.]]></text>
+			</staticText>
+			<ellipse>
+				<reportElement x="25" y="96" width="5" height="5" backcolor="#000000" uuid="6f04e746-1d39-4332-a578-d02ffa1b6927"/>
+			</ellipse>
+			<ellipse>
+				<reportElement x="25" y="117" width="5" height="5" backcolor="#000000" uuid="0212caa4-dbe1-4b0d-a9bc-0755b97eb6bc"/>
+			</ellipse>
+			<staticText>
+				<reportElement x="40" y="112" width="475" height="20" uuid="20ac7046-c50d-404d-99f1-26d6b9bb393e"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Respecter les dispositions réglementaires relatives aux publicités, coutumes et bonnes mæurs.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="40" y="132" width="475" height="33" uuid="779f78ac-feb7-4f70-87b8-c23e6bb77030"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Transmettre au Ministère des Transports, du Tourisme et de la Météorologie (MTTM) et à I'ATT la liste des véhicules et des infrastructures de transport utilisant le support de communication.]]></text>
+			</staticText>
+			<ellipse>
+				<reportElement x="25" y="137" width="5" height="5" backcolor="#000000" uuid="61a542ef-69f0-44b2-bb4d-3df5041dcf1e"/>
+			</ellipse>
+			<staticText>
+				<reportElement x="40" y="165" width="475" height="33" uuid="58467664-7107-4af3-bf97-9e0da72a7480"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Enlever les annonces publicitaires du véhicule à l'expiration de I'autorisation d'utilisation et de l'agrément.]]></text>
+			</staticText>
+			<ellipse>
+				<reportElement x="25" y="170" width="5" height="5" backcolor="#000000" uuid="d8534668-4d12-4833-92a3-9a2dce95747c"/>
+			</ellipse>
+			<staticText>
+				<reportElement x="0" y="198" width="515" height="16" uuid="4dfc4dea-526b-4faa-90d7-193a68cd9730"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[E- DES DROITS DES PARTIES:]]></text>
+			</staticText>
+			<textField pattern="">
+				<reportElement x="0" y="214" width="515" height="15" uuid="340c2dce-fb1c-4177-898a-fa01716af4bd"/>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA["Article 6: Le promoteur a droit à:"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="40" y="229" width="475" height="33" uuid="9da7a155-42fb-4b85-aa1f-763a0f81ad84"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[L'exclusivité du transporteur en ce qui concerne l'utilisation des véhicules comme support de communication, conformément à la liste par lui fournie.]]></text>
+			</staticText>
+			<ellipse>
+				<reportElement x="25" y="234" width="5" height="5" backcolor="#000000" uuid="9027a810-a08f-46ea-a5e4-0f51ddb571c0"/>
+			</ellipse>
+			<ellipse>
+				<reportElement x="25" y="267" width="5" height="5" backcolor="#000000" uuid="0e05f0f1-927a-443a-92d1-72cf0845ea8c"/>
+			</ellipse>
+			<staticText>
+				<reportElement x="40" y="262" width="475" height="23" uuid="0e58eaa1-f124-4132-8e5a-4d4af2e08160"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[L'installation des supports de communication sur les véhicules de transport.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="295" width="515" height="16" uuid="29c2701e-2010-49df-b9f6-5c4f04aa6715"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[F- DES MODALITES DE VERSEMENT DE LA REDEVANCE DE PUBLICITE:]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="225" width="40" height="1" uuid="f2ce42c2-cf97-447f-9d35-5a57f3b32866"/>
+			</line>
+			<textField pattern="">
+				<reportElement x="0" y="311" width="515" height="28" uuid="e5a903a4-a867-4141-b559-aa12b127e491"/>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA["Article 7:  La redevance de publicité est versée à I'ATT par le promoteur à chaque début de contrat signé avec le propriétaire d\'un véhicule de transport en commun de voyageur ou avec le gérant d\'infrastructure de transport."]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="322" width="40" height="1" uuid="36495898-3d06-4685-bd31-e3a54190070c"/>
+			</line>
+			<textField>
+				<reportElement x="0" y="339" width="515" height="31" uuid="174c3ae2-ef1c-4090-a34e-a6624830a217"/>
+				<textFieldExpression><![CDATA["\tLa quittance de paiement de la redevance fera office de pièce justificative et d\'autorisation de port de publicité pour le véhicule."]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="380" width="515" height="16" uuid="53a15e1a-d633-4d3d-96d5-82d6cf84a36e"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[G- DE LA MODIFICATION DE LA CONVENTION:]]></text>
+			</staticText>
+			<textField pattern="">
+				<reportElement x="0" y="396" width="515" height="25" uuid="a7b05562-5be7-4e77-9a3e-c3c4710458c6"/>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA["Article 8:  Toute modification de la présente convention doit faire l'objet d'un avenant."]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="407" width="40" height="1" uuid="e07e3794-1e1c-4234-8401-ab3ca2dc5853"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="421" width="515" height="16" uuid="42d760c6-734f-4109-8916-82b7bbab32ac"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[H- DE LA RESILIATION DE LA CONVENTION:]]></text>
+			</staticText>
+			<textField pattern="">
+				<reportElement x="0" y="440" width="515" height="16" uuid="985e23ae-e404-4f03-a228-1ce002648158"/>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA["Article 9:  La présente convention est réalisée en cas de:"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="451" width="40" height="1" uuid="16412a62-960d-41ab-a83b-a86ea1bd3eb3"/>
+			</line>
+			<ellipse>
+				<reportElement x="25" y="461" width="5" height="5" backcolor="#000000" uuid="ed541185-35bc-4f87-9f60-856a1f8f895e"/>
+			</ellipse>
+			<staticText>
+				<reportElement x="40" y="456" width="475" height="15" uuid="ce6f5a70-878e-4bc4-9d99-c583c809b6ee"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Demande de résiliation formulée par I'une des parties assortie d'un préavis de trois (03) mois. ]]></text>
+			</staticText>
+			<ellipse>
+				<reportElement x="25" y="476" width="5" height="5" backcolor="#000000" uuid="30e95d05-a930-44fe-8a52-bf191f91bdbd"/>
+			</ellipse>
+			<staticText>
+				<reportElement x="40" y="471" width="475" height="41" uuid="e57ab9bc-b8c4-453f-82bd-8fb3336c436f"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Non-exécution totale ou partielle d'une ou de plusieurs engagements de l'une des parties, après lettre de mise en demeure restée infructueuse.Il incombe à la partie lésée de prouver cette inexécution de l'autre partie, à moins qu'elle ait été motivée par des cas fortuits ou de force majeure dûment constatés.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="522" width="515" height="16" uuid="2cc21902-2477-4fc2-bae8-4b6afff47d0e"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[I- DE L'OBLIGATION DE CONFIDENTIALITE:]]></text>
+			</staticText>
+			<textField pattern="">
+				<reportElement x="0" y="538" width="515" height="33" uuid="e89d0c94-2ca9-4b9e-bcc5-1e20606c0d89"/>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA["Article 10:  Chacune des parties s'engage à ne pas divulguer les dispositions de la présente convention et à ne pas les communiquer aux tiers sans I'accord exprès de l'autre partie."]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="549" width="45" height="1" uuid="eacfbbd7-b4ee-4730-979d-7657b84a5f75"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="582" width="515" height="16" uuid="df580e48-026a-48f5-90d9-494e65d1b23d"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[J- DU REGLEMENT DES DIFFERENDS:]]></text>
+			</staticText>
+			<textField pattern="">
+				<reportElement x="0" y="598" width="515" height="28" uuid="d7b4a349-0572-4edc-90ea-138c70800c33"/>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA["Article 11: En cas de différend occasionné par I'interprétation ou de I'exécution de la présente convention, les parties doivent le résoudre amiablement."]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="610" width="45" height="1" uuid="4a358369-9998-4b9b-9389-54ab89193415"/>
+			</line>
+			<textField>
+				<reportElement x="0" y="626" width="515" height="21" uuid="b48ba390-9f44-4470-877d-fb19f796461a"/>
+				<textFieldExpression><![CDATA["\tA défaut d'accord amiable, le Tribunal d'Antananarivo est compétent pour le règlement du litige."]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="30" y="687" width="97" height="16" uuid="12420b77-81e2-4a74-92cc-3732cc1a8439"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Pour le promoteur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="311" y="685" width="174" height="30" uuid="cbff9a27-6ddc-4597-9a1a-084a4097a3e6"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Pour L'AGENCE DES TRANSPORTS TERRESTRES]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="266" y="657" width="249" height="20" uuid="ba8abf2a-854f-4fe5-9c9b-222f79e2cc86"/>
+				<textFieldExpression><![CDATA["Fait à Antananarivo, le "]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

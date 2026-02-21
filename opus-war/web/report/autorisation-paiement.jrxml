@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="autorisation-paiement" pageWidth="595" pageHeight="842" columnWidth="495" leftMargin="50" rightMargin="50" topMargin="40" bottomMargin="20" uuid="0d2b8350-a044-4b8a-89f4-22535e81d700">
+	<property name="ireport.zoom" value="1.6105100000000023"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="508"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["/Volumes/Mahefa/att/sources/att-war/web/report/"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DATE" class="java.lang.String"/>
+	<parameter name="ID" class="java.lang.String"/>
+	<parameter name="SOCIETE" class="java.lang.String"/>
+	<parameter name="ADRESSE" class="java.lang.String"/>
+	<parameter name="PERSONNE" class="java.lang.String"/>
+	<parameter name="SOMME" class="java.lang.String"/>
+	<parameter name="SOMMELIB" class="java.lang.String"/>
+	<parameter name="CONVENTION" class="java.lang.String"/>
+	<parameter name="DATEATT" class="java.lang.String"/>
+	<field name="details" class="java.util.List"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="423" splitType="Stretch">
+			<staticText>
+				<reportElement x="280" y="0" width="215" height="20" uuid="6fd21ce0-6ad6-4443-ab05-bf99b9666a7d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[ Agence des Transports Terrestres]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="20" width="215" height="20" uuid="f7e42a81-6644-4925-9e6d-c884a368e363"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[Lot ll E 2 CG ladiambola]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="39" width="215" height="20" uuid="58be70bb-051a-401f-97ca-cc54fdb7e2b7"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[Ampasampito - Antananarivo 101]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="231" y="59" width="264" height="20" uuid="11a0327f-2fe9-44ef-8896-fcc89d57c695"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[Tél (261) 20 26 213 44 - (261) 34 12 680 09]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="101" width="493" height="20" uuid="327d1b29-0548-46e5-93f6-a9e5bc34c6a2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[AUTORISATION DE PAIEMENT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="145" width="491" height="20" uuid="f21ca4f9-7c85-417c-9d3b-bbe4a31da054"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Décret nº 2016-125 du 23 Février 2016]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="165" width="493" height="20" uuid="d6df7736-86a1-4ea3-9868-ae42cecf8ccc"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Arrêté nº 8499/2018 du 11 Avril 2018]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="222" width="495" height="38" uuid="ca58cb67-8629-4e9e-a0ef-39fb27bd42e9"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA["Relative à I'utilisation des véhicules de transport routier en commun voyageur et des infrastructures comme support de communication ".]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="337" width="493" height="38" uuid="38814c38-5477-4910-b3d5-b6c7a3b95b6d"/>
+				<textElement verticalAlignment="Top">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[est autorisée à payer à la redevance publicitaire selon le détail ci-après et la liste proposée en annexe.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="112" y="389" width="168" height="34" uuid="b9d57d7e-ee36-4ac4-bc55-81c8f691e5e6"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Rubrique]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="280" y="389" width="40" height="34" uuid="61a98223-18d7-4eae-b181-7a17325805ee"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Nombre]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="412" y="389" width="83" height="34" uuid="434599d6-52e2-4f20-adc5-ae4620fdc54c"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Coût total (Ariary)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="320" y="389" width="92" height="34" uuid="44d915a4-e37e-482f-89e4-9972a2c98c94"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Coût unitaire (Ariary)]]></text>
+			</staticText>
+			<image>
+				<reportElement x="2" y="0" width="162" height="79" uuid="0e18afcc-d6ec-4678-8fab-5fba1e3ce0a4"/>
+				<imageExpression><![CDATA["logo.jpg"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="3" y="271" width="492" height="20" uuid="22f3a2e9-d4d1-48d5-9149-38469a1cd513"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["La Société : "+$P{SOCIETE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="121" width="493" height="20" uuid="75b83e11-7588-41c8-ad53-cd20ec473fd5"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["N° "+$P{ID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="3" y="293" width="490" height="20" uuid="2e90ea0a-da6a-4ab6-8306-178b72a043ec"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Adresse: "+$P{ADRESSE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="3" y="317" width="490" height="20" uuid="a935f202-63bb-4ceb-a1cc-618fc3229caa"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Personnes à contacter: "+$P{PERSONNE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Transparent" x="35" y="389" width="77" height="34" uuid="877487f2-455d-4264-8fa5-4e27bbbb417a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Immatriculation]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="189" width="493" height="20" uuid="60e4535b-f3f3-4338-a51e-030e4d1dcd6a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Convention N° "+$P{CONVENTION} + " du " +$P{DATEATT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="389" width="35" height="34" uuid="d258fdcd-a3f9-4dca-938a-931ea5b1d9a3"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[N°]]></text>
+			</staticText>
+		</band>
+		<band height="50">
+			<subreport>
+				<reportElement x="0" y="0" width="495" height="50" uuid="c8524b09-8777-47fc-982e-a4f766435dc0"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{details})]]></dataSourceExpression>
+				<subreportExpression><![CDATA["AUTORISATIONPAIEMENTDETAIL.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="174">
+			<textField>
+				<reportElement x="0" y="54" width="495" height="48" uuid="bba17790-1d39-40ec-b83b-506b21c4addf"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Arrêté la présente Autorisation de paiement à la somme de "+$P{SOMMELIB}+ " Ariary."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="102" width="495" height="20" uuid="c72136cf-82d6-426d-9426-9c42ec17338c"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Antananarivo le "+$P{DATE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="412" y="-1" width="83" height="24" uuid="0a7b27a7-716d-4e59-94ef-4922e2628b9b"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{SOMME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="-1" width="412" height="24" uuid="3042683f-cdaf-4bca-9893-c895ff45ebe6"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[   Total:]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>
