@@ -11,11 +11,12 @@
 -- Pour se connecter : ETU000001 / test  ou  ETU000002 / test
 
 -- Utilisateurs
-INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, idrole, id, estactif)
-VALUES (100, 'ETU000001', 'paop', 'Rakoto Jean', 'etu', 'ETU000001', 1);
+-- adruser = DIR42 obligatoire : la vue utilisateurvue fait JOIN direction ON adruser = direction.id
+INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, id, estactif)
+VALUES (100, 'ETU000001', 'paop', 'Rakoto Jean', 'DIR42', 'etu', 'ETU000001', 1);
 
-INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, idrole, id, estactif)
-VALUES (101, 'ETU000002', 'paop', 'Rasoa Marie', 'etu', 'ETU000002', 1);
+INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, id, estactif)
+VALUES (101, 'ETU000002', 'paop', 'Rasoa Marie', 'DIR42', 'etu', 'ETU000002', 1);
 
 -- Parametres de cryptage (obligatoire pour que testeValide fonctionne)
 -- Meme format que l'admin existant : CRY000088 / niveau=4 / croissante=1 / idutilisateur=1
