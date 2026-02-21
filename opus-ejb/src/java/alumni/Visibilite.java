@@ -39,11 +39,11 @@ public class Visibilite extends ClassMAPTable {
         this.idvisibilite = idvisibilite;
     }
 
-    public String getChamp() {
+    public String getChampVisibilite() {
         return champ;
     }
 
-    public void setChamp(String champ) {
+    public void setChampVisibilite(String champ) {
         this.champ = champ;
     }
 
