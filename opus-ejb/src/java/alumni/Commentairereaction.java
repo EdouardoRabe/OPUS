@@ -6,7 +6,7 @@ import java.sql.Connection;
 public class Commentairereaction extends ClassMAPTable {
 
     private String idcommentairereaction;
-    private String idutilisateur;
+    private int idutilisateur;
     private String idpublicationcommentaire;
     private String idreactiontype;
 
@@ -38,11 +38,11 @@ public class Commentairereaction extends ClassMAPTable {
         this.idcommentairereaction = idcommentairereaction;
     }
 
-    public String getIdutilisateur() {
+    public int getIdutilisateur() {
         return idutilisateur;
     }
 
-    public void setIdutilisateur(String idutilisateur) {
+    public void setIdutilisateur(int idutilisateur) {
         this.idutilisateur = idutilisateur;
     }
 

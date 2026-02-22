@@ -7,8 +7,8 @@
 -- =====================================================================
 
 -- ======================== TYPES DE PUBLICATION ========================
-INSERT INTO typepublication (idtypepublication, libelle) VALUES ('TPB000001', 'Normal');
-INSERT INTO typepublication (idtypepublication, libelle) VALUES ('TPB000002', 'Partage');
+INSERT INTO typepublication (idtypepublication, libelle) VALUES ('TPB000001', 'Offre d''emploi');
+INSERT INTO typepublication (idtypepublication, libelle) VALUES ('TPB000002', 'Stage');
 
 -- ======================== TYPES DE MEDIA ========================
 INSERT INTO mediatype (idmediatype, libelle) VALUES ('MDT000001', 'Image');

@@ -88,7 +88,7 @@
                     String type = cReacts[r].getIdreactiontype();
                     Integer cnt = (Integer) reactMap.get(type);
                     reactMap.put(type, cnt == null ? new Integer(1) : new Integer(cnt.intValue() + 1));
-                    if (cReacts[r].getIdutilisateur().equals(String.valueOf(refuser))) {
+                    if (cReacts[r].getIdutilisateur() == refuser) {
                         myReaction = type;
                     }
                 }

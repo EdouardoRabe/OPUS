@@ -9,6 +9,7 @@
 <%@ page import="alumni.Publicationreaction" %>
 <%@ page import="alumni.Publicationcommentaire" %>
 <%@ page import="alumni.Reactiontype" %>
+<%@ page import="alumni.Typepublication" %>
 <%@ page import="utilisateurAcade.UtilisateurAcade" %>
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.util.Map" %>
@@ -25,6 +26,11 @@
     if (msgSucces != null) session.removeAttribute("pubSucces");
     String msgErreur = (String) session.getAttribute("pubErreur");
     if (msgErreur != null) session.removeAttribute("pubErreur");
+
+    // --- APJ: Charger les types de publication pour le dropdown ---
+    Typepublication[] typesPub = (Typepublication[]) CGenUtil.rechercher(
+        new Typepublication(), null, null, " order by idtypepublication");
+    if (typesPub == null) typesPub = new Typepublication[0];
 %>
 
 <div class="content-wrapper">
@@ -43,14 +49,23 @@
         <!-- ==================== FORMULAIRE NOUVELLE PUBLICATION ==================== -->
         <div style="border:1px solid #ccc;padding:15px;margin-bottom:20px;background:#fafafa;">
             <h3>Nouvelle publication</h3>
-            <form method="POST" action="<%= ctx %>/pages/alumni/ajax/creer-publication.jsp">
+            <form method="POST" enctype="multipart/form-data"
+                  action="<%= ctx %>/pages/alumni/ajax/creer-publication.jsp">
+                <div style="margin-bottom:8px;">
+                    <label>Type de publication :</label>
+                    <select name="idtypepublication" style="padding:5px;margin-left:5px;">
+                        <% for (int t = 0; t < typesPub.length; t++) { %>
+                            <option value="<%= typesPub[t].getIdtypepublication() %>"><%= typesPub[t].getLibelle() %></option>
+                        <% } %>
+                    </select>
+                </div>
                 <div>
                     <textarea name="description" rows="3" style="width:100%;padding:8px;"
                               placeholder="Quoi de neuf, <%= nomConnecte %> ?"></textarea>
                 </div>
                 <div style="margin-top:8px;">
-                    <input type="text" name="imageUrl" style="width:100%;padding:6px;"
-                           placeholder="URL de l'image (optionnel, ex: https://exemple.com/photo.jpg)">
+                    <label>Image (optionnel) :</label>
+                    <input type="file" name="image" accept="image/*">
                 </div>
                 <div style="margin-top:8px;">
                     <button type="submit" style="padding:8px 20px;">Publier</button>
@@ -119,7 +134,7 @@
                         Integer cnt = (Integer) reactCounts.get(type);
                         reactCounts.put(type, cnt == null ? new Integer(1) : new Integer(cnt.intValue() + 1));
                         totalReactions++;
-                        if (reactions[r].getIdutilisateur().equals(String.valueOf(refuserConnecte))) {
+                        if (reactions[r].getIdutilisateur() == refuserConnecte) {
                             myReaction = type;
                         }
                     }
@@ -151,9 +166,14 @@
             <!-- Contenu -->
             <div style="margin-bottom:10px;">
                 <p><%= descSafe %></p>
-                <% for (int m = 0; m < medias.length; m++) { %>
+                <% for (int m = 0; m < medias.length; m++) {
+                    String mUrl = medias[m].getMediaurl();
+                    if (mUrl != null && !mUrl.startsWith("http")) {
+                        mUrl = ctx + "/UploadDownloadFileServlet?fileName=" + java.net.URLEncoder.encode(mUrl, "UTF-8");
+                    }
+                %>
                     <div style="margin-top:8px;">
-                        <img src="<%= medias[m].getMediaurl() %>" style="max-width:100%;max-height:400px;border:1px solid #eee;" alt="media">
+                        <img src="<%= mUrl %>" style="max-width:100%;max-height:400px;border:1px solid #eee;" alt="media">
                     </div>
                 <% } %>
             </div>
@@ -224,17 +244,20 @@ var CTX = '<%= ctx %>';
 
 // ========== REACTIONS PUBLICATION ==========
 function toggleReaction(idpub, idreactiontype) {
-    fetch(CTX + '/pages/alumni/ajax/reagir-publication.jsp?idpublication=' + idpub + '&idreactiontype=' + idreactiontype)
-    .then(function(r) { return r.text(); })
-    .then(function(text) {
-        try { var data = JSON.parse(text); } catch(e) { alert('Erreur serveur'); return; }
+    fetch(CTX + '/pages/alumni/ajax/reagir-publication.jsp?idpublication=' + encodeURIComponent(idpub) + '&idreactiontype=' + encodeURIComponent(idreactiontype))
+    .then(function(resp) {
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        return resp.text();
+    })
+    .then(function(body) {
+        try { var data = JSON.parse(body); } catch(e) { alert('Erreur serveur (reaction): ' + body.substring(0, 200)); return; }
         if (data.success) {
             location.reload();
         } else {
-            alert(data.error || 'Erreur');
+            alert('Erreur reaction: ' + (data.error || 'Inconnue'));
         }
     })
-    .catch(function(e) { alert('Erreur: ' + e); });
+    .catch(function(e) { alert('Erreur reseau (reaction): ' + e); });
 }
 
 // ========== COMMENTAIRES ==========
@@ -252,10 +275,13 @@ function chargerCommentaires(idpub) {
     var listeDiv = document.getElementById('liste-comm-' + idpub);
     listeDiv.innerHTML = '<em>Chargement...</em>';
 
-    fetch(CTX + '/pages/alumni/ajax/charger-commentaires.jsp?idpublication=' + idpub)
-    .then(function(r) { return r.text(); })
-    .then(function(text) {
-        try { var data = JSON.parse(text); } catch(e) { listeDiv.innerHTML = '<span style="color:red;">Erreur serveur</span>'; return; }
+    fetch(CTX + '/pages/alumni/ajax/charger-commentaires.jsp?idpublication=' + encodeURIComponent(idpub))
+    .then(function(resp) {
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        return resp.text();
+    })
+    .then(function(body) {
+        try { var data = JSON.parse(body); } catch(e) { listeDiv.innerHTML = '<span style="color:red;">Erreur parse JSON: ' + body.substring(0, 200) + '</span>'; return; }
         if (!data.success) {
             listeDiv.innerHTML = '<span style="color:red;">' + (data.error || 'Erreur') + '</span>';
             return;
@@ -309,27 +335,30 @@ function chargerCommentaires(idpub) {
 
 function ajouterCommentaire(idpub) {
     var input = document.getElementById('comm-text-' + idpub);
-    var text = input.value.trim();
-    if (!text) return;
+    var val = input.value.trim();
+    if (!val) return;
 
     fetch(CTX + '/pages/alumni/ajax/commenter.jsp', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: 'idpublication=' + encodeURIComponent(idpub) + '&description=' + encodeURIComponent(text)
+        body: 'idpublication=' + encodeURIComponent(idpub) + '&description=' + encodeURIComponent(val)
     })
-    .then(function(r) { return r.text(); })
-    .then(function(text) {
-        try { var data = JSON.parse(text); } catch(e) { alert('Erreur serveur'); return; }
+    .then(function(resp) {
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        return resp.text();
+    })
+    .then(function(body) {
+        try { var data = JSON.parse(body); } catch(e) { alert('Erreur serveur (commentaire): ' + body.substring(0, 200)); return; }
         if (data.success) {
             input.value = '';
             chargerCommentaires(idpub);
             var nbSpan = document.getElementById('nb-comm-' + idpub);
             nbSpan.textContent = parseInt(nbSpan.textContent) + 1;
         } else {
-            alert(data.error || 'Erreur');
+            alert('Erreur commentaire: ' + (data.error || 'Inconnue'));
         }
     })
-    .catch(function(e) { alert('Erreur: ' + e); });
+    .catch(function(e) { alert('Erreur reseau (commentaire): ' + e); });
 }
 
 function montrerReponse(idcomm) {
@@ -339,44 +368,50 @@ function montrerReponse(idcomm) {
 
 function ajouterReponse(idpub, idparent) {
     var input = document.getElementById('reponse-text-' + idparent);
-    var text = input.value.trim();
-    if (!text) return;
+    var val = input.value.trim();
+    if (!val) return;
 
     fetch(CTX + '/pages/alumni/ajax/commenter.jsp', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: 'idpublication=' + encodeURIComponent(idpub)
-            + '&description=' + encodeURIComponent(text)
+            + '&description=' + encodeURIComponent(val)
             + '&idparent=' + encodeURIComponent(idparent)
     })
-    .then(function(r) { return r.text(); })
-    .then(function(text) {
-        try { var data = JSON.parse(text); } catch(e) { alert('Erreur serveur'); return; }
+    .then(function(resp) {
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        return resp.text();
+    })
+    .then(function(body) {
+        try { var data = JSON.parse(body); } catch(e) { alert('Erreur serveur (reponse): ' + body.substring(0, 200)); return; }
         if (data.success) {
             input.value = '';
             chargerCommentaires(idpub);
             var nbSpan = document.getElementById('nb-comm-' + idpub);
             nbSpan.textContent = parseInt(nbSpan.textContent) + 1;
         } else {
-            alert(data.error || 'Erreur');
+            alert('Erreur reponse: ' + (data.error || 'Inconnue'));
         }
     })
-    .catch(function(e) { alert('Erreur: ' + e); });
+    .catch(function(e) { alert('Erreur reseau (reponse): ' + e); });
 }
 
 // ========== REACTIONS COMMENTAIRE ==========
 function toggleReactionComm(idcomm, idreactiontype, idpub) {
-    fetch(CTX + '/pages/alumni/ajax/reagir-commentaire.jsp?idcommentaire=' + idcomm + '&idreactiontype=' + idreactiontype)
-    .then(function(r) { return r.text(); })
-    .then(function(text) {
-        try { var data = JSON.parse(text); } catch(e) { alert('Erreur serveur'); return; }
+    fetch(CTX + '/pages/alumni/ajax/reagir-commentaire.jsp?idcommentaire=' + encodeURIComponent(idcomm) + '&idreactiontype=' + encodeURIComponent(idreactiontype))
+    .then(function(resp) {
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        return resp.text();
+    })
+    .then(function(body) {
+        try { var data = JSON.parse(body); } catch(e) { alert('Erreur serveur (reaction comm): ' + body.substring(0, 200)); return; }
         if (data.success) {
             chargerCommentaires(idpub);
         } else {
-            alert(data.error || 'Erreur');
+            alert('Erreur reaction commentaire: ' + (data.error || 'Inconnue'));
         }
     })
-    .catch(function(e) { alert('Erreur: ' + e); });
+    .catch(function(e) { alert('Erreur reseau (reaction comm): ' + e); });
 }
 
 function escHtml(str) {

@@ -7,7 +7,7 @@ public class Publicationreaction extends ClassMAPTable {
 
     private String idpublicationreaction;
     private String idreactiontype;
-    private String idutilisateur;
+    private int idutilisateur;
     private String idpublication;
 
     public Publicationreaction() {
@@ -46,11 +46,11 @@ public class Publicationreaction extends ClassMAPTable {
         this.idreactiontype = idreactiontype;
     }
 
-    public String getIdutilisateur() {
+    public int getIdutilisateur() {
         return idutilisateur;
     }
 
-    public void setIdutilisateur(String idutilisateur) {
+    public void setIdutilisateur(int idutilisateur) {
         this.idutilisateur = idutilisateur;
     }
 

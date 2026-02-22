@@ -8,7 +8,7 @@ public class Publicationcommentaire extends ClassMAPTable {
     private String idpublicationcommentaire;
     private String description;
     private int etat;
-    private String idutilisateur;
+    private int idutilisateur;
     private String idpublicationcommentaire_1;
     private String idpublication;
 
@@ -56,11 +56,11 @@ public class Publicationcommentaire extends ClassMAPTable {
         this.etat = etat;
     }
 
-    public String getIdutilisateur() {
+    public int getIdutilisateur() {
         return idutilisateur;
     }
 
-    public void setIdutilisateur(String idutilisateur) {
+    public void setIdutilisateur(int idutilisateur) {
         this.idutilisateur = idutilisateur;
     }
 
