@@ -15,7 +15,7 @@ DELETE FROM MENUDYNAMIQUE WHERE id LIKE 'MENDYN%' OR id LIKE 'MENU_TEST%';
 
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
 -- 1. Accueil (Racine - Niveau 0)
-('MENDYN000001', 'Accueil', 'fa-home', 'mdule.jsp?but=accueil.jsp', 1, 0, NULL),
+('MENDYN000001', 'Accueil', 'fa-home', 'module.jsp?but=accueil.jsp', 1, 0, NULL),
 
 -- 2. Réseau (Dropdown - Niveau 0)
 ('MENDYN000002', 'Réseau', 'fa-users', '#', 2, 0, NULL),
@@ -30,18 +30,18 @@ INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALU
 
 -- Sous-menus de RÉSEAU
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
-('MENDYN000005', 'Annuaire', 'fa-address-book', 'mdule.jsp?but=annuaire/annuaire.jsp', 1, 1, 'MENDYN000002'),
-('MENDYN000006', 'Spécialités', 'fa-tags', 'mdule.jsp?but=specialites/specialites.jsp', 2, 1, 'MENDYN000002');
+('MENDYN000005', 'Annuaire', 'fa-address-book', 'module.jsp?but=annuaire/annuaire.jsp', 1, 1, 'MENDYN000002'),
+('MENDYN000006', 'Spécialités', 'fa-tags', 'module.jsp?but=specialites/specialites.jsp', 2, 1, 'MENDYN000002');
 
 -- Sous-menus de CARRIÈRE
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
-('MENDYN000007', 'Offres d''emploi', 'fa-list-alt', 'mdule.jsp?but=carriere/offres.jsp', 1, 1, 'MENDYN000003'),
-('MENDYN000008', 'Publier une offre', 'fa-plus-circle', 'mdule.jsp?but=carriere/publier-offre.jsp', 2, 1, 'MENDYN000003');
+('MENDYN000007', 'Offres d''emploi', 'fa-list-alt', 'module.jsp?but=carriere/offres.jsp', 1, 1, 'MENDYN000003'),
+('MENDYN000008', 'Publier une offre', 'fa-plus-circle', 'module.jsp?but=carriere/publier-offre.jsp', 2, 1, 'MENDYN000003');
 
 -- Sous-menus de MON PROFIL
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
-('MENDYN000009', 'Voir ma fiche', 'fa-id-card', 'mdule.jsp?but=profil/voir.jsp', 1, 1, 'MENDYN000004'),
-('MENDYN000010', 'mdifier le profil', 'fa-edit', 'mdule.jsp?but=profil/mdifier.jsp', 2, 1, 'MENDYN000004'),
+('MENDYN000009', 'Voir ma fiche', 'fa-id-card', 'module.jsp?but=profil/voir.jsp', 1, 1, 'MENDYN000004'),
+('MENDYN000010', 'Modifier le profil', 'fa-edit', 'module.jsp?but=profil/modifier.jsp', 2, 1, 'MENDYN000004'),
 ('MENDYN000011', 'Déconnexion', 'fa-sign-out', 'deconnexion.jsp', 3, 1, 'MENDYN000004');
 
 -- ═══ ÉTAPE 4: INSÉRER LES DROITS D'ACCÈS (USERMENU) ═══
@@ -67,7 +67,6 @@ INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
 ('USRM000010', 'MENDYN000010', '*', 0, 'etu'),  -- mdifier le profil
 ('USRM000011', 'MENDYN000011', '*', 0, 'etu');  -- Déconnexion
 
--- Si vous avez d'autres rôles (admin, md, etc.), ajouter aussi:
 -- Menus pour le rôle 'md' (Direction Générale)
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000012', 'MENDYN000001', '*', 0, 'md'),
@@ -81,4 +80,24 @@ VALUES ('USRM000012', 'MENDYN000001', '*', 0, 'md'),
        ('USRM000020', 'MENDYN000009', '*', 0, 'md'),
        ('USRM000021', 'MENDYN000010', '*', 0, 'md'),
        ('USRM000022', 'MENDYN000011', '*', 0, 'md');
+
+-- ═══ ÉTAPE 5: MENU PUBLICATIONS ═══
+
+-- Menu principal Publications (Niveau 0)
+INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
+('MENDYN000012', 'Publications', 'fa-newspaper-o', '#', 2, 0, NULL);
+
+-- Sous-menu Fil d'actualité (Niveau 1)
+INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
+('MENDYN000013', 'Fil d''actualite', 'fa-list', 'module.jsp?but=alumni/fil-actualite.jsp', 1, 1, 'MENDYN000012');
+
+-- Droits: role etu
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
+('USRM000023', 'MENDYN000012', '*', 0, 'etu'),
+('USRM000024', 'MENDYN000013', '*', 0, 'etu');
+
+-- Droits: role md
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
+('USRM000025', 'MENDYN000012', '*', 0, 'md'),
+('USRM000026', 'MENDYN000013', '*', 0, 'md');
 
