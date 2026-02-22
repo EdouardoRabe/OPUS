@@ -26,8 +26,6 @@ public class UtilisateurPg extends ClassMAPTable{
 
     private String matricule;
 
-    private String email;
-
     public String getProfile() {
         return profile;
     }
@@ -143,13 +141,5 @@ public class UtilisateurPg extends ClassMAPTable{
 
     public void setAcronyme(String acronyme) {
         this.acronyme = acronyme;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 }

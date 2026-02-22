@@ -6,6 +6,7 @@ import java.sql.Connection;
 public class Profil extends ClassMAPTable {
 
     private String idprofil;
+    private String email;
     private String nom;
     private String prenom;
     private String dtn;
@@ -40,6 +41,14 @@ public class Profil extends ClassMAPTable {
 
     public void setIdprofil(String idprofil) {
         this.idprofil = idprofil;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getNom() {
