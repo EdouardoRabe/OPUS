@@ -108,3 +108,16 @@ INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
 ('USRM000028', 'MENDYN000014', '*', 0, 'md');
 
+-- ETAPE 7: MENU RESEAU PROFESSIONNEL (visualisation graphe)
+
+-- Sous-menu Reseau Professionnel sous RESEAU (niveau 1)
+INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
+('MENDYN000015', 'Reseau pro', 'bi-diagram-3-fill', 'module.jsp?but=alumni/reseau-professionnel.jsp', 3, 1, 'MENDYN000002');
+
+-- Droits role etu
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
+('USRM000033', 'MENDYN000015', '*', 0, 'etu');
+
+-- Droits role md
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
+('USRM000034', 'MENDYN000015', '*', 0, 'md');
