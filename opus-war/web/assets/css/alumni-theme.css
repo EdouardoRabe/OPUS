@@ -1,8 +1,23 @@
 /* ═══════════════════════════════════════════════════
-   ITU ALUMNI — MODERN THEME
-   Color palette inspired by https://www.ituniversity-mg.com/page/
+   OPUS — MODERN THEME
+   Utilisant les ressources locales du projet
 ═══════════════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Charger les fonts locales */
+@font-face {
+  font-family: 'DM Sans';
+  src: url('../../assets/fonts/DMSans-VariableFont_opsz.ttf') format('truetype');
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  src: url('../../assets/fonts/DMSans-Italic-VariableFont_opsz.ttf') format('truetype');
+  font-weight: 400 700;
+  font-style: italic;
+  font-display: swap;
+}
 
 :root {
   /* ── ITU Brand Colors ── */
@@ -48,8 +63,8 @@
   --radius-full: 9999px;
 
   /* Typography */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-serif: 'Manrope', sans-serif;
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'DM Sans', sans-serif;
 }
 
 /* ═══ RESET & BASE ═══ */
@@ -160,7 +175,7 @@ a:hover { color: var(--itu-blue-dark); text-decoration: none; }
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   padding: 4rem;
   color: var(--white);
   overflow: hidden;
@@ -211,6 +226,37 @@ a:hover { color: var(--itu-blue-dark); text-decoration: none; }
   font-size: 1.5rem;
   color: var(--itu-dark);
   font-weight: 900;
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.login-brand-logo {
+  height: 52px;
+  width: auto;
+  display: block;
+}
+
+.login-brand-text {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+
+.login-brand-text .brand-itu {
+  color: var(--itu-lime);
+}
+
+.login-brand-text .brand-alumni {
+  color: var(--white);
 }
 
 .login-hero-title {
@@ -351,6 +397,14 @@ a:hover { color: var(--itu-blue-dark); text-decoration: none; }
   position: relative;
 }
 
+.login-hero-wrap {
+  position: relative;
+  z-index: 1;
+  padding: 3rem 0;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
 /* Responsive */
 @media (max-width: 991px) {
   .login-split { grid-template-columns: 1fr; }
@@ -363,4 +417,3 @@ a:hover { color: var(--itu-blue-dark); text-decoration: none; }
   .login-tabs { margin-bottom: 1.5rem; }
   .login-tab { padding: 0.65rem 1.25rem; }
 }
-

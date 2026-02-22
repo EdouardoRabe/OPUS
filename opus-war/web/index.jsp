@@ -8,200 +8,186 @@
     }
 %>
 <!DOCTYPE html>
-  <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>OPUS - Identification</title>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPUS — Connexion</title>
 
-<%--      <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/img/logo.png">--%>
+    <!-- Bootstrap 3.3.7 (du projet) -->
+    <link href="${pageContext.request.contextPath}/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
-        <!-- Tell the browser to be responsive to screen width -->
-      <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-      <!-- Bootstrap 3.3.4 -->
-<%--      <link href="${pageContext.request.contextPath}/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />--%>
-      <!-- Font Awesome Icons -->
-<%--      <link href="${pageContext.request.contextPath}/dist/js/font-awesome-4.4.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />--%>
-      <!-- Theme style -->
-<%--      <link href="${pageContext.request.contextPath}/dist/css/AdminLTE.min.css" rel="stylesheet" type="text/css" />--%>
-        <link href="${pageContext.request.contextPath}/assets/css/refontlogin.css" rel="stylesheet">
-        <link href="${pageContext.request.contextPath}/assets/css/api-global-style.css" rel="stylesheet">
-        <link href="${pageContext.request.contextPath}/assets/css/refontSidebar.css" rel="stylesheet">
-<%--        <link href="${pageContext.request.contextPath}/dist/css/stylecustom.css" rel="stylesheet">--%>
-        <!-- iCheck -->
-<%--      <link href="${pageContext.request.contextPath}/plugins/iCheck/square/blue.css" rel="stylesheet" type="text/css" />--%>
-<%--      <link href="${pageContext.request.contextPath}/dist/css/swal.css" rel="stylesheet" type="text/css" />--%>
+    <!-- FontAwesome 4.4.0 (du projet) -->
+    <link href="${pageContext.request.contextPath}/dist/css/font-awesome-4.4.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
 
-      <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-      <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-      <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-      <![endif]-->
-        <script src="${pageContext.request.contextPath}/dist/js/swal.js"></script>
-    <body>
-    <div class="page">
-        <div class="frame">
-            <section class="panel-left">
-                <header class="brand">
-<%--                    <img class="logo"--%>
-<%--                         src="${pageContext.request.contextPath}/assets/img/logo.jpeg"--%>
-<%--                         alt="Logo">--%>
-                </header>
-                <!-- <img class="logo" src="${pageContext.request.contextPath}/assets/img/Logo-Async-Footer.png" alt="Logo Async"> -->
-                <main class="card">
-                    <h1>Connexion</h1>
-                    <p class="subtitle">Accédez à vos outils de gestion</p>
+    <!-- OPUS CUSTOM THEME (local, utilisant les fonts du projet) -->
+    <link href="${pageContext.request.contextPath}/assets/css/alumni-theme.css" rel="stylesheet" type="text/css" />
 
-                    <form class="form" action="<%=but%>" method="post">
-                        <label class="field">
-                            <span class="label">Identifiant</span>
-                            <span class="input-wrap">
-                                <span class="icon" aria-hidden="true">
-                                    <!-- user icon -->
-                                    <svg viewBox="0 0 24 24" width="18" height="18"
-                                         fill="currentColor">
-                                        <path
-                                                d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-5.33 0-8 2.67-8 6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1c0-3.33-2.67-6-8-6z" />
-                                    </svg>
-                                </span>
-                                <input type="text" name="identifiant"
-                                       placeholder="Entrer vos identifiant" required />
-                            </span>
-                        </label>
-
-                        <label class="field">
-                            <span class="label">Mot de passe</span>
-                            <span class="input-wrap">
-                                <span class="icon" aria-hidden="true">
-                                    <!-- lock icon -->
-                                    <svg viewBox="0 0 24 24" width="18" height="18"
-                                         fill="currentColor">
-                                        <path
-                                                d="M17 10h-1V7a4 4 0 0 0-8 0v3H7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2zm-6 0V7a3 3 0 0 1 6 0v3z" />
-                                    </svg>
-                                </span>
-                                <input type="password" name="passe"
-                                       placeholder="Entrer votre mot de passe" required />
-                                <span class="toggle-eye"
-                                      title="Afficher le mot de passe" aria-hidden="true" onclick="showMDP()" >
-                                    <svg viewBox="0 0 24 24" width="18" height="18"
-                                         fill="currentColor">
-                                        <path
-                                                d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7zm0 12a5 5 0 1 1 5-5 5 5 0 0 1-5 5zm0-8a3 3 0 1 0 3 3 3 3 0 0 0-3-3z" />
-                                    </svg>
-                                </span>
-                            </span>
-                        </label>
-
-                        <button class="btn-primary" id="login-btn" type="submit">
-                            <span id="login-btn-text">Se connecter</span>
-                        </button>
-                    </form>
-                </main>
-
-                <footer class="footer">
-<%--                    <img class="logo"--%>
-<%--                         src="${pageContext.request.contextPath}/assets/img/Logo-Async-Footer.png"--%>
-<%--                         alt="Logo Async">--%>
-<%--                    <span class="by">by BICI</span>--%>
-                </footer>
-            </section>
-
-            <!-- Right / Illustration -->
-            <aside class="panel-right" aria-hidden="true">
-                <div class="image">
-                </div>
-            </aside>
+    <!-- SweetAlert (du projet) -->
+    <script src="${pageContext.request.contextPath}/dist/js/swal.js"></script>
+  </head>
+  <body>
+    <div class="login-split">
+      <!-- LEFT PANEL -->
+      <div class="login-left">
+        <div class="login-brand">
+          <img class="login-brand-logo" src="${pageContext.request.contextPath}/dist/img/ITU_logo.png" alt="ITU logo" />
+          <span class="login-brand-text"><span class="brand-itu">ITU</span><span class="brand-alumni">alumni</span></span>
         </div>
 
-      <!-- jQuery 2.1.4 -->
-      <script src="${pageContext.request.contextPath}/plugins/jQuery/jQuery-2.1.4.min.js" type="text/javascript"></script>
-      <!-- Bootstrap 3.3.2 JS -->
-      <script src="${pageContext.request.contextPath}/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
-      <!-- iCheck -->
-      <script src="${pageContext.request.contextPath}/plugins/iCheck/icheck.min.js" type="text/javascript"></script>
-      <script>
-        $(function () {
-          $('input').iCheck({
-            checkboxClass: 'icheckbox_square-blue',
-            radioClass: 'iradio_square-blue',
-            increaseArea: '20%' // optional
-          });
-        });
+        <div class="login-hero-wrap">
+          <h1 class="login-hero-title">Votre réseau,<br><span>votre avenir.</span></h1>
+          <p class="login-hero-text">Rejoignez la communauté exclusive des anciens de l'ITUniversity. Échangez avec vos pairs, partagez des opportunités qualifiées et propulsez votre carrière vers de nouveaux horizons.</p>
+        </div>
+      </div>
 
-        function showMDP() {
-            var d = document.getElementsByName("passe")[0];
-            var icon = document.getElementsByClassName("toggle-eye")[0]; // <-- on cible le premier élément
+      <!-- RIGHT PANEL -->
+      <div class="login-right">
+        <div style="position: absolute; bottom: 2rem; right: 2rem; font-family: var(--font-serif); font-size: 8rem; font-weight: 900; color: rgba(0,0,0,0.03); line-height: 1; pointer-events: none; z-index: 0;">OPUS</div>
 
-            if (d.type === "password") {
-                d.type = "text";
-                icon.innerHTML = `
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                <path d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7zM12 15a3 3 0 0 0 0-6 3 3 0 0 0 0 6z"></path>
-            </svg>`;
-                return;
-            }
-            if (d.type === "text") {
-                d.type = "password";
-                icon.innerHTML = `
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                <path d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7zm0 12a5 5 0 1 1 5-5 5 5 0 0 1-5 5zm0-8a3 3 0 1 0 3 3 3 3 0 0 0-3-3z"></path>
-            </svg>`;
-                return;
-            }
+        <div class="login-card" style="position: relative; z-index: 1;">
+          <h2 style="font-family: var(--font-serif); font-size: 2rem; color: var(--itu-dark); margin-bottom: 0.4rem; font-weight: 700;">Bienvenue</h2>
+          <p style="color: var(--gray-500); font-size: 0.95rem; margin-bottom: 1.75rem;">Accédez à votre espace privilégié OPUS</p>
+
+          <!-- TABS -->
+          <div class="login-tabs">
+            <button class="login-tab active" onclick="switchTab('login', event)">Connexion</button>
+            <button class="login-tab" onclick="switchTab('register', event)">Inscription</button>
+          </div>
+
+          <!-- LOGIN FORM -->
+          <div id="login-form">
+            <form action="<%=but%>" method="post">
+              <div class="form-group">
+                <label>Identifiant</label>
+                <div class="input-position-relative">
+                  <input type="text" name="identifiant" class="form-control-custom" placeholder="E-mail ou numéro ETU" style="padding-right:90px;" required />
+                  <span id="login-id-badge" style="background:var(--gray-200); color:var(--gray-500);">EMAIL</span>
+                </div>
+                <div class="info-badge">
+                  <i class="fa fa-info-circle"></i> Utilisez votre <em>e-mail</em> ou <em>identifiant</em> (ex: <strong>ETU003356</strong>)
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" name="passe" class="form-control-custom" placeholder="••••••••" required />
+              </div>
+              <div class="forgot">Mot de passe oublié ?</div>
+              <button type="submit" class="btn btn-primary btn-block" id="login-btn" style="padding: 0.85rem; font-size: 1rem; font-weight: 700;">
+                <span id="login-btn-text">Se connecter</span> <i class="fa fa-arrow-right" style="margin-left: 8px;"></i>
+              </button>
+            </form>
+          </div>
+
+          <!-- REGISTER FORM -->
+          <div id="register-form" style="display: none;">
+            <form action="#" method="post" onsubmit="return false;">
+              <div class="row">
+                <div class="col-xs-6 form-group">
+                  <label>Prénom</label>
+                  <input type="text" class="form-control-custom" placeholder="Jean" required />
+                </div>
+                <div class="col-xs-6 form-group">
+                  <label>Nom</label>
+                  <input type="text" class="form-control-custom" placeholder="Dupont" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>E-mail universitaire</label>
+                <input type="email" class="form-control-custom" placeholder="jean.dupont@opus.edu" required />
+              </div>
+              <div class="form-group">
+                <label>Numéro ETU</label>
+                <div class="input-position-relative">
+                  <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:0.76rem;font-weight:700;letter-spacing:0.08em;color:var(--itu-blue);pointer-events:none;">ETU</span>
+                  <input type="text" class="form-control-custom" placeholder="Ex: 003356" style="padding-left:52px;" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Promotion (année)</label>
+                <input type="text" class="form-control-custom" placeholder="Ex: 2022" required />
+              </div>
+              <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" class="form-control-custom" placeholder="Min. 8 caractères" required />
+              </div>
+              <button type="button" class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1rem; font-weight: 700;" onclick="alert('L\'inscription sera intégrée ultérieurement')">
+                Créer mon compte <i class="fa fa-arrow-right" style="margin-left: 8px;"></i>
+              </button>
+              <p style="font-size: 0.78rem; color: var(--gray-500); margin-top: 1rem; text-align: center;">
+                <em>L'inscription sera disponible très prochainement</em>
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- jQuery 2.1.4 -->
+    <script src="${pageContext.request.contextPath}/plugins/jQuery/jQuery-2.1.4.min.js" type="text/javascript"></script>
+    <!-- Bootstrap 3.3.2 JS -->
+    <script src="${pageContext.request.contextPath}/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+
+    <script>
+      // Fonction pour basculer entre les onglets
+      function switchTab(tab, event) {
+        if (event) {
+          event.preventDefault();
         }
 
-      </script>
+        // Masquer les deux formulaires
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('register-form').style.display = 'none';
 
-      <%
-          String loginError = (String) session.getAttribute("errorLogin");
-          if (loginError != null) {
-              session.removeAttribute("errorLogin");
-      %>
-      <script>
-          Swal.fire({
-              title: "Ouupss !",
-              text: "<%= loginError.replace("\"", "\\\"") %>",
-              icon: "error",
-              confirmButtonText: "OK"
-          });
-      </script>
-      <%
-          }
-      %>
+        // Désactiver tous les onglets
+        document.querySelectorAll('.login-tab').forEach(function (t) {
+          t.classList.remove('active');
+        });
 
-        <!-- Div flottant global amélioré -->
-<%--        <div id="mon-div-flottant" style="--%>
-<%--            position: fixed;--%>
-<%--            bottom: 20px;--%>
-<%--            right: 20px;--%>
-<%--            width: 250px;--%>
-<%--            background-color: #fff;--%>
-<%--            border: 1px solid #ddd;--%>
-<%--            border-radius: 8px;--%>
-<%--            box-shadow: 0 4px 15px rgba(0,0,0,0.3);--%>
-<%--            z-index: 9999;--%>
-<%--            font-family: 'Open Sans', sans-serif;">--%>
-<%--            <div id="drag-handle" style="--%>
-<%--                padding: 10px;--%>
-<%--                background-color: #007bff;--%>
-<%--                color: white;--%>
-<%--                border-radius: 8px 8px 0 0;--%>
-<%--                cursor: move;--%>
-<%--                font-weight: bold;--%>
-<%--                display: flex;--%>
-<%--                justify-content: space-between;--%>
-<%--                align-items: center;">--%>
-<%--                <!-- ce framework ne supporte pas les emojis et les accents comme â. Par exemple pour é, on utilise &eacute; fait le pour taches-->--%>
-<%--                <span> &#128190; Tâches en cours</span>--%>
-<%--                <button onclick="$('#timer-content').toggle()" style="background:none; border:none; color:white; cursor:pointer; font-weight: bold;">_</button>--%>
-<%--            </div>--%>
-<%--            <div id="timer-content" style="padding: 0; max-height: 300px; overflow-y: auto;">--%>
-<%--                <ul id="timer-list" style="list-style: none; padding: 0; margin: 0;">--%>
-<%--                    <li style="color: #666; font-style: italic; text-align: center; font-size: 12px; padding: 10px;">Chargement...</li>--%>
-<%--                </ul>--%>
-<%--            </div>--%>
-<%--        </div>--%>
-        <script src="${pageContext.request.contextPath}/assets/js/timer-flottant.js"></script>
-    </body>
-  </html>
+        // Afficher le formulaire sélectionné
+        if (tab === 'login') {
+          document.getElementById('login-form').style.display = 'block';
+        } else if (tab === 'register') {
+          document.getElementById('register-form').style.display = 'block';
+        }
+
+        // Activer l'onglet cliqué
+        event.target.classList.add('active');
+      }
+
+      // Badge de type identifiant
+      const loginInput = document.querySelector('input[name="identifiant"]');
+      const loginBadge = document.getElementById('login-id-badge');
+
+      if (loginInput) {
+        loginInput.addEventListener('input', function () {
+          const val = this.value.trim();
+          const isETU = /^ETU/i.test(val) || (/^\d/.test(val) && val.length <= 10);
+          loginBadge.textContent = isETU ? 'ETU' : 'EMAIL';
+          loginBadge.style.background = isETU ? 'rgba(91,35,255,0.12)' : 'var(--gray-200)';
+          loginBadge.style.color = isETU ? 'var(--itu-blue)' : 'var(--gray-500)';
+        });
+      }
+    </script>
+
+    <%
+        String loginError = (String) session.getAttribute("errorLogin");
+        if (loginError != null) {
+            session.removeAttribute("errorLogin");
+    %>
+    <script>
+        Swal.fire({
+            title: "Oups !",
+            text: "<%= loginError.replace("\"", "\\\"") %>",
+            icon: "error",
+            confirmButtonText: "OK"
+        });
+    </script>
+    <%
+        }
+    %>
+
+    <script src="${pageContext.request.contextPath}/assets/js/timer-flottant.js"></script>
+  </body>
+</html>
+
