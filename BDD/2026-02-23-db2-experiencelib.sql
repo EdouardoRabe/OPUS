@@ -14,5 +14,5 @@ FROM experience e
 LEFT JOIN poste p   ON p.idposte     = e.idposte
 LEFT JOIN profil pr ON pr.idprofil   = e.idprofil;
 
-COMMENT ON VIEW experiencelib IS 'Vue expérience avec libellé du poste et idutilisateur du profil';
+COMMENT ON VIEW experiencelib IS 'Vue experience avec libelle du poste et idutilisateur du profil';
 
