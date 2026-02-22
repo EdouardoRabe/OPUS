@@ -67,32 +67,18 @@ INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
 ('USRM000010', 'MENDYN000010', '*', 0, 'etu'),  -- Modifier le profil
 ('USRM000011', 'MENDYN000011', '*', 0, 'etu');  -- Déconnexion
 
--- Si vous avez d'autres rôles (admin, dg, etc.), ajouter aussi:
--- Menus pour le rôle 'dg' (Direction Générale)
+-- Si vous avez d'autres rôles (admin, mod, etc.), ajouter aussi:
+-- Menus pour le rôle 'mod' (Direction Générale)
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
-VALUES ('USRM000012', 'MENDYN000001', '*', 0, 'dg'),
-       ('USRM000013', 'MENDYN000002', '*', 0, 'dg'),
-       ('USRM000014', 'MENDYN000003', '*', 0, 'dg'),
-       ('USRM000015', 'MENDYN000004', '*', 0, 'dg'),
-       ('USRM000016', 'MENDYN000005', '*', 0, 'dg'),
-       ('USRM000017', 'MENDYN000006', '*', 0, 'dg'),
-       ('USRM000018', 'MENDYN000007', '*', 0, 'dg'),
-       ('USRM000019', 'MENDYN000008', '*', 0, 'dg'),
-       ('USRM000020', 'MENDYN000009', '*', 0, 'dg'),
-       ('USRM000021', 'MENDYN000010', '*', 0, 'dg'),
-       ('USRM000022', 'MENDYN000011', '*', 0, 'dg');
-
--- Menus pour le rôle 'admin' (Administrateur)
-INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
-('USRM000023', 'MENDYN000001', '*', 0, 'admin'),
-('USRM000024', 'MENDYN000002', '*', 0, 'admin'),
-('USRM000025', 'MENDYN000003', '*', 0, 'admin'),
-('USRM000026', 'MENDYN000004', '*', 0, 'admin'),
-('USRM000027', 'MENDYN000005', '*', 0, 'admin'),
-('USRM000028', 'MENDYN000006', '*', 0, 'admin'),
-('USRM000029', 'MENDYN000007', '*', 0, 'admin'),
-('USRM000030', 'MENDYN000008', '*', 0, 'admin'),
-('USRM000031', 'MENDYN000009', '*', 0, 'admin'),
-('USRM000032', 'MENDYN000010', '*', 0, 'admin'),
-('USRM000033', 'MENDYN000011', '*', 0, 'admin');
+VALUES ('USRM000012', 'MENDYN000001', '*', 0, 'mod'),
+       ('USRM000013', 'MENDYN000002', '*', 0, 'mod'),
+       ('USRM000014', 'MENDYN000003', '*', 0, 'mod'),
+       ('USRM000015', 'MENDYN000004', '*', 0, 'mod'),
+       ('USRM000016', 'MENDYN000005', '*', 0, 'mod'),
+       ('USRM000017', 'MENDYN000006', '*', 0, 'mod'),
+       ('USRM000018', 'MENDYN000007', '*', 0, 'mod'),
+       ('USRM000019', 'MENDYN000008', '*', 0, 'mod'),
+       ('USRM000020', 'MENDYN000009', '*', 0, 'mod'),
+       ('USRM000021', 'MENDYN000010', '*', 0, 'mod'),
+       ('USRM000022', 'MENDYN000011', '*', 0, 'mod');
 
