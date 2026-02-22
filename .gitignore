@@ -1,4 +1,9 @@
 build-file/**
-BDD/**
+# BDD/**
+note/
 /build.xml
 /opus-ejb/src/java/apj.properties
+hs_err_pid8888.log
+.idea/
+.vscode/
+/opus-war/web/dateBuild.txt

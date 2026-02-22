@@ -60,26 +60,29 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     CNAPSUser cnapsUser;
     Configuration[] listeConfig;
     String langue;
-    Map<String,String> mapTraduction;
+    Map<String, String> mapTraduction;
 
     public String getLangue() {
         return langue;
     }
+
     public void setLangue(String langue) {
         this.langue = langue;
     }
+
     public Map<String, String> getMapTraduction() {
         return mapTraduction;
     }
+
     public void setMapTraduction(Map<String, String> mapTraduction) {
         this.mapTraduction = mapTraduction;
     }
 
-    public String getTraduction(String mot){
+    public String getTraduction(String mot) {
         String result = mot;
-        if (this.getLangue() != null && this.getLangue().equalsIgnoreCase("fr")==false){
+        if (this.getLangue() != null && this.getLangue().equalsIgnoreCase("fr") == false) {
             String valeur = this.getMapTraduction().get(mot);
-            if (valeur!=null){
+            if (valeur != null) {
                 result = valeur;
             }
         }
@@ -87,11 +90,11 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     private HashMap<String, String> mapAutoComplete = new HashMap<>();
-    
+
     public Configuration[] getListeConfiguration() {
         return listeConfig;
     }
-    
+
     public CNAPSUser getCnapsUser() {
         return cnapsUser;
     }
@@ -100,37 +103,41 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         u = null;
     }
 
-//    public void ejbRemove() {
-//        MapHistorique histo = new MapHistorique("logout", "logout", String.valueOf(u.getRefuser()), String.valueOf(u.getRefuser()));
-//        histo.setObjet("mg.cnaps.utilisateur.CNAPSUser");
-//        histo.setAction(histo.getAction());
-//
-//        String heure = LocalTime.now().toString();
-//        heure = heure.replace(".", ":");
-//        histo.setHeure(heure);
-//        try {
-//            histo.insertToTable();
-//
-//            TimingApplication timingApplication = new TimingApplication();
-//            timingApplication.setRefuser(String.valueOf(u.getRefuser()));
-//
-//            TimingApplication[] timingApplications = (TimingApplication[]) CGenUtil.rechercher(timingApplication, null, null, " and dateheurefin is null");
-//            if(timingApplications.length!=0){
-//                timingApplication = timingApplications[0];
-//                timingApplication.setDateHeureFin(Timestamp.valueOf(LocalDateTime.now()));
-//
-//                LocalDateTime debut = timingApplication.getDateHeureDebut().toLocalDateTime();
-//                LocalDateTime fin = timingApplication.getDateHeureFin().toLocalDateTime();
-//                int duration = (int) Duration.between(debut, fin).toMinutes();
-//
-//                timingApplication.setDuree(duration);
-//
-//                timingApplication.upDateToTable();
-//            }
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    // public void ejbRemove() {
+    // MapHistorique histo = new MapHistorique("logout", "logout",
+    // String.valueOf(u.getRefuser()), String.valueOf(u.getRefuser()));
+    // histo.setObjet("mg.cnaps.utilisateur.CNAPSUser");
+    // histo.setAction(histo.getAction());
+    //
+    // String heure = LocalTime.now().toString();
+    // heure = heure.replace(".", ":");
+    // histo.setHeure(heure);
+    // try {
+    // histo.insertToTable();
+    //
+    // TimingApplication timingApplication = new TimingApplication();
+    // timingApplication.setRefuser(String.valueOf(u.getRefuser()));
+    //
+    // TimingApplication[] timingApplications = (TimingApplication[])
+    // CGenUtil.rechercher(timingApplication, null, null, " and dateheurefin is
+    // null");
+    // if(timingApplications.length!=0){
+    // timingApplication = timingApplications[0];
+    // timingApplication.setDateHeureFin(Timestamp.valueOf(LocalDateTime.now()));
+    //
+    // LocalDateTime debut =
+    // timingApplication.getDateHeureDebut().toLocalDateTime();
+    // LocalDateTime fin = timingApplication.getDateHeureFin().toLocalDateTime();
+    // int duration = (int) Duration.between(debut, fin).toMinutes();
+    //
+    // timingApplication.setDuree(duration);
+    //
+    // timingApplication.upDateToTable();
+    // }
+    // } catch (Exception e) {
+    // throw new RuntimeException(e);
+    // }
+    // }
 
     public void ejbActivate() {
     }
@@ -149,7 +156,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
 
     @Override
     public ClassMAPTable[] getDataPage(ClassMAPTable e, String requete, Connection c) throws Exception {
-        return (ClassMAPTable[])CGenUtil.rechercher(e, requete, c);
+        return (ClassMAPTable[]) CGenUtil.rechercher(e, requete, c);
     }
 
     @Override
@@ -172,6 +179,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             }
         }
     }
+
     @Override
     public void createObjectFilleMultipleSansMere(String u, ClassMAPTable[] fille) throws Exception {
         Connection c = null;
@@ -179,7 +187,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             c = new UtilDB().GetConn();
             c.setAutoCommit(false);
 
-            createObjectMultipleSansMere(u,fille, c);
+            createObjectMultipleSansMere(u, fille, c);
 
             c.commit();
         } catch (Exception e) {
@@ -207,12 +215,13 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         }
 
     }
-    public Object[] createObjectMultipleSansMere(String u,ClassMAPTable[] o, Connection c) throws Exception {
+
+    public Object[] createObjectMultipleSansMere(String u, ClassMAPTable[] o, Connection c) throws Exception {
         try {
             Object[] ret = new Object[o.length];
             for (int i = 0; i < o.length; i++) {
                 ret[i] = o[i].createObject(u, c);
-                //ret[i] = createObject(o[i], c);
+                // ret[i] = createObject(o[i], c);
             }
             return ret;
         } catch (Exception ex) {
@@ -224,12 +233,14 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     @Override
-    public String createUtilisateurs(String loginuser, String pwduser, String nomuser, String adruser, String teluser, String idrole) throws Exception {
+    public String createUtilisateurs(String loginuser, String pwduser, String nomuser, String adruser, String teluser,
+            String idrole) throws Exception {
         HistoriqueLocal rl = null;
         try {
             if (u.getIdrole().compareTo("dg") == 0) {
                 rl = HistoriqueEJBClient.lookupHistoriqueEJBBeanLocal();
-                String s = rl.createUtilisateurs(loginuser, pwduser, nomuser, adruser, teluser, idrole, u.getTuppleID());
+                String s = rl.createUtilisateurs(loginuser, pwduser, nomuser, adruser, teluser, idrole,
+                        u.getTuppleID());
                 return s;
             } else {
                 throw new Exception("Erreur de droit");
@@ -240,14 +251,17 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     @Override
-    public String updateUtilisateurs(String refuser, String loginuser, String pwduser, String nomuser, String adruser, String teluser, String idrole) throws Exception {
+    public String updateUtilisateurs(String refuser, String loginuser, String pwduser, String nomuser, String adruser,
+            String teluser, String idrole) throws Exception {
         HistoriqueLocal rl = null;
         try {
             rl = HistoriqueEJBClient.lookupHistoriqueEJBBeanLocal();
             if (u.getIdrole().compareTo("dg") == 0) {
-                return rl.updateUtilisateurs(refuser, loginuser, pwduser, nomuser, adruser, teluser, idrole, u.getTuppleID());
+                return rl.updateUtilisateurs(refuser, loginuser, pwduser, nomuser, adruser, teluser, idrole,
+                        u.getTuppleID());
             } else if (String.valueOf(u.getRefuser()).compareTo(refuser) == 0) {
-                return rl.updateUtilisateurs(refuser, loginuser, pwduser, nomuser, adruser, teluser, u.getIdrole(), u.getTuppleID());
+                return rl.updateUtilisateurs(refuser, loginuser, pwduser, nomuser, adruser, teluser, u.getIdrole(),
+                        u.getTuppleID());
             } else {
                 throw new Exception("Erreur de droit");
             }
@@ -261,7 +275,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         HistoriqueLocal rl = null;
 
         try {
-            if (u.getIdrole().compareTo("admin") == 0 || u.getIdrole().compareTo("dg") == 0 || u.getIdrole().compareTo("adminFacture") == 0) {
+            if (u.getIdrole().compareTo("admin") == 0 || u.getIdrole().compareTo("dg") == 0
+                    || u.getIdrole().compareTo("adminFacture") == 0) {
                 rl = HistoriqueEJBClient.lookupHistoriqueEJBBeanLocal();
                 int i = rl.deleteUtilisateurs(refuser, u.getTuppleID());
                 return i;
@@ -289,7 +304,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     @Override
     public String createTypeObjet(String nomTable, String proc, String pref, String typ, String desc) throws Exception {
         try {
-            if (u.getIdrole().compareTo("Chef") == 0 || u.getIdrole().compareTo("admin") == 0 || u.getIdrole().compareTo("dg") == 0 || u.getIdrole().compareTo("adminFacture") == 0) {
+            if (u.getIdrole().compareTo("Chef") == 0 || u.getIdrole().compareTo("admin") == 0
+                    || u.getIdrole().compareTo("dg") == 0 || u.getIdrole().compareTo("adminFacture") == 0) {
                 TypeObjet to = new TypeObjet(nomTable, proc, pref, typ, desc);
                 MapHistorique histo = new MapHistorique(nomTable, "insert", u.getTuppleID(), to.getId());
                 histo.setObjet("bean.TypeObjet");
@@ -304,7 +320,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         }
     }
 
-    public String updateMontantUnionIntra(String nomTable, String id1, String[] id2, String[] montant) throws Exception {
+    public String updateMontantUnionIntra(String nomTable, String id1, String[] id2, String[] montant)
+            throws Exception {
         Connection c = null;
         Statement st = null;
         try {
@@ -321,7 +338,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
                 if (liefflc[0].estIlModifiable() == true) {
                     liefflc[0].setMontantMere(Double.parseDouble(montant[i]));
                     liefflc[0].setNomTable(nomTable);
-                    String rek = "update " + nomTable + "  set montantMere = " + montant[i] + " where id1 = '" + liefflc[0].getId1() + "' and id2 = '" + liefflc[0].getId2() + "'";
+                    String rek = "update " + nomTable + "  set montantMere = " + montant[i] + " where id1 = '"
+                            + liefflc[0].getId1() + "' and id2 = '" + liefflc[0].getId2() + "'";
                     st.executeUpdate(rek);
                 }
             }
@@ -344,7 +362,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     @Override
     public String updateTypeObjet(String table, String id, String typ, String desc) throws Exception {
         try {
-            if (u.getIdrole().compareTo("Chef") == 0 || u.getIdrole().compareTo("admin") == 0 || u.getIdrole().compareTo("dg") == 0 || u.getIdrole().compareTo("adminFacture") == 0) {
+            if (u.getIdrole().compareTo("Chef") == 0 || u.getIdrole().compareTo("admin") == 0
+                    || u.getIdrole().compareTo("dg") == 0 || u.getIdrole().compareTo("adminFacture") == 0) {
                 TypeObjet to = new TypeObjet(table, id, typ, desc);
                 MapHistorique histo = new MapHistorique(table, "update", u.getTuppleID(), to.getId());
                 histo.setObjet("bean.TypeObjet");
@@ -362,7 +381,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     @Override
     public int deleteTypeObjet(String nomTable, String id) throws Exception {
         try {
-            if (u.getIdrole().compareTo("Chef") == 0 || u.getIdrole().compareTo("admin") == 0 || u.getIdrole().compareTo("dg") == 0 || u.getIdrole().compareTo("adminFacture") == 0) {
+            if (u.getIdrole().compareTo("Chef") == 0 || u.getIdrole().compareTo("admin") == 0
+                    || u.getIdrole().compareTo("dg") == 0 || u.getIdrole().compareTo("adminFacture") == 0) {
 
                 TypeObjet to = new TypeObjet(nomTable, id, "-", "-");
                 MapHistorique h = new MapHistorique(nomTable, "delete", u.getTuppleID(), id);
@@ -380,9 +400,10 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     @Override
-    public MapUtilisateur[] findUtilisateurs(String refuser, String loginuser, String pwduser, String nomuser, String adruser, String teluser, String idrole) throws Exception {
+    public MapUtilisateur[] findUtilisateurs(String refuser, String loginuser, String pwduser, String nomuser,
+            String adruser, String teluser, String idrole) throws Exception {
         try {
-            int[] a = {1, 2, 3, 4, 5, 6, 7}; //Donne le numero des champs sur lesquelles on va mettre des criteres
+            int[] a = { 1, 2, 3, 4, 5, 6, 7 }; // Donne le numero des champs sur lesquelles on va mettre des criteres
             String[] val = new String[a.length];
             val[0] = refuser;
             val[1] = loginuser;
@@ -390,7 +411,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             val[3] = nomuser;
             val[4] = adruser;
             val[5] = teluser;
-            val[6] = idrole; //Affecte des valeurs aux criteres
+            val[6] = idrole; // Affecte des valeurs aux criteres
             UtilisateurUtil cu = new UtilisateurUtil();
             return (MapUtilisateur[]) cu.rechercher(a, val);
         } catch (Exception ex) {
@@ -399,7 +420,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     @Override
-    public ResultatEtSomme findResultatFinalePage(String nomTable, String apresW, String colonne, String ordre) throws Exception {
+    public ResultatEtSomme findResultatFinalePage(String nomTable, String apresW, String colonne, String ordre)
+            throws Exception {
         return null;
     }
 
@@ -413,9 +435,13 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         return u;
     }
 
-    public int getMontantBilletage(String dix, String cinq, String deux, String un, String deuxCinq, String deuxCent, String cent, String cinquante, String vingt) {
-        int retour1 = UtilitaireAcade.stringToInt(dix) * 10000 + 5000 * UtilitaireAcade.stringToInt(cinq) + 2000 * UtilitaireAcade.stringToInt(deux) + 1000 * UtilitaireAcade.stringToInt(un);
-        int retour2 = UtilitaireAcade.stringToInt(deuxCinq) * 500 + 200 * UtilitaireAcade.stringToInt(deuxCent) + 100 * UtilitaireAcade.stringToInt(cent) + 50 * UtilitaireAcade.stringToInt(cinquante) + 20 * UtilitaireAcade.stringToInt(vingt);
+    public int getMontantBilletage(String dix, String cinq, String deux, String un, String deuxCinq, String deuxCent,
+            String cent, String cinquante, String vingt) {
+        int retour1 = UtilitaireAcade.stringToInt(dix) * 10000 + 5000 * UtilitaireAcade.stringToInt(cinq)
+                + 2000 * UtilitaireAcade.stringToInt(deux) + 1000 * UtilitaireAcade.stringToInt(un);
+        int retour2 = UtilitaireAcade.stringToInt(deuxCinq) * 500 + 200 * UtilitaireAcade.stringToInt(deuxCent)
+                + 100 * UtilitaireAcade.stringToInt(cent) + 50 * UtilitaireAcade.stringToInt(cinquante)
+                + 20 * UtilitaireAcade.stringToInt(vingt);
         return retour1 + retour2;
     }
 
@@ -435,7 +461,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     public int desactiveUtilisateur(String ref) throws Exception {
 
         try {
-            if (u.getIdrole().compareTo("admin") == 0 || u.getIdrole().compareTo("dg") == 0 || u.getIdrole().compareTo("adminFacture") == 0) {
+            if (u.getIdrole().compareTo("admin") == 0 || u.getIdrole().compareTo("dg") == 0
+                    || u.getIdrole().compareTo("adminFacture") == 0) {
 
                 int i = desactiveUtilisateur(ref, u.getTuppleID());
                 return i;
@@ -449,7 +476,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
 
     public int activeUtilisateur(String ref, String refUser) throws bean.ErreurDAO {
         try {
-            historique.AnnulationUtilisateur[] au = (historique.AnnulationUtilisateur[]) new historique.AnnulationUtilisateurUtil().rechercher(2, ref);
+            historique.AnnulationUtilisateur[] au = (historique.AnnulationUtilisateur[]) new historique.AnnulationUtilisateurUtil()
+                    .rechercher(2, ref);
             historique.MapHistorique h = new historique.MapHistorique("Utilisateurs", "active", refUser, ref);
             h.setObjet("historique.AnnulationUtilisateur");
             for (int i = 0; i < au.length; i++) {
@@ -465,7 +493,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     public int activeUtilisateur(String ref) throws Exception {
 
         try {
-            if (u.getIdrole().compareTo("admin") == 0 || u.getIdrole().compareTo("dg") == 0 || u.getIdrole().compareTo("adminFacture") == 0) {
+            if (u.getIdrole().compareTo("admin") == 0 || u.getIdrole().compareTo("dg") == 0
+                    || u.getIdrole().compareTo("adminFacture") == 0) {
 
                 int i = activeUtilisateur(ref, u.getTuppleID());
                 return i;
@@ -491,7 +520,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         Connection connection = null;
         try {
             connection = (new UtilDB()).GetConn();
-            HomePageURL[] hommePageList = (HomePageURL[]) CGenUtil.rechercher(new HomePageURL(), null, null, connection, "");
+            HomePageURL[] hommePageList = (HomePageURL[]) CGenUtil.rechercher(new HomePageURL(), null, null, connection,
+                    "");
             if (hommePageList != null && hommePageList.length > 0) {
                 this.home_page = hommePageList[0].getUrlpage();
             }
@@ -507,16 +537,18 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     @Override
-    public Direction[] findDirection(String idDir, String libelledir, String descdir, String abbrevDir, String idDirecteur) throws Exception {
+    public Direction[] findDirection(String idDir, String libelledir, String descdir, String abbrevDir,
+            String idDirecteur) throws Exception {
 
         try {
             String afterW = "";
-            int[] numChamp = {0, 1, 2};
-            String[] val = {idDir, libelledir, descdir};
+            int[] numChamp = { 0, 1, 2 };
+            String[] val = { idDir, libelledir, descdir };
             DirectionUtil du = new DirectionUtil();
             du.utiliserChampBase();
-            //if(idDirecteur.compareToIgnoreCase("")==0 || idDirecteur.compareToIgnoreCase("%")==0) idDirecteur = "%";
-            //afterW=" AND idDirecteur like  '" + idDirecteur +"'";
+            // if(idDirecteur.compareToIgnoreCase("")==0 ||
+            // idDirecteur.compareToIgnoreCase("%")==0) idDirecteur = "%";
+            // afterW=" AND idDirecteur like '" + idDirecteur +"'";
             return (Direction[]) du.rechercher(numChamp, val, "");
 
         } catch (Exception ex) {
@@ -545,7 +577,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             UtilisateurUtil crt = new UtilisateurUtil();
             uVue = crt.testeValide("utilisateurVue", user, pass);
             type = u.getIdrole();
-            MapHistorique histo = new MapHistorique("login", "login", String.valueOf(u.getRefuser()), String.valueOf(u.getRefuser()));
+            MapHistorique histo = new MapHistorique("login", "login", String.valueOf(u.getRefuser()),
+                    String.valueOf(u.getRefuser()));
             histo.setObjet("mg.cnaps.utilisateur.CNAPSUser");
             histo.setAction(histo.getAction());
 
@@ -555,8 +588,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
 
             histo.insertToTable();
 
-//            TimingApplication timingApplication = new TimingApplication();
-//            timingApplication.addTiming(u);
+            // TimingApplication timingApplication = new TimingApplication();
+            // timingApplication.addTiming(u);
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -567,6 +600,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             }
         }
     }
+
     @Override
     public void testLogin(String user, String pass, String param) throws Exception {
         Connection c = null;
@@ -578,7 +612,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             UtilisateurUtil crt = new UtilisateurUtil();
             uVue = crt.testeValide("utilisateurVue", user, pass);
             type = u.getIdrole();
-            MapHistorique histo = new MapHistorique("login", "login", String.valueOf(u.getRefuser()), String.valueOf(u.getRefuser()));
+            MapHistorique histo = new MapHistorique("login", "login", String.valueOf(u.getRefuser()),
+                    String.valueOf(u.getRefuser()));
             histo.setObjet("mg.cnaps.utilisateur.CNAPSUser");
             histo.setAction(histo.getAction());
 
@@ -588,8 +623,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
 
             histo.insertToTable();
 
-//            TimingApplication timingApplication = new TimingApplication();
-//            timingApplication.addTiming(u);
+            // TimingApplication timingApplication = new TimingApplication();
+            // timingApplication.addTiming(u);
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -615,12 +650,14 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     @Override
-    public String mapperMereFille(ClassMAPTable e, String idMere, String[] idFille, String rem, String montant, String etat) throws Exception {
+    public String mapperMereFille(ClassMAPTable e, String idMere, String[] idFille, String rem, String montant,
+            String etat) throws Exception {
         Connection c = null;
         try {
             c = new UtilDB().GetConn();
             c.setAutoCommit(false);
-            mapperMereFille(e.getNomTable(), e.getNomProcedureSequence(), e.getINDICE_PK(), idMere, idFille, rem, montant, etat, c);
+            mapperMereFille(e.getNomTable(), e.getNomProcedureSequence(), e.getINDICE_PK(), idMere, idFille, rem,
+                    montant, etat, c);
             c.commit();
         } catch (Exception ex) {
             c.rollback();
@@ -634,7 +671,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     @Override
-    public String mapperMereFille(ClassMAPTable e, String nomTable, String idMere, String[] idFille, String rem, String montant, String etat) throws Exception {
+    public String mapperMereFille(ClassMAPTable e, String nomTable, String idMere, String[] idFille, String rem,
+            String montant, String etat) throws Exception {
         Connection c = null;
         try {
             c = new UtilDB().GetConn();
@@ -672,10 +710,12 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         }
     }
 
-    public String mapperMereFille(String nomtableMappage, String nomProcedure, String suffixeMap, String idMere, String[] idFille, String rem, String montant, String etat, Connection c) throws Exception {
+    public String mapperMereFille(String nomtableMappage, String nomProcedure, String suffixeMap, String idMere,
+            String[] idFille, String rem, String montant, String etat, Connection c) throws Exception {
         try {
             for (int i = 0; i < idFille.length; i++) {
-                UtilitaireMetier.mapperMereToFille(nomtableMappage, nomProcedure, suffixeMap, idMere, idFille[i], rem, montant, u.getTuppleID(), etat, c);
+                UtilitaireMetier.mapperMereToFille(nomtableMappage, nomProcedure, suffixeMap, idMere, idFille[i], rem,
+                        montant, u.getTuppleID(), etat, c);
             }
         } catch (Exception e) {
             throw e;
@@ -683,7 +723,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         return null;
     }
 
-    public void deleteMereFille(String nomtableMappage, String idMere, String[] idFille, Connection c) throws Exception {
+    public void deleteMereFille(String nomtableMappage, String idMere, String[] idFille, Connection c)
+            throws Exception {
         try {
             for (int i = 0; i < idFille.length; i++) {
                 UtilitaireMetier.deleteMereToFille(nomtableMappage, idMere, idFille[i], u.getTuppleID(), c);
@@ -694,7 +735,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     @Override
-    public void deleteMereFille(ClassMAPTable e, String nomTable, String idMere, String[] liste_id_fille) throws Exception {
+    public void deleteMereFille(ClassMAPTable e, String nomTable, String idMere, String[] liste_id_fille)
+            throws Exception {
         Connection c = null;
         try {
             c = new UtilDB().GetConn();
@@ -722,11 +764,13 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     public boolean testMemeDirection(int userAutres) throws Exception {
         boolean retour = true;
         MapUtilisateur crt = new MapUtilisateur();
-        MapUtilisateur[] t = (MapUtilisateur[]) (bean.CGenUtil.rechercher(crt, null, null, " and refuser=" + userAutres));
+        MapUtilisateur[] t = (MapUtilisateur[]) (bean.CGenUtil.rechercher(crt, null, null,
+                " and refuser=" + userAutres));
         if (t.length == 0) {
             throw new Exception("Utilisateur finale " + userAutres + " non existante");
         }
-        //System.out.println("u adre user = "+t.length+" t[0] adr user = "+t[0].getAdruser()+" t[0] id user = "+userAutres);
+        // System.out.println("u adre user = "+t.length+" t[0] adr user =
+        // "+t[0].getAdruser()+" t[0] id user = "+userAutres);
         if (u.getAdruser().compareToIgnoreCase(t[0].getAdruser()) != 0) {
             throw new Exception("Utilisateur dans une autre direction");
         }
@@ -736,58 +780,76 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     public String testRangUser(ClassMAPTable e, Connection c) throws Exception {
         String retour = "";
 
-        //si adruser = DG => direction like '%'
-        //si autre => direction = 'autre_direction'
-//        if (e instanceof bean.ClassEtat || e instanceof bean.ClassUser) {
-//            if (u.getIdrole().compareTo("verificateur_recette")!=0&&u.getAdruser().compareTo("DG") != 0 && ListeColonneTable.getChamp(e, "direction", c) != null) {
-//                retour += " and direction like '" + u.getAdruser() + "'";
-//            }
-//        }
+        // si adruser = DG => direction like '%'
+        // si autre => direction = 'autre_direction'
+        // if (e instanceof bean.ClassEtat || e instanceof bean.ClassUser) {
+        // if
+        // (u.getIdrole().compareTo("verificateur_recette")!=0&&u.getAdruser().compareTo("DG")
+        // != 0 && ListeColonneTable.getChamp(e, "direction", c) != null) {
+        // retour += " and direction like '" + u.getAdruser() + "'";
+        // }
+        // }
 
-        /*UtilisateurRole util = new UtilisateurRole();
-         UtilisateurRole[] utilEnCours = (UtilisateurRole[]) CGenUtil.rechercher(util, null, null, c, " and refuser=" + u.getTuppleID());
-         if (utilEnCours.length != 0) {
-         UtilisateurRole[] liste_util = (UtilisateurRole[]) CGenUtil.rechercher(util, null, null, c, " and rang <= " + utilEnCours[0].getRang());
-         String[] users = new String[liste_util.length];
-
-         for (int i = 0; i < liste_util.length; i++) {
-         users[i] = liste_util[i].getRefuser() + "";
-         }
-         if (e instanceof bean.ClassEtat || e instanceof bean.ClassUser) {
-         if (e instanceof mg.cnaps.notification.NotificationLibelle) {
-         return NotificationService.conditionLectureNotification(utilEnCours[0]);
-         } else if ((ListeColonneTable.getChamp(e, "direction", c) != null && ListeColonneTable.getChamp(e, "service", c) != null)) {
-         if (utilEnCours[0].getRang() < ConstanteUser.getRangChefDeService()) {
-         return " and ((iduser = '" + utilEnCours[0].getRefuser() + "') OR (iduser like '%' AND service = '" + utilEnCours[0].getService() + "') OR (iduser like '%' AND direction like '%'))";
-         }
-         if (utilEnCours[0].getRang() >= ConstanteUser.getRangChefDeService() && utilEnCours[0].getRang() < ConstanteUser.getRangDG()) {
-         return " and ((service = '" + utilEnCours[0].getService() + "') OR (direction like '%' AND service like '%' ) OR (service like '%' AND direction = '" + utilEnCours[0].getDirection() + "'))";
-         }
-         if (utilEnCours[0].getRang() >= ConstanteUser.getRangDG()) {
-         return " and (direction like '%' OR direction is null)";
-         }
-         } else {
-         retour = UtilitaireAcade.tabToString(users, "'", ",");
-         retour = " and iduser in (" + retour + ",'0')";
-         }
-         }
-         //            if ((e.getClass().getSuperclass().getSimpleName() != null) && (e.getClass().getSuperclass().getSimpleName().compareToIgnoreCase("ClassEtat") == 0 || e.getClass().getSuperclass().getSimpleName().compareToIgnoreCase("ClassUser") == 0)) {
-         //                retour = UtilitaireAcade.tabToString(users, "'", ",");
-         //                retour = " and iduser in (" + retour + ",'0')";
-         //            }
-         }*/
+        /*
+         * UtilisateurRole util = new UtilisateurRole();
+         * UtilisateurRole[] utilEnCours = (UtilisateurRole[]) CGenUtil.rechercher(util,
+         * null, null, c, " and refuser=" + u.getTuppleID());
+         * if (utilEnCours.length != 0) {
+         * UtilisateurRole[] liste_util = (UtilisateurRole[]) CGenUtil.rechercher(util,
+         * null, null, c, " and rang <= " + utilEnCours[0].getRang());
+         * String[] users = new String[liste_util.length];
+         * 
+         * for (int i = 0; i < liste_util.length; i++) {
+         * users[i] = liste_util[i].getRefuser() + "";
+         * }
+         * if (e instanceof bean.ClassEtat || e instanceof bean.ClassUser) {
+         * if (e instanceof mg.cnaps.notification.NotificationLibelle) {
+         * return NotificationService.conditionLectureNotification(utilEnCours[0]);
+         * } else if ((ListeColonneTable.getChamp(e, "direction", c) != null &&
+         * ListeColonneTable.getChamp(e, "service", c) != null)) {
+         * if (utilEnCours[0].getRang() < ConstanteUser.getRangChefDeService()) {
+         * return " and ((iduser = '" + utilEnCours[0].getRefuser() +
+         * "') OR (iduser like '%' AND service = '" + utilEnCours[0].getService() +
+         * "') OR (iduser like '%' AND direction like '%'))";
+         * }
+         * if (utilEnCours[0].getRang() >= ConstanteUser.getRangChefDeService() &&
+         * utilEnCours[0].getRang() < ConstanteUser.getRangDG()) {
+         * return " and ((service = '" + utilEnCours[0].getService() +
+         * "') OR (direction like '%' AND service like '%' ) OR (service like '%' AND direction = '"
+         * + utilEnCours[0].getDirection() + "'))";
+         * }
+         * if (utilEnCours[0].getRang() >= ConstanteUser.getRangDG()) {
+         * return " and (direction like '%' OR direction is null)";
+         * }
+         * } else {
+         * retour = UtilitaireAcade.tabToString(users, "'", ",");
+         * retour = " and iduser in (" + retour + ",'0')";
+         * }
+         * }
+         * // if ((e.getClass().getSuperclass().getSimpleName() != null) &&
+         * (e.getClass().getSuperclass().getSimpleName().compareToIgnoreCase(
+         * "ClassEtat") == 0 ||
+         * e.getClass().getSuperclass().getSimpleName().compareToIgnoreCase("ClassUser")
+         * == 0)) {
+         * // retour = UtilitaireAcade.tabToString(users, "'", ",");
+         * // retour = " and iduser in (" + retour + ",'0')";
+         * // }
+         * }
+         */
         return retour;
     }
 
     @Override
-    public ResultatEtSomme getDataPageMax(ClassMAPTable e, String[] colInt, String[] valInt, int numPage, String apresWhere, String[] nomColSomme, Connection c) throws Exception {
+    public ResultatEtSomme getDataPageMax(ClassMAPTable e, String[] colInt, String[] valInt, int numPage,
+            String apresWhere, String[] nomColSomme, Connection c) throws Exception {
         return getDataPageMax(e, colInt, valInt, numPage, apresWhere, nomColSomme, c, 0);
     }
 
     @Override
-    public ResultatEtSomme getDataPageMax(ClassMAPTable e, String[] colInt, String[] valInt, int numPage, String apresWhere, String[] nomColSomme, Connection c, int npp) throws Exception {
+    public ResultatEtSomme getDataPageMax(ClassMAPTable e, String[] colInt, String[] valInt, int numPage,
+            String apresWhere, String[] nomColSomme, Connection c, int npp) throws Exception {
         e.setMode("select");
-        //novaina direction ilay iduser
+        // novaina direction ilay iduser
         if (ListeColonneTable.getChamp(e, "direction", c) != null) {
             ClassUser temp = (ClassUser) e;
             apresWhere = testRangUser(e, c) + apresWhere;
@@ -795,58 +857,69 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         if (e.getNomTableSelect().compareToIgnoreCase("SIG_TRAVAILLEUR_INFO_COMPLET") == 0) {
             return CGenUtil.rechercherPageMaxSansRecap(e, colInt, valInt, numPage, apresWhere, nomColSomme, c, npp);
         }
-        //System.out.println("apres where vaovao oooo "+apresWhere+ "user vaovao ooo"+u.getTuppleID());
+        // System.out.println("apres where vaovao oooo "+apresWhere+ "user vaovao
+        // ooo"+u.getTuppleID());
         return CGenUtil.rechercherPageMax(e, colInt, valInt, numPage, apresWhere, nomColSomme, c, npp);
     }
 
     @Override
-    public ResultatEtSomme getDataPage(ClassMAPTable e, String[] colInt, String[] valInt, int numPage, String apresWhere, String[] nomColSomme, Connection c) throws Exception {
+    public ResultatEtSomme getDataPage(ClassMAPTable e, String[] colInt, String[] valInt, int numPage,
+            String apresWhere, String[] nomColSomme, Connection c) throws Exception {
         return getDataPage(e, colInt, valInt, numPage, apresWhere, nomColSomme, c, 0);
     }
 
     @Override
-    public ResultatEtSomme getDataPage(ClassMAPTable e, String[] colInt, String[] valInt, int numPage, String apresWhere, String[] nomColSomme, Connection c, int npp) throws Exception {
+    public ResultatEtSomme getDataPage(ClassMAPTable e, String[] colInt, String[] valInt, int numPage,
+            String apresWhere, String[] nomColSomme, Connection c, int npp) throws Exception {
         e.setMode("select");
-        //novaina direction ilay iduser
+        // novaina direction ilay iduser
         if (ListeColonneTable.getChamp(e, "direction", c) != null) {
             ClassUser temp = (ClassUser) e;
             apresWhere = testRangUser(e, c) + apresWhere;
         }
-        ResultatEtSomme rs= CGenUtil.rechercherPage(e, colInt, valInt, numPage, apresWhere, nomColSomme, c, npp);
-        
+        ResultatEtSomme rs = CGenUtil.rechercherPage(e, colInt, valInt, numPage, apresWhere, nomColSomme, c, npp);
+
         return rs;
     }
 
     @Override
-    public ResultatEtSomme getDataPageGroupe(ClassMAPTable e, String[] groupe, String[] sommeGroupe, String[] colInt, String[] valInt, int numPage, String apresWhere, String[] nomColSomme, String ordre, Connection c) throws Exception {
+    public ResultatEtSomme getDataPageGroupe(ClassMAPTable e, String[] groupe, String[] sommeGroupe, String[] colInt,
+            String[] valInt, int numPage, String apresWhere, String[] nomColSomme, String ordre, Connection c)
+            throws Exception {
         e.setMode("select");
-        //novaina direction ilay iduser
+        // novaina direction ilay iduser
         if (ListeColonneTable.getChamp(e, "direction", c) != null) {
             apresWhere = testRangUser(e, c) + apresWhere;
         }
-        return CGenUtil.rechercherPageGroupe(e, groupe, sommeGroupe, colInt, valInt, numPage, apresWhere, nomColSomme, ordre, c);
+        return CGenUtil.rechercherPageGroupe(e, groupe, sommeGroupe, colInt, valInt, numPage, apresWhere, nomColSomme,
+                ordre, c);
     }
 
     @Override
-    public ResultatEtSomme getDataPageGroupe(ClassMAPTable e, String[] groupe, String[] sommeGroupe, String[] colInt, String[] valInt, int numPage, String apresWhere, String[] nomColSomme, String ordre, Connection c, int npp) throws Exception {
+    public ResultatEtSomme getDataPageGroupe(ClassMAPTable e, String[] groupe, String[] sommeGroupe, String[] colInt,
+            String[] valInt, int numPage, String apresWhere, String[] nomColSomme, String ordre, Connection c, int npp)
+            throws Exception {
         e.setMode("select");
-        //novaina direction ilay iduser
+        // novaina direction ilay iduser
 
         if (ListeColonneTable.getChamp(e, "direction", c) != null) {
             apresWhere = testRangUser(e, c) + apresWhere;
         }
-//        if(e instanceof HistoriqueCreationTacheTous){
-//            String req=HistoriqueCreationTacheTous.getRequete(valInt);
-//            return CGenUtil.rechercherPageGroupe( e,  req,  groupe,  sommeGroupe,  colInt,  valInt,  numPage,  apresWhere,  nomColSomme,  ordre,  c,  npp);
-//        }
-        System.out.println("new gsonnn "+new Gson().toJson(colInt)+" eee "+new Gson().toJson(valInt));
-        return CGenUtil.rechercherPageGroupe(e, groupe, sommeGroupe, colInt, valInt, numPage, apresWhere, nomColSomme, ordre, c, npp);
+        // if(e instanceof HistoriqueCreationTacheTous){
+        // String req=HistoriqueCreationTacheTous.getRequete(valInt);
+        // return CGenUtil.rechercherPageGroupe( e, req, groupe, sommeGroupe, colInt,
+        // valInt, numPage, apresWhere, nomColSomme, ordre, c, npp);
+        // }
+        System.out.println("new gsonnn " + new Gson().toJson(colInt) + " eee " + new Gson().toJson(valInt));
+        return CGenUtil.rechercherPageGroupe(e, groupe, sommeGroupe, colInt, valInt, numPage, apresWhere, nomColSomme,
+                ordre, c, npp);
     }
 
     @Override
-    public Object[] getData(ClassMAPTable e, String[] colInt, String[] valInt, Connection c, String apresWhere) throws Exception {
+    public Object[] getData(ClassMAPTable e, String[] colInt, String[] valInt, Connection c, String apresWhere)
+            throws Exception {
         e.setMode("select");
-        //novaina direction ilay iduser
+        // novaina direction ilay iduser
         if (ListeColonneTable.getChamp(e, "direction", c) != null) {
             apresWhere = testRangUser(e, c) + apresWhere;
         }
@@ -887,7 +960,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             c = new UtilDB().GetConn();
             java.sql.Statement sta = c.createStatement();
             temp += "where " + colonne[0] + " ='" + listeCritere[0] + "'";
-            //System.out.println("TY LE TEMP "+temp);
+            // System.out.println("TY LE TEMP "+temp);
             if (tailleCrt > 1) {
                 for (int i = 1; i < tailleCrt; i++) {
                     temp += " and " + colonne[i] + " = '" + listeCritere[i] + "'";
@@ -905,7 +978,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         return retour;
     }
 
-    public static String getMaxColonne(String table, String colonne, String champCritere, String critere) throws Exception {
+    public static String getMaxColonne(String table, String colonne, String champCritere, String critere)
+            throws Exception {
         String retour = "----";
         Connection c = null;
         try {
@@ -913,7 +987,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             c = new UtilDB().GetConn();
             java.sql.Statement sta = c.createStatement();
 
-            //System.out.println("TY LE TEMP "+temp);
+            // System.out.println("TY LE TEMP "+temp);
             java.sql.ResultSet res = sta.executeQuery(temp);
             res.next();
             retour = res.getString(1);
@@ -946,15 +1020,18 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     public Object validerObject(ClassMAPTable o, Connection c) throws Exception {
-        /*	if (u.getRang() < 4) 
-	{
-	    throw new Exception("	Erreur de droit");
-	}*/
+        /*
+         * if (u.getRang() < 4)
+         * {
+         * throw new Exception("	Erreur de droit");
+         * }
+         */
         try {
             return ValiderObject.validerObject(c, o, this, u, listeConfig);
         } catch (Exception ex) {
             ex.printStackTrace();
-            if(c!=null)c.rollback();
+            if (c != null)
+                c.rollback();
             throw ex;
         }
     }
@@ -1060,7 +1137,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         try {
             o.setMode("modif");
 
-         //   this.updateEtat(o, ConstanteEtatAcade.getEtatRejeter(), o.getValInsert("id"), c);
+            // this.updateEtat(o, ConstanteEtatAcade.getEtatRejeter(), o.getValInsert("id"),
+            // c);
             c.commit();
             return o;
         } catch (Exception ex) {
@@ -1088,22 +1166,21 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         }
     }
 
-    
-    
     public Object annulerObject(ClassMAPTable o, Connection c) throws Exception {
         if (testRestriction(u.getIdrole(), "ACT000005", o.getNomTable(), c) == 1) {
             throw new Exception("Erreur de droit");
         }
         try {
             o.setMode("modif");
-//            this.updateEtat(o, ConstanteEtatAcade.getEtatAnnuler(), CGenUtil.getValeurInsert(o, "id"),
-            
-             ClassEtat[] liste = (ClassEtat[]) CGenUtil.rechercher(o, null, null, c,"");
+            // this.updateEtat(o, ConstanteEtatAcade.getEtatAnnuler(),
+            // CGenUtil.getValeurInsert(o, "id"),
+
+            ClassEtat[] liste = (ClassEtat[]) CGenUtil.rechercher(o, null, null, c, "");
             if (liste.length == 0) {
                 throw new Exception("Objet inexistante");
             }
             liste[0].annulerObject(u.getTuppleID(), c);
-//	    c.commit();
+            // c.commit();
             return o;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -1209,14 +1286,16 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     public void updateEtat(ClassMAPTable e, int valeurEtat, String id, Connection c, String colid) throws Exception {
         Statement cmd = null;
         try {
-            ClassMAPTable[] lobj = (ClassMAPTable[])CGenUtil.rechercher(e, null, null, c, String.format(" and upper("+colid+") like upper('%s') ", id));
-            if(lobj.length==0){
+            ClassMAPTable[] lobj = (ClassMAPTable[]) CGenUtil.rechercher(e, null, null, c,
+                    String.format(" and upper(" + colid + ") like upper('%s') ", id));
+            if (lobj.length == 0) {
                 throw new Exception("Il n y a de donnees correspondants a cet id");
             }
             ClassMAPTable obj = lobj[0];
             obj.setValChamp("etat", valeurEtat);
             obj.controlerUpdate(c);
-            String req = "update " + e.getNomTable() + " set etat='" + valeurEtat + "' where "+colid+" = '" + id + "'";
+            String req = "update " + e.getNomTable() + " set etat='" + valeurEtat + "' where " + colid + " = '" + id
+                    + "'";
             System.out.println(req);
             cmd = c.createStatement();
             cmd.executeUpdate(req);
@@ -1234,8 +1313,9 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     public void updateEtat(ClassMAPTable e, int valeurEtat, String id, Connection c) throws Exception {
         Statement cmd = null;
         try {
-            ClassMAPTable[] lobj = (ClassMAPTable[])CGenUtil.rechercher(e, null, null, c, String.format(" and upper(id) like upper('%s') ", id));
-            if(lobj.length==0){
+            ClassMAPTable[] lobj = (ClassMAPTable[]) CGenUtil.rechercher(e, null, null, c,
+                    String.format(" and upper(id) like upper('%s') ", id));
+            if (lobj.length == 0) {
                 throw new Exception("Il n y a de donnees correspondants a cet id");
             }
             ClassMAPTable obj = lobj[0];
@@ -1381,7 +1461,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         return 0;
     }
 
-    public int retournerObjectMultiple(ClassEtat o, String[] listeIdObjet, String motif, Connection c) throws Exception {
+    public int retournerObjectMultiple(ClassEtat o, String[] listeIdObjet, String motif, Connection c)
+            throws Exception {
         try {
 
             String script = UtilitaireAcade.tabToString(listeIdObjet, "'", ",");
@@ -1393,11 +1474,14 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         return 0;
     }
 
-    public int rejeterObjectMultiple(ClassEtat o, String[] listeIdObjet, Connection c, String nomTableRejet, String nomTableCategorieRejet) throws Exception {
+    public int rejeterObjectMultiple(ClassEtat o, String[] listeIdObjet, Connection c, String nomTableRejet,
+            String nomTableCategorieRejet) throws Exception {
         try {
             String script = UtilitaireAcade.tabToString(listeIdObjet, "'", ",");
-            ClassEtat[] mapTableListe = (ClassEtat[]) CGenUtil.rechercher(o, null, null, c, " and upper(" + o.getAttributIDName() + ") in (" + script + " )");
-            if (mapTableListe != null && testRestriction(u.getIdrole(), "ACT000006", mapTableListe[0].getNomTable(), c) == 1) {
+            ClassEtat[] mapTableListe = (ClassEtat[]) CGenUtil.rechercher(o, null, null, c,
+                    " and upper(" + o.getAttributIDName() + ") in (" + script + " )");
+            if (mapTableListe != null
+                    && testRestriction(u.getIdrole(), "ACT000006", mapTableListe[0].getNomTable(), c) == 1) {
                 throw new Exception("Erreur de droit");
             }
             TypeObjet to = new TypeObjet();
@@ -1405,9 +1489,10 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             TypeObjet toVal = (TypeObjet) CGenUtil.rechercher(to, null, null, c, "")[0];
             for (int i = 0; i < mapTableListe.length; i++) {
                 mapTableListe[i].setMode("modif");
-                //setEtat(mapTableListe[i], ConstanteEtatAcade.getEtatObjetRejeter());
+                // setEtat(mapTableListe[i], ConstanteEtatAcade.getEtatObjetRejeter());
                 mapTableListe[i].updateToTableWithHisto(u.getTuppleID(), c);
-                RejetTable rejet = new RejetTable(UtilitaireAcade.dateDuJourSql(), "rejet multiple", listeIdObjet[i], "rejet multiple", toVal.getId());
+                RejetTable rejet = new RejetTable(UtilitaireAcade.dateDuJourSql(), "rejet multiple", listeIdObjet[i],
+                        "rejet multiple", toVal.getId());
                 rejet.setNomTable(nomTableRejet);
                 this.createObject(rejet, c);
             }
@@ -1418,7 +1503,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         return 0;
     }
 
-    public int rejeterObjectMultiple(ClassEtat o, String[] listeIdObjet, String nomTableRejet, String nomTableCategorieRejet) throws Exception {
+    public int rejeterObjectMultiple(ClassEtat o, String[] listeIdObjet, String nomTableRejet,
+            String nomTableCategorieRejet) throws Exception {
         Connection c = null;
         try {
             c = new UtilDB().GetConn();
@@ -1456,7 +1542,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         }
     }
 
-    public String genererEnfantMatricule(String motherName, String sexe, Date dateNaissance, String nationalite, String numActe) throws Exception {
+    public String genererEnfantMatricule(String motherName, String sexe, Date dateNaissance, String nationalite,
+            String numActe) throws Exception {
         try {
             System.out.println("----------------------motherName = " + motherName);
             String anneeDeNaissance = UtilitaireAcade.getAnnee(dateNaissance) + "";
@@ -1469,27 +1556,32 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             int rangMoisNaissance;
             int rangJourNaissance;
 
-            if (sexe.compareToIgnoreCase("0") == 0) { //1989
+            if (sexe.compareToIgnoreCase("0") == 0) { // 1989
                 rangMoisLettre = UtilitaireAcade.getRangMoisLettre(moisDeNaissance + 12);
             } else {
                 rangMoisLettre = UtilitaireAcade.getRangMoisLettre(moisDeNaissance);
             }
 
-            if (nationalite.compareToIgnoreCase("1") == 0) { //1989
+            if (nationalite.compareToIgnoreCase("1") == 0) { // 1989
                 rangJourNaissance = Integer.parseInt(jour) + 40;
             } else {
                 rangJourNaissance = Integer.parseInt(jour);
             }
 
-            // System.out.println("premierChiffreAnnee == " + premierChiffreAnnee + "millenismeAnnee = " + millenismeAnnee + " rangMoisLettre = " + rangMoisLettre + " rangJourNaissance = " + rangJourNaissance + " numActe = " + numActe);
-            // System.out.println(premierChiffreAnnee + "" + millenismeAnnee + "" + rangMoisLettre + "" + rangJourNaissance + "" + numActe);
-            String temp = premierChiffreAnnee + "" + millenismeAnnee + "" + rangMoisLettre + "" + String.format("%02d", rangJourNaissance) + "" + numActe;
+            // System.out.println("premierChiffreAnnee == " + premierChiffreAnnee +
+            // "millenismeAnnee = " + millenismeAnnee + " rangMoisLettre = " +
+            // rangMoisLettre + " rangJourNaissance = " + rangJourNaissance + " numActe = "
+            // + numActe);
+            // System.out.println(premierChiffreAnnee + "" + millenismeAnnee + "" +
+            // rangMoisLettre + "" + rangJourNaissance + "" + numActe);
+            String temp = premierChiffreAnnee + "" + millenismeAnnee + "" + rangMoisLettre + ""
+                    + String.format("%02d", rangJourNaissance) + "" + numActe;
             // cryptage du mere
 
             // dechifrer
             double nom_dechiffrer = UtilitaireAcade.dechiffrer(motherName);
 
-            //System.out.println(" dechiffrement ========= " + nom_dechiffrer);
+            // System.out.println(" dechiffrement ========= " + nom_dechiffrer);
             String val_hex_nom = UtilitaireAcade.completerInt(6, (int) nom_dechiffrer);
 
             System.out.println(" valeur hexa ========= " + val_hex_nom);
@@ -1513,7 +1605,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             int rangJourNaissance = Integer.parseInt(jour);
             String numeroSequence = idTravailleur.substring(6, 10);
 
-            if (sexe.compareToIgnoreCase("0") == 0) { //1989
+            if (sexe.compareToIgnoreCase("0") == 0) { // 1989
                 rangMoisNaissance = moisDeNaissance + 20;
             } else {
                 rangMoisNaissance = moisDeNaissance;
@@ -1521,11 +1613,15 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
 
             rangMoisNaissance = Integer.parseInt(String.format("%02d", rangMoisNaissance));
 
-            String numTemp = millenismeAnnee + "" + rangMoisNaissance + "" + String.format("%02d", rangJourNaissance) + "" + numeroSequence;
+            String numTemp = millenismeAnnee + "" + rangMoisNaissance + "" + String.format("%02d", rangJourNaissance)
+                    + "" + numeroSequence;
 
             long randumNumber = Long.parseLong(numTemp) % 97;
 
-            //System.out.println("millenismeAnnee = " + millenismeAnnee + " rangMoisNaissance = " + rangMoisNaissance + " rangJourNaissance = " + rangJourNaissance + " numeroSequence = " + numeroSequence + " randumNumber = " + randumNumber);
+            // System.out.println("millenismeAnnee = " + millenismeAnnee + "
+            // rangMoisNaissance = " + rangMoisNaissance + " rangJourNaissance = " +
+            // rangJourNaissance + " numeroSequence = " + numeroSequence + " randumNumber =
+            // " + randumNumber);
             numTemp += randumNumber + "";
 
             return numTemp;
@@ -1552,7 +1648,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         try {
             c = (new UtilDB()).GetConn();
             Object ret = finaliser(map, c);
-            //c.commit();
+            // c.commit();
             return ret;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -1565,14 +1661,17 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     public Object createObject(ClassMAPTable o, Connection c) throws Exception {
-        /*if (testRestriction(u.getIdrole(), "ACT000001", o.getNomTable(), c) == 1) {
-	    throw new Exception("Erreur de droit");
-	}*/
+        /*
+         * if (testRestriction(u.getIdrole(), "ACT000001", o.getNomTable(), c) == 1) {
+         * throw new Exception("Erreur de droit");
+         * }
+         */
         try {
             return CreateObject.createObject(o, c, u, this, listeConfig);
         } catch (Exception ex) {
             ex.printStackTrace();
-            if(c!=null)c.rollback();
+            if (c != null)
+                c.rollback();
             throw ex;
         }
     }
@@ -1604,12 +1703,13 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
                 String id = o.getValInsert("id");
                 System.out.println("affichage id : " + id);
                 ClassMAPTable cl = (ClassMAPTable) Class.forName(o.getClassName()).newInstance();
-                ClassMAPTable[] liste = (ClassMAPTable[]) CGenUtil.rechercher(cl, null, null, c, " and id = '" + id + "'");
+                ClassMAPTable[] liste = (ClassMAPTable[]) CGenUtil.rechercher(cl, null, null, c,
+                        " and id = '" + id + "'");
                 if (UtilitaireAcade.stringToInt(liste[0].getValInsert("etat")) == ConstanteEtatAcade.getEtatAnnuler()) {
                     throw new Exception(" Impossible de modifier. Objet annul?");
                 }
                 if (UtilitaireAcade.stringToInt(liste[0].getValInsert("etat")) >= ConstanteEtatAcade.getEtatValider()) {
-                    //throw new Exception(" Impossible de modifier. Objet d�j� vis�");
+                    // throw new Exception(" Impossible de modifier. Objet d�j� vis�");
                 }
 
             }
@@ -1620,8 +1720,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     public Object updateObject(ClassMAPTable o, Connection c) throws Exception {
-        //Connection c=null;
-        //System.out.println("ato updateObject");
+        // Connection c=null;
+        // System.out.println("ato updateObject");
         if (testRestriction(u.getIdrole(), ConstanteUtilisateur.acteUpdate, o.getNomTable(), c) == 1) {
             throw new Exception("Erreur de droit");
         }
@@ -1638,7 +1738,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
 
     public void testDelete(ClassMAPTable o, Connection c) throws Exception {
         try {
-            //System.out.println("miditra delete");
+            // System.out.println("miditra delete");
             if (o.getClass().getSuperclass().getSimpleName().compareToIgnoreCase("ClassEtat") == 0) {
                 String id = o.getValInsert("id");
                 ClassMAPTable[] liste = (ClassMAPTable[]) CGenUtil.rechercher(o, null, null, c, "");
@@ -1695,7 +1795,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             c = new UtilDB().GetConn();
             boolean defaultDelete = true;
             c.setAutoCommit(false);
-            //testFk(o, c);
+            // testFk(o, c);
             if (testRestriction(u.getIdrole(), "ACT000003", o.getNomTable(), c) == 1) {
                 throw new Exception("Erreur de droit");
             }
@@ -1728,14 +1828,15 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     @Override
-    public void updateOneColonneMultiple(String nomTable, String colonne, String colonneCritere, String[]valeurCritere, Object valeur) throws Exception{
+    public void updateOneColonneMultiple(String nomTable, String colonne, String colonneCritere, String[] valeurCritere,
+            Object valeur) throws Exception {
         Connection c = null;
         Object ret = null;
         System.out.println("-tafiditra updateOneColonneMultiple");
         try {
             c = new UtilDB().GetConn();
             c.setAutoCommit(false);
-            for(int i = 0; i<valeurCritere.length; i++){
+            for (int i = 0; i < valeurCritere.length; i++) {
                 System.out.println("-ato");
                 System.out.println(nomTable);
                 System.out.println(colonne);
@@ -1758,30 +1859,30 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             }
         }
     }
-    
 
-    public void updateOneColonneGen(String nomTable, String colonne, String colonneCritere, String valeurCritere, Object valeur, Connection c) throws Exception {
+    public void updateOneColonneGen(String nomTable, String colonne, String colonneCritere, String valeurCritere,
+            Object valeur, Connection c) throws Exception {
         PreparedStatement pst = null;
         try {
             String sql = "UPDATE " + nomTable + " SET " + colonne + "=? WHERE " + colonneCritere + "=?";
             pst = c.prepareStatement(sql);
-            System.out.println("type "+valeur.getClass().getName());
+            System.out.println("type " + valeur.getClass().getName());
             if (valeur.getClass().getName().compareToIgnoreCase("java.lang.String") == 0) {
-                pst.setString(1, (String)valeur);
+                pst.setString(1, (String) valeur);
             }
             if (valeur.getClass().getName().compareToIgnoreCase("java.sql.Date") == 0) {
-                pst.setDate(1, (java.sql.Date)valeur);
-            } 
+                pst.setDate(1, (java.sql.Date) valeur);
+            }
             if (valeur.getClass().getName().compareToIgnoreCase("double") == 0) {
-                pst.setDouble(1, ((Double)valeur).doubleValue());
+                pst.setDouble(1, ((Double) valeur).doubleValue());
             }
             if (valeur.getClass().getName().compareToIgnoreCase("int") == 0) {
-                pst.setInt(1, ((Integer)valeur).intValue());
+                pst.setInt(1, ((Integer) valeur).intValue());
             }
-            if (valeur.getClass().getName().compareToIgnoreCase("java.lang.Integer")==0){
-                pst.setInt(1, ((Integer)valeur).intValue());
-            }            
-            pst.setString(2, valeurCritere);            
+            if (valeur.getClass().getName().compareToIgnoreCase("java.lang.Integer") == 0) {
+                pst.setInt(1, ((Integer) valeur).intValue());
+            }
+            pst.setString(2, valeurCritere);
             pst.executeUpdate();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -1794,7 +1895,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         }
     }
 
-    public void updateOneColonne(String nomTable, String colonne, String colonneCritere, String valeurCritere, String valeur, Connection c) throws Exception {
+    public void updateOneColonne(String nomTable, String colonne, String colonneCritere, String valeurCritere,
+            String valeur, Connection c) throws Exception {
         PreparedStatement pst = null;
         try {
             String sql = "UPDATE " + nomTable + " SET " + colonne + "=? WHERE " + colonneCritere + "=?";
@@ -1898,7 +2000,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         return 0;
     }
 
-    public int ajouterPJInfo(String info_valeur, String pieces_id, String info_id, String info_ok, Connection con) throws Exception {
+    public int ajouterPJInfo(String info_valeur, String pieces_id, String info_id, String info_ok, Connection con)
+            throws Exception {
         return 0;
     }
 
@@ -1935,7 +2038,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     @Override
-    public void createUploadedPj(String nomtable, String nomprocedure, String libelle, String chemin, String mere) throws Exception {
+    public void createUploadedPj(String nomtable, String nomprocedure, String libelle, String chemin, String mere)
+            throws Exception {
         Connection con = null;
         try {
             con = new UtilDB().GetConn();
@@ -1954,7 +2058,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         }
     }
 
-    public Object dupliquerObject(ClassMAPTable o, String mapFille, String nomColonneMere, Connection c) throws Exception {
+    public Object dupliquerObject(ClassMAPTable o, String mapFille, String nomColonneMere, Connection c)
+            throws Exception {
         if (testRestriction(u.getIdrole(), "ACT000010", o.getNomTable(), c) == 1) {
             throw new Exception("Erreur de droit");
         }
@@ -2028,9 +2133,9 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     public void annulerVisa(ClassMAPTable o, Connection c) throws Exception {
         try {
             if (/*
-                     * testRestriction(u.getIdrole(), "ACT000009",
-                     * o.getNomTable(), c) == 1
-                     */u.getRang() < ConstanteUser.rangDir) {
+                 * testRestriction(u.getIdrole(), "ACT000009",
+                 * o.getNomTable(), c) == 1
+                 */u.getRang() < ConstanteUser.rangDir) {
                 throw new Exception("Erreur de droit");
             }
             boolean defaultVisa = true;
@@ -2038,9 +2143,9 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             String id = o.getValInsert("id");
             o.setValChamp("id", id);
             ClassMAPTable[] liste = (ClassMAPTable[]) CGenUtil.rechercher(o, null, null, c, "");
-            //Control avant update
+            // Control avant update
 
-            //Update etat
+            // Update etat
             if (defaultVisa) {
                 this.updateEtat(o, ConstanteEtatAcade.getEtatCreer(), id, c);
             }
@@ -2050,10 +2155,12 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         }
     }
 
-    public String mapperMereToFilleMetier(String nomtableMappage, String nomProcedure, String suffixeMap, String idMere, String[] idFille, String rem, String montant, String etat, Connection c) throws Exception {
+    public String mapperMereToFilleMetier(String nomtableMappage, String nomProcedure, String suffixeMap, String idMere,
+            String[] idFille, String rem, String montant, String etat, Connection c) throws Exception {
         try {
             for (int i = 0; i < idFille.length; i++) {
-                UtilitaireMetier.mapperMereToFilleMetier(nomtableMappage, nomProcedure, suffixeMap, idMere, idFille[i], rem, montant, u.getTuppleID(), etat, c);
+                UtilitaireMetier.mapperMereToFilleMetier(nomtableMappage, nomProcedure, suffixeMap, idMere, idFille[i],
+                        rem, montant, u.getTuppleID(), etat, c);
             }
         } catch (Exception e) {
             throw e;
@@ -2062,7 +2169,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     @Override
-    public String mapperMereToFilleMetier(ClassMAPTable e, String nomTable, String idMere, String[] idFille, String rem, String montant, String etat) throws Exception {
+    public String mapperMereToFilleMetier(ClassMAPTable e, String nomTable, String idMere, String[] idFille, String rem,
+            String montant, String etat) throws Exception {
         Connection c = null;
         try {
             c = new UtilDB().GetConn();
@@ -2084,12 +2192,14 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     @Override
-    public String mapperMereToFilleMetier(ClassMAPTable e, String idMere, String[] idFille, String rem, String montant, String etat) throws Exception {
+    public String mapperMereToFilleMetier(ClassMAPTable e, String idMere, String[] idFille, String rem, String montant,
+            String etat) throws Exception {
         Connection c = null;
         try {
             c = new UtilDB().GetConn();
             c.setAutoCommit(false);
-            mapperMereToFilleMetier(e.getNomTable(), e.getNomProcedureSequence(), e.getINDICE_PK(), idMere, idFille, rem, montant, etat, c);
+            mapperMereToFilleMetier(e.getNomTable(), e.getNomProcedureSequence(), e.getINDICE_PK(), idMere, idFille,
+                    rem, montant, etat, c);
             c.commit();
         } catch (Exception ex) {
             c.rollback();
@@ -2102,7 +2212,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         return null;
     }
 
-    public Object[] createObjectMultiple(ClassMAPTable[] o, String colonneMere, String idmere, Connection c) throws Exception {
+    public Object[] createObjectMultiple(ClassMAPTable[] o, String colonneMere, String idmere, Connection c)
+            throws Exception {
         try {
             Object[] ret = new Object[o.length];
             for (int i = 0; i < o.length; i++) {
@@ -2143,25 +2254,29 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     @Override
-    public void createUploadedPjService(String iddossier, HashMap<String, String> listeVal, Iterator it, String nomtable, String nomprocedure, String mere) throws Exception {
+    public void createUploadedPjService(String iddossier, HashMap<String, String> listeVal, Iterator it,
+            String nomtable, String nomprocedure, String mere) throws Exception {
         try {
-            service.UploadService.createUploadedPj(iddossier, u.getTuppleID(), listeVal, it, nomtable, nomprocedure, mere);
+            service.UploadService.createUploadedPj(iddossier, u.getTuppleID(), listeVal, it, nomtable, nomprocedure,
+                    mere);
         } catch (Exception ex) {
             ex.printStackTrace();
             throw ex;
         }
     }
-    
+
     @Override
-    public Object createUploadedPjServiceRetour(String iddossier, HashMap<String, String> listeVal, Iterator it, String nomtable, String nomprocedure, String mere) throws Exception {
+    public Object createUploadedPjServiceRetour(String iddossier, HashMap<String, String> listeVal, Iterator it,
+            String nomtable, String nomprocedure, String mere) throws Exception {
         try {
-            Object obj = (Object)service.UploadService.createUploadedPjRetour(iddossier, u.getTuppleID(), listeVal, it, nomtable, nomprocedure, mere);
+            Object obj = (Object) service.UploadService.createUploadedPjRetour(iddossier, u.getTuppleID(), listeVal, it,
+                    nomtable, nomprocedure, mere);
             return obj;
         } catch (Exception ex) {
             ex.printStackTrace();
             throw ex;
         }
-    }    
+    }
 
     @Override
     public void deleteUploadedPj(String nomtable, String id) throws Exception {
@@ -2235,7 +2350,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
                 c.setAutoCommit(false);
                 verif = 1;
             }
-            //this.updateEtat(t, ConstanteEtatAcade.etatDoublon, t.getValInsert("id"), c);
+            // this.updateEtat(t, ConstanteEtatAcade.etatDoublon, t.getValInsert("id"), c);
             if (verif == 1) {
                 c.commit();
             }
@@ -2281,7 +2396,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
                 c.setAutoCommit(false);
                 verif = 1;
             }
-            //this.updateEtat(o, ConstanteEtatAcade.etatEnAttente, id, c);
+            // this.updateEtat(o, ConstanteEtatAcade.etatEnAttente, id, c);
             if (verif == 1) {
                 c.commit();
             }
@@ -2296,7 +2411,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         }
     }
 
-    public int validerObjetMereFille(ClassEtat mere, ClassEtat fille, String idmere, String nomcolonneidmere, Connection c) throws Exception {
+    public int validerObjetMereFille(ClassEtat mere, ClassEtat fille, String idmere, String nomcolonneidmere,
+            Connection c) throws Exception {
         int verif = 0;
         try {
             if (c == null) {
@@ -2319,17 +2435,20 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             }
         }
     }
+
     @Override
-    public ResultatEtSomme getDataPageMaxSansRecap(ClassMAPTable e, String[] colInt, String[] valInt, int numPage, String apresWhere, String[] nomColSomme, Connection c, int npp) throws Exception {
+    public ResultatEtSomme getDataPageMaxSansRecap(ClassMAPTable e, String[] colInt, String[] valInt, int numPage,
+            String apresWhere, String[] nomColSomme, Connection c, int npp) throws Exception {
         e.setMode("select");
         if (ListeColonneTable.getChamp(e, "iduser", c) != null) {
             ClassUser temp = (ClassUser) e;
             apresWhere = testRangUser(e, c) + apresWhere;
         }
-        //System.out.println("apres where vaovao oooo "+apresWhere+ "user vaovao ooo"+u.getTuppleID());
+        // System.out.println("apres where vaovao oooo "+apresWhere+ "user vaovao
+        // ooo"+u.getTuppleID());
         return CGenUtil.rechercherPageMaxSansRecap(e, colInt, valInt, numPage, apresWhere, nomColSomme, c, npp);
     }
-    
+
     @Override
     public HashMap<String, String> getMapAutoComplete() {
         return mapAutoComplete;
@@ -2339,7 +2458,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     public void setMapAutoComplete(HashMap<String, String> mapAutoComplete) {
         this.mapAutoComplete = mapAutoComplete;
     }
-    
+
     public Object[] updateObjectMultiple(ClassMAPTable[] o, Connection c) throws Exception {
         try {
             Object[] ret = new Object[o.length];
@@ -2355,7 +2474,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         }
 
     }
-    
+
     public Object[] updateObjectMultiple(ClassMAPTable[] o) throws Exception {
         Connection c = null;
         Object[] ret = null;
@@ -2375,14 +2494,15 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         }
         return ret;
     }
-    
+
     public Object[] updateInsertObjectMultiple(ClassMAPTable[] o, Connection c) throws Exception {
         try {
-            //Object[] ret = new Object[o.length];
-            if(o.length==0){
+            // Object[] ret = new Object[o.length];
+            if (o.length == 0) {
                 return null;
             }
-            Object[] ret = (Object[]) java.lang.reflect.Array.newInstance(o[0].getClass().newInstance().getClass(), o.length);
+            Object[] ret = (Object[]) java.lang.reflect.Array.newInstance(o[0].getClass().newInstance().getClass(),
+                    o.length);
             for (int i = 0; i < o.length; i++) {
                 if (!o[i].getTuppleID().equals("")) {
                     ret[i] = updateObject(o[i], c);
@@ -2398,7 +2518,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         }
 
     }
-    
+
     @Override
     public Object[] updateInsertObjectMultiple(ClassMAPTable[] o) throws Exception {
         Connection c = null;
@@ -2418,10 +2538,11 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             }
         }
         return ret;
-    }    
-    
+    }
+
     @Override
-    public void createTypeObjetMultiple(String nomTable, String proc, String pref, String[] typ, String[] desc) throws Exception {
+    public void createTypeObjetMultiple(String nomTable, String proc, String pref, String[] typ, String[] desc)
+            throws Exception {
         Connection c = null;
         int verif = 0;
         try {
@@ -2444,9 +2565,10 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             }
         }
     }
-    
+
     @Override
-    public String createTypeObjet(String nomTable, String proc, String pref, String typ, String desc, Connection c) throws Exception {
+    public String createTypeObjet(String nomTable, String proc, String pref, String typ, String desc, Connection c)
+            throws Exception {
         try {
             if (u.getRang() >= 4) {
                 if (typ.compareTo("") == 0) {
@@ -2459,7 +2581,8 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
                     refuser = g[0];
                 }
 
-                MapHistorique histo = new MapHistorique(nomTable, "Insertion par " + u.getTuppleID(), refuser, to.getId());
+                MapHistorique histo = new MapHistorique(nomTable, "Insertion par " + u.getTuppleID(), refuser,
+                        to.getId());
                 histo.setObjet("bean.TypeObjet");
                 to.insertToTable(histo, c);
                 String s = to.getId();
@@ -2471,28 +2594,30 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             throw ex;
         }
     }
-    
+
     @Override
-    public void deleteMultiple(String[]ids, String classe,String nomtable,Connection c) throws Exception {
+    public void deleteMultiple(String[] ids, String classe, String nomtable, Connection c) throws Exception {
         boolean connectionOuvert = false;
         try {
-            if(c == null){
+            if (c == null) {
                 c = new UtilDB().GetConn();
                 c.setAutoCommit(false);
                 connectionOuvert = true;
             }
             ClassMAPTable t = null;
-            for(String id : ids){
+            for (String id : ids) {
                 t = (ClassMAPTable) (Class.forName(classe).newInstance());
                 t.setValChamp(t.getAttributIDName(), id);
                 if (nomtable != null && !nomtable.isEmpty()) {
                     t.setNomTable(nomtable);
                 }
-                deleteObject(t,c);
+                deleteObject(t, c);
             }
-            if(connectionOuvert) c.commit();
+            if (connectionOuvert)
+                c.commit();
         } catch (Exception e) {
-            if(c != null && connectionOuvert) c.rollback();
+            if (c != null && connectionOuvert)
+                c.rollback();
             throw e;
         } finally {
             if (c != null && connectionOuvert) {
@@ -2500,7 +2625,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             }
         }
     }
-    
+
     public void deleteObject(ClassMAPTable o, Connection c) throws Exception {
 
         try {
@@ -2514,7 +2639,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             crt.setTuppleId(o.getTuppleID());
             crt.setNomTable(o.getNomTable());
             o = crt;
-            
+
             ClassMAPTable[] liste = (ClassMAPTable[]) CGenUtil.rechercher(o, null, null, c, "");
             if (liste.length > 0) {
                 liste[0].testDelete(c);
@@ -2532,7 +2657,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             throw ex;
         }
     }
-    
+
     @Override
     public Object updateObjectMultiple(ClassMAPTable mere, String colonneMere, ClassMAPTable[] fille) throws Exception {
         Connection c = null;
@@ -2556,14 +2681,17 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         }
         return ret;
     }
-    
-    public Object[] updateObjectMultiple(ClassMAPTable[] o, String colonneMere, String idmere, Connection c) throws Exception {
+
+    public Object[] updateObjectMultiple(ClassMAPTable[] o, String colonneMere, String idmere, Connection c)
+            throws Exception {
         try {
             Object[] ret = new Object[o.length];
-            /*if(o.length>0)
-            {
-                o[0].deleteToTable(colonneMere+"='"+idmere+"'", c);
-            }*/
+            /*
+             * if(o.length>0)
+             * {
+             * o[0].deleteToTable(colonneMere+"='"+idmere+"'", c);
+             * }
+             */
             for (int i = 0; i < o.length; i++) {
                 o[i].setValChamp(colonneMere, idmere);
                 if (!o[i].getTuppleID().equals("")) {
@@ -2580,9 +2708,10 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         }
 
     }
+
     @Override
     public Object[] getData(ClassMAPTable e, String req, Connection c) throws Exception {
         e.setMode("select");
-        return CGenUtil.rechercher(e,req,c); 
+        return CGenUtil.rechercher(e, req, c);
     }
 }
