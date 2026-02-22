@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 1bnegjh1b0OudEjWtO5J7WaLPkwxFgOdNnaB5T5i30vnVHbCi1MZkXhUq29xfss
+-- \restrict 1bnegjh1b0OudEjWtO5J7WaLPkwxFgOdNnaB5T5i30vnVHbCi1MZkXhUq29xfss
 
 -- Dumped from database version 16.11 (Ubuntu 16.11-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 16.11 (Ubuntu 16.11-0ubuntu0.24.04.1)
