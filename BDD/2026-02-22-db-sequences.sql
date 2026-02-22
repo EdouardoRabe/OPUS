@@ -231,18 +231,6 @@ END
 $$;
 ALTER FUNCTION public.get_seq_media() OWNER TO postgres;
 
--- ======================== NOTIFICATION (alumni) ========================
--- Nom distinct pour eviter le conflit avec seq_notification du framework APJ
-CREATE SEQUENCE public.seq_notifalumni START WITH 1 INCREMENT BY 1 NO MINVALUE MAXVALUE 999999999999999 CACHE 1;
-ALTER SEQUENCE public.seq_notifalumni OWNER TO postgres;
-
-CREATE FUNCTION public.get_seq_notifalumni() RETURNS integer
-    LANGUAGE plpgsql AS $$
-BEGIN
-    RETURN (SELECT nextval('seq_notifalumni'));
-END
-$$;
-ALTER FUNCTION public.get_seq_notifalumni() OWNER TO postgres;
 
 -- ======================== IDENTIFICATION ========================
 CREATE SEQUENCE public.seq_identification START WITH 1 INCREMENT BY 1 NO MINVALUE MAXVALUE 999999999999999 CACHE 1;
