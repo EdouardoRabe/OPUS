@@ -62,7 +62,7 @@
         comm.insertToTableWithHisto(userId, conn);
 
         String newId = comm.getIdpublicationcommentaire();
-        String lien = "module.jsp?but=alumni/fil-actualite.jsp#pub-" + idpub;
+        String lien = "module.jsp?but=alumni/fil-actualite.jsp#comm-" + newId;
         String nomSource = Notification.getNomUtilisateur(conn, refuser);
 
         // === NOTIFICATIONS ===

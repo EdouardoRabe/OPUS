@@ -140,7 +140,7 @@
                 String icone = getIconeType(n.getTypenotif());
                 String couleur = getIconeColor(n.getTypenotif());
             %>
-                <div onclick="<%= lienNotif != null && !lienNotif.isEmpty() ? "window.location.href='" + lienNotif.replace("'", "\\'") + "'" : "" %>"
+                <div onclick="<%= lienNotif != null && !lienNotif.isEmpty() ? "marquerEtNaviguer('" + n.getIdnotification().replace("'", "\\'") + "','" + lienNotif.replace("'", "\\'") + "')" : "" %>"
                      style="display:flex;align-items:flex-start;gap:12px;padding:14px 18px;background:<%= bgColor %>;border-bottom:1px solid #f0f0f0;cursor:<%= lienNotif != null ? "pointer" : "default" %>;transition:background 0.2s;"
                      onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='<%= bgColor %>'">
 
@@ -170,6 +170,19 @@
     </section>
 </div>
 
+<script>
+function marquerEtNaviguer(idnotif, lien) {
+    var ctx = '<%= request.getContextPath() %>';
+    $.ajax({
+        type: 'POST',
+        url: ctx + '/pages/alumni/ajax/marquer-notification-lu.jsp',
+        data: { idnotification: idnotif },
+        complete: function() {
+            if (lien) window.location.href = lien;
+        }
+    });
+}
+</script>
 <%
     } catch (Exception e) {
         e.printStackTrace();

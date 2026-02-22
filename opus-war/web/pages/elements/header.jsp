@@ -284,7 +284,7 @@
     <div class="topnav-notif-dropdown" style="position:relative;display:flex;align-items:center;margin-right:8px;">
       <button class="topnav-link" type="button" id="notif-bell-btn" title="Notifications" style="position:relative;background:none;border:none;cursor:pointer;padding:6px;">
         <i class="bi bi-bell-fill" style="font-size:20px;color:#434040;"></i>
-        <span id="notif-badge" class="badge" style="display:none;position:absolute;top:0;right:0;background:#e00;color:#fff;font-size:10px;padding:2px 5px;border-radius:10px;">0</span>
+        <span id="notif-badge" class="badge" style="display:none;position:absolute;top:0;right:0;background:#e00;color:#fff;font-size:10px;padding:2px 5px;border-radius:10px;direction:ltr;unicode-bidi:bidi-override;min-width:16px;text-align:center;">0</span>
       </button>
       <div id="notif-dropdown-panel" style="display:none;position:absolute;top:100%;right:0;width:380px;max-height:480px;background:#fff;border:1px solid #ddd;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);z-index:2000;overflow:hidden;">
         <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-bottom:1px solid #eee;">
