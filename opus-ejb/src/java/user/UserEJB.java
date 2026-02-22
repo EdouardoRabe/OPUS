@@ -26,9 +26,7 @@ public interface UserEJB {
     public ResultatEtSomme getDataPageMax(ClassMAPTable e, String[] colInt, String[] valInt, int numPage, String apresWhere, String[] nomColSomme, Connection c, int npp) throws Exception;
 
     //public Object createRemisemagasinMultiple(String[] immo, String magasin) throws Exception;
-//    public void ejbRemove();
-
-    
+    //public void ejbRemove();
 
     public void deleteObjetFille(ClassMAPTable o, Connection conn) throws Exception;
 
