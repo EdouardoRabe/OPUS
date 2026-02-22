@@ -967,38 +967,59 @@ function renderPubTags() {
 
 // ========== SCROLL TO ANCHOR (pour les notifications) ==========
 $(document).ready(function() {
-    var hash = window.location.hash;
-    if (hash && hash.startsWith('#comm-')) {
-        var idpub = null;
-        // Trouver la publication parente du commentaire
-        // D'abord ouvrir tous les commentaires, puis scroller
-        var commId = hash.substring(1); // 'comm-PCM000123'
-        // On ouvre toutes les zones de commentaires et on attend le scroll
-        var pubDivs = document.querySelectorAll('[id^="pub-"]');
-        pubDivs.forEach(function(div) {
-            var pubId = div.id.replace('pub-', '');
-            var commDiv = document.getElementById('commentaires-' + pubId);
-            if (commDiv && commDiv.style.display === 'none') {
+    // Lire les parametres d'URL
+    var urlParams = new URLSearchParams(window.location.search);
+    var scrollTo = urlParams.get('scrollTo');
+    if (!scrollTo) return;
+
+    if (scrollTo.startsWith('comm-')) {
+        // Notification de type commentaire: ouvrir la bonne publication
+        var opub = urlParams.get('opub');
+        if (opub) {
+            var commDiv = document.getElementById('commentaires-' + opub);
+            if (commDiv) {
                 commDiv.style.display = 'block';
-                chargerCommentaires(pubId);
+                chargerCommentaires(opub);
             }
-        });
-        // Attendre le chargement puis scroller
+        } else {
+            // Fallback: ouvrir toutes les publications
+            var pubDivs = document.querySelectorAll('[id^="pub-"]');
+            pubDivs.forEach(function(div) {
+                var pubId = div.id.replace('pub-', '');
+                var cd = document.getElementById('commentaires-' + pubId);
+                if (cd && cd.style.display === 'none') {
+                    cd.style.display = 'block';
+                    chargerCommentaires(pubId);
+                }
+            });
+        }
+        // Attendre le chargement AJAX puis scroller
+        var attempts = 0;
+        var scrollInterval = setInterval(function() {
+            attempts++;
+            var el = document.getElementById(scrollTo);
+            if (el) {
+                clearInterval(scrollInterval);
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.style.background = '#fff9c4';
+                el.style.borderLeft = '4px solid #f9a825';
+                el.style.transition = 'background 2s';
+                setTimeout(function() { el.style.background = ''; el.style.borderLeft = ''; }, 4000);
+            }
+            if (attempts > 20) clearInterval(scrollInterval); // max 10 secondes
+        }, 500);
+    } else if (scrollTo.startsWith('pub-')) {
+        // Notification de type publication
         setTimeout(function() {
-            var el = document.getElementById(commId);
+            var el = document.getElementById(scrollTo);
             if (el) {
                 el.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 el.style.background = '#fff9c4';
-                setTimeout(function() { el.style.background = ''; }, 3000);
+                el.style.borderLeft = '4px solid #f9a825';
+                el.style.transition = 'background 2s';
+                setTimeout(function() { el.style.background = ''; el.style.borderLeft = ''; }, 4000);
             }
-        }, 1500);
-    } else if (hash && hash.startsWith('#pub-')) {
-        var el = document.getElementById(hash.substring(1));
-        if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            el.style.background = '#fff9c4';
-            setTimeout(function() { el.style.background = ''; }, 3000);
-        }
+        }, 300);
     }
 });
 </script>

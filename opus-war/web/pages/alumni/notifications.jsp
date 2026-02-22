@@ -10,6 +10,7 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Date" %>
+<%@ page import="java.sql.PreparedStatement" %>
 <%!
     private String calculerEcart(String daty, String heure) {
         try {
@@ -64,15 +65,11 @@
         conn.setAutoCommit(false);
 
         if ("toutlu".equals(action)) {
-            Notification[] nonLus = (Notification[]) CGenUtil.rechercher(
-                new Notification(), null, null, conn,
-                " and idutilisateur = " + refuser + " and etat = 0");
-            if (nonLus != null) {
-                for (int i = 0; i < nonLus.length; i++) {
-                    nonLus[i].setEtat(1);
-                    nonLus[i].upDateToTable(conn);
-                }
-            }
+            PreparedStatement psMark = conn.prepareStatement(
+                "UPDATE notification SET etat = 1 WHERE idutilisateur = ? AND etat = 0");
+            psMark.setInt(1, refuser);
+            psMark.executeUpdate();
+            psMark.close();
             conn.commit();
         }
 
