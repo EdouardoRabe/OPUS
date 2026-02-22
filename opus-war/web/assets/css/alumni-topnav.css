@@ -303,7 +303,9 @@
   position: absolute;
   top: 100%;
   right: 0;
-  width: 230px;
+  width: 260px;
+  max-height: 70vh;
+  overflow-y: auto;
   background: var(--white);
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-md);
@@ -332,27 +334,55 @@
 }
 .topnav-overflow-menu .topnav-link-group {
   display: block;
-}
-.topnav-overflow-menu .topnav-link-group .topnav-link {
   width: 100%;
+}
+.topnav-overflow-menu .topnav-link-group > .topnav-link {
+  width: 100%;
+  height: 42px;
+  flex-direction: row;
+  justify-content: flex-start;
+  padding: 0 0.7rem;
+  border-radius: var(--radius-sm);
+  gap: 0.65rem;
+  font-size: 0.8rem;
+  border-bottom: none;
+}
+.topnav-overflow-menu .topnav-link-group > .topnav-link .topnav-link-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+.topnav-overflow-menu .topnav-link-group > .topnav-link .topnav-link-caret {
+  margin-left: auto;
+}
+.topnav-overflow-menu .topnav-link-group > .topnav-link:hover {
+  background: rgba(0, 139, 255, 0.06);
 }
 .topnav-overflow-menu .topnav-submenu {
   position: static;
-  display: block;
+  display: none;
   border: none;
   box-shadow: none;
   padding: 0 0 0.35rem 0;
+  margin-left: 0.5rem;
   min-width: 0;
   background: transparent;
+  border-left: 2px solid var(--gray-200);
 }
-.topnav-overflow-menu .topnav-link-group:not(.is-open) .topnav-submenu {
-  display: none;
+.topnav-overflow-menu .topnav-link-group.is-open .topnav-submenu {
+  display: block;
 }
 .topnav-overflow-menu .topnav-sublink {
-  height: 34px;
+  height: 36px;
   margin-left: 0.3rem;
-  padding-left: 0.65rem;
-  font-size: 0.76rem;
+  padding-left: 0.75rem;
+  font-size: 0.78rem;
+  border-radius: var(--radius-sm);
+}
+.topnav-overflow-menu .topnav-sublink:hover {
+  background: rgba(0, 139, 255, 0.08);
+  color: var(--itu-violet);
 }
 
 .topnav-user-btn {
