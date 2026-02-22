@@ -1,4 +1,5 @@
 build-file/**
-BDD/**
+# BDD/**
+note/
 /build.xml
 /opus-ejb/src/java/apj.properties
