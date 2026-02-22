@@ -10,7 +10,7 @@
 <%@ page import="alumni.Publicationcommentaire" %>
 <%@ page import="alumni.Reactiontype" %>
 <%@ page import="alumni.Typepublication" %>
-<%@ page import="utilisateurAcade.UtilisateurAcade" %>
+<%@ page import="alumni.Profil" %>
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
@@ -84,13 +84,13 @@
                     new Reactiontype(), null, null, conn, " order by idreactiontype");
                 if (reactTypes == null) reactTypes = new Reactiontype[0];
 
-                // --- APJ: Charger tous les utilisateurs pour lookup nom ---
-                UtilisateurAcade[] allUsers = (UtilisateurAcade[]) CGenUtil.rechercher(
-                    new UtilisateurAcade(), null, null, conn, "");
+                // --- APJ: Charger tous les profils pour lookup nom ---
+                alumni.Profil[] allProfils = (alumni.Profil[]) CGenUtil.rechercher(
+                    new alumni.Profil(), null, null, conn, "");
                 Map userNames = new HashMap();
-                if (allUsers != null) {
-                    for (int i = 0; i < allUsers.length; i++) {
-                        userNames.put(allUsers[i].getRefuser(), allUsers[i].getNomuser());
+                if (allProfils != null) {
+                    for (int i = 0; i < allProfils.length; i++) {
+                        userNames.put(new Integer(allProfils[i].getIdutilisateur()), allProfils[i].getNom() + " " + allProfils[i].getPrenom());
                     }
                 }
 
@@ -110,7 +110,7 @@
                 for (int p = 0; p < pubs.length; p++) {
                     Publication pub = pubs[p];
                     String idpub = pub.getIdpublication();
-                    String auteur = (String) userNames.get(pub.getIdutilisateur());
+                    String auteur = (String) userNames.get(new Integer(pub.getIdutilisateur()));
                     if (auteur == null) auteur = "Utilisateur";
 
                     // --- APJ: Medias de cette publication ---
