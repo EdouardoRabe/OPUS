@@ -48,9 +48,9 @@
         <% } %>
 
         <!-- ==================== FORMULAIRE NOUVELLE PUBLICATION ==================== -->
-        <div style="border:1px solid #ccc;padding:15px;margin-bottom:20px;background:#fafafa;">
+        <div style="border:1px solid #ccc;padding:15px;margin-bottom:20px;background:#fafafa;border-radius:8px;">
             <h3>Nouvelle publication</h3>
-            <form method="POST" enctype="multipart/form-data"
+            <form method="POST" enctype="multipart/form-data" id="form-pub"
                   action="<%= ctx %>/pages/alumni/ajax/creer-publication.jsp">
                 <div style="margin-bottom:8px;">
                     <label>Type de publication :</label>
@@ -61,15 +61,31 @@
                     </select>
                 </div>
                 <div>
-                    <textarea name="description" rows="3" style="width:100%;padding:8px;"
+                    <textarea name="description" rows="3" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ccc;"
                               placeholder="Quoi de neuf, <%= nomConnecte %> ?"></textarea>
                 </div>
                 <div style="margin-top:8px;">
                     <label>Image (optionnel) :</label>
                     <input type="file" name="image" accept="image/*">
                 </div>
-                <div style="margin-top:8px;">
-                    <button type="submit" style="padding:8px 20px;">Publier</button>
+
+                <!-- Identifier des personnes (comme Facebook) -->
+                <div style="margin-top:10px;">
+                    <a href="javascript:void(0)" onclick="togglePubTag()" style="text-decoration:none;color:#337ab7;font-size:13px;">
+                        <i class="bi bi-tag-fill"></i> Identifier des personnes
+                    </a>
+                    <div id="pub-tag-zone" style="display:none;margin-top:8px;padding:10px;background:#f0f4ff;border:1px solid #d0d8f0;border-radius:6px;">
+                        <input type="text" id="pub-tag-search" placeholder="Rechercher un utilisateur..."
+                               oninput="rechercherPourPubTag()" autocomplete="off"
+                               style="width:70%;padding:5px;border:1px solid #ccc;border-radius:4px;">
+                        <div id="pub-tag-suggestions" style="max-height:150px;overflow-y:auto;border:1px solid #eee;border-radius:4px;background:#fff;"></div>
+                        <div id="pub-tag-selected" style="margin-top:5px;display:flex;flex-wrap:wrap;gap:5px;"></div>
+                    </div>
+                    <input type="hidden" name="identifications" id="pub-identifications" value="">
+                </div>
+
+                <div style="margin-top:10px;">
+                    <button type="submit" style="padding:8px 20px;background:#337ab7;color:#fff;border:none;border-radius:6px;cursor:pointer;">Publier</button>
                 </div>
             </form>
         </div>
@@ -566,24 +582,39 @@ function chargerCommentaires(idpub) {
             listeDiv.innerHTML = '<span style="color:red;">' + (data.error || 'Erreur') + '</span>';
             return;
         }
-        var html = '';
         var comms = data.commentaires;
         var rTypes = data.reactionTypes;
 
         if (comms.length === 0) {
-            html = '<p style="color:#999;"><em>Aucun commentaire</em></p>';
+            listeDiv.innerHTML = '<p style="color:#999;"><em>Aucun commentaire</em></p>';
+            return;
         }
 
+        // Construire un arbre: regrouper les enfants sous leur parent
+        var commMap = {};
+        var topLevel = [];
+        for (var i = 0; i < comms.length; i++) {
+            comms[i].children = [];
+            commMap[comms[i].id] = comms[i];
+        }
         for (var i = 0; i < comms.length; i++) {
             var c = comms[i];
-            var isReply = c.idparent && c.idparent !== '';
-            var indent = isReply ? 'margin-left:25px;' : '';
+            if (c.idparent && c.idparent !== '' && commMap[c.idparent]) {
+                commMap[c.idparent].children.push(c);
+            } else {
+                topLevel.push(c);
+            }
+        }
 
-            html += '<div style="padding:8px 0;border-bottom:1px solid #f0f0f0;' + indent + '">';
-            if (isReply) html += '<small style="color:#999;">&#8627; r&eacute;ponse</small> ';
+        // Rendu recursif
+        function renderComment(c, depth) {
+            var indent = Math.min(depth, 5) * 25; // max 5 niveaux d'indentation
+            var html = '';
+            html += '<div style="padding:8px 0;border-bottom:1px solid #f0f0f0;margin-left:' + indent + 'px;">';
+            if (depth > 0) html += '<small style="color:#999;">&#8627; r&eacute;ponse</small> ';
             html += '<strong>' + escHtml(c.auteur) + '</strong>: ' + formatMentions(c.description);
 
-            // Reactions du commentaire
+            // Reactions
             html += ' <span style="font-size:11px;">';
             for (var j = 0; j < rTypes.length; j++) {
                 var rt = rTypes[j];
@@ -597,21 +628,31 @@ function chargerCommentaires(idpub) {
             }
             html += '</span>';
 
-            // Bouton repondre (top-level uniquement)
-            if (!isReply) {
-                html += ' <a href="javascript:void(0)" onclick="montrerReponse(\'' + c.id + '\',\'' + idpub + '\')" style="font-size:11px;color:#337ab7;">R&eacute;pondre</a>';
-                html += '<div id="reponse-form-' + c.id + '" style="display:none;margin-top:5px;margin-left:15px;position:relative;">';
-                html += '<input type="text" id="reponse-text-' + c.id + '" placeholder="Votre r&eacute;ponse... (tapez @ pour mentionner)" style="width:60%;padding:4px;"'
-                    + ' oninput="onReplyInput(this,\'' + c.id + '\',\'' + idpub + '\')"'
-                    + ' onkeydown="onReplyKeydown(event,\'' + c.id + '\',\'' + idpub + '\')">';
-                html += '<input type="hidden" id="reponse-mentions-' + c.id + '" value="">';
-                html += '<div id="mention-reply-' + c.id + '" class="mention-dropdown" style="display:none;"></div>';
-                html += ' <button onclick="ajouterReponse(\'' + idpub + '\',\'' + c.id + '\')" style="padding:4px 10px;">Envoyer</button>';
-                html += '</div>';
-            }
+            // Bouton repondre - sur TOUS les commentaires (pas juste top-level)
+            html += ' <a href="javascript:void(0)" onclick="montrerReponse(\'' + c.id + '\',\'' + idpub + '\')" style="font-size:11px;color:#337ab7;">R&eacute;pondre</a>';
+            html += '<div id="reponse-form-' + c.id + '" style="display:none;margin-top:5px;margin-left:15px;position:relative;">';
+            html += '<input type="text" id="reponse-text-' + c.id + '" placeholder="Votre r&eacute;ponse... (tapez @ pour mentionner)" style="width:60%;padding:4px;"'
+                + ' oninput="onReplyInput(this,\'' + c.id + '\',\'' + idpub + '\')"'
+                + ' onkeydown="onReplyKeydown(event,\'' + c.id + '\',\'' + idpub + '\')">';
+            html += '<input type="hidden" id="reponse-mentions-' + c.id + '" value="">';
+            html += '<div id="mention-reply-' + c.id + '" class="mention-dropdown" style="display:none;"></div>';
+            html += ' <button onclick="ajouterReponse(\'' + idpub + '\',\'' + c.id + '\')" style="padding:4px 10px;">Envoyer</button>';
+            html += '</div>';
 
             html += '</div>';
+
+            // Rendu recursif des enfants
+            for (var k = 0; k < c.children.length; k++) {
+                html += renderComment(c.children[k], depth + 1);
+            }
+            return html;
         }
+
+        var html = '';
+        for (var i = 0; i < topLevel.length; i++) {
+            html += renderComment(topLevel[i], 0);
+        }
+
         listeDiv.innerHTML = html;
     })
     .catch(function(e) { listeDiv.innerHTML = '<span style="color:red;">Erreur: ' + e + '</span>'; });
@@ -727,11 +768,18 @@ function renderReplyMentionDropdown(idcomm) {
     var html = '';
     state.suggestions.forEach(function(u, i) {
         var cls = (i === state.selectedIndex) ? 'mention-item active' : 'mention-item';
-        html += '<div class="' + cls + '" onmousedown="selectReplyMention(\'' + idcomm + '\',' + JSON.stringify(u).replace(/'/g, "\\'") + ')">'
+        html += '<div class="' + cls + '" onmousedown="selectReplyMentionByIndex(\'' + idcomm + '\',' + i + ')">'
             + escHtml(u.nomComplet) + '</div>';
     });
     dropdown.innerHTML = html;
     dropdown.style.display = 'block';
+}
+
+function selectReplyMentionByIndex(idcomm, idx) {
+    var state = getReplyMentionState(idcomm);
+    if (idx >= 0 && idx < state.suggestions.length) {
+        selectReplyMention(idcomm, state.suggestions[idx]);
+    }
 }
 
 function selectReplyMention(idcomm, user) {
@@ -818,5 +866,63 @@ function escHtml(str) {
 function escAttr(str) {
     if (!str) return '';
     return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+// ========== IDENTIFICATION DANS LE FORMULAIRE DE PUBLICATION ==========
+var pubTagUsers = []; // [{id, nom}]
+
+function togglePubTag() {
+    var zone = document.getElementById('pub-tag-zone');
+    zone.style.display = (zone.style.display === 'none') ? 'block' : 'none';
+}
+
+function rechercherPourPubTag() {
+    var input = document.getElementById('pub-tag-search');
+    var query = input.value.trim();
+    var sugDiv = document.getElementById('pub-tag-suggestions');
+    if (query.length < 1) { sugDiv.innerHTML = ''; return; }
+
+    fetch(CTX + '/pages/alumni/ajax/rechercher-utilisateurs.jsp?q=' + encodeURIComponent(query))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (!data.success) return;
+        var html = '';
+        var alreadyIds = pubTagUsers.map(function(u) { return u.id; });
+        data.utilisateurs.forEach(function(u) {
+            if (alreadyIds.indexOf(u.id) === -1) {
+                html += '<div class="mention-item" style="padding:6px 10px;cursor:pointer;border-bottom:1px solid #f0f0f0;" '
+                    + 'onclick="selectPubTag(' + u.id + ',\'' + escAttr(u.nomComplet) + '\')">'
+                    + escHtml(u.nomComplet) + '</div>';
+            }
+        });
+        sugDiv.innerHTML = html || '<div style="padding:6px 10px;color:#999;">Aucun resultat</div>';
+    });
+}
+
+function selectPubTag(userId, nomComplet) {
+    for (var i = 0; i < pubTagUsers.length; i++) {
+        if (pubTagUsers[i].id === userId) return;
+    }
+    pubTagUsers.push({ id: userId, nom: nomComplet });
+    renderPubTags();
+    document.getElementById('pub-tag-search').value = '';
+    document.getElementById('pub-tag-suggestions').innerHTML = '';
+}
+
+function removePubTag(userId) {
+    pubTagUsers = pubTagUsers.filter(function(u) { return u.id !== userId; });
+    renderPubTags();
+}
+
+function renderPubTags() {
+    var container = document.getElementById('pub-tag-selected');
+    var html = '';
+    pubTagUsers.forEach(function(u) {
+        html += '<span class="tag-chip">' + escHtml(u.nom) 
+            + ' <span class="remove-tag" onclick="removePubTag(' + u.id + ')">&times;</span></span>';
+    });
+    container.innerHTML = html;
+    // Mettre a jour le champ hidden
+    document.getElementById('pub-identifications').value = pubTagUsers.map(function(u) { return u.id; }).join(',');
 }
 </script>

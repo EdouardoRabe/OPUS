@@ -103,9 +103,9 @@
                 sb.append(",\"icone\":\"").append(getIconeType(n.getTypenotif())).append("\"");
                 sb.append(",\"lien\":\"").append(ej(n.getLien())).append("\"");
                 sb.append(",\"etat\":").append(n.getEtat());
-                sb.append(",\"daty\":\"").append(ej(n.getDaty())).append("\"");
+                sb.append(",\"daty\":\"").append(ej(n.getDaty() != null ? n.getDaty().toString() : "")).append("\"");
                 sb.append(",\"heure\":\"").append(ej(n.getHeure())).append("\"");
-                sb.append(",\"ecart\":\"").append(calculerEcart(n.getDaty(), n.getHeure())).append("\"");
+                sb.append(",\"ecart\":\"").append(calculerEcart(n.getDaty() != null ? n.getDaty().toString() : null, n.getHeure())).append("\"");
                 sb.append(",\"source\":\"").append(ej(sourceNom)).append("\"");
                 sb.append(",\"idorigine\":\"").append(ej(n.getIdorigine())).append("\"");
                 sb.append("}");

@@ -54,7 +54,7 @@
             if (existing == null || existing.length == 0) {
                 // Creer l'identification
                 Identification ident = new Identification();
-                ident.setIdutilisateur(idTarget);
+                ident.setIdutilisateur(targetUserId);
                 ident.setIdpublication(idpub);
                 ident.construirePK(conn);
                 ident.insertToTableWithHisto(userId, conn);

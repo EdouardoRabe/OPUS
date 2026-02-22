@@ -136,7 +136,7 @@
                 String sourceNom = (String) userNames.get(n.getIdorigine());
                 if (sourceNom == null) sourceNom = "";
                 String lienNotif = n.getLien();
-                String ecart = calculerEcart(n.getDaty(), n.getHeure());
+                String ecart = calculerEcart(n.getDaty() != null ? n.getDaty().toString() : null, n.getHeure());
                 String icone = getIconeType(n.getTypenotif());
                 String couleur = getIconeColor(n.getTypenotif());
             %>

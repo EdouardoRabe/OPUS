@@ -23,7 +23,7 @@ public class Notification extends ClassMAPTable {
 
     private String idnotification;
     private String objet;
-    private String daty;
+    private java.sql.Date daty;
     private String idorigine;
     private String lien;
     private int etat;
@@ -47,7 +47,7 @@ public class Notification extends ClassMAPTable {
 
     @Override
     public void construirePK(Connection c) throws Exception {
-        this.preparePk("NTF", "get_seq_notifalumni");
+        this.preparePk("NTF", "get_seq_notification");
         this.setIdnotification(makePK(c));
     }
 
@@ -62,10 +62,9 @@ public class Notification extends ClassMAPTable {
         notif.setIdorigine(userId);
         notif.setIdutilisateur(targetUser);
         notif.setEtat(0); 
-        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat sdfHeure = new SimpleDateFormat("HH:mm:ss");
         Date now = new Date();
-        notif.setDaty(sdfDate.format(now));
+        notif.setDaty(new java.sql.Date(now.getTime()));
         notif.setHeure(sdfHeure.format(now));
 
         notif.construirePK(conn);
@@ -112,11 +111,11 @@ public class Notification extends ClassMAPTable {
         this.objet = objet;
     }
 
-    public String getDaty() {
+    public java.sql.Date getDaty() {
         return daty;
     }
 
-    public void setDaty(String daty) {
+    public void setDaty(java.sql.Date daty) {
         this.daty = daty;
     }
 
