@@ -27,6 +27,7 @@
 
         String idspecialite  = null;
         String libelle       = null;
+        String description   = null;
         String photoActuelle = null;
         FileItem photoItem   = null;
 
@@ -42,6 +43,7 @@
                 String v = item.getString("UTF-8");
                 if ("idspecialite".equals(n))  idspecialite  = v;
                 if ("libelle".equals(n))        libelle       = v;
+                if ("description".equals(n))    description   = v;
                 if ("photoActuelle".equals(n))  photoActuelle = v;
             } else {
                 if ("photo".equals(item.getFieldName()) && item.getSize() > 0
@@ -79,6 +81,7 @@
         Specialite spe = new Specialite();
         spe.setIdspecialite(idspecialite.trim());
         spe.setLibelle(libelle.trim());
+        spe.setDescription(description != null ? description.trim() : "");
         spe.setPhoto(photoPath);
         spe.setMode("modif");
         spe.updateToTableWithHisto(userId, conn);

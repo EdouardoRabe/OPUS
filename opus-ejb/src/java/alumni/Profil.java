@@ -1,6 +1,7 @@
 package alumni;
 
 import bean.ClassMAPTable;
+import bean.CGenUtil;
 import java.sql.Connection;
 import java.sql.Date;
 
@@ -19,6 +20,7 @@ public class Profil extends ClassMAPTable {
     public Profil() {
         setNomTable("profil");
     }
+
 
     @Override
     public String getTuppleID() {

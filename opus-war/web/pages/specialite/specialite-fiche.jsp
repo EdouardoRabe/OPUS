@@ -11,6 +11,7 @@
 
         pc.getChampByName("idspecialite").setLibelle("ID");
         pc.getChampByName("libelle").setLibelle("Libell&eacute;");
+        pc.getChampByName("description").setLibelle("Description");
         pc.getChampByName("photo").setVisible(false);
         pc.getChampByName("photohtml").setVisible(false);
         pc.setTitre("Fiche sp&eacute;cialit&eacute;");
