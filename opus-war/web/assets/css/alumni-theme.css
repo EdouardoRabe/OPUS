@@ -417,3 +417,283 @@ a:hover { color: var(--itu-blue-dark); text-decoration: none; }
   .login-tabs { margin-bottom: 1.5rem; }
   .login-tab { padding: 0.65rem 1.25rem; }
 }
+
+/* ═══════════════════════════════════════════
+   SPÉCIALITÉS — PAGE HEADER
+═══════════════════════════════════════════ */
+.page-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+.page-title-lg {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--itu-dark);
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════
+   CUSTOM CARD (search / filter container)
+═══════════════════════════════════════════ */
+.custom-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  border: 1px solid var(--gray-200);
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.custom-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  border-color: rgba(0,139,255,.25);
+}
+.custom-card.no-hover:hover {
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  border-color: var(--gray-200);
+  transform: none;
+}
+
+/* ═══════════════════════════════════════════
+   SPÉCIALITÉS — GRID & CARD
+═══════════════════════════════════════════ */
+.specialities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.speciality-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+}
+.speciality-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  border-color: rgba(0,139,255,.24);
+  transform: translateY(-2px);
+}
+
+.speciality-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  color: var(--white);
+  margin: 0 auto 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,.06);
+  overflow: hidden;
+}
+.speciality-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+}
+
+.speciality-title {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--itu-dark);
+  margin: 0 0 0.35rem;
+}
+
+.speciality-desc {
+  font-size: 0.82rem;
+  color: var(--gray-500);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.speciality-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.speciality-count {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--itu-dark);
+}
+
+.speciality-level {
+  display: inline-block;
+  font-size: 0.7rem;
+  background: var(--itu-lime);
+  color: var(--itu-dark);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.btn-speciality {
+  margin-top: auto;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+}
+
+/* Specialité — search row layout */
+.specialite-search-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.specialite-filter-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .specialites-grid {
+    grid-template-columns: 1fr;
+  }
+  .specialite-search-row {
+    flex-direction: column;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   SPÉCIALITÉS — PAGINATION OVERRIDE
+═══════════════════════════════════════════ */
+.specialite-pagination-wrap {
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Remove table-footer appearance */
+.specialite-pagination-wrap .pagination-bas-page {
+  border: none !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--white) !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  border: 1px solid var(--gray-200) !important;
+  padding: 0.85rem 1.25rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Result count text */
+.specialite-pagination-wrap .pagination-title {
+  font-size: 0.82rem;
+  color: var(--gray-500);
+  font-weight: 500;
+  font-family: var(--font-sans);
+  margin: 0;
+}
+
+/* Nav element centering */
+.specialite-pagination-wrap nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Bootstrap ul.pagination reset */
+.specialite-pagination-wrap .pagination {
+  margin: 0;
+  height: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  padding: 0;
+}
+
+/* All page-link buttons */
+.specialite-pagination-wrap .pagination > li > a,
+.specialite-pagination-wrap .pagination > li > span,
+.specialite-pagination-wrap .pagination > li > button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  padding: 0 0.6rem !important;
+  border-radius: var(--radius-full) !important;
+  border: 1.5px solid var(--gray-200) !important;
+  background: var(--white) !important;
+  color: var(--gray-600) !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  font-family: var(--font-sans) !important;
+  text-decoration: none !important;
+  transition: all 0.18s ease !important;
+  cursor: pointer;
+  line-height: 1 !important;
+}
+
+.specialite-pagination-wrap .pagination > li > a:hover,
+.specialite-pagination-wrap .pagination > li > button:hover {
+  background: var(--gray-100) !important;
+  border-color: var(--itu-blue) !important;
+  color: var(--itu-blue) !important;
+}
+
+/* Active page */
+.specialite-pagination-wrap .pagination > li.active > a,
+.specialite-pagination-wrap .pagination > li.active > span {
+  background: var(--itu-blue) !important;
+  border-color: var(--itu-blue) !important;
+  color: var(--white) !important;
+  box-shadow: 0 4px 10px rgba(0,139,255,0.3);
+}
+
+/* Disabled state */
+.specialite-pagination-wrap .pagination > li.disabled > a,
+.specialite-pagination-wrap .pagination > li.disabled > span,
+.specialite-pagination-wrap .pagination > li.disabled > button {
+  background: var(--gray-100) !important;
+  border-color: var(--gray-200) !important;
+  color: var(--gray-400) !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  box-shadow: none !important;
+}
+
+/* Page info span ("Page: X sur Y") */
+.specialite-pagination-wrap .pagination > li > span.page-link {
+  font-size: 0.78rem !important;
+  color: var(--gray-500) !important;
+  background: transparent !important;
+  border: none !important;
+  font-weight: 400 !important;
+  padding: 0 0.5rem !important;
+  min-width: 0 !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 640px) {
+  .specialite-pagination-wrap .pagination-bas-page {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .specialite-pagination-wrap nav {
+    width: 100%;
+    justify-content: center;
+  }
+}

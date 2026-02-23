@@ -48,6 +48,8 @@
     <jsp:include page='elements/css.jsp'/>
     <!-- Alumni Navbar Module CSS -->
     <link href="${pageContext.request.contextPath}/assets/css/alumni-navbar-module.css" rel="stylesheet" type="text/css" />
+    <!-- Alumni Theme (card grids, page layouts, specialité, etc.) -->
+    <link href="${pageContext.request.contextPath}/assets/css/alumni-theme.css" rel="stylesheet" type="text/css" />
     <script>
         const _CONTEXT_PATH = '<%= request.getContextPath() %>';
     </script>
