@@ -33,34 +33,23 @@
     String teluser = telephone;
     String idrole = "etu"; 
 
-    String message = null;
     try {
+        // Construire le profil
+        Profil profil = new Profil();
+        profil.setEmail(email);
+        profil.setNom(nom);
+        profil.setPrenom(prenom);
+        if(dtnDate != null) profil.setDtn(dtnDate);
+        profil.setTelephone(telephone);
+        profil.setIdparcours(idparcours);
+        profil.setIdpromotion(idpromotion);
+        if(idgenre != null && !idgenre.isEmpty()) {
+            profil.setIdgenre(idgenre);
+        }
+
+        // Tout creer dans une seule transaction (utilisateur + profil)
         UserEJB u = UserEJBClient.lookupUserEJBBeanLocal();
-        String ret = u.createUtilisateurs(loginuser, pwduser, nomuser, adruser, teluser, idrole);
-     
-        if(ret != null && !ret.toLowerCase().startsWith("erreur")) {
-                Profil profil = new Profil();
-                profil.setEmail(email);
-                profil.setNom(nom);
-                profil.setPrenom(prenom);
-                if(dtnDate != null) profil.setDtn(dtnDate);
-                profil.setTelephone(telephone);
-                profil.setIdparcours(idparcours);
-                profil.setIdpromotion(idpromotion);
-                if(idgenre != null && !idgenre.isEmpty()) {
-                    profil.setIdgenre(idgenre);
-                }
-                try {
-                    profil.setIdutilisateur(Integer.parseInt(ret));
-                } catch(NumberFormatException nfe) {
-                    // leave null if parsing fails
-                }
-                profil.insertToTable();
-        }
-      
-        if(message == null) {
-            message = "Inscription réussie, vous pouvez maintenant vous connecter.";
-        }
+        String ret = u.createUtilisateurs(loginuser, pwduser, nomuser, adruser, teluser, idrole, profil);
 
         // redirect back to login with success flag
         response.sendRedirect(request.getContextPath() + "/index.jsp?inscription=success");
@@ -68,24 +57,19 @@
 
     } catch (Exception e) {
         e.printStackTrace();
-        // root cause if nested
         Throwable cause = e;
         while(cause.getCause() != null) cause = cause.getCause();
         String errText = cause.getMessage();
         if(errText == null) errText = e.toString();
-        // translate common Postgres missing function message
+        // Traduire les erreurs Postgres courantes
         if(errText.toLowerCase().contains("getseqcnapsuser")){
             errText = "Problème de configuration de la base : fonction de séquence utilisateur manquante";
         }
+        if(errText.toLowerCase().contains("profil_email_key") || errText.toLowerCase().contains("email")){
+            errText = "Cet email est déjà utilisé!";
+        }
         session.setAttribute("errorInscription", errText);
-        // preserve form values by appending as query parameters
-        String redirectURL = "detailsInscription.jsp?" +
-                "etu=" + java.net.URLEncoder.encode(etu == null?"":etu, "UTF-8") +
-                "&password=" + java.net.URLEncoder.encode(password==null?"":password, "UTF-8") +
-                "&idparcours=" + java.net.URLEncoder.encode(idparcours==null?"":idparcours, "UTF-8") +
-                "&idpromotion=" + java.net.URLEncoder.encode(idpromotion==null?"":idpromotion, "UTF-8") +
-                "&idgenre=" + java.net.URLEncoder.encode(idgenre==null?"":idgenre, "UTF-8");
-        response.sendRedirect(redirectURL);
+        response.sendRedirect("inscription.jsp");
         return;
     }
 %>

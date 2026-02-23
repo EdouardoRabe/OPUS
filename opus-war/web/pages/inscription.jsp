@@ -19,6 +19,18 @@
     <script src="${pageContext.request.contextPath}/dist/js/swal.js"></script>
   </head>
   <body>
+  <% String errMsg = (String) session.getAttribute("errorInscription");
+       if(errMsg != null){
+           session.removeAttribute("errorInscription"); %>
+    <script>
+      Swal.fire({
+        title: "Erreur",
+        text: "<%= errMsg.replace("\"","\\\"") %>",
+        icon: "error",
+        confirmButtonText: "OK"
+      });
+    </script>
+    <% } %>
     <div class="login-split">
       <!-- LEFT PANEL (optional, same as login page) -->
       <div class="login-left">

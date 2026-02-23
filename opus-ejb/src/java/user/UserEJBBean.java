@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 import javax.ejb.*;
 
+import alumni.DirectionAlumni;
+import alumni.Profil;
 import lc.Direction;
 import lc.DirectionUtil;
 import mg.cnaps.utilisateur.CNAPSUser;
@@ -237,6 +239,11 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     @Override
     public String createUtilisateurs(String loginuser, String pwduser, String nomuser, String adruser, String teluser,
             String idrole) throws Exception {
+        return createUtilisateurs(loginuser, pwduser, nomuser, adruser, teluser, idrole, null);
+    }
+
+    public String createUtilisateurs(String loginuser, String pwduser, String nomuser, String adruser, String teluser,
+            String idrole, Profil profil) throws Exception {
         // Droit : autoriser si aucun user connecte (inscription) ou si DG
         if (u != null && u.getIdrole().compareTo("dg") != 0) {
             throw new Exception("Erreur de droit");
@@ -256,37 +263,61 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
                 throw new Exception("Login deja utilise!");
             }
 
-            // 2. Recuperer adruser depuis la table direction (premier idDir)
-            Direction dirCrit = new Direction();
-            Direction[] directions = (Direction[]) CGenUtil.rechercher(dirCrit, null, null, "");
-            if (directions == null || directions.length == 0) {
-                throw new Exception("Aucune direction trouvee dans la base");
+            // 2. Verifier email unique si profil fourni
+            if (profil != null && profil.getEmail() != null && !profil.getEmail().isEmpty()) {
+                Profil emailCrit = new Profil();
+                emailCrit.setEmail(profil.getEmail());
+                try {
+                    Profil[] existingProfils = (Profil[]) CGenUtil.rechercher(emailCrit, null, null, "");
+                    if (existingProfils != null && existingProfils.length > 0) {
+                        throw new Exception("Cet email est deja utilise!");
+                    }
+                } catch (Exception emailEx) {
+                    if (emailEx.getMessage() != null && emailEx.getMessage().contains("email")) {
+                        throw emailEx;
+                    }
+                    // pas de resultat = OK, on continue
+                }
             }
-            String adrDirection = directions[0].getIdDir();
 
-            // 3. Crypter le mot de passe
+            // 3. Recuperer adruser depuis la table direction
+            String adrDirection = "DIR42";
+            try {
+                DirectionAlumni[] directions = (DirectionAlumni[]) CGenUtil.rechercher(new DirectionAlumni(), null, null, "");
+                if (directions != null && directions.length > 0) {
+                    adrDirection = directions[0].getId();
+                }
+            } catch (Exception dirEx) {
+                System.out.println("Pas de direction trouvee, utilisation de la valeur par defaut: " + adrDirection);
+            }
+
+            // 4. Crypter le mot de passe
             int niveau = (int) Math.round(Math.random() * 10.0);
             int sens   = (int) Math.round(Math.random());
             if (niveau == 0) niveau = -5;
             String passCrypt = Utilitaire.cryptWord(pwduser.toLowerCase(), niveau, sens == 0);
 
-            // 4. Inserer l'utilisateur via le framework
+            // 5. Inserer l'utilisateur
             String refUser = (u != null ? u.getTuppleID() : "0");
-            
             MapUtilisateur newUser = new MapUtilisateur(loginuser, passCrypt, nomuser, adrDirection, teluser, idrole);
-            System.out.println("Avant creation utilisateur avec ref hhhh : " + newUser.getLoginuser() + " " + newUser.getAdruser() + " " + newUser.getTeluser());
             newUser.createObject(refUser, c);
 
-            // 4. Inserer le CNAPSUser
+            // 6. Inserer le CNAPSUser
             CNAPSUser cnapsUser = new CNAPSUser(idrole, "1", "1", "1", loginuser, "1", newUser.getTuppleID());
             // cnapsUser.createObject(refUser, c);
 
-            // 5. Inserer les parametres de cryptage
+            // 7. Inserer les parametres de cryptage
             historique.ParamCrypt pc = new historique.ParamCrypt(niveau, sens, newUser.getTuppleID());
             pc.createObject(refUser, c);
 
+            // 8. Inserer le profil si fourni (dans la meme transaction)
+            if (profil != null) {
+                profil.setIdutilisateur(Integer.parseInt(newUser.getTuppleID()));
+                profil.createObject(refUser, c);
+            }
+
             c.commit();
-            System.out.println("Utilisateur cree avec ref hhhh : " + newUser.getTuppleID());
+            System.out.println("Utilisateur cree avec ref : " + newUser.getTuppleID());
             return newUser.getTuppleID();
 
         } catch (Exception e) {

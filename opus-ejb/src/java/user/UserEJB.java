@@ -1,5 +1,6 @@
 package user;
  
+import alumni.Profil;
 import bean.ClassEtat;
 import bean.ClassMAPTable;
 import bean.ResultatEtSomme;
@@ -77,6 +78,8 @@ public interface UserEJB {
     void createObjectFilleMultipleSansMere(String u, ClassMAPTable[] fille) throws Exception;
 
     public String createUtilisateurs(String loginuser, String pwduser, String nomuser, String adruser, String teluser, String idrole) throws Exception;
+
+    public String createUtilisateurs(String loginuser, String pwduser, String nomuser, String adruser, String teluser, String idrole, Profil profil) throws Exception;
 
     public int desactiveUtilisateur(String ref) throws Exception;
 
