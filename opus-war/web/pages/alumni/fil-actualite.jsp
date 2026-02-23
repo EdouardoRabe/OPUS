@@ -53,7 +53,7 @@
                 <div class="fa-profile-name"><%= nomConnecte %></div>
                 <hr class="fa-divider">
                 <nav class="fa-profile-nav">
-                    <a href="<%= ctx %>/pages/module.jsp?but=alumni/profil.jsp" class="fa-nav-link">
+                    <a href="<%= ctx %>module.jsp?but=profil/voir.jsp" class="fa-nav-link">
                         <i class="bi bi-person-fill"></i> Mon profil
                     </a>
                     <a href="#" class="fa-nav-link fa-nav-link--active">
@@ -551,28 +551,124 @@
 /* ---- Zone identification ---- */
 .fa-tag-zone { padding: 12px 16px; border-top: 1px solid var(--fa-border); background: #f8f9fb; }
 .fa-tag-zone-title { font-size: 13px; color: var(--fa-text-secondary); margin: 0 0 8px; }
-/* ---- Zone commentaires ---- */
-.fa-comments-zone { padding: 8px 16px 12px; border-top: 1px solid var(--fa-border); display: flex; flex-direction: column; gap: 8px; }
-.fa-comment-item { display: flex; flex-direction: column; }
+/* ---- Zone commentaires (Facebook style) ---- */
+.fa-comments-zone {
+    padding: 4px 12px 12px;
+    border-top: 1px solid var(--fa-border);
+    display: flex; flex-direction: column; gap: 2px;
+}
+/* Chaque commentaire */
+.fa-comment-item {
+    display: flex; flex-direction: column;
+    padding: 4px 0;
+}
+/* Replies nestées dans le parent */
+.fa-comment-item--reply { padding-top: 2px; }
+/* Zone toggle + liste de réponses */
+.fa-replies-area { margin-top: 2px; }
+.fa-replies-toggle {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: none; border: none;
+    color: var(--itu-blue,#008BFF);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; padding: 4px 8px;
+    border-radius: 6px; margin-left: -4px;
+    transition: background .15s;
+    line-height: 1;
+}
+.fa-replies-toggle:hover { background: rgba(0,139,255,.1); }
+.fa-replies-toggle i { font-size: 12px; transition: transform .25s; }
+.fa-replies-toggle--expanded i { transform: rotate(180deg); }
+/* Container des réponses : animation max-height */
+.fa-replies-wrap {
+    overflow: hidden;
+    max-height: 0;
+    padding-left: 12px;
+    border-left: 2px solid #e4e6ea;
+    margin-left: 14px;
+    margin-top: 4px;
+    transition: max-height .35s ease-out;
+}
+.fa-replies-wrap--open {
+    max-height: 4000px;
+    transition: max-height .45s ease-in;
+}
 .fa-comment-inner { display: flex; gap: 8px; align-items: flex-start; }
 .fa-comment-content { flex: 1; min-width: 0; }
-.fa-comment-bubble { background: #f0f2f5; border-radius: 14px; padding: 8px 12px; display: inline-block; max-width: 100%; }
-.fa-comment-author { font-weight: 700; font-size: 13px; display: block; margin-bottom: 2px; }
-.fa-comment-text { font-size: 14px; color: var(--fa-text); }
-.fa-comment-actions { display: flex; align-items: center; gap: 8px; padding: 4px 4px 0; font-size: 12px; }
-.fa-comment-react-btn { background: none; border: none; font-size: 12px; font-weight: 600; color: var(--fa-text-secondary); cursor: pointer; padding: 0; }
-.fa-comment-react-btn:hover, .fa-comment-react-btn--active { color: var(--itu-blue,#008BFF); text-decoration: underline; }
-.fa-comment-reply-link { color: var(--fa-text-secondary); font-weight: 600; text-decoration: none; }
-.fa-comment-reply-link:hover { text-decoration: underline; color: var(--fa-text); }
+/* Bulle */
+.fa-comment-bubble {
+    background: #f0f2f5;
+    border-radius: 18px;
+    padding: 8px 12px;
+    display: inline-block;
+    max-width: 100%;
+    cursor: default;
+    transition: background .15s;
+}
+.fa-comment-bubble:hover { background: #e4e6ea; }
+.fa-comment-author {
+    font-weight: 600; font-size: 13px;
+    color: #050505; display: block;
+    margin-bottom: 2px; line-height: 1.2;
+}
+.fa-comment-author:hover { text-decoration: underline; cursor: pointer; }
+.fa-comment-text { font-size: 14px; color: #050505; word-break: break-word; line-height: 1.4; }
+/* Barre d'actions sous la bulle */
+.fa-comment-actions {
+    display: flex; align-items: center; gap: 2px;
+    padding: 3px 4px 0; font-size: 12px; font-weight: 600;
+    color: #65676b; line-height: 1;
+}
+.fa-comment-actions .fa-dot { color: #65676b; font-weight: 400; opacity: .7; padding: 0 2px; }
+.fa-comment-react-btn {
+    background: none; border: none;
+    font-size: 12px; font-weight: 600;
+    color: #65676b; cursor: pointer;
+    padding: 3px 5px; border-radius: 4px;
+    transition: background .12s, color .12s;
+    line-height: 1; white-space: nowrap;
+}
+.fa-comment-react-btn:hover { background: #f0f2f5; color: #050505; }
+.fa-comment-react-btn--active { color: var(--itu-blue,#008BFF); }
+.fa-comment-react-btn--active:hover { background: #e7f3ff; color: var(--itu-blue,#008BFF); }
+.fa-comment-reply-link {
+    font-size: 12px; font-weight: 600;
+    color: #65676b; text-decoration: none;
+    padding: 3px 5px; border-radius: 4px;
+    transition: background .12s, color .12s;
+    line-height: 1;
+}
+.fa-comment-reply-link:hover { background: #f0f2f5; color: #050505; text-decoration: none; }
+/* Formulaire de saisie (nouveau commentaire & réponse) */
 .fa-comment-input-wrap { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
 .fa-comment-input-box {
     flex: 1; display: flex; align-items: center;
-    background: #f0f2f5; border-radius: 20px; padding: 0 8px 0 14px; position: relative;
+    background: #f0f2f5; border-radius: 20px;
+    padding: 0 6px 0 14px; position: relative;
+    border: 1.5px solid transparent;
+    transition: border-color .15s, background .15s;
 }
-.fa-comment-input { flex: 1; background: transparent; border: none; outline: none; padding: 9px 4px; font-size: 14px; color: var(--fa-text); font-family: inherit; }
-.fa-comment-input::placeholder { color: var(--fa-text-secondary); }
-.fa-comment-send-btn { background: none; border: none; color: var(--itu-blue,#008BFF); font-size: 16px; cursor: pointer; padding: 4px 6px; border-radius: 50%; transition: background .15s; }
-.fa-comment-send-btn:hover { background: rgba(0,139,255,.1); }
+.fa-comment-input-box:focus-within {
+    background: #fff;
+    border-color: var(--itu-blue,#008BFF);
+    box-shadow: 0 0 0 3px rgba(0,139,255,.08);
+}
+.fa-comment-input {
+    flex: 1; background: transparent; border: none; outline: none;
+    padding: 9px 4px; font-size: 14px;
+    color: #050505; font-family: inherit; min-width: 0;
+}
+.fa-comment-input::placeholder { color: #65676b; }
+.fa-comment-send-btn {
+    background: none; border: none;
+    color: var(--itu-blue,#008BFF);
+    font-size: 16px; cursor: pointer;
+    padding: 6px; border-radius: 50%;
+    transition: background .15s;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.fa-comment-send-btn:hover { background: rgba(0,139,255,.12); }
 /* ---- Etats vides / erreurs ---- */
 .fa-empty-feed { text-align: center; padding: 48px 20px; color: var(--fa-text-secondary); font-size: 16px; }
 .fa-empty-feed i { font-size: 52px; display: block; margin-bottom: 16px; opacity: .4; }
@@ -890,6 +986,42 @@ function toggleCommentaires(idpub) {
     }
 }
 
+// Agrandir / aplatir les réponses d'un commentaire
+function toggleReplies(commId) {
+    var wrap = document.getElementById('replies-' + commId);
+    var btn  = document.getElementById('replies-btn-' + commId);
+    if (!wrap || !btn) return;
+    var isOpen = wrap.classList.contains('fa-replies-wrap--open');
+    if (isOpen) {
+        wrap.classList.remove('fa-replies-wrap--open');
+        btn.classList.remove('fa-replies-toggle--expanded');
+        var n = btn.getAttribute('data-count');
+        btn.innerHTML = '<i class="bi bi-chevron-down"></i> Voir ' + n + ' réponse' + (n > 1 ? 's' : '');
+    } else {
+        wrap.classList.add('fa-replies-wrap--open');
+        btn.classList.add('fa-replies-toggle--expanded');
+        btn.innerHTML = '<i class="bi bi-chevron-up"></i> Masquer les réponses';
+    }
+}
+
+// Agrandir / aplatir les réponses d'un commentaire
+function toggleReplies(commId) {
+    var wrap = document.getElementById('replies-' + commId);
+    var btn  = document.getElementById('replies-btn-' + commId);
+    if (!wrap || !btn) return;
+    var isOpen = wrap.classList.contains('fa-replies-wrap--open');
+    if (isOpen) {
+        wrap.classList.remove('fa-replies-wrap--open');
+        btn.classList.remove('fa-replies-toggle--expanded');
+        var n = btn.getAttribute('data-count');
+        btn.innerHTML = '<i class="bi bi-chevron-down"></i> Voir ' + n + ' r\u00e9ponse' + (n > 1 ? 's' : '');
+    } else {
+        wrap.classList.add('fa-replies-wrap--open');
+        btn.classList.add('fa-replies-toggle--expanded');
+        btn.innerHTML = '<i class="bi bi-chevron-up"></i> Masquer les r\u00e9ponses';
+    }
+}
+
 function chargerCommentaires(idpub) {
     var listeDiv = document.getElementById('liste-comm-' + idpub);
     listeDiv.innerHTML = '<em>Chargement...</em>';
@@ -931,43 +1063,69 @@ function chargerCommentaires(idpub) {
 
         // Rendu recursif
         function renderComment(c, depth) {
-            var indent = Math.min(depth, 5) * 25; // max 5 niveaux d'indentation
+            var initials = getInitials(c.auteur);
+            var replyClass = depth > 0 ? ' fa-comment-item--reply' : '';
             var html = '';
-            html += '<div id="comm-' + c.id + '" style="padding:8px 0;border-bottom:1px solid #f0f0f0;margin-left:' + indent + 'px;">';
-            if (depth > 0) html += '<small style="color:#999;">&#8627; r&eacute;ponse</small> ';
-            html += '<strong>' + escHtml(c.auteur) + '</strong>: ' + formatMentions(c.description);
+            html += '<div id="comm-' + c.id + '" class="fa-comment-item' + replyClass + '">';
+            html += '<div class="fa-comment-inner">';
+            html += '<div class="fa-avatar fa-avatar--xs">' + escHtml(initials) + '</div>';
+            html += '<div class="fa-comment-content">';
+            html += '<div class="fa-comment-bubble">';
+            html += '<span class="fa-comment-author">' + escHtml(c.auteur) + '</span>';
+            html += '<span class="fa-comment-text">' + formatMentions(c.description) + '</span>';
+            html += '</div>';
 
-            // Reactions
-            html += ' <span style="font-size:11px;">';
+            // Barre d'actions
+            html += '<div class="fa-comment-actions">';
             for (var j = 0; j < rTypes.length; j++) {
                 var rt = rTypes[j];
                 var cnt = c.reactions[rt.id] || 0;
-                var bold = (c.myReaction === rt.id) ? 'font-weight:bold;background:#d0e8ff;' : '';
-                html += ' <button style="font-size:10px;padding:1px 5px;cursor:pointer;' + bold + '" ';
+                var activeClass = (c.myReaction === rt.id) ? ' fa-comment-react-btn--active' : '';
+                html += '<button class="fa-comment-react-btn' + activeClass + '" ';
                 html += 'onclick="toggleReactionComm(\'' + c.id + '\',\'' + rt.id + '\',\'' + idpub + '\')">';
                 html += rt.libelle;
-                if (cnt > 0) html += '(' + cnt + ')';
+                if (cnt > 0) html += ' <span style="font-weight:400;font-size:11px;">(' + cnt + ')</span>';
                 html += '</button>';
+                html += '<span class="fa-dot">&middot;</span>';
             }
-            html += '</span>';
+            html += '<a href="javascript:void(0)" class="fa-comment-reply-link" ';
+            html += 'onclick="montrerReponse(\'' + c.id + '\',\'' + idpub + '\',\'' + escAttr(c.auteur) + '\',\'' + c.idutilisateur + '\')">';
+            html += 'R&eacute;pondre</a>';
+            html += '</div>';
 
-            // Bouton repondre - sur TOUS les commentaires (pas juste top-level)
-            html += ' <a href="javascript:void(0)" onclick="montrerReponse(\'' + c.id + '\',\'' + idpub + '\',\'' + escAttr(c.auteur) + '\',\'' + c.idutilisateur + '\')" style="font-size:11px;color:#337ab7;">R&eacute;pondre</a>';
-            html += '<div id="reponse-form-' + c.id + '" style="display:none;margin-top:5px;margin-left:15px;position:relative;">';
-            html += '<input type="text" id="reponse-text-' + c.id + '" placeholder="Votre r&eacute;ponse... (tapez @ pour mentionner)" style="width:60%;padding:4px;"'
-                + ' oninput="onReplyInput(this,\'' + c.id + '\',\'' + idpub + '\')"'
-                + ' onkeydown="onReplyKeydown(event,\'' + c.id + '\',\'' + idpub + '\')">';
+            // Formulaire de réponse
+            html += '<div id="reponse-form-' + c.id + '" style="display:none;">';
+            html += '<div class="fa-comment-input-wrap">';
+            html += '<div class="fa-comment-input-box">';
+            html += '<input type="text" id="reponse-text-' + c.id + '" class="fa-comment-input" placeholder="R\u00e9pondre\u2026 (@ pour mentionner)"';
+            html += ' oninput="onReplyInput(this,\'' + c.id + '\',\'' + idpub + '\')"';
+            html += ' onkeydown="onReplyKeydown(event,\'' + c.id + '\',\'' + idpub + '\')">';
             html += '<input type="hidden" id="reponse-mentions-' + c.id + '" value="">';
             html += '<div id="mention-reply-' + c.id + '" class="mention-dropdown" style="display:none;"></div>';
-            html += ' <button onclick="ajouterReponse(\'' + idpub + '\',\'' + c.id + '\')" style="padding:4px 10px;">Envoyer</button>';
+            html += '<button class="fa-comment-send-btn" onclick="ajouterReponse(\'' + idpub + '\',\'' + c.id + '\')"><i class="bi bi-send-fill"></i></button>';
+            html += '</div>';
+            html += '</div>';
             html += '</div>';
 
-            html += '</div>';
-
-            // Rendu recursif des enfants
-            for (var k = 0; k < c.children.length; k++) {
-                html += renderComment(c.children[k], depth + 1);
+            // Zone réponses collapsible
+            if (c.children.length > 0) {
+                var n = c.children.length;
+                html += '<div class="fa-replies-area">';
+                html += '<button id="replies-btn-' + c.id + '" class="fa-replies-toggle" data-count="' + n + '" onclick="toggleReplies(\'' + c.id + '\')">'
+                html += '<i class="bi bi-chevron-down"></i> Voir ' + n + ' réponse' + (n > 1 ? 's' : '');
+                html += '</button>';
+                html += '<div id="replies-' + c.id + '" class="fa-replies-wrap">';
+                for (var k = 0; k < c.children.length; k++) {
+                    html += renderComment(c.children[k], depth + 1);
+                }
+                html += '</div>'; // fa-replies-wrap
+                html += '</div>'; // fa-replies-area
             }
+
+            html += '</div>'; // fa-comment-content
+            html += '</div>'; // fa-comment-inner
+            html += '</div>'; // fa-comment-item
+
             return html;
         }
 
@@ -979,6 +1137,15 @@ function chargerCommentaires(idpub) {
         listeDiv.innerHTML = html;
     })
     .catch(function(e) { listeDiv.innerHTML = '<span style="color:red;">Erreur: ' + e + '</span>'; });
+}
+
+// Calculer les initiales depuis un nom complet
+function getInitials(name) {
+    if (!name) return '?';
+    var parts = name.trim().split(/\s+/);
+    var ini = parts[0].charAt(0).toUpperCase();
+    if (parts.length > 1) ini += parts[parts.length - 1].charAt(0).toUpperCase();
+    return ini;
 }
 
 // Formatter les @mentions dans le texte du commentaire

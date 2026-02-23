@@ -249,6 +249,27 @@
             </div>
         </div>
         <%
+            } else if (icone != null && icone.contains("bi-bell-fill")) {
+                // Menu notification dynamique
+        %>
+        <div class="topnav-link-group topnav-notif-dropdown" data-overflow-item="true">
+          <button class="topnav-link" type="button" id="notif-bell-btn" title="<%= libelle %>" aria-expanded="false" style="position:relative;">
+            <i class="<%= bsIcon %>"></i>
+            <span class="topnav-link-label"><%= libelle %></span>
+            <span id="notif-badge" class="badge" style="display:none;position:absolute;top:0;right:0;background:#e00;color:#fff;font-size:10px;padding:2px 5px;border-radius:10px;direction:ltr;unicode-bidi:bidi-override;min-width:16px;text-align:center;">0</span>
+          </button>
+          <div id="notif-dropdown-panel" class="topnav-submenu" style="min-width:380px;right:0;left:auto;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-bottom:1px solid #eee;">
+              <h4 style="margin:0;font-size:16px;font-weight:600;">Notifications</h4>
+              <a href="javascript:void(0)" onclick="marquerToutLu()" style="font-size:12px;color:#1a73e8;">Tout marquer comme lu</a>
+            </div>
+            <div id="notif-list" style="max-height:380px;overflow-y:auto;padding:5px 0;"><div style="text-align:center;padding:20px;color:#999;">Chargement...</div></div>
+            <div style="text-align:center;padding:8px;border-top:1px solid #eee;">
+              <a href="<%=lien%>?but=alumni/notifications.jsp" style="font-size:13px;color:#1a73e8;">Voir toutes les notifications</a>
+            </div>
+          </div>
+        </div>
+        <%
             } else {
                 // Menu simple sans sous-menus
                 String href = "#";
@@ -280,42 +301,6 @@
       <i class="bi bi-search"></i>
     </button>
 
-    <!-- Notification Bell -->
-    <div class="topnav-notif-dropdown" style="position:relative;display:flex;align-items:center;margin-right:8px;">
-      <button class="topnav-link" type="button" id="notif-bell-btn" title="Notifications" style="position:relative;background:none;border:none;cursor:pointer;padding:6px;">
-        <i class="bi bi-bell-fill" style="font-size:20px;color:#434040;"></i>
-        <span id="notif-badge" class="badge" style="display:none;position:absolute;top:0;right:0;background:#e00;color:#fff;font-size:10px;padding:2px 5px;border-radius:10px;direction:ltr;unicode-bidi:bidi-override;min-width:16px;text-align:center;">0</span>
-      </button>
-      <div id="notif-dropdown-panel" style="display:none;position:absolute;top:100%;right:0;width:380px;max-height:480px;background:#fff;border:1px solid #ddd;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);z-index:2000;overflow:hidden;">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-bottom:1px solid #eee;">
-          <h4 style="margin:0;font-size:16px;font-weight:600;">Notifications</h4>
-          <a href="javascript:void(0)" onclick="marquerToutLu()" style="font-size:12px;color:#1a73e8;">Tout marquer comme lu</a>
-        </div>
-        <div id="notif-list" style="max-height:380px;overflow-y:auto;padding:5px 0;"><div style="text-align:center;padding:20px;color:#999;">Chargement...</div></div>
-        <div style="text-align:center;padding:8px;border-top:1px solid #eee;">
-          <a href="<%=lien%>?but=alumni/notifications.jsp" style="font-size:13px;color:#1a73e8;">Voir toutes les notifications</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- User Profile Dropdown -->
-    <div class="topnav-user-dropdown">
-      <button class="topnav-user-btn" type="button" title="Mon profil" aria-expanded="false">
-        <div class="topnav-avatar"><%= map.getNomuser().substring(0, 1).toUpperCase() %></div>
-        <span>Moi</span>
-      </button>
-      <div class="topnav-user-menu">
-        <a class="topnav-user-menu-item" href="<%=lien%>?but=utilisateur/utilisateur-modif.jsp&id=<%=map.getRefuser()%>">
-          <i class="bi bi-person-fill"></i>
-          Modifier Profil
-        </a>
-        <div class="topnav-user-menu-divider"></div>
-        <a class="topnav-user-menu-item" href="deconnexion.jsp">
-          <i class="bi bi-box-arrow-right"></i>
-          Déconnexion
-        </a>
-      </div>
-    </div>
   </div>
 
   <!-- Mobile Bottom Navigation -->

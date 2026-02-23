@@ -193,6 +193,11 @@
   border-bottom-color: var(--itu-violet);
   background: rgba(91, 35, 255, 0.06);
 }
+.topnav-link-group.is-open > .topnav-link {
+  color: var(--itu-violet);
+  border-bottom-color: var(--itu-violet);
+  background: rgba(91, 35, 255, 0.06);
+}
 .topnav-link .notif-dot {
   position: absolute;
   top: 8px; right: calc(50% - 13px);
