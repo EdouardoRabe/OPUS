@@ -16,8 +16,6 @@
           }
           if (session.getAttribute("u")!=null)
           {
-            UserEJB u=(UserEJB)session.getAttribute("u");
-            u.ejbRemove();
             session.removeAttribute("u");
             session.removeAttribute("lien");
             session.removeAttribute("dir");

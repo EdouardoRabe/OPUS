@@ -11,6 +11,7 @@ public class ProfilLib extends Profil {
     private String profile;
     private String idrole;
     private int refuser;
+    private String loginuser;
 
     public ProfilLib() {
         setNomTable("profillib");
@@ -95,5 +96,14 @@ public class ProfilLib extends Profil {
 
     public void setRefuser(int refuser) {
         this.refuser = refuser;
+    }
+
+    /* ── loginuser ── */
+    public String getLoginuser() {
+        return loginuser;
+    }
+
+    public void setLoginuser(String loginuser) {
+        this.loginuser = loginuser;
     }
 }

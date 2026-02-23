@@ -34,7 +34,8 @@ SELECT
     u.estactif,
     u.profile,
     u.idrole,
-    u.refuser
+    u.refuser,
+    u.loginuser
 FROM utilisateur u
     LEFT JOIN profil pr   ON pr.idutilisateur = u.refuser
     LEFT JOIN promotion p ON p.idpromotion    = pr.idpromotion
