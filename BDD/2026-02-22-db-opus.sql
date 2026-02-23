@@ -15,6 +15,8 @@ CREATE TABLE promotion(
    idpromotion VARCHAR(20) ,
    annee INTEGER NOT NULL,
    libelle VARCHAR(50)  NOT NULL,
+   idparcours VARCHAR(20)  NOT NULL,
+   FOREIGN KEY(idparcours) REFERENCES parcours(idparcours),
    PRIMARY KEY(idpromotion)
 );
 

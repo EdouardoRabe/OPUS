@@ -8,6 +8,7 @@ public class Promotion extends ClassMAPTable {
     private String idpromotion;
     private int annee;
     private String libelle;
+    private String idparcours;
 
     public Promotion() {
         setNomTable("promotion");
@@ -51,5 +52,13 @@ public class Promotion extends ClassMAPTable {
 
     public void setLibelle(String libelle) {
         this.libelle = libelle;
+    }
+
+    public String getIdparcours() {
+        return idparcours;
+    }
+    
+    public void setIdparcours(String idparcours) {
+        this.idparcours = idparcours;
     }
 }

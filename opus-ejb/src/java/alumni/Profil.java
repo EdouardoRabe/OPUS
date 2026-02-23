@@ -9,11 +9,13 @@ public class Profil extends ClassMAPTable {
     private String email;
     private String nom;
     private String prenom;
-    private String dtn;
+    private java.sql.Date dtn;
     private String telephone;
     private String idpromotion;
     private String idparcours;
-    private String idutilisateur;
+    // linked genre (homme / femme etc)
+    private String idgenre;
+    private Integer idutilisateur;
 
     public Profil() {
         setNomTable("profil");
@@ -67,11 +69,11 @@ public class Profil extends ClassMAPTable {
         this.prenom = prenom;
     }
 
-    public String getDtn() {
+    public java.sql.Date getDtn() {
         return dtn;
     }
 
-    public void setDtn(String dtn) {
+    public void setDtn(java.sql.Date dtn) {
         this.dtn = dtn;
     }
 
@@ -99,11 +101,19 @@ public class Profil extends ClassMAPTable {
         this.idparcours = idparcours;
     }
 
-    public String getIdutilisateur() {
+    public String getIdgenre() {
+        return idgenre;
+    }
+
+    public void setIdgenre(String idgenre) {
+        this.idgenre = idgenre;
+    }
+
+    public Integer getIdutilisateur() {
         return idutilisateur;
     }
 
-    public void setIdutilisateur(String idutilisateur) {
+    public void setIdutilisateur(Integer idutilisateur) {
         this.idutilisateur = idutilisateur;
     }
 }
