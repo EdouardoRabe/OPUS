@@ -11,11 +11,12 @@
 
         //Modification des affichages
         pi.getFormu().getChamp("libelle").setLibelle("Libell&eacute;");
+        pi.getFormu().getChamp("description").setLibelle("Description");
         pi.getFormu().getChamp("photo").setLibelle("Photo");
 
         //Variables de navigation
         String butApresPost = "specialite/specialite-list.jsp";
-        String[] ordre   = {"libelle", "photo"};
+        String[] ordre   = {"libelle", "description", "photo"};
         pi.getFormu().setOrdre(ordre);
 
         //Generer les affichages

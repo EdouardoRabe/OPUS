@@ -5,7 +5,7 @@
     SpecialiteCpl t = new SpecialiteCpl();
     String listeCrt[] = {"idspecialite", "libelle"};
     String listeInt[] = {};
-    String libEntete[] = {"idspecialite", "libelle", "photohtml"};
+    String libEntete[] = {"idspecialite", "libelle", "description", "photohtml"};
     PageRecherche pr = new PageRecherche(t, request, listeCrt, listeInt, 3, libEntete, libEntete.length);
     pr.setTitre("Liste des sp&eacute;cialit&eacute;s");
     pr.setUtilisateur((user.UserEJB) session.getValue("u"));
@@ -24,7 +24,7 @@
     pr.getTableau().setLien(lienTableau);
     pr.getTableau().setAttLien(attributLien);
     pr.getTableau().setColonneLien(colonneLien);
-    String libEnteteAffiche[] = {"Id", "Libell&eacute;", "Photo"};
+    String libEnteteAffiche[] = {"Id", "Libell&eacute;", "Description", "Photo"};
     pr.getTableau().setLibelleAffiche(libEnteteAffiche);
 %>
 

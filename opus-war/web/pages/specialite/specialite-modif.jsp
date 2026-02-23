@@ -23,6 +23,9 @@
         // Libelle
         pu.getFormu().getChamp("libelle").setLibelle("Libell&eacute;");
 
+        // Description
+        pu.getFormu().getChamp("description").setLibelle("Description");
+
         // Photo : libellé visible, le JS remplacera le textbox par un input file
         pu.getFormu().getChamp("photo").setLibelle("Photo");
 
