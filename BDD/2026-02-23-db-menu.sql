@@ -15,7 +15,7 @@ DELETE FROM MENUDYNAMIQUE WHERE id LIKE 'MENDYN%' OR id LIKE 'MENU_TEST%';
 
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
 -- 1. Accueil (Racine - Niveau 0)
-('MENDYN000001', 'Accueil', 'fa-home', 'pages/module.jsp?but=accueil.jsp', 1, 0, NULL),
+('MENDYN000001', 'Accueil', 'fa-home', 'module.jsp?but=accueil.jsp', 1, 0, NULL),
 
 -- 2. Réseau (Dropdown - Niveau 0)
 ('MENDYN000002', 'Réseau', 'fa-users', '#', 2, 0, NULL),
@@ -30,18 +30,18 @@ INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALU
 
 -- Sous-menus de RÉSEAU
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
-('MENDYN000005', 'Annuaire', 'fa-address-book', 'pages/module.jsp?but=annuaire/annuaire.jsp', 1, 1, 'MENDYN000002'),
-('MENDYN000006', 'Spécialités', 'fa-tags', 'pages/module.jsp?but=specialites/specialites.jsp', 2, 1, 'MENDYN000002');
+('MENDYN000005', 'Annuaire', 'fa-address-book', 'module.jsp?but=annuaire/annuaire.jsp', 1, 1, 'MENDYN000002'),
+('MENDYN000006', 'Spécialités', 'fa-tags', 'module.jsp?but=specialites/specialites.jsp', 2, 1, 'MENDYN000002');
 
 -- Sous-menus de CARRIÈRE
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
-('MENDYN000007', 'Offres d''emploi', 'fa-list-alt', 'pages/module.jsp?but=carriere/offres.jsp', 1, 1, 'MENDYN000003'),
-('MENDYN000008', 'Publier une offre', 'fa-plus-circle', 'pages/module.jsp?but=carriere/publier-offre.jsp', 2, 1, 'MENDYN000003');
+('MENDYN000007', 'Offres d''emploi', 'fa-list-alt', 'module.jsp?but=carriere/offres.jsp', 1, 1, 'MENDYN000003'),
+('MENDYN000008', 'Publier une offre', 'fa-plus-circle', 'module.jsp?but=carriere/publier-offre.jsp', 2, 1, 'MENDYN000003');
 
 -- Sous-menus de MON PROFIL
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
-('MENDYN000009', 'Voir ma fiche', 'fa-id-card', 'pages/module.jsp?but=profil/voir.jsp', 1, 1, 'MENDYN000004'),
-('MENDYN000010', 'Modifier le profil', 'fa-edit', 'pages/module.jsp?but=profil/modifier.jsp', 2, 1, 'MENDYN000004'),
+('MENDYN000009', 'Voir ma fiche', 'fa-id-card', 'module.jsp?but=profil/voir.jsp', 1, 1, 'MENDYN000004'),
+('MENDYN000010', 'Modifier le profil', 'fa-edit', 'module.jsp?but=profil/modifier.jsp', 2, 1, 'MENDYN000004'),
 ('MENDYN000011', 'Déconnexion', 'fa-sign-out', 'deconnexion.jsp', 3, 1, 'MENDYN000004');
 
 -- ═══ ÉTAPE 4: INSÉRER LES DROITS D'ACCÈS (USERMENU) ═══
