@@ -26,6 +26,7 @@
         String userId = String.valueOf(u.getUser().getRefuser());
 
         String libelle = null;
+        String description = null;
         FileItem photoItem = null;
 
         // --- Parse multipart ---
@@ -38,6 +39,8 @@
             if (item.isFormField()) {
                 if ("libelle".equals(item.getFieldName()))
                     libelle = item.getString("UTF-8");
+                if ("description".equals(item.getFieldName()))
+                    description = item.getString("UTF-8");
             } else {
                 if ("photo".equals(item.getFieldName()) && item.getSize() > 0
                         && item.getName() != null && !item.getName().trim().isEmpty())
@@ -69,6 +72,7 @@
 
         Specialite spe = new Specialite();
         spe.setLibelle(libelle.trim());
+        spe.setDescription(description != null ? description.trim() : "");
         spe.setPhoto(photoPath);
         spe.construirePK(conn);
         spe.insertToTableWithHisto(userId, conn);
