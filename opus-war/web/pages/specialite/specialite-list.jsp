@@ -58,9 +58,16 @@
         <i class="fa fa-tags" style="color:var(--itu-blue);font-size:1.1rem;margin-right:10px;"></i>
         Sp&eacute;cialit&eacute;s Alumni
     </h1>
-    <span style="font-size:0.85rem;color:var(--gray-500);">
-        <strong style="color:var(--itu-dark);"><%= pr.getListe().length %></strong> sp&eacute;cialit&eacute;s affich&eacute;es
-    </span>
+    <div style="display:flex;align-items:center;gap:1rem;">
+        <span style="font-size:0.85rem;color:var(--gray-500);">
+            <strong style="color:var(--itu-dark);"><%= pr.getListe().length %></strong> sp&eacute;cialit&eacute;s affich&eacute;es
+        </span>
+        <a class="btn btn-primary"
+           href="<%= lienBase %>?but=specialite/specialite-saisie.jsp"
+           style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap;">
+            <i class="fa fa-plus"></i> Ajouter
+        </a>
+    </div>
 </div>
 
 <!-- ═══ SEARCH & FILTER ═══ -->
@@ -89,6 +96,67 @@
     </form>
 </div>
 
+<!-- ═══ STYLES MENU KEBAB ═══ -->
+<style>
+.spe-card-menu {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    z-index: 10;
+}
+.spe-menu-btn {
+    background: transparent;
+    border: 1px solid #dde3ec;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s, border-color .15s;
+    padding: 0;
+}
+.spe-menu-btn:hover {
+    background: #f0f4ff;
+    border-color: var(--itu-blue, #008BFF);
+    color: var(--itu-blue, #008BFF);
+}
+.spe-menu-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    min-width: 160px;
+    background: #fff;
+    border: 1px solid #dde3ec;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    overflow: hidden;
+    z-index: 100;
+}
+.spe-menu-dropdown.open {
+    display: block;
+}
+.spe-menu-dropdown a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    font-size: .85rem;
+    color: #374151;
+    text-decoration: none;
+    transition: background .12s;
+}
+.spe-menu-dropdown a:hover {
+    background: #f0f4ff;
+    color: var(--itu-blue, #008BFF);
+}
+</style>
+
 <!-- ═══ SPECIALITES GRID ═══ -->
 <div class="specialities-grid">
 <%
@@ -100,7 +168,17 @@
         if (photoHtml != null) photoHtml = photoHtml.replace("__CTX__", request.getContextPath());
         boolean hasPhoto = (photoHtml != null && !photoHtml.trim().isEmpty());
 %>
-    <div class="speciality-card">
+    <div class="speciality-card" style="position:relative;">
+
+        <!-- Menu 3 points -->
+        <div class="spe-card-menu">
+            <button class="spe-menu-btn" onclick="toggleSpeMenu(this, event)" title="Options">&#8942;</button>
+            <div class="spe-menu-dropdown" id="spe-dd-<%= i %>">
+                <a href="<%= lienBase %>?but=specialite/specialite-fiche.jsp&amp;idspecialite=<%= spe.getIdspecialite() %>">
+                    <i class="fa fa-info-circle"></i> Voir d&eacute;tails
+                </a>
+            </div>
+        </div>
 
         <!-- Icone / Photo -->
         <div class="speciality-icon" style="<%= hasPhoto ? "background:var(--gray-100);" : iconGradients[idx] %>">
@@ -153,6 +231,24 @@
 <div class="specialite-pagination-wrap">
     <%= pr.getBasPage() %>
 </div>
+
+<script>
+function toggleSpeMenu(btn, e) {
+    e.stopPropagation();
+    var dd = btn.nextElementSibling;
+    var isOpen = dd.classList.contains('open');
+    // close all open menus first
+    document.querySelectorAll('.spe-menu-dropdown.open').forEach(function(el) {
+        el.classList.remove('open');
+    });
+    if (!isOpen) dd.classList.add('open');
+}
+document.addEventListener('click', function() {
+    document.querySelectorAll('.spe-menu-dropdown.open').forEach(function(el) {
+        el.classList.remove('open');
+    });
+});
+</script>
 
 <%
     } catch (Exception e) {
