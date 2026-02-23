@@ -78,7 +78,6 @@ INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
 ('USRM000011', 'MENDYN000011', '*', 0, 'etu'),
 ('USRM000025', 'MENDYN000024', '*', 1, 'etu');  -- Déconnexion
 
--- Si vous avez d'autres rôles (admin, md, etc.), ajouter aussi:
 -- Menus pour le rôle 'md' (Direction Générale)
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000012', 'MENDYN000001', '*', 0, 'md'),
@@ -95,4 +94,24 @@ VALUES ('USRM000012', 'MENDYN000001', '*', 0, 'md'),
        ('USRM000099', 'MENDYN000999', '*', 0, 'md'),
        ('USRM000023', 'MENDYN000023', '*', 0, 'md'),
        ('USRM000024', 'MENDYN000024', '*', 0, 'md');
+
+-- ═══ ÉTAPE 5: MENU PUBLICATIONS ═══
+
+-- Menu principal Publications (Niveau 0)
+INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
+('MENDYN000012', 'Publications', 'fa-newspaper-o', '#', 2, 0, NULL);
+
+-- Sous-menu Fil d'actualité (Niveau 1)
+INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
+('MENDYN000013', 'Fil d''actualite', 'fa-list', 'module.jsp?but=alumni/fil-actualite.jsp', 1, 1, 'MENDYN000012');
+
+-- Droits: role etu
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
+('USRM000023', 'MENDYN000012', '*', 0, 'etu'),
+('USRM000024', 'MENDYN000013', '*', 0, 'etu');
+
+-- Droits: role md
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
+('USRM000025', 'MENDYN000012', '*', 0, 'md'),
+('USRM000026', 'MENDYN000013', '*', 0, 'md');
 
