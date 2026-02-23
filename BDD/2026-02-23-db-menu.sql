@@ -24,7 +24,7 @@ INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALU
 -- Sous-menus de RESEAU
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
 ('MENDYN000005', 'Annuaire',    'bi-book-fill', 'module.jsp?but=annuaire/annuaire.jsp',       1, 1, 'MENDYN000002'),
-('MENDYN000006', 'Specialites', 'bi-tags-fill', 'module.jsp?but=specialites/specialites.jsp', 2, 1, 'MENDYN000002');
+('MENDYN000006', 'Specialites', 'bi-tags-fill', 'module.jsp?but=specialite/specialite-list.jsp', 2, 1, 'MENDYN000002');
 
 -- Sous-menus de CARRIERE
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
@@ -74,31 +74,11 @@ INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
 ('USRM000023', 'MENDYN000023', '*', 0, 'md'),
 ('USRM000024', 'MENDYN000024', '*', 0, 'md');
 
--- ETAPE 5: MENU PUBLICATIONS
-
--- Menu principal Publications (Niveau 0)
-INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
-('MENDYN000012', 'Publications', 'fa-newspaper-o', '#', 2, 0, NULL);
-
--- Sous-menu Fil d'actualite (Niveau 1)
-INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
-('MENDYN000013', 'Fil d''actualite', 'fa-list', 'module.jsp?but=alumni/fil-actualite.jsp', 1, 1, 'MENDYN000012');
-
--- Droits role etu (IDs 029/030 - eviter doublons avec ETAPE 4)
-INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
-('USRM000029', 'MENDYN000012', '*', 0, 'etu'),
-('USRM000030', 'MENDYN000013', '*', 0, 'etu');
-
--- Droits role md (IDs 031/032 - eviter doublons avec ETAPE 4)
-INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
-('USRM000031', 'MENDYN000012', '*', 0, 'md'),
-('USRM000032', 'MENDYN000013', '*', 0, 'md');
-
--- ETAPE 6: MENU NOTIFICATIONS
+-- ETAPE 5: MENU NOTIFICATIONS
 
 -- Sous-menu Notifications sous Publications (Niveau 1)
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
-('MENDYN000014', 'Notifications', 'bi-bell-fill', 'module.jsp?but=alumni/notifications.jsp', 2, 1, 'MENDYN000012');
+('MENDYN000014', 'Notifications', 'bi-bell-fill', '#', 5, 0, NULL);
 
 -- Droits role etu
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
