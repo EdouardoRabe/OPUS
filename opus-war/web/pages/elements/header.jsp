@@ -1,100 +1,343 @@
 <%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
 <%@page import="bean.CGenUtil"%>
 <%@page import="historique.MapUtilisateur"%>
-
 <%@page import="user.UserEJB"%>
+<%@page import="menu.MenuDynamique"%>
+<%@page import="java.util.ArrayList"%>
+
+<!-- JSP Method Declaration for Icon Conversion -->
+<%!
+    // Function to convert Font Awesome to Ionicons
+    public String convertToIonicon(String faIcon) {
+        if (faIcon == null) return "ion ion-link";
+
+        // Map of Font Awesome to Ionicons
+        java.util.Map<String, String> iconMap = new java.util.HashMap<>();
+        iconMap.put("fa-users", "ion ion-people");
+        iconMap.put("fa-briefcase", "ion ion-briefcase");
+        iconMap.put("fa-comment-dots", "ion ion-chatboxes");
+        iconMap.put("fa-bell", "ion ion-alert");
+        iconMap.put("fa-home", "ion ion-home");
+        iconMap.put("fa-user", "ion ion-person");
+        iconMap.put("fa-search", "ion ion-search");
+        iconMap.put("fa-ellipsis-h", "ion ion-navicon-round");
+        iconMap.put("fa-graduation-cap", "ion ion-university");
+
+        // Check if it's a Font Awesome icon
+        if (faIcon.startsWith("fa")) {
+            for (String key : iconMap.keySet()) {
+                if (faIcon.contains(key.replace("fa-", ""))) {
+                    return iconMap.get(key);
+                }
+            }
+        }
+
+        // If it looks like Font Awesome, try to convert
+        if (faIcon.startsWith("fa-") || faIcon.startsWith("fa ")) {
+            String iconName = faIcon.replace("fa-", "").replace("fa ", "");
+            // Default mapping
+            String ionIcon = "ion ion-" + iconName;
+            return ionIcon;
+        }
+
+        // Otherwise return as is (probably already ionicon)
+        return faIcon;
+    }
+%>
+
+<%@page import="utilisateur.UserMenu"%>
+
 <%
     String lien = (String) session.getValue("lien");
     UserEJB ue = (UserEJB) session.getValue("u");
     MapUtilisateur map = ue.getUser();
-    /*NotificationLib notif = new NotificationLib();
-    notif.setNomTable("notificationLibNonLu");
-    String where = " and receiver = '%s' order by etat asc, daty desc, heure desc";
-    where = String.format(where, ue.getUser().getRefuser());
-    NotificationLib[]mesnotifs = (NotificationLib[])CGenUtil.rechercher(notif, null, null, where);
-    int limit = 5;
-    if(mesnotifs.length <5){
-        limit = mesnotifs.length;
-    }*/
-%>
-        <script>          
+    String currentMenu = request.getParameter("currentMenu");
 
-        function verifEditerTef(et,name){
-        if(et<11){
-                alert('Impossible d\'editer Tef. '+name+' non vis� ');
-        }else{
-            document.tef.submit();
-                
-            }
-        }
-        function verifLivraisonBC(et){
-        if(et<11){
-                alert('Impossible d effectuer la livraison du bon de commande');
-        }else{
-            document.tef.submit();
-                
-            }
-        }
-        function CocherToutCheckBox(ref, name) {
-            var form = ref;
+    // Get menu tree using CGenUtil.rechercher directly (framework pattern)
+    ArrayList<ArrayList<MenuDynamique>> arbreMenu = null;
+    MenuDynamique[] tabMenu = null;
 
-            while (form.parentNode && form.nodeName.toLowerCase() != 'form') {
-                form = form.parentNode;
-            }
+    try {
+        // 1. D'abord charger les menus autorises pour cet utilisateur depuis usermenu
+        String refuser = String.valueOf(map.getRefuser());
+        String idrole = map.getIdrole();
 
-            var elements = form.getElementsByTagName('input');
+        // Requete pour les menus autorises (interdit=0 ou null) par refuser='*' ou par role
+        String whereUserMenu = " AND (interdit=0 OR interdit IS NULL) AND (refuser='*' OR refuser='" + refuser + "' OR idrole='" + idrole + "')";
+        UserMenu[] userMenus = (UserMenu[]) CGenUtil.rechercher(new UserMenu(), null, null, whereUserMenu);
 
-            for (var i = 0; i < elements.length; i++) {
-                if (elements[i].type == 'checkbox' && elements[i].name == name) {
-                    elements[i].checked = ref.checked;
+        // 2. Collecter les IDs des menus autorises
+        java.util.Set<String> menuAutorises = new java.util.HashSet<String>();
+        if (userMenus != null) {
+            for (UserMenu um : userMenus) {
+                if (um.getIdmenu() != null) {
+                    menuAutorises.add(um.getIdmenu());
                 }
             }
         }
-        
-        </script>
-<header class="main-header" style="position: fixed; left: 0; right: 0;">
+
+        // 3. Charger tous les menus
+        tabMenu = (MenuDynamique[]) CGenUtil.rechercher(new MenuDynamique(), null, null, " ORDER BY niveau, rang ASC");
+
+        if (tabMenu != null && tabMenu.length > 0) {
+            // Organiser les menus par niveau (seulement ceux autorises)
+            arbreMenu = new ArrayList<ArrayList<MenuDynamique>>();
+            java.util.Map<Integer, ArrayList<MenuDynamique>> menuParNiveau = new java.util.HashMap<Integer, ArrayList<MenuDynamique>>();
+
+            for (MenuDynamique menu : tabMenu) {
+                // Filtrer : garder seulement les menus autorises
+                if (menuAutorises.isEmpty() || menuAutorises.contains(menu.getId())) {
+                    int niveau = menu.getNiveau();
+                    if (!menuParNiveau.containsKey(niveau)) {
+                        menuParNiveau.put(niveau, new ArrayList<MenuDynamique>());
+                    }
+                    menuParNiveau.get(niveau).add(menu);
+                }
+            }
+
+            // Ajouter les niveaux dans l'ordre
+            int maxNiveau = 0;
+            for (Integer n : menuParNiveau.keySet()) {
+                if (n > maxNiveau) maxNiveau = n;
+            }
+            for (int i = 0; i <= maxNiveau; i++) {
+                if (menuParNiveau.containsKey(i)) {
+                    arbreMenu.add(menuParNiveau.get(i));
+                } else {
+                    arbreMenu.add(new ArrayList<MenuDynamique>());
+                }
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        arbreMenu = null;
+    }
+%>
+
+<script>
+    function verifEditerTef(et,name){
+        if(et<11){
+            alert('Impossible d\'editer Tef. '+name+' non visé ');
+        }else{
+            document.tef.submit();
+        }
+    }
+    function verifLivraisonBC(et){
+        if(et<11){
+            alert('Impossible d effectuer la livraison du bon de commande');
+        }else{
+            document.tef.submit();
+        }
+    }
+    function CocherToutCheckBox(ref, name) {
+        var form = ref;
+        while (form.parentNode && form.nodeName.toLowerCase() != 'form') {
+            form = form.parentNode;
+        }
+        var elements = form.getElementsByTagName('input');
+        for (var i = 0; i < elements.length; i++) {
+            if (elements[i].type == 'checkbox' && elements[i].name == name) {
+                elements[i].checked = ref.checked;
+            }
+        }
+    }
+</script>
+
+<!-- ══ TOP NAVBAR (LinkedIn-style) ══ -->
+<nav class="alumni-topnav">
+  <div class="topnav-main-row">
     <!-- Logo -->
-	<div>
-		<a href="<%= lien %>?but=accueil.jsp" class="logo" style="background-color:var(--Background-primaire);color: var(--Text-primary);">
-            <span class="logo-mini" style="color:#333;font-weight: 600;">
-                <img style="width: auto;height:42px;" src="${pageContext.request.contextPath}/assets/img/logo.png"/>
-            </span>
-            <!-- logo for regular state and mobile devices -->
-            <span class="logo-lg">
+    <a class="topnav-brand" href="<%= lien %>?but=accueil.jsp">
+      <div class="topnav-logo">
+        <img src="${pageContext.request.contextPath}/dist/img/ITU_logo.png" alt="ITU Logo" style="width: 100%; height: 100%; object-fit: contain;">
+      </div>
+    </a>
 
-                <img style="width: auto;height:42px;" src="${pageContext.request.contextPath}/assets/img/logo.png"/>
-            </span>
-        </a>
-	</div>
-    <!-- Header Navbar: style can be found in header.less -->
-    <nav class="navbar navbar-static-top" role="navigation">
-        <!-- Sidebar toggle button-->
-        <button class="sidebar-toggle" style="background:none;border:none;cursor:pointer;color:var(--Text-primary)"
-                data-toggle="offcanvas" role="button" aria-label="Toggle navigation">
+    <!-- Search Bar (Desktop) -->
+    <div class="topnav-search-wrap">
+      <form action="<%=lien%>" method="GET" style="display: flex; align-items: center; flex: 1;">
+        <input value="recherche-global.jsp" name="but" type="hidden">
+        <div class="topnav-search-container">
+          <i class="ion ion-search"></i>
+          <input class="topnav-search" type="text" name="remarque" placeholder="Rechercher...">
+        </div>
+      </form>
+    </div>
 
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 12 13" fill="none">
-                <path
-                        d="M9.05 8.1828V4.84946C9.05 4.73924 8.99722 4.66446 8.89167 4.62513C8.78611 4.58579 8.69444 4.60502 8.61667 4.6828L7.13333 6.16613C7.03333 6.26613 6.98333 6.3828 6.98333 6.51613C6.98333 6.64946 7.03333 6.76613 7.13333 6.86613L8.61667 8.34946C8.69444 8.42724 8.78611 8.44646 8.89167 8.40713C8.99722 8.3678 9.05 8.29302 9.05 8.1828ZM1 12.5161C0.725 12.5161 0.489611 12.4182 0.293833 12.2223C0.0979445 12.0265 0 11.7911 0 11.5161V1.51613C0 1.24113 0.0979445 1.00568 0.293833 0.809795C0.489611 0.614017 0.725 0.516129 1 0.516129H11C11.275 0.516129 11.5104 0.614017 11.7063 0.809795C11.9021 1.00568 12 1.24113 12 1.51613V11.5161C12 11.7911 11.9021 12.0265 11.7063 12.2223C11.5104 12.4182 11.275 12.5161 11 12.5161H1ZM3.45 11.5161V1.51613H1V11.5161H3.45ZM4.45 11.5161H11V1.51613H4.45V11.5161Z"
-                        fill="currentColor" />
-            </svg>
-        </button>
-        <div class="recherche-global " >
-            <form action="<%=lien%>" method="GET" >
-                <div class="form-input col-md-12 form-input-apj recherche-global-container ">
-                    <label class="Body14pxRegular" style="margin-right: 10px;white-space: nowrap;">Recherche Globale</label>
-                    <input value="recherche-global.jsp" name="but" type="hidden">
-                    <div style="position: relative; flex: 1;width: 100%">
-                        <input name="remarque" type="text" class="form-control global-search-input" style="height: 28px; padding-right: 30px;"
-                               onkeydown="if(event.key === 'Enter'){ event.preventDefault(); this.form.submit(); }">
-                        <span onclick="this.parentNode.querySelector('input[name=remarque]').form.submit();" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: #aaa;">
-                                    <i class="fa fa-search"></i>
-                                </span>
+    <!-- Primary Navigation Links -->
+    <div class="topnav-primary-links">
+        <!-- Dynamic Menu from MenuDynamique (niveau 0 only) -->
+        <%
+        if (arbreMenu != null && !arbreMenu.isEmpty()) {
+          ArrayList<MenuDynamique> menuNiveau0 = arbreMenu.get(0);
+          if (menuNiveau0 != null) {
+            for (MenuDynamique menu : menuNiveau0) {
+              if (menu != null) {
+                String href = "#";
+                if (menu.getHref() != null && !menu.getHref().isEmpty()) {
+                  href = menu.getHref() + "?currentMenu=" + menu.getId();
+                }
+                String libelle = menu.getLibelle() != null ? menu.getLibelle() : "Menu";
+                String icone = menu.getIcone() != null ? menu.getIcone() : "fa-link";
+                String ionIcon = convertToIonicon(icone);
+      %>
+      <a class="topnav-link" href="<%= href %>" data-overflow-item="true" title="<%= libelle %>">
+        <i class="<%= ionIcon %>"></i>
+        <span><%= libelle %></span>
+      </a>
+      <%
+              }
+            }
+          }
+        }
+      %>
+    </div>
+
+    <!-- More Button (Overflow) -->
+    <div class="topnav-overflow">
+      <button class="topnav-more-btn" type="button" title="Plus d'options">
+        <i class="ion ion-navicon-round"></i>
+        <span>Plus</span>
+      </button>
+      <div class="topnav-overflow-menu"></div>
+    </div>
+
+    <!-- Search Toggle (Mobile) -->
+    <button class="topnav-search-toggle" type="button" title="Rechercher">
+      <i class="ion ion-search"></i>
+    </button>
+
+    <!-- User Profile -->
+    <a class="topnav-user-btn" href="#" title="Mon profil">
+      <div class="topnav-avatar"><%= map.getNomuser().substring(0, 1).toUpperCase() %></div>
+      <span>Moi</span>
+    </a>
+  </div>
+
+  <!-- Mobile Bottom Navigation -->
+  <div class="topnav-mobile-links">
+    <a class="topnav-link" href="<%= lien %>?but=accueil.jsp" title="Accueil">
+      <i class="ion ion-home"></i>
+    </a>
+
+    <!-- Dynamic Menu for Mobile (niveau 0 only - max 4 items) -->
+    <%
+      if (arbreMenu != null && arbreMenu.size() > 0) {
+        ArrayList<MenuDynamique> menuNiveau0 = arbreMenu.get(0);
+        if (menuNiveau0 != null) {
+          int count = 0;
+          for (MenuDynamique menu : menuNiveau0) {
+            if (count >= 4) break; // Show max 4 items + home + profile
+            if (menu != null) {
+              String href = "#";
+              if (menu.getHref() != null && !menu.getHref().isEmpty()) {
+                href = menu.getHref() + "?currentMenu=" + menu.getId();
+              }
+              String libelle = menu.getLibelle() != null ? menu.getLibelle() : "Menu";
+              String icone = menu.getIcone() != null ? menu.getIcone() : "fa-link";
+              String ionIcon = convertToIonicon(icone);
+    %>
+    <a class="topnav-link" href="<%= href %>" title="<%= libelle %>">
+      <i class="<%= ionIcon %>"></i>
+    </a>
+    <%
+              count++;
+            }
+          }
+        }
+      }
+    %>
+
+    <a class="topnav-link" href="#" title="Mon profil">
+      <i class="ion ion-person"></i>
+    </a>
+  </div>
+</nav>
+
+<!-- Modals (kept from original) -->
+<div class="modal fade" id="modalSendMessage" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="message-chat-title"></h4>
+            </div>
+            <div class="modal-body clearfix">
+                <div class="message-chat-content clearfix" id="message-chat-content"></div>
+                <br/>
+                <form>
+                    <textarea id="messagefrom" onkeypress="keypressedsendMessage(this, 1)" class="form-control" rows="3" placeholder="Votre message ici" ></textarea>
+                    <br/><br/>
+                    <input type="button" class="btn btn-primary pull-right" style="margin-left: 5px;" onclick="keypressedsendMessage(this, 2)" value="Envoyer"/>
+                    <input type="reset" class="btn btn-danger pull-right" value="Annuler"/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalSendMessageTo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <%
+                    MapUtilisateur[] utilisateurs2 = (MapUtilisateur[]) CGenUtil.rechercher(new MapUtilisateur(), null, null, " AND REFUSER <> '" + map.getRefuser() + "'");
+                    if (utilisateurs2 != null) {
+                      for (MapUtilisateur utilisateur : utilisateurs2) {%>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="optionsRadios" id="optionsRadios1" value="<%=utilisateur.getRefuser()%>">
+                        <%=utilisateur.getNomuser()%>
+                    </label>
+                </div>
+                <%}
+                    }
+                %>
+            </div>
+            <div class="modal-body clearfix">
+                <form>
+                    <textarea id="msgelement" class="form-control" rows="3" placeholder="Votre message ici" ></textarea>
+                    <br/><br/>
+                    <input type="button" class="btn btn-primary pull-right" style="margin-left: 5px;" onclick="keypressedsendMessage(this, 3)" value="Envoyer"/>
+                    <input type="reset" class="btn btn-danger pull-right" value="Annuler"/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="alarmModal" tabindex="-1" role="dialog" aria-labelledby="alarmModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="alarmForm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Créer une alarme</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="alarmMessage">Message</label>
+                        <input type="text" class="form-control" id="alarmMessage" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="alarmTimestamp">Date & Heure</label>
+                        <input type="datetime-local" class="form-control" id="alarmTimestamp" required>
                     </div>
                 </div>
-            </form>
-        </div>
-<%--        <div class="navbar-custom-menu">--%>
-<%--            <ul class="nav navbar-nav">--%>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Créer</button>
+                    <button type="button" class="btn btn-tertiary" data-dismiss="modal">Annuler</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${pageContext.request.contextPath}/apjplugins/notification.js" type="text/javascript"></script>
+
 <%--                <!-- Messages: style can be found in dropdown.less-->--%>
 <%--                <!--<li class="dropdown messages-menu">--%>
 <%--                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" onclick="loadMessageHeader()">--%>
@@ -213,7 +456,8 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <%
                     MapUtilisateur[] utilisateurs = (MapUtilisateur[]) CGenUtil.rechercher(new MapUtilisateur(), null, null, " AND REFUSER <> '" + map.getRefuser() + "'");
-                    for (MapUtilisateur utilisateur : utilisateurs) {%>
+                    if (utilisateurs != null) {
+                      for (MapUtilisateur utilisateur : utilisateurs) {%>
                 <div class="radio">
                     <label>
                         <input type="radio" name="optionsRadios" id="optionsRadios1" value="<%=utilisateur.getRefuser()%>">
@@ -221,6 +465,7 @@
                     </label>
                 </div>
                 <%}
+                    }
                 %>
 
             </div>
