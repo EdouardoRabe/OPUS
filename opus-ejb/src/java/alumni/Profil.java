@@ -17,7 +17,7 @@ public class Profil extends ClassMAPTable {
     private String idparcours;
     // linked genre (homme / femme etc)
     private String idgenre;
-    private Integer idutilisateur;
+    private int idutilisateur;
 
     public Profil() {
         setNomTable("profil");
