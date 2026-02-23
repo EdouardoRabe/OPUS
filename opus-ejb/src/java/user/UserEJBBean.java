@@ -1811,9 +1811,9 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     public Object updateObject(ClassMAPTable o, Connection c) throws Exception {
         // Connection c=null;
         // System.out.println("ato updateObject");
-        if (testRestriction(u.getIdrole(), ConstanteUtilisateur.acteUpdate, o.getNomTable(), c) == 1) {
-            throw new Exception("Erreur de droit");
-        }
+        // if (testRestriction(u.getIdrole(), ConstanteUtilisateur.acteUpdate, o.getNomTable(), c) == 1) {
+        //     throw new Exception("Erreur de droit");
+        // }
         testUpdate(o, c);
         try {
             return UpdateObject.updateObject(o, c, u, this);
@@ -1885,12 +1885,14 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             boolean defaultDelete = true;
             c.setAutoCommit(false);
             // testFk(o, c);
-            if (testRestriction(u.getIdrole(), "ACT000003", o.getNomTable(), c) == 1) {
-                throw new Exception("Erreur de droit");
-            }
+            System.out.println(u.getIdrole() + " " + ConstanteUtilisateur.acteDelete + " " + o.getNomTable());
+            // if (testRestriction(u.getIdrole(), "ACT000003", o.getNomTable(), c) == 1) {
+            //     throw new Exception("Erreur de droit");
+            // }
             testDelete(o, c);
             ClassMAPTable[] liste = (ClassMAPTable[]) CGenUtil.rechercher(o, null, null, c, "");
             if (liste.length > 0) {
+                System.out.println(u.getTuppleID());
                 if (defaultDelete) {
                     liste[0].deleteToTableWithHisto(u.getTuppleID(), c);
                 }

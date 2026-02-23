@@ -18,6 +18,9 @@ VALUES (100, 'ETU000001', 'paop', 'Rakoto Jean', 'DIR42', 'etu', 'ETU000001', 1)
 INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, id, estactif)
 VALUES (101, 'ETU000002', 'paop', 'Rasoa Marie', 'DIR42', 'etu', 'ETU000002', 1);
 
+INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, id, estactif)
+VALUES (102, 'ETU000003', 'paop', 'Rasolobe Andry', 'DIR42', 'md', 'ETU000003', 1);
+
 -- Parametres de cryptage (obligatoire pour que testeValide fonctionne)
 -- Meme format que l'admin existant : CRY000088 / niveau=4 / croissante=1 / idutilisateur=1
 INSERT INTO paramcrypt (id, niveau, croissante, idutilisateur)
@@ -25,3 +28,6 @@ VALUES ('CRY000100', 4, 1, '100');
 
 INSERT INTO paramcrypt (id, niveau, croissante, idutilisateur)
 VALUES ('CRY000101', 4, 1, '101');
+
+INSERT INTO paramcrypt (id, niveau, croissante, idutilisateur)
+VALUES ('CRY000102', 4, 1, '102');

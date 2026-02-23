@@ -17,6 +17,7 @@
     try{
 %>
 <%@include file="security-login.jsp"%>
+<%@include file="security-access.jsp"%>
 <%
     if (session.getAttribute("lien") != null) {
         lien = (String) session.getAttribute("lien");

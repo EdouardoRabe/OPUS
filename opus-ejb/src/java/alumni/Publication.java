@@ -2,17 +2,18 @@ package alumni;
 
 import bean.ClassMAPTable;
 import java.sql.Connection;
+import java.sql.Date;
 
 public class Publication extends ClassMAPTable {
 
     private String idpublication;
-    private String daty;
+    private Date daty;
     private String descritpion;
     private int etat;
     private String idorigine;
     private String heure;
     private String idtypepublication;
-    private String idutilisateur;
+    private int idutilisateur;
 
     public Publication() {
         setNomTable("publication");
@@ -42,11 +43,11 @@ public class Publication extends ClassMAPTable {
         this.idpublication = idpublication;
     }
 
-    public String getDaty() {
+    public Date getDaty() {
         return daty;
     }
 
-    public void setDaty(String daty) {
+    public void setDaty(Date daty) {
         this.daty = daty;
     }
 
@@ -90,11 +91,11 @@ public class Publication extends ClassMAPTable {
         this.idtypepublication = idtypepublication;
     }
 
-    public String getIdutilisateur() {
+    public int getIdutilisateur() {
         return idutilisateur;
     }
 
-    public void setIdutilisateur(String idutilisateur) {
+    public void setIdutilisateur(int idutilisateur) {
         this.idutilisateur = idutilisateur;
     }
 }

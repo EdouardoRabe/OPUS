@@ -169,10 +169,13 @@
     try {
         System.out.println("suppression : " + request.getParameter("confirm") + " nom table : " + nomtable);
         t = (ClassMAPTable) (Class.forName(classe).newInstance());
+        System.out.println("1");
         t.setValChamp(t.getAttributIDName(), request.getParameter("id"));
+        System.out.println("2");
         if (nomtable != null && !nomtable.isEmpty()) {
             t.setNomTable(nomtable);
         }
+        System.out.println("3");
         u.deleteObject(t);
         if (classe.compareToIgnoreCase("commande.Commande") == 0) {
 %>
@@ -262,7 +265,6 @@
         ClassMAPTable o = (ClassMAPTable) u.validerObject(t);
         temp = t;
         val = o.getTuppleID();
-
 
 %>
 <script language="JavaScript"> document.location.replace("<%=lien%>?but=<%=bute + rajoutLie%>&id=<%=val%>");</script>

@@ -1,7 +1,9 @@
 package alumni;
 
 import bean.ClassMAPTable;
+import bean.CGenUtil;
 import java.sql.Connection;
+import java.sql.Date;
 
 public class Profil extends ClassMAPTable {
 
@@ -20,6 +22,7 @@ public class Profil extends ClassMAPTable {
     public Profil() {
         setNomTable("profil");
     }
+
 
     @Override
     public String getTuppleID() {
@@ -69,11 +72,11 @@ public class Profil extends ClassMAPTable {
         this.prenom = prenom;
     }
 
-    public java.sql.Date getDtn() {
+    public Date getDtn() {
         return dtn;
     }
 
-    public void setDtn(java.sql.Date dtn) {
+    public void setDtn(Date dtn) {
         this.dtn = dtn;
     }
 
@@ -109,11 +112,11 @@ public class Profil extends ClassMAPTable {
         this.idgenre = idgenre;
     }
 
-    public Integer getIdutilisateur() {
+    public int getIdutilisateur() {
         return idutilisateur;
     }
 
-    public void setIdutilisateur(Integer idutilisateur) {
+    public void setIdutilisateur(int idutilisateur) {
         this.idutilisateur = idutilisateur;
     }
 }

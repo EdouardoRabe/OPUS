@@ -1,143 +1,162 @@
+// ============================================================
+// NOTIFICATION.JS — Alumni Notification System
+// ============================================================
 var mesnotifs = [];
-var limit = 5;
 var titre = document.title;
-var check = false;
+var notifDropdownOpen = false;
 
-function getNotification() {
-   var tmp = mesnotifs.length;
+// ========== CHARGEMENT DES NOTIFICATIONS ==========
+function chargerNotifications() {
+    var ctx = (typeof _NOTIF_CTX !== 'undefined') ? _NOTIF_CTX : _CONTEXT_PATH;
     $.ajax({
         type: "GET",
-        url: "../../opus/Notification",
+        url: ctx + "/pages/alumni/ajax/charger-notifications.jsp",
         dataType: "json",
-        data: {"nb" : ""+mesnotifs.length},
-        success: function (data, textStatus, jqXHR) {
-            mesnotifs = data;
-            buildHTMLNotif();
-            var taillenotif =  mesnotifs.length;
-            var ecart = taillenotif - tmp;
-            if(check){
-                for(var i = 0; i<ecart; i++){
-                    getNotificationWindows(mesnotifs[i].message);
+        success: function(data) {
+            if (!data.success) return;
+            mesnotifs = data.notifications || [];
+            var nbNonLu = data.nbNonLu || 0;
+
+            // Badge
+            var badge = document.getElementById('notif-badge');
+            if (badge) {
+                if (nbNonLu > 0) {
+                    badge.textContent = nbNonLu > 99 ? '99+' : nbNonLu;
+                    badge.style.display = 'inline-block';
+                    document.title = "(" + nbNonLu + ") " + titre;
+                } else {
+                    badge.style.display = 'none';
+                    document.title = titre;
                 }
             }
-            check = true;
-            if(taillenotif!=0){
-                document.title = "("+taillenotif+") "+titre;
+
+            // Si dropdown ouvert, mettre a jour la liste
+            if (notifDropdownOpen) {
+                renderNotifList();
             }
-        }
-    });
-}
-                        
-function getNotificationWindows(message) {
-    $.ajax({
-        type: "GET",
-        url: "../../opus/Notification",
-        dataType: "json",
-        data: {"notifSys" : message},
-        success: function (data, textStatus, jqXHR) {
+        },
+        error: function(xhr, status, error) {
+            console.error("Erreur chargement notifications:", error);
         }
     });
 }
 
-//                 function buildHTMLNotif() {
-//                     // 1. Vérifier si le dropdown est ouvert
-//                     var wasOpen = $('.js-btn-notif').hasClass('open');
-//
-//                     if(mesnotifs.length < 5){
-//                         limit = mesnotifs.length;
-//                     }
-//
-//                     var c = "<div class='btn-group js-btn-notif";
-//                     if (wasOpen) c += " open"; // 2. Forcer la classe "open" si elle était là
-//                     c += "' style='position: initial; transform: scaleX(-1)'>\n\
-//     <a class='dropdown-toggle' data-toggle='dropdown' aria-expanded='true'>\n\
-//     <i class='fa fa-bell' data-toggle='tooltip' data-placement='bottom' style='color: white'></i>";
-//
-//                     if (mesnotifs.length != 0) {
-//                         c += "<span class='badge badge-ketrika js-badge-notif' id='nbnonlu' style='background-color: rgb(204, 0, 0); transform: scaleX(-1)'>" + mesnotifs.length + "</span>";
-//                     }
-//
-//                     c += "</a>\n\
-//     <ul class='dropdown-menu with-caret dropdown-menu-notif' role='menu' style='border: 1px solid; width: 400px; transform: scaleX(-1);'>\n\
-//         <h4 style='margin-left: 2%'>Notifications <i class='fa fa-exclamation-circle'></i></h4>\n";
-//
-//                     if (mesnotifs.length == 0) {
-//                         c += "<h6 style='text-align: center'>Aucune notifications</h6>";
-//                     } else {
-//                         c += "<h5 style='text-align: right; margin-right: 2%'><a href='?but=apresNotif.jsp&acte=toutvu&bute=" + window.location.href.split('?but=')[1] + "'>Tout marqu&eacute; comme Lu</a></h5>";
-//                     }
-//
-//                     for (var i = 0; i < limit; i++) {
-//                         if (mesnotifs[i].etat == 1) {
-//
-//                             c += "<li style='background-color: rgb(249, 249, 249); border: 1px solid; padding: 0 2%; margin: 2% 0; cursor: pointer'>";
-//                         }
-//                         else {
-//                             c += "<li onclick=\"location.href='" + mesnotifs[i].message + "';\" style='background-color: rgb(249, 249, 249); border: 1px solid; padding: 0 2%; margin: 2% 0; cursor: pointer'>";
-//                         }
-//                         c += "<p>" + mesnotifs[i].message + "</p><span class='dropdown-notif-time'>" + mesnotifs[i].ecartstring + "</span></li>";
-//                     }
-//
-//                     c += "<a class='dropdown-menu-pagenotif col-xs-12 bg-primary' href='" + lien + "?but=tache/notification/notification-liste.jsp' style='text-align: center'> Voir tout</a>\n\
-//     </ul>\n\
-// </div>";
-//
-//                     // Remplacer le HTML
-//                     $('#notifrefresh').html(c);
-//                 }
-
-function buildHTMLNotif() {
-    var wasOpen = $('.js-btn-notif').hasClass('open');
-    var limit = mesnotifs.length < 5 ? mesnotifs.length : 5;
-
-    var c = "<div class='btn-group js-btn-notif" + (wasOpen ? " open" : "") + "' style='position: relative; transform: scaleX(-1)'>\
-        <a class='dropdown-toggle' data-toggle='dropdown' aria-expanded='true'>\
-            <i class='fa fa-bell' data-toggle='tooltip' data-placement='bottom' style='color: #434040; font-size: 17px;'></i>";
-
-    if (mesnotifs.length !== 0) {
-        c += "<span class='badge js-badge-notif' id='nbnonlu' >" + mesnotifs.length + "</span>";
-    }
-
-    c += "</a>\
-        <ul class='dropdown-menu with-caret dropdown-menu-notif' role='menu' style='width: 400px; transform: scaleX(-1); padding: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 10px;'>\
-            <div style='display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; border-bottom: 1px solid #ddd;'>\
-                <h4 style='margin: 0; font-size: 16px;'>Notifications <i class='fa fa-bell'></i></h4>";
-
-    if (mesnotifs.length > 0) {
-        var redirect = window.location.href.split('?but=')[1];
-        c += "<a href='?but=apresNotif.jsp&acte=toutvu&bute=" + redirect + "' style='font-size: 12px;'>Tout marquer comme lu</a>";
-    }
-
-    c += "</div>";
+function renderNotifList() {
+    var listDiv = document.getElementById('notif-list');
+    if (!listDiv) return;
 
     if (mesnotifs.length === 0) {
-        c += "<div style='text-align: center; padding: 20px; color: #999;'>Aucune nouvelle notification</div>";
-    } else {
-        for (var i = 0; i < limit; i++) {
-            var notif = mesnotifs[i];
-            var background = notif.etat === 1 ? '#f1f1f1' : '#ffffff';
-            var clickable = notif.etat !== 1 ? " onclick=\"location.href='" + notif.message + "';\"" : "";
-
-            c += "<li style='list-style: none; background-color: " + background + "; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px 15px; margin: 8px 0; cursor: pointer;' " + clickable + ">";
-            c += "<p style='margin: 0 0 5px; font-size: 14px;'>" + notif.message + "</p>";
-            c += "<span style='font-size: 12px; color: #888;'>" + notif.ecartstring + "</span>";
-            c += "</li>";
-        }
+        listDiv.innerHTML = '<div style="text-align:center;padding:30px;color:#999;"><i class="bi bi-bell-slash" style="font-size:28px;display:block;margin-bottom:8px;"></i>Aucune notification</div>';
+        return;
     }
 
-    c += "<a class='dropdown-menu-pagenotif btn btn-primary btn-block mt-2' href='" + lien + "?but=tache/notification/notification-liste.jsp' style='margin-top: 10px;'>Voir tout</a>\
-        </ul>\
-    </div>";
+    var html = '';
+    var limit = Math.min(mesnotifs.length, 20);
+    for (var i = 0; i < limit; i++) {
+        var n = mesnotifs[i];
+        var bgColor = (n.etat === 0 || n.etat === '0') ? '#e8f4fd' : '#fff';
+        var dotHtml = (n.etat === 0 || n.etat === '0') ? '<span style="width:8px;height:8px;background:#1a73e8;border-radius:50%;display:inline-block;margin-left:6px;"></span>' : '';
+        var lienClick = n.lien ? ' onclick="ouvrirNotif(\'' + escHtmlAttr(n.id) + '\',\'' + escHtmlAttr(n.lien) + '\')" style="cursor:pointer;"' : '';
 
-    $('#notifrefresh').html(c);
+        html += '<div class="notif-item" ' + lienClick + ' style="display:flex;align-items:flex-start;gap:10px;padding:10px 15px;background:' + bgColor + ';border-bottom:1px solid #f0f0f0;transition:background 0.2s;" onmouseover="this.style.background=\'#f5f5f5\'" onmouseout="this.style.background=\'' + bgColor + '\'">';
+
+        // Icone
+        html += '<div style="flex-shrink:0;width:36px;height:36px;background:#e8f0fe;border-radius:50%;display:flex;align-items:center;justify-content:center;">';
+        html += '<i class="bi ' + getNotifIcon(n.type) + '" style="font-size:16px;color:#1a73e8;"></i>';
+        html += '</div>';
+
+        // Contenu
+        html += '<div style="flex:1;min-width:0;">';
+        html += '<div style="font-size:13px;line-height:1.4;color:#333;">' + escNotifHtml(n.objet) + dotHtml + '</div>';
+        html += '<div style="font-size:11px;color:#999;margin-top:2px;">' + escNotifHtml(n.ecart || n.daty || '') + '</div>';
+        html += '</div>';
+
+        html += '</div>';
+    }
+
+    listDiv.innerHTML = html;
 }
 
+function getNotifIcon(type) {
+    if (!type) return 'bi-bell';
+    switch (type) {
+        case 'COMMENT': return 'bi-chat-dots-fill';
+        case 'REPLY': return 'bi-reply-fill';
+        case 'PUB_REACTION': return 'bi-hand-thumbs-up-fill';
+        case 'COMM_REACTION': return 'bi-emoji-smile-fill';
+        case 'MENTION': return 'bi-at';
+        case 'IDENTIFICATION': return 'bi-tag-fill';
+        default: return 'bi-bell';
+    }
+}
 
-getNotification();
-    // var getNotif = window.setInterval(function(){
-    //     getNotification();
-    // }, 10000);
+function ouvrirNotif(idnotif, lien) {
+    // Marquer comme lu puis naviguer
+    var ctx = (typeof _NOTIF_CTX !== 'undefined') ? _NOTIF_CTX : _CONTEXT_PATH;
+    $.ajax({
+        type: "POST",
+        url: ctx + "/pages/alumni/ajax/marquer-notification-lu.jsp",
+        data: { idnotification: idnotif },
+        complete: function() {
+            if (lien) window.location.href = lien;
+        }
+    });
+}
 
+function voirToutesNotifs() {
+    notifDropdownOpen = false;
+    var panel = document.getElementById('notif-dropdown-panel');
+    if (panel) panel.style.display = 'none';
+    var ctx = (typeof _NOTIF_CTX !== 'undefined') ? _NOTIF_CTX : _CONTEXT_PATH;
+    window.location.href = ctx + '/pages/module.jsp?but=alumni/notifications.jsp';
+}
+
+function marquerToutLu() {
+    var ctx = (typeof _NOTIF_CTX !== 'undefined') ? _NOTIF_CTX : _CONTEXT_PATH;
+    $.ajax({
+        type: "POST",
+        url: ctx + "/pages/alumni/ajax/marquer-notification-lu.jsp",
+        data: { action: 'all' },
+        success: function(data) {
+            chargerNotifications();
+        }
+    });
+}
+
+// ========== TOGGLE DROPDOWN ==========
+$(document).ready(function() {
+    var bellBtn = document.getElementById('notif-bell-btn');
+    var panel = document.getElementById('notif-dropdown-panel');
+
+    if (bellBtn && panel) {
+        bellBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            notifDropdownOpen = !notifDropdownOpen;
+            panel.style.display = notifDropdownOpen ? 'block' : 'none';
+            if (notifDropdownOpen) {
+                renderNotifList();
+            }
+        });
+
+        // Fermer en cliquant dehors
+        document.addEventListener('click', function(e) {
+            if (notifDropdownOpen && !panel.contains(e.target) && e.target !== bellBtn) {
+                notifDropdownOpen = false;
+                panel.style.display = 'none';
+            }
+        });
+
+        // Empecher la fermeture en cliquant dans le panel
+        panel.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+});
+
+// ========== CHARGEMENT INITIAL ==========
+chargerNotifications();
+
+// ========== ALARME (code existant conserve) ==========
 function showAlarmPopup() {
     $('#alarmModal').modal('show');
 }
@@ -153,22 +172,12 @@ $(document).ready(function () {
         var now = new Date();
 
         if (isNaN(selectedDate.getTime())) {
-            Swal.fire({
-                title: "Date invalide",
-                html: "<p>Veuillez entrer une date valide.</p>",
-                icon: "warning",
-                confirmButtonText: "OK"
-            });
+            Swal.fire({ title: "Date invalide", html: "<p>Veuillez entrer une date valide.</p>", icon: "warning", confirmButtonText: "OK" });
             return;
         }
 
         if (selectedDate <= now) {
-            Swal.fire({
-                title: "Date pass&eacute;e",
-                html: "<p>Veuillez choisir une date et une heure futures.</p>",
-                icon: "warning",
-                confirmButtonText: "OK"
-            });
+            Swal.fire({ title: "Date pass&eacute;e", html: "<p>Veuillez choisir une date et une heure futures.</p>", icon: "warning", confirmButtonText: "OK" });
             return;
         }
 
@@ -176,124 +185,114 @@ $(document).ready(function () {
             url: '/opus/alarm',
             method: 'POST',
             contentType: 'application/x-www-form-urlencoded',
-            data: {
-                message: message,
-                dh: timestamp
-            },
+            data: { message: message, dh: timestamp },
             success: function (response) {
                 if (response.status === 'success') {
                     $('#alarmModal').modal('hide');
                     $('#alarmForm')[0].reset();
-
                     Swal.fire({
                         title: "Alarme enregistr&eacute;e !",
-                        html: `
-                            <p><strong>Message&nbsp;:</strong> ${message}</p>
-                            <p><strong>Date &amp; Heure&nbsp;:</strong> ${new Date(timestamp).toLocaleString()}</p>
-                        `,
-                        icon: "success",
-                        confirmButtonText: "OK"
+                        html: "<p><strong>Message&nbsp;:</strong> " + message + "</p><p><strong>Date &amp; Heure&nbsp;:</strong> " + new Date(timestamp).toLocaleString() + "</p>",
+                        icon: "success", confirmButtonText: "OK"
                     });
                 } else {
-                    Swal.fire({
-                        title: "Erreur",
-                        html: `<p><strong>D&eacute;tail&nbsp;:</strong> ${response.message}</p>`,
-                        icon: "error",
-                        confirmButtonText: "OK"
-                    });
+                    Swal.fire({ title: "Erreur", html: "<p>" + response.message + "</p>", icon: "error", confirmButtonText: "OK" });
                 }
             },
             error: function (xhr, status, error) {
-                console.error('Erreur lors de la création de l\'alarme', error);
-                const errorMessage = xhr.responseText || 'Une erreur inconnue est survenue.';
-
-                Swal.fire({
-                    title: "Erreur lors de l&#39;enregistrement",
-                    html: `<p><strong>D&eacute;tail&nbsp;:</strong> ${errorMessage}</p>`,
-                    icon: "error",
-                    confirmButtonText: "OK"
-                });
+                console.error('Erreur alarme', error);
+                Swal.fire({ title: "Erreur", html: "<p>" + (xhr.responseText || 'Erreur inconnue') + "</p>", icon: "error", confirmButtonText: "OK" });
             }
         });
     });
 });
 
-let loc = window.location;
-let protocol = (loc.protocol === "https:") ? "wss://" : "ws://";
+// ========== WEBSOCKET NOTIFICATIONS ==========
+var loc = window.location;
+var protocol = (loc.protocol === "https:") ? "wss://" : "ws://";
+var _ctxPath = (typeof _NOTIF_CTX !== 'undefined') ? _NOTIF_CTX : ((typeof _CONTEXT_PATH !== 'undefined') ? _CONTEXT_PATH : '/opus');
 
-let ws_notif_url = protocol + loc.host + _CONTEXT_PATH + "/ws/notifications";
-let ws_notif = new WebSocket(ws_notif_url);
+var ws_notif_url = protocol + loc.host + _ctxPath + "/ws/notifications";
+var ws_notif = new WebSocket(ws_notif_url);
 
-
-ws_notif.onopen = () => console.log("CONNECTED NOTIF");
-ws_notif.onerror = (e) => console.error("ERROR ALARM", e);
+ws_notif.onopen = function() {
+    console.log("WS Notifications connecte");
+    // Enregistrer l'utilisateur pour recevoir les notifications ciblees
+    if (typeof id_user_conn !== 'undefined' && id_user_conn) {
+        ws_notif.send("register:" + id_user_conn);
+    }
+};
+ws_notif.onerror = function(e) { console.error("WS Notifications erreur", e); };
 
 ws_notif.onmessage = function(event) {
-    const message = event.data;
-    getNotification();
+    var message = event.data;
 
+    // Recharger les notifications depuis le serveur
+    chargerNotifications();
+
+    // Notification navigateur
     try {
-        const data = JSON.parse(message);
-        if (data.refUser === id_user_conn) {
-            if (Notification.permission === "granted") {
-                new Notification("Notification", {
-                    body: data.message
-                });
-            } else if (Notification.permission !== "denied") {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") {
-                        new Notification("Notification", {
-                            body: data.message
-                        });
-                    }
-                });
-            }
-        }
-    } catch (e) {
-        console.log(e);
-    }
-};
-
-
-let wsUrl = protocol + loc.host + _CONTEXT_PATH + "/ws/alarm";
-let ws_alarm = new WebSocket(wsUrl);
-
-ws_alarm.onopen = () => console.log("CONNECTED ALARM");
-ws_alarm.onerror = (e) => console.error("ERROR NOTIF", e);
-
-ws_alarm.onmessage = function(event) {
-    const data = JSON.parse(event.data);
-
-    if (data.refUser === id_user_conn) {
-        const showNotification = () => {
-            new Notification("Il est temps !", {
-                body: data.message
-            });
-        };
+        var data = JSON.parse(message);
+        var notifBody = data.objet || data.message || "Nouvelle notification";
 
         if (Notification.permission === "granted") {
-            showNotification();
+            new Notification("OPUS Alumni", { body: notifBody, icon: _ctxPath + "/dist/img/ITU_logo.png" });
         } else if (Notification.permission !== "denied") {
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") showNotification();
+            Notification.requestPermission().then(function(permission) {
+                if (permission === "granted") {
+                    new Notification("OPUS Alumni", { body: notifBody, icon: _ctxPath + "/dist/img/ITU_logo.png" });
+                }
             });
         }
-
-        const oldTitle = document.title;
-        const blinkInterval = setInterval(() => {
-            document.title = document.title === "[ALERTE]" ? oldTitle : "[ALERTE]";
-        }, 1000);
-
-        window.addEventListener('focus', () => {
-            clearInterval(blinkInterval);
-            document.title = oldTitle;
-        });
-
-        Swal.fire({
-            title: "Il est temps !",
-            html: `<strong>${data.message}</strong>`,
-            icon: "info",
-            confirmButtonText: "OK"
-        });
+    } catch (e) {
+        console.log("WS notif parse error:", e);
     }
 };
+
+// ========== WEBSOCKET ALARM ==========
+var wsAlarmUrl = protocol + loc.host + _ctxPath + "/ws/alarm";
+var ws_alarm = new WebSocket(wsAlarmUrl);
+
+ws_alarm.onopen = function() { console.log("WS Alarm connecte"); };
+ws_alarm.onerror = function(e) { console.error("WS Alarm erreur", e); };
+
+ws_alarm.onmessage = function(event) {
+    try {
+        var data = JSON.parse(event.data);
+        if (typeof id_user_conn !== 'undefined' && data.refUser === id_user_conn) {
+            var showNotif = function() {
+                new Notification("Il est temps !", { body: data.message });
+            };
+
+            if (Notification.permission === "granted") {
+                showNotif();
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(function(p) { if (p === "granted") showNotif(); });
+            }
+
+            var oldTitle = document.title;
+            var blinkInterval = setInterval(function() {
+                document.title = document.title === "[ALERTE]" ? oldTitle : "[ALERTE]";
+            }, 1000);
+
+            window.addEventListener('focus', function() {
+                clearInterval(blinkInterval);
+                document.title = oldTitle;
+            });
+
+            Swal.fire({ title: "Il est temps !", html: "<strong>" + data.message + "</strong>", icon: "info", confirmButtonText: "OK" });
+        }
+    } catch(e) {
+        console.log("WS alarm error:", e);
+    }
+};
+
+// ========== UTILITAIRES ==========
+function escNotifHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escHtmlAttr(str) {
+    if (!str) return '';
+    return str.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
