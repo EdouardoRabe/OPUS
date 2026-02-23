@@ -88,3 +88,22 @@ INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
 ('USRM000028', 'MENDYN000014', '*', 0, 'md');
 
+-- ETAPE 6: MENU CALENDRIER
+-- menu Calendrier (Niveau 0)
+INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
+('MENDYN000015', 'Evenements', 'bi-calendar-event-fill', '#', 6, 0, NULL),
+('MENDYN000016', 'Saisie', 'bi-plus-circle-fill', 'module.jsp?but=evenement/evenement-saisie.jsp', 1, 1, 'MENDYN000015'),
+('MENDYN000017', 'Liste', 'bi-list-ul', 'module.jsp?but=evenement/evenement-list.jsp', 2, 1, 'MENDYN000015'),
+('MENDYN000018', 'Calendrier', 'bi-calendar-heart-fill', 'module.jsp?but=evenement/evenement-calendar.jsp', 3, 1, 'MENDYN000015');
+
+-- Droits role etu
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
+('USRM000029', 'MENDYN000015', '*', 0, 'etu'),
+('USRM000030', 'MENDYN000018', '*', 0, 'etu');
+
+-- Droits role md
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
+('USRM000031', 'MENDYN000015', '*', 0, 'md'),
+('USRM000032', 'MENDYN000016', '*', 0, 'md'),
+('USRM000033', 'MENDYN000017', '*', 0, 'md'),
+('USRM000034', 'MENDYN000018', '*', 0, 'md');   
