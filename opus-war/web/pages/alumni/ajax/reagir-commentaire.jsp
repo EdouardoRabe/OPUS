@@ -4,15 +4,12 @@
 <%@ page import="bean.CGenUtil" %>
 <%@ page import="utilitaire.UtilDB" %>
 <%@ page import="alumni.Commentairereaction" %>
+<%@ page import="alumni.Publicationcommentaire" %>
+<%@ page import="alumni.Reactiontype" %>
+<%@ page import="alumni.Notification" %>
 <%@ page import="java.sql.Connection" %>
 <%
-    // AJAX GET: Toggle reaction sur commentaire
-    // Logique identique a reagir-publication:
-    //   - Clic type X, pas de reaction => INSERT
-    //   - Clic type X, reaction existante = X => DELETE (toggle off)
-    //   - Clic type X, reaction existante = Y => DELETE ancien + INSERT nouveau
-    // Utilise ClassMAPTable methods (APJ) avec connection manuelle
-
+    // AJAX GET: Toggle reaction sur commentaire + notification
     response.setContentType("application/json; charset=UTF-8");
 
     Connection conn = null;
@@ -31,6 +28,8 @@
         }
 
         String userId = String.valueOf(u.getUser().getRefuser());
+        int refuser = u.getUser().getRefuser();
+        boolean isNewReaction = false;
 
         conn = new UtilDB().GetConn();
         conn.setAutoCommit(false);
@@ -42,26 +41,50 @@
 
         if (existing != null && existing.length > 0) {
             String existingType = existing[0].getIdreactiontype();
-            // Toujours supprimer l'ancien
             existing[0].deleteToTableWithHisto(userId, conn);
 
             if (!existingType.equals(idreaction)) {
-                // Type different: creer le nouveau
                 Commentairereaction newR = new Commentairereaction();
                 newR.setIdutilisateur(Integer.parseInt(userId));
                 newR.setIdpublicationcommentaire(idcomm);
                 newR.setIdreactiontype(idreaction);
                 newR.construirePK(conn);
                 newR.insertToTableWithHisto(userId, conn);
+                isNewReaction = true;
             }
         } else {
-            // Aucune reaction: creer
             Commentairereaction newR = new Commentairereaction();
             newR.setIdutilisateur(Integer.parseInt(userId));
             newR.setIdpublicationcommentaire(idcomm);
             newR.setIdreactiontype(idreaction);
             newR.construirePK(conn);
             newR.insertToTableWithHisto(userId, conn);
+            isNewReaction = true;
+        }
+
+        // === NOTIFICATION: Notifier l'auteur du commentaire ===
+        if (isNewReaction) {
+            Publicationcommentaire[] comms = (Publicationcommentaire[]) CGenUtil.rechercher(
+                new Publicationcommentaire(), null, null, conn,
+                " and idpublicationcommentaire = '" + idcomm + "'");
+            if (comms != null && comms.length > 0) {
+                int commOwner = comms[0].getIdutilisateur();
+                if (commOwner != refuser) {
+                    String reactionLib = "reagir";
+                    Reactiontype[] rTypes = (Reactiontype[]) CGenUtil.rechercher(
+                        new Reactiontype(), null, null, conn,
+                        " and idreactiontype = '" + idreaction + "'");
+                    if (rTypes != null && rTypes.length > 0) {
+                        reactionLib = rTypes[0].getLibelle();
+                    }
+
+                    String nomSource = Notification.getNomUtilisateur(conn, refuser);
+                    String lien = "module.jsp?but=alumni/fil-actualite.jsp#pub-" + comms[0].getIdpublication();
+                    Notification.creerEtEnvoyer(conn, userId, commOwner,
+                        nomSource + " a reagit " + reactionLib + " a votre commentaire",
+                        Notification.TYPE_COMM_REACTION, lien);
+                }
+            }
         }
 
         conn.commit();

@@ -3,6 +3,8 @@
 <%@ page import="historique.MapUtilisateur" %>
 <%@ page import="alumni.Publication" %>
 <%@ page import="alumni.Media" %>
+<%@ page import="alumni.Identification" %>
+<%@ page import="alumni.Notification" %>
 <%@ page import="utilitaire.UtilDB" %>
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.io.File" %>
@@ -30,6 +32,7 @@
         // --- Parse multipart avec Commons FileUpload ---
         String description = null;
         String idtypepublication = null;
+        String identifications = null;
         FileItem imageItem = null;
 
         if (ServletFileUpload.isMultipartContent(request)) {
@@ -44,6 +47,7 @@
                     String fieldValue = item.getString("UTF-8");
                     if ("description".equals(fieldName)) description = fieldValue;
                     else if ("idtypepublication".equals(fieldName)) idtypepublication = fieldValue;
+                    else if ("identifications".equals(fieldName)) identifications = fieldValue;
                 } else {
                     if (item.getSize() > 0 && item.getName() != null && !item.getName().trim().isEmpty()) {
                         imageItem = item;
@@ -108,6 +112,33 @@
                 media.setIdpublication(pub.getIdpublication());
                 media.construirePK(conn);
                 media.insertToTableWithHisto(userId, conn);
+            }
+
+            // --- Identification: taguer des personnes dans la publication ---
+            if (identifications != null && !identifications.trim().isEmpty()) {
+                String nomSource = Notification.getNomUtilisateur(conn, map.getRefuser());
+                String lienPub = "module.jsp?but=alumni/fil-actualite.jsp#pub-" + pub.getIdpublication();
+                String[] tagIds = identifications.split(",");
+                for (int t = 0; t < tagIds.length; t++) {
+                    String tid = tagIds[t].trim();
+                    if (tid.isEmpty()) continue;
+                    try {
+                        int targetUser = Integer.parseInt(tid);
+                        // Creer l'entite Identification
+                        Identification ident = new Identification();
+                        ident.setIdutilisateur(targetUser);
+                        ident.setIdpublication(pub.getIdpublication());
+                        ident.construirePK(conn);
+                        ident.insertToTableWithHisto(userId, conn);
+
+                        // Notification
+                        if (targetUser != map.getRefuser()) {
+                            Notification.creerEtEnvoyer(conn, userId, targetUser,
+                                nomSource + " vous a identifie(e) dans une publication",
+                                Notification.TYPE_IDENTIFICATION, lienPub);
+                        }
+                    } catch (NumberFormatException nfe) { /* ignorer */ }
+                }
             }
 
             conn.commit();
