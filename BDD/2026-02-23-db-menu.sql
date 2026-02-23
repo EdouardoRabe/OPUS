@@ -49,8 +49,8 @@ INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALU
 -- Sous-menus de ADMINISTRATION (exemple pour le rôle 'md')
 
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
-('MENDYN000023', 'Gestion des utilisateurs', 'fa-users-cog', 'module.jsp?but=admin/gestion-utilisateurs.jsp', 1, 1, 'MENDYN000999'),
-('MENDYN000024', 'Gestion des signalements', 'fa-user-shield', 'module.jsp?but=admin/gestion-roles.jsp', 2, 1, 'MENDYN000999');
+('MENDYN000023', 'Gestion des utilisateurs', 'fa-users-cog', 'module.jsp?but=mod/gestion-utilisateurs.jsp', 1, 1, 'MENDYN000999'),
+('MENDYN000024', 'Gestion des signalements', 'fa-user-shield', 'module.jsp?but=mod/gestion-signalements.jsp', 2, 1, 'MENDYN000999');
 
 
 -- ═══ ÉTAPE 4: INSÉRER LES DROITS D'ACCÈS (USERMENU) ═══
@@ -74,7 +74,8 @@ INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
 -- Sous-menus Mon Profil
 ('USRM000009', 'MENDYN000009', '*', 0, 'etu'),  -- Voir ma fiche
 ('USRM000010', 'MENDYN000010', '*', 0, 'etu'),  -- mdifier le profil
-('USRM000011', 'MENDYN000011', '*', 0, 'etu');  -- Déconnexion
+('USRM000011', 'MENDYN000011', '*', 0, 'etu'),
+('USRM000025', 'MENDYN000024', '*', 1, 'etu');  -- Déconnexion
 
 -- Si vous avez d'autres rôles (admin, md, etc.), ajouter aussi:
 -- Menus pour le rôle 'md' (Direction Générale)
