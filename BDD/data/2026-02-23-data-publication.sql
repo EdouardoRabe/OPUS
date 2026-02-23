@@ -22,21 +22,6 @@ INSERT INTO reactiontype (idreactiontype, libelle) VALUES ('RCT000004', 'Wow');
 INSERT INTO reactiontype (idreactiontype, libelle) VALUES ('RCT000005', 'Triste');
 INSERT INTO reactiontype (idreactiontype, libelle) VALUES ('RCT000006', 'Enerve');
 
--- ======================== PROMOTION ET PARCOURS DE TEST ========================
-INSERT INTO promotion (idpromotion, annee, libelle) VALUES ('PRM000001', 2024, 'Promotion 2024');
-INSERT INTO parcours (idparcours, libelle) VALUES ('PRC000001', 'Informatique');
-
--- ======================== PROFILS DE TEST ========================
--- Lies aux utilisateurs de 2026-02-22-data-utilisateur.sql (refuser 100, 101, 102)
-INSERT INTO profil (idprofil, email, nom, prenom, dtn, telephone, idpromotion, idparcours, idutilisateur)
-VALUES ('PRF000001', 'rakoto@itu.mg', 'Rakoto', 'Jean', '2000-01-15', '034 00 000 01', 'PRM000001', 'PRC000001', 100);
-
-INSERT INTO profil (idprofil, email, nom, prenom, dtn, telephone, idpromotion, idparcours, idutilisateur)
-VALUES ('PRF000002', 'rasoa@itu.mg', 'Rasoa', 'Marie', '2001-03-20', '034 00 000 02', 'PRM000001', 'PRC000001', 101);
-
-INSERT INTO profil (idprofil, email, nom, prenom, dtn, telephone, idpromotion, idparcours, idutilisateur)
-VALUES ('PRF000003', 'rasolobe@itu.mg', 'Rasolobe', 'Andry', '1999-06-10', '034 00 000 03', 'PRM000001', 'PRC000001', 102);
-
 -- ======================== PUBLICATIONS DE TEST ========================
 INSERT INTO publication (idpublication, daty, descritpion, etat, idorigine, heure, idtypepublication, idutilisateur)
 VALUES ('PUB000001', '2026-02-22', 'Bienvenue sur la plateforme Alumni ITU ! Content de retrouver tout le monde ici.', 1, NULL, '10:30', 'TPB000001', 100);
@@ -80,9 +65,6 @@ SELECT setval('seq_media', 10);
 SELECT setval('seq_publicationreaction', 10);
 SELECT setval('seq_publicationcommentaire', 10);
 SELECT setval('seq_commentairereaction', 10);
-SELECT setval('seq_promotion', 10);
-SELECT setval('seq_parcours', 10);
-SELECT setval('seq_profil', 10);
 SELECT setval('seq_reactiontype', 10);
 SELECT setval('seq_typepublication', 10);
 SELECT setval('seq_mediatype', 10);

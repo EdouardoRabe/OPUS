@@ -6,7 +6,7 @@
 <%@ page import="alumni.Publicationcommentaire" %>
 <%@ page import="alumni.Commentairereaction" %>
 <%@ page import="alumni.Reactiontype" %>
-<%@ page import="utilisateurAcade.UtilisateurAcade" %>
+<%@ page import="alumni.Profil" %>
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
@@ -52,13 +52,13 @@
             }
             sbRT.append("]");
 
-            // --- APJ: Tous les utilisateurs pour lookup noms ---
-            UtilisateurAcade[] allUsers = (UtilisateurAcade[]) CGenUtil.rechercher(
-                new UtilisateurAcade(), null, null, conn, "");
+            // --- APJ: Tous les profils pour lookup noms ---
+            alumni.Profil[] allProfils = (alumni.Profil[]) CGenUtil.rechercher(
+                new alumni.Profil(), null, null, conn, "");
             Map userNames = new HashMap();
-            if (allUsers != null) {
-                for (int i = 0; i < allUsers.length; i++) {
-                    userNames.put(allUsers[i].getRefuser(), allUsers[i].getNomuser());
+            if (allProfils != null) {
+                for (int i = 0; i < allProfils.length; i++) {
+                    userNames.put(new Integer(allProfils[i].getIdutilisateur()), allProfils[i].getNom() + " " + allProfils[i].getPrenom());
                 }
             }
 
@@ -72,7 +72,7 @@
             for (int i = 0; i < comms.length; i++) {
                 Publicationcommentaire c = comms[i];
                 String idcomm = c.getIdpublicationcommentaire();
-                String auteur = (String) userNames.get(c.getIdutilisateur());
+                String auteur = (String) userNames.get(new Integer(c.getIdutilisateur()));
                 if (auteur == null) auteur = "Utilisateur";
 
                 // --- APJ: Reactions sur ce commentaire ---
