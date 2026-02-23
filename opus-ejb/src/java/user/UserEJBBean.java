@@ -274,7 +274,6 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             String refUser = (u != null ? u.getTuppleID() : "0");
             
             MapUtilisateur newUser = new MapUtilisateur(loginuser, passCrypt, nomuser, adrDirection, teluser, idrole);
-            newUser.setEstActif("1");
             System.out.println("Avant creation utilisateur avec ref hhhh : " + newUser.getLoginuser() + " " + newUser.getAdruser() + " " + newUser.getTeluser());
             newUser.createObject(refUser, c);
 
