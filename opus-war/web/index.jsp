@@ -1,5 +1,4 @@
 <%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
-<%@page import="utilitaireAcade.UtilitaireAcade"%>
 <%
     String queryString = request.getQueryString();
     String but = "pages/testLogin.jsp";
@@ -61,8 +60,8 @@
               <div class="form-group">
                 <label>Identifiant</label>
                 <div class="input-position-relative">
-                  <input type="text" name="identifiant" class="form-control-custom" placeholder="E-mail ou numéro ETU" style="padding-right:90px;" required />
-                  <span id="login-id-badge" style="background:var(--gray-200); color:var(--gray-500);">EMAIL</span>
+                  <input type="text" name="identifiant" class="form-control-custom" placeholder="Numéro ETU" style="padding-right:90px;" required />
+                  <span id="login-id-badge" style="background:var(--gray-200); color:var(--gray-500);">ETU</span>
                 </div>
                 <div class="info-badge">
                   <i class="fa fa-info-circle"></i> Utilisez votre <em>e-mail</em> ou <em>identifiant</em> (ex: <strong>ETU003356</strong>)

@@ -69,8 +69,12 @@
         String refuser = String.valueOf(map.getRefuser());
         String idrole = map.getIdrole();
 
-        // Requete pour les menus autorises
-        String whereUserMenu = " AND (interdit=0 OR interdit IS NULL) AND (refuser='*' OR refuser='" + refuser + "' OR idrole='" + idrole + "')";
+        // Requete pour les menus autorises pour CE role specifique
+        // Un menu est accessible si:
+        // 1. interdit=0 ou null (non interdit)
+        // 2. idrole correspond au role de l'utilisateur
+        // 3. refuser='*' (tous) OU refuser correspond à l'utilisateur specifique
+        String whereUserMenu = " AND (interdit=0 OR interdit IS NULL) AND idrole='" + idrole + "' AND (refuser='*' OR refuser='" + refuser + "')";
         UserMenu[] userMenus = (UserMenu[]) CGenUtil.rechercher(new UserMenu(), null, null, whereUserMenu);
 
         // Collecter les IDs des menus autorises
@@ -86,10 +90,10 @@
         // Charger tous les menus
         MenuDynamique[] tabMenu = (MenuDynamique[]) CGenUtil.rechercher(new MenuDynamique(), null, null, " ORDER BY niveau, rang ASC");
 
-        if (tabMenu != null && tabMenu.length > 0) {
+        if (tabMenu != null && tabMenu.length > 0 && !menuAutorises.isEmpty()) {
             for (MenuDynamique menu : tabMenu) {
                 // Filtrer : garder seulement les menus autorises
-                if (menuAutorises.isEmpty() || menuAutorises.contains(menu.getId())) {
+                if (menuAutorises.contains(menu.getId())) {
                     int niveau = menu.getNiveau();
                     String idPere = menu.getId_pere();
 

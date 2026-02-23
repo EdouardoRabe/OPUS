@@ -1,5 +1,8 @@
 build-file/**
 # BDD/**
+BDD/query
+BDD/donation0220.sql
+BDD/init-opus.sql
 note/
 /build.xml
 /opus-ejb/src/java/apj.properties

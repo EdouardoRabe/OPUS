@@ -40,6 +40,7 @@ import modules.GestionRole;
 
 import utilisateur.ConstanteUtilisateur;
 import utilisateur.HomePageURL;
+import utilisateurAcade.UtilisateurAcade;
 import constanteAcade.ConstanteEtatAcade;
 import utilitaire.ConstanteUser;
 import utilitaire.UtilDB;
@@ -625,6 +626,46 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
 
             // TimingApplication timingApplication = new TimingApplication();
             // timingApplication.addTiming(u);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new Exception(ex.getMessage());
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+    }
+
+    @Override
+    public void testLoginAlumni(String etu, String pass) throws Exception {
+        Connection c = null;
+        try {
+            // Resoudre ETU (colonne id) vers loginuser
+            c = new UtilDB().GetConn();
+            UtilisateurAcade[] users = (UtilisateurAcade[]) CGenUtil.rechercher(
+                    new UtilisateurAcade(), null, null, c, " and id = '" + etu + "'");
+            if (users == null || users.length == 0) {
+                throw new Exception("Numero ETU introuvable");
+            }
+            String loginuser = users[0].getLoginuser();
+
+            // Meme logique que testLogin
+            u = testeValide(loginuser, pass);
+
+            UtilisateurUtil crt = new UtilisateurUtil();
+            uVue = crt.testeValide("utilisateurVue", loginuser, pass);
+            type = u.getIdrole();
+            MapHistorique histo = new MapHistorique("login", "login", String.valueOf(u.getRefuser()),
+                    String.valueOf(u.getRefuser()));
+            histo.setObjet("mg.cnaps.utilisateur.CNAPSUser");
+            histo.setAction(histo.getAction());
+
+            String heure = LocalTime.now().toString();
+            heure = heure.replace(".", ":");
+            histo.setHeure(heure);
+
+            histo.insertToTable();
 
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -21,7 +21,7 @@
         pwd = request.getParameter("passe");
 
         u = UserEJBClient.lookupUserEJBBeanLocal();
-        u.testLogin(username, pwd);
+        u.testLoginAlumni(username, pwd);
 
         session.setAttribute("username", username);
         session.setAttribute("u", u);
