@@ -4,40 +4,55 @@
 <%@ page import="affichage.*" %>
 <%@ page import="alumni.Specialite" %>
 <%
-    String lienSaisie    = (String) session.getValue("lien");
-    String butApresPost  = "specialite/specialite-list.jsp";
-    String htmlFormSaisie = "";
+    String lien     = (String) session.getValue("lien");
+    String id       = "";
+    String apres    = "specialite/specialite-fiche.jsp";
+    String photoPath = "";
+    String mapping  = "alumni.Specialite";
+    String nomtable = "specialite";
+    String titre    = "Modification sp&eacute;cialit&eacute;";
+    String htmlForm = "";
     try {
-        Specialite a = new Specialite();
-        PageInsert pi = new PageInsert(a, request, (user.UserEJB) session.getValue("u"));
-        pi.setLien(lienSaisie);
-        pi.getFormu().getChamp("libelle").setLibelle("Libell&eacute;");
-        pi.getFormu().getChamp("description").setLibelle("Description");
-        pi.getFormu().getChamp("photo").setLibelle("Photo");
+        Specialite t = new Specialite();
 
-        String[] ordre   = {"libelle", "description", "photo"};
-        pi.getFormu().setOrdre(ordre);
-        pi.preparerDataFormu();
-        pi.getFormu().makeHtmlInsertTabIndex();
-        htmlFormSaisie = pi.getFormu().getHtmlInsert();
+        PageUpdate pu = new PageUpdate(t, request, (user.UserEJB) session.getValue("u"));
+        pu.setLien(lien);
+        pu.setTitre(titre);
+
+        pu.getFormu().getChamp("idspecialite").setLibelle("ID");
+        pu.getFormu().getChamp("idspecialite").setAutre("readonly");
+        pu.getFormu().getChamp("libelle").setLibelle("Libell&eacute;");
+
+        // Description
+        pu.getFormu().getChamp("description").setLibelle("Description");
+
+        // Photo : libellé visible, le JS remplacera le textbox par un input file
+        pu.getFormu().getChamp("photo").setLibelle("Photo");
+
+        pu.preparerDataFormu();
+
+        id        = pu.getBase().getTuppleID();
+        photoPath = ((Specialite) pu.getBase()).getPhoto();
+        if (photoPath == null) photoPath = "";
+        pu.getFormu().makeHtmlInsertTabIndex();
+        htmlForm  = pu.getFormu().getHtmlInsert();
     } catch (Exception e) {
         e.printStackTrace();
     }
 %>
-
 <!-- ═══ PAGE HEADER ═══ -->
 <div class="page-header-top">
     <h1 class="page-title-lg">
-        <a href="<%= lienSaisie %>?but=specialite/specialite-list.jsp"
+        <a href="<%= lien %>?but=specialite/specialite-fiche.jsp&idspecialite=<%= id %>"
            style="color:var(--gray-400);margin-right:10px;font-size:1rem;vertical-align:middle;"
-           title="Retour à la liste">
+           title="Retour à la fiche">
             <i class="fa fa-arrow-left"></i>
         </a>
-        <i class="fa fa-plus-circle" style="color:var(--itu-blue);font-size:1.1rem;margin-right:8px;"></i>
-        Nouvelle sp&eacute;cialit&eacute;
+        <i class="fa fa-pencil" style="color:var(--itu-blue);font-size:1.1rem;margin-right:8px;"></i>
+        Modifier la sp&eacute;cialit&eacute;
     </h1>
     <span style="font-size:0.85rem;color:var(--gray-500);">
-        <a href="<%= lienSaisie %>?but=specialite/specialite-list.jsp"
+        <a href="<%= lien %>?but=specialite/specialite-list.jsp"
            style="color:var(--gray-500);text-decoration:none;">
             <i class="fa fa-tags" style="margin-right:4px;"></i>Liste des sp&eacute;cialit&eacute;s
         </a>
@@ -48,11 +63,14 @@
 <div style="max-width:680px;margin:0 auto;">
     <div class="custom-card no-hover">
 
-        <form id="formSaisie" enctype="multipart/form-data">
+        <form id="formModif" enctype="multipart/form-data">
+            <input type="hidden" name="photoActuelle" value="<%= photoPath != null ? photoPath : "" %>">
+            <input type="hidden" name="idspecialite"  value="<%= id %>">
+
             <style>
                 /* ── Scope APJ-generated fields to alumni theme ── */
-                #formSaisie .form-group label,
-                #formSaisie label {
+                #formModif .form-group label,
+                #formModif label {
                     font-size: 0.78rem;
                     font-weight: 700;
                     color: var(--itu-dark);
@@ -61,10 +79,10 @@
                     text-transform: uppercase;
                     display: block;
                 }
-                #formSaisie input[type=text],
-                #formSaisie input[type=file],
-                #formSaisie textarea,
-                #formSaisie select {
+                #formModif input[type=text],
+                #formModif input[type=file],
+                #formModif textarea,
+                #formModif select {
                     width: 100%;
                     padding: 0.72rem 1rem;
                     border: 1.5px solid var(--gray-200);
@@ -77,13 +95,13 @@
                     transition: border-color 0.2s ease, box-shadow 0.2s ease;
                     box-sizing: border-box;
                 }
-                #formSaisie input[type=text]:focus,
-                #formSaisie textarea:focus,
-                #formSaisie select:focus {
+                #formModif input[type=text]:focus,
+                #formModif textarea:focus,
+                #formModif select:focus {
                     border-color: var(--itu-blue);
                     box-shadow: 0 0 0 3px rgba(0,139,255,0.1);
                 }
-                #formSaisie input[type=file] { display: none !important; }
+                #formModif input[type=file] { display: none !important; }
                 .photo-upload-zone {
                     display: flex;
                     flex-direction: column;
@@ -130,13 +148,16 @@
                     padding: 0;
                     text-decoration: underline;
                 }
-                #formSaisie .form-group {
+                #formModif .form-group {
                     margin-bottom: 1.25rem;
                 }
-                #formSaisie .box,
-                #formSaisie .box-body,
-                #formSaisie .box-header { all: unset; display: block; }
-                #formSaisie .box-footer {
+                #formModif .form-group {
+                    margin-bottom: 1.25rem;
+                }
+                #formModif .box,
+                #formModif .box-body,
+                #formModif .box-header { all: unset; display: block; }
+                #formModif .box-footer {
                     all: unset;
                     display: flex !important;
                     justify-content: flex-end;
@@ -145,11 +166,11 @@
                     margin-top: 1.75rem;
                     padding-top: 1.25rem;
                 }
-                #formSaisie .box-footer .btn { float: none !important; margin: 0 !important; }
+                #formModif .box-footer .btn { float: none !important; margin: 0 !important; }
                 #uploadBox { display: none !important; }
             </style>
 
-            <%= htmlFormSaisie %>
+            <%= htmlForm %>
         </form>
 
     </div>
@@ -180,11 +201,19 @@
         previewWrap.innerHTML =
             '<img id="photoPreviewImg" src="" alt="Aperçu">' +
             '<span class="photo-preview-name" id="photoPreviewName"></span>' +
-            '<button type="button" class="photo-remove-btn" id="photoRemoveBtn">✕ Supprimer</button>';
+            '<button type="button" class="photo-remove-btn" id="photoRemoveBtn">✕ Changer la photo</button>';
 
-        // Insert before the hidden fi
         fi.parentNode.insertBefore(zone, fi);
         fi.parentNode.insertBefore(previewWrap, fi);
+
+        // Pre-fill preview if existing photo
+        var existingPhoto = "<%= photoPath != null ? photoPath : "" %>";
+        if (existingPhoto && existingPhoto.length > 0) {
+            document.getElementById("photoPreviewImg").src = "<%= request.getContextPath() %>/" + existingPhoto;
+            document.getElementById("photoPreviewName").textContent = existingPhoto.split("/").pop();
+            zone.style.display = "none";
+            previewWrap.style.display = "flex";
+        }
 
         zone.addEventListener("click", function() { fi.click(); });
         zone.addEventListener("dragover", function(e) { e.preventDefault(); zone.classList.add("dragover"); });
@@ -215,7 +244,7 @@
     }
 
     // Restyle APJ submit button and replace reset with Annuler link
-    var footer = document.querySelector("#formSaisie .box-footer");
+    var footer = document.querySelector("#formModif .box-footer");
     if (footer) {
         var submitBtn = footer.querySelector("button[type=submit]");
         if (submitBtn) {
@@ -227,27 +256,27 @@
         var resetBtn = footer.querySelector("button[type=reset]");
         if (resetBtn) {
             var cancelLink = document.createElement("a");
-            cancelLink.href = "<%= lienSaisie %>?but=specialite/specialite-list.jsp";
+            cancelLink.href = "<%= lien %>?but=specialite/specialite-fiche.jsp&idspecialite=<%= id %>";
             cancelLink.className = "btn btn-ghost";
             cancelLink.textContent = "Annuler";
             resetBtn.parentNode.replaceChild(cancelLink, resetBtn);
         }
     }
 
-    document.getElementById("formSaisie").addEventListener("submit", function(e) {
+    document.getElementById("formModif").addEventListener("submit", function(e) {
         e.preventDefault();
         var btn = document.getElementById("btnSubmit");
         btn.disabled = true;
         btn.innerHTML = '<i class="fa fa-spinner fa-spin" style="margin-right:5px;"></i>Enregistrement...';
 
-        fetch("<%= request.getContextPath() %>/pages/specialite/ajax/traitement-insert.jsp", {
+        fetch("<%= request.getContextPath() %>/pages/specialite/ajax/traitement-update.jsp", {
             method: "POST",
             body: new FormData(this)
         })
         .then(function(r) { return r.json(); })
         .then(function(data) {
             if (data.success) {
-                window.location.href = "<%= lienSaisie %>?but=<%= butApresPost %>";
+                window.location.href = "<%= lien %>?but=<%= apres %>&idspecialite=" + data.id;
             } else {
                 alert("Erreur : " + data.error);
                 btn.disabled = false;
