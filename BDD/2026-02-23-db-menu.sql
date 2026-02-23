@@ -24,7 +24,7 @@ INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALU
 -- Sous-menus de RESEAU
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
 ('MENDYN000005', 'Annuaire',    'bi-book-fill', 'module.jsp?but=annuaire/annuaire.jsp',       1, 1, 'MENDYN000002'),
-('MENDYN000006', 'Specialites', 'bi-tags-fill', 'module.jsp?but=specialites/specialites.jsp', 2, 1, 'MENDYN000002');
+('MENDYN000006', 'Specialites', 'bi-tags-fill', 'module.jsp?but=specialite/specialite-list.jsp', 2, 1, 'MENDYN000002');
 
 -- Sous-menus de CARRIERE
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES

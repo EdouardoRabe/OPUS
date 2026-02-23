@@ -957,6 +957,31 @@
         closeAllReactionBars();
     });
 
+    // ========== REACTION BAR COMMENTAIRE ==========
+    function getReactionEmoji(lib) {
+        var l = lib.toLowerCase();
+        if (l.indexOf('adore') >= 0 || l.indexOf('love') >= 0) return '\u2764\uFE0F';
+        if (l.indexOf('haha') >= 0 || l.indexOf('humour') >= 0) return '\uD83D\uDE02';
+        if (l.indexOf('surprise') >= 0 || l.indexOf('wow') >= 0) return '\uD83D\uDE2E';
+        if (l.indexOf('triste') >= 0 || l.indexOf('sad') >= 0) return '\uD83D\uDE22';
+        if (l.indexOf('grrr') >= 0 || l.indexOf('ang') >= 0) return '\uD83D\uDE20';
+        return '\uD83D\uDC4D';
+    }
+    function toggleCommReactionBar(commId, event) {
+        event.stopPropagation();
+        var bar = document.getElementById('creact-bar-' + commId);
+        var isOpen = bar.classList.contains('fa-reaction-bar--open');
+        closeAllReactionBars();
+        if (!isOpen) {
+            bar.classList.add('fa-reaction-bar--open');
+        }
+    }
+    function selectCommReaction(commId, idreactiontype, idpub, event) {
+        event.stopPropagation();
+        closeAllReactionBars();
+        toggleReactionComm(commId, idreactiontype, idpub);
+    }
+
     // ========== REACTIONS PUBLICATION ==========
     function toggleReaction(idpub, idreactiontype) {
         fetch(CTX + '/pages/alumni/ajax/reagir-publication.jsp?idpublication=' + encodeURIComponent(idpub) + '&idreactiontype=' + encodeURIComponent(idreactiontype))
@@ -1075,19 +1100,44 @@
                     html += '<span class="fa-comment-text">' + formatMentions(c.description) + '</span>';
                     html += '</div>';
 
+                    // Calcul total reactions + lib de ma reaction
+                    var totalCReact = 0;
+                    var myCommReactLib = '';
+                    for (var jr = 0; jr < rTypes.length; jr++) {
+                        totalCReact += (c.reactions[rTypes[jr].id] || 0);
+                        if (c.myReaction === rTypes[jr].id) myCommReactLib = rTypes[jr].libelle;
+                    }
+                    var hasCommReact = (c.myReaction && c.myReaction !== '');
+
                     // Barre d'actions
                     html += '<div class="fa-comment-actions">';
-                    for (var j = 0; j < rTypes.length; j++) {
-                        var rt = rTypes[j];
-                        var cnt = c.reactions[rt.id] || 0;
-                        var activeClass = (c.myReaction === rt.id) ? ' fa-comment-react-btn--active' : '';
-                        html += '<button class="fa-comment-react-btn' + activeClass + '" ';
-                        html += 'onclick="toggleReactionComm(\'' + c.id + '\',\'' + rt.id + '\',\'' + idpub + '\')">';
-                        html += rt.libelle;
-                        if (cnt > 0) html += ' <span style="font-weight:400;font-size:11px;">(' + cnt + ')</span>';
+
+                    // Reaction wrap (barre popup)
+                    html += '<div class="fa-reaction-wrap" id="creact-wrap-' + c.id + '" style="display:inline-flex;position:relative;flex:none;">';
+                    html += '<button class="fa-comment-react-btn' + (hasCommReact ? ' fa-comment-react-btn--active' : '') + '" ';
+                    html += 'id="creact-btn-' + c.id + '" ';
+                    html += 'onclick="toggleCommReactionBar(\'' + c.id + '\', event)">';
+                    html += '<i class="bi bi-hand-thumbs-up' + (hasCommReact ? '-fill' : '') + '" style="font-size:11px;margin-right:3px;"></i>';
+                    html += hasCommReact ? myCommReactLib : 'J&apos;aime';
+                    if (totalCReact > 0) html += ' <span style="font-weight:400;font-size:11px;">(' + totalCReact + ')</span>';
+                    html += '</button>';
+                    // Barre reaction popup
+                    html += '<div class="fa-reaction-bar" id="creact-bar-' + c.id + '">';
+                    for (var jr = 0; jr < rTypes.length; jr++) {
+                        var rt = rTypes[jr];
+                        var isMyCommR = (c.myReaction === rt.id);
+                        var rEmoji = getReactionEmoji(rt.libelle);
+                        html += '<button class="fa-reaction-item' + (isMyCommR ? ' fa-reaction-item--active' : '') + '" ';
+                        html += 'onclick="selectCommReaction(\'' + c.id + '\',\'' + rt.id + '\',\'' + idpub + '\', event)" ';
+                        html += 'title="' + escHtml(rt.libelle) + '">';
+                        html += '<span class="fa-reaction-emoji">' + rEmoji + '</span>';
+                        html += '<span class="fa-reaction-label">' + escHtml(rt.libelle) + '</span>';
                         html += '</button>';
-                        html += '<span class="fa-dot">&middot;</span>';
                     }
+                    html += '</div>'; // fa-reaction-bar
+                    html += '</div>'; // fa-reaction-wrap
+
+                    html += '<span class="fa-dot">&middot;</span>';
                     html += '<a href="javascript:void(0)" class="fa-comment-reply-link" ';
                     html += 'onclick="montrerReponse(\'' + c.id + '\',\'' + idpub + '\',\'' + escAttr(c.auteur) + '\',\'' + c.idutilisateur + '\')">';
                     html += 'R&eacute;pondre</a>';
