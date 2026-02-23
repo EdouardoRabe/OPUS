@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="font-awesome-master2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/opus-war/web/pages/dist/css/font-awesome-master.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

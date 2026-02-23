@@ -1,3 +1,4 @@
+-- Active: 1736646695640@@127.0.0.1@5432@opus@public
 CREATE TABLE poste(
    idposte VARCHAR(20) ,
    libelle VARCHAR(150)  NOT NULL,
@@ -61,18 +62,20 @@ CREATE TABLE typesignalement(
 
 CREATE TABLE profil(
    idprofil VARCHAR(20) ,
+   email VARCHAR(250) ,
    nom VARCHAR(450)  NOT NULL,
    prenom VARCHAR(450)  NOT NULL,
    dtn DATE NOT NULL,
    telephone VARCHAR(250)  NOT NULL,
    idpromotion VARCHAR(20)  NOT NULL,
    idparcours VARCHAR(20)  NOT NULL,
-   idutilisateur VARCHAR(50)  NOT NULL,
+   idutilisateur integer NOT NULL,
    PRIMARY KEY(idprofil),
    UNIQUE(idutilisateur),
+   UNIQUE(email),
    FOREIGN KEY(idpromotion) REFERENCES promotion(idpromotion),
    FOREIGN KEY(idparcours) REFERENCES parcours(idparcours),
-   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(id)
+   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(refuser)
 );
 
 CREATE TABLE visibilite(
@@ -127,9 +130,9 @@ CREATE TABLE utilisateurhistoetat(
    daty DATE NOT NULL,
    etat INTEGER NOT NULL,
    remarque VARCHAR(250)  NOT NULL,
-   idutilisateur VARCHAR(50)  NOT NULL,
+   idutilisateur integer NOT NULL,
    PRIMARY KEY(idutilisateurhistoetat),
-   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(id)
+   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(refuser)
 );
 
 CREATE TABLE photo(
@@ -151,10 +154,10 @@ CREATE TABLE publication(
    idorigine VARCHAR(50) ,
    heure VARCHAR(50)  NOT NULL,
    idtypepublication VARCHAR(20)  NOT NULL,
-   idutilisateur VARCHAR(50)  NOT NULL,
+   idutilisateur integer NOT NULL,
    PRIMARY KEY(idpublication),
    FOREIGN KEY(idtypepublication) REFERENCES typepublication(idtypepublication),
-   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(id)
+   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(refuser)
 );
 
 CREATE TABLE media(
@@ -175,28 +178,28 @@ CREATE TABLE notification(
    lien TEXT NOT NULL,
    etat INTEGER NOT NULL,
    heure VARCHAR(50)  NOT NULL,
-   idutilisateur VARCHAR(50)  NOT NULL,
+   idutilisateur integer NOT NULL,
    PRIMARY KEY(idnotification),
-   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(id)
+   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(refuser)
 );
 
 CREATE TABLE identification(
    ididentification VARCHAR(20) ,
-   idutilisateur VARCHAR(50)  NOT NULL,
+   idutilisateur integer NOT NULL,
    idpublication VARCHAR(20)  NOT NULL,
    PRIMARY KEY(ididentification),
-   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(id),
+   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(refuser),
    FOREIGN KEY(idpublication) REFERENCES publication(idpublication)
 );
 
 CREATE TABLE publicationreaction(
    idpublicationreaction VARCHAR(20) ,
    idreactiontype VARCHAR(50)  NOT NULL,
-   idutilisateur VARCHAR(50)  NOT NULL,
+   idutilisateur integer NOT NULL,
    idpublication VARCHAR(20)  NOT NULL,
    PRIMARY KEY(idpublicationreaction),
    FOREIGN KEY(idreactiontype) REFERENCES reactiontype(idreactiontype),
-   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(id),
+   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(refuser),
    FOREIGN KEY(idpublication) REFERENCES publication(idpublication)
 );
 
@@ -204,22 +207,22 @@ CREATE TABLE publicationcommentaire(
    idpublicationcommentaire VARCHAR(20) ,
    description VARCHAR(250)  NOT NULL,
    etat INTEGER NOT NULL,
-   idutilisateur VARCHAR(50)  NOT NULL,
+   idutilisateur integer NOT NULL,
    idpublicationcommentaire_1 VARCHAR(20) ,
    idpublication VARCHAR(20)  NOT NULL,
    PRIMARY KEY(idpublicationcommentaire),
-   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(id),
+   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(refuser),
    FOREIGN KEY(idpublicationcommentaire_1) REFERENCES publicationcommentaire(idpublicationcommentaire),
    FOREIGN KEY(idpublication) REFERENCES publication(idpublication)
 );
 
 CREATE TABLE commentairereaction(
    idcommentairereaction VARCHAR(20) ,
-   idutilisateur VARCHAR(50)  NOT NULL,
+   idutilisateur integer NOT NULL,
    idpublicationcommentaire VARCHAR(20)  NOT NULL,
    idreactiontype VARCHAR(50)  NOT NULL,
    PRIMARY KEY(idcommentairereaction),
-   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(id),
+   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(refuser),
    FOREIGN KEY(idpublicationcommentaire) REFERENCES publicationcommentaire(idpublicationcommentaire),
    FOREIGN KEY(idreactiontype) REFERENCES reactiontype(idreactiontype)
 );
@@ -230,9 +233,9 @@ CREATE TABLE evenement(
    daty DATE NOT NULL,
    datefin DATE,
    datedebut DATE NOT NULL,
-   idutilisateur VARCHAR(50)  NOT NULL,
+   idutilisateur integer NOT NULL,
    PRIMARY KEY(idevenement),
-   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(id)
+   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(refuser)
 );
 
 CREATE TABLE signalementpublication(
@@ -241,19 +244,19 @@ CREATE TABLE signalementpublication(
    descritpion VARCHAR(50) ,
    typesignalement VARCHAR(20)  NOT NULL,
    idpublication VARCHAR(20)  NOT NULL,
-   idutilisateur VARCHAR(50)  NOT NULL,
+   idutilisateur integer NOT NULL,
    PRIMARY KEY(idsignalementpublication),
    FOREIGN KEY(typesignalement) REFERENCES typesignalement(typesignalement),
    FOREIGN KEY(idpublication) REFERENCES publication(idpublication),
-   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(id)
+   FOREIGN KEY(idutilisateur) REFERENCES utilisateur(refuser)
 );
 
--- 1) 1 r action max par utilisateur sur une publication
+-- 1) 1 réaction max par utilisateur sur une publication
 ALTER TABLE publicationreaction
 ADD CONSTRAINT uq_publicationreaction_user_publication
 UNIQUE (idutilisateur, idpublication);
 
--- 2) 1 r action max par utilisateur sur un commentaire
+-- 2) 1 réaction max par utilisateur sur un commentaire
 ALTER TABLE commentairereaction
 ADD CONSTRAINT uq_commentairereaction_user_commentaire
 UNIQUE (idutilisateur, idpublicationcommentaire);

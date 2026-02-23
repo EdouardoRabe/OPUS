@@ -1,4 +1,0 @@
-apj.connection.url=jdbc:postgresql://localhost:5432/opus
-apj.connection.user=postgres
-apj.connection.password=postgres
-apj.connection.driver=org.postgresql.Driver

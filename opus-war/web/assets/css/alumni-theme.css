@@ -1,0 +1,419 @@
+/* ═══════════════════════════════════════════════════
+   OPUS — MODERN THEME
+   Utilisant les ressources locales du projet
+═══════════════════════════════════════════════════ */
+
+/* Charger les fonts locales */
+@font-face {
+  font-family: 'DM Sans';
+  src: url('../../assets/fonts/DMSans-VariableFont_opsz.ttf') format('truetype');
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  src: url('../../assets/fonts/DMSans-Italic-VariableFont_opsz.ttf') format('truetype');
+  font-weight: 400 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  /* ── ITU Brand Colors ── */
+  --itu-dark: #362F4F;
+  --itu-dark-alt: #2a2440;
+  --itu-lime: #E4FF30;
+  --itu-lime-light: #eaff5e;
+  --itu-blue: #008BFF;
+  --itu-blue-dark: #006fcc;
+  --itu-violet: #5B23FF;
+  --itu-violet-dark: #4a1cd9;
+
+  /* Legacy aliases (kept for compat) */
+  --deep-purple: #362F4F;
+  --vibrant-violet: #5B23FF;
+  --bright-blue: #008BFF;
+  --neon-yellow: #E4FF30;
+
+  /* Neutrals */
+  --ink: #0d0d0d;
+  --cream: #f4f6f9;
+  --gray-100: #f0f2f5;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --white: #ffffff;
+  --text-body: #969CB3;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'DM Sans', sans-serif;
+}
+
+/* ═══ RESET & BASE ═══ */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--gray-100);
+  color: var(--gray-700);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.005em;
+  line-height: 1.6;
+  margin: 0;
+}
+
+h1, h2, h3, h4, .font-serif {
+  font-family: var(--font-serif);
+  letter-spacing: -0.01em;
+}
+
+/* ═══ LINKS ═══ */
+a { color: var(--itu-blue); transition: all 0.2s ease; }
+a:hover { color: var(--itu-blue-dark); text-decoration: none; }
+
+/* ═══ BUTTONS ═══ */
+.btn {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  transition: all 0.25s ease;
+  padding: 0.55rem 1.25rem;
+  border: none;
+  cursor: pointer;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+.btn-primary { background: var(--itu-blue); color: var(--white); }
+.btn-primary:hover, .btn-primary:focus {
+  background: var(--itu-blue-dark);
+  color: var(--white);
+  box-shadow: 0 4px 15px rgba(0, 139, 255, 0.35);
+}
+.btn-primary:disabled {
+  background: var(--gray-400);
+  cursor: not-allowed;
+}
+.btn-accent { background: var(--itu-lime); color: var(--itu-dark); font-weight: 700; }
+.btn-accent:hover, .btn-accent:focus {
+  background: var(--itu-lime-light);
+  color: var(--itu-dark);
+  box-shadow: 0 4px 15px rgba(228, 255, 48, 0.4);
+}
+.btn-outline-primary {
+  background: transparent;
+  border: 1.5px solid var(--itu-blue);
+  color: var(--itu-blue);
+}
+.btn-outline-primary:hover {
+  background: var(--itu-blue);
+  color: var(--white);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--gray-600);
+  border: 1.5px solid var(--gray-300);
+}
+.btn-ghost:hover {
+  background: var(--gray-100);
+  border-color: var(--gray-400);
+  color: var(--itu-dark);
+}
+.btn-block {
+  width: 100%;
+  display: block;
+}
+
+/* ═══ FORMS ═══ */
+.form-control-custom {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  outline: none;
+  background: var(--white);
+  transition: all 0.2s ease;
+  color: var(--itu-dark);
+}
+.form-control-custom:focus {
+  border-color: var(--itu-blue);
+  box-shadow: 0 0 0 3px rgba(0, 139, 255, 0.1);
+}
+.form-control-custom::placeholder {
+  color: var(--gray-400);
+}
+
+/* ═══ LOGIN LAYOUT ═══ */
+.login-split {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  min-height: 100vh;
+  overflow: hidden;
+}
+.login-left {
+  background: var(--itu-dark);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 4rem;
+  color: var(--white);
+  overflow: hidden;
+}
+.login-left::before {
+  content: '';
+  position: absolute;
+  top: -20%; right: -20%;
+  width: 80%; height: 80%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(91, 35, 255, 0.3), transparent 60%);
+  filter: blur(50px);
+}
+.login-left::after {
+  content: '';
+  position: absolute;
+  bottom: -20%; left: -20%;
+  width: 60%; height: 60%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(228, 255, 48, 0.2), transparent 60%);
+  filter: blur(50px);
+}
+.login-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gray-100);
+  padding: 3rem;
+  position: relative;
+}
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--white);
+  padding: 2.75rem;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.alumni-logo-mark-login {
+  width: 56px; height: 56px;
+  background: var(--itu-lime);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  color: var(--itu-dark);
+  font-weight: 900;
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.login-brand-logo {
+  height: 52px;
+  width: auto;
+  display: block;
+}
+
+.login-brand-text {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+
+.login-brand-text .brand-itu {
+  color: var(--itu-lime);
+}
+
+.login-brand-text .brand-alumni {
+  color: var(--white);
+}
+
+.login-hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.8rem, 5vw, 4.2rem);
+  color: var(--white);
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  font-weight: 900;
+}
+
+.login-hero-title span {
+  color: var(--itu-lime);
+  display: block;
+}
+
+.login-hero-text {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 1.05rem;
+  line-height: 1.8;
+  max-width: 440px;
+}
+
+.stats-row {
+  display: flex;
+  gap: 3rem;
+  position: relative;
+  z-index: 1;
+  margin-top: 2rem;
+}
+
+.stat { border-left: 3px solid var(--itu-blue); padding-left: 1.25rem; }
+
+.stat-num {
+  font-family: var(--font-serif);
+  font-size: 2.25rem;
+  color: var(--white);
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.login-tabs {
+  display: flex;
+  margin-bottom: 2.25rem;
+  border-bottom: 2px solid var(--gray-200);
+}
+
+.login-tab {
+  padding: 0.85rem 1.75rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--gray-500);
+  border-bottom: 2px solid transparent;
+  background: none;
+  border-top: none; border-left: none; border-right: none;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  margin-bottom: -2px;
+  transition: all 0.2s ease;
+}
+
+.login-tab:hover { color: var(--itu-dark); }
+
+.login-tab.active {
+  color: var(--itu-blue);
+  border-bottom-color: var(--itu-blue);
+  font-weight: 700;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--itu-dark);
+  margin-bottom: 0.45rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.forgot {
+  text-align: right;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--itu-blue);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.forgot:hover { text-decoration: underline; color: var(--itu-blue-dark); }
+
+#register-form { display: none; }
+#login-form { display: block; }
+
+/* Badge de type identifiant */
+#login-id-badge {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--gray-500);
+  background: var(--gray-200);
+  padding: 0.18rem 0.5rem;
+  border-radius: var(--radius-full);
+  pointer-events: none;
+  transition: all 0.2s;
+}
+
+.info-badge {
+  margin-top: 0.45rem;
+  font-size: 0.76rem;
+  color: var(--gray-500);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.info-badge i {
+  font-size: 0.75rem;
+}
+
+.input-position-relative {
+  position: relative;
+}
+
+.login-hero-wrap {
+  position: relative;
+  z-index: 1;
+  padding: 3rem 0;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+  .login-split { grid-template-columns: 1fr; }
+  .login-left { display: none; }
+  .login-right { padding: 1.5rem; }
+}
+
+@media (max-width: 768px) {
+  .login-card { padding: 1.75rem; }
+  .login-tabs { margin-bottom: 1.5rem; }
+  .login-tab { padding: 0.65rem 1.25rem; }
+}
