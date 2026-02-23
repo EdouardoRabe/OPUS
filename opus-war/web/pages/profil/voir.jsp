@@ -5,12 +5,18 @@
 <%@ page import="utilitaire.UtilDB" %>
 <%@ page import="alumni.ProfilLib" %>
 <%@ page import="alumni.ExperienceLib" %>
+<%@ page import="alumni.Specialite" %>
+<%@ page import="alumni.Specialiteprofil" %>
+<%@ page import="alumni.Poste" %>
 <%@ page import="java.sql.Connection" %>
 <%
     UserEJB    uEJB  = (UserEJB) session.getAttribute("u");
     String     _lien = (String) session.getValue("lien");
     ProfilLib      profil = null;
     ExperienceLib[] experiences = null;
+    Specialiteprofil[] specProfils = null;
+    Specialite[] allSpecialites = null;
+    Poste[] allPostes = null;
     String     _erreur = null;
     if (uEJB != null && uEJB.getUser() != null) {
         MapUtilisateur mu = uEJB.getUser();
@@ -26,8 +32,20 @@
             // Chargement des expériences
             experiences = (ExperienceLib[]) CGenUtil.rechercher(
                 new ExperienceLib(), null, null, conn,
-                " and idutilisateur='" + mu.getRefuser() + "'"
+                " and idutilisateur='" + mu.getRefuser() + "' order by debut desc"
             );
+
+            // Chargement des spécialités du profil
+            if (profil != null && profil.getIdprofil() != null) {
+                Specialiteprofil spf = new Specialiteprofil();
+                spf.setIdprofil(profil.getIdprofil());
+                specProfils = (Specialiteprofil[]) CGenUtil.rechercher(spf, null, null, conn, "");
+            }
+
+            // Listes de référence
+            allSpecialites = (Specialite[]) CGenUtil.rechercher(new Specialite(), null, null, conn, " order by libelle");
+            allPostes = (Poste[]) CGenUtil.rechercher(new Poste(), null, null, conn, " order by libelle");
+
         } catch (Exception e) {
             _erreur = e.getMessage();
             System.err.println("voir.jsp - erreur chargement profil: " + e.getMessage());
@@ -35,6 +53,10 @@
             if (conn != null) try { conn.close(); } catch (Exception ignore) {}
         }
     }
+    if (experiences == null) experiences = new ExperienceLib[0];
+    if (specProfils == null) specProfils = new Specialiteprofil[0];
+    if (allSpecialites == null) allSpecialites = new Specialite[0];
+    if (allPostes == null) allPostes = new Poste[0];
     String _idprofil    = profil != null && profil.getIdprofil()       != null ? profil.getIdprofil()       : "";
     String _nom         = profil != null && profil.getNom()            != null ? profil.getNom()            : "";
     String _prenom      = profil != null && profil.getPrenom()         != null ? profil.getPrenom()         : "";
@@ -146,6 +168,7 @@
   font-size: 13px; font-weight: 600;
 }
 .pv-tag.grey { background: #f0f0f0; color: #555; }
+.pv-tag.green { background: #e8f5e9; color: #2e7d32; }
 
 /* Info grid */
 .pv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 28px; }
@@ -155,6 +178,60 @@
   letter-spacing: .6px; color: #888; display: block; margin-bottom: 3px;
 }
 .pv-field span { font-size: 14px; }
+
+/* Section header */
+.pv-section-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px;
+}
+.pv-section-header h2 { margin: 0; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.pv-section-header h2 i { font-size: 16px; color: #0a66c2; }
+
+.pv-btn-add {
+  background: transparent; color: #0a66c2; border: 1.5px solid #0a66c2;
+  border-radius: 20px; padding: 5px 14px; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 5px;
+}
+.pv-btn-add:hover { background: #0a66c2; color: #fff; }
+
+/* Experience item */
+.pv-exp-item {
+  border-left: 3px solid #0a66c2; padding: 10px 0 10px 16px;
+  margin-bottom: 16px; position: relative;
+}
+.pv-exp-item:last-child { margin-bottom: 0; }
+.pv-exp-company { font-weight: 700; font-size: 14px; color: #191919; }
+.pv-exp-poste { font-size: 13px; color: #0a66c2; margin-top: 1px; }
+.pv-exp-dates { font-size: 12px; color: #888; margin-top: 3px; }
+.pv-exp-desc { font-size: 13px; color: #444; margin-top: 5px; line-height: 1.5; }
+.pv-exp-actions {
+  position: absolute; top: 8px; right: 0;
+  display: flex; gap: 4px;
+}
+.pv-exp-actions button {
+  background: #f5f5f5; border: none; border-radius: 50%;
+  width: 28px; height: 28px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: #666; transition: all .15s;
+}
+.pv-exp-actions button:hover { background: #eef3fb; color: #0a66c2; }
+.pv-exp-actions button.del:hover { background: #ffebee; color: #c62828; }
+
+/* Spec item */
+.pv-spec-item {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #e8f5e9; color: #2e7d32; border-radius: 20px;
+  padding: 6px 10px 6px 14px; font-size: 13px; font-weight: 600;
+}
+.pv-spec-item .pv-spec-niveau {
+  font-size: 10px; background: rgba(0,0,0,.08); border-radius: 10px;
+  padding: 2px 8px; font-weight: 700;
+}
+.pv-spec-item button {
+  background: none; border: none; cursor: pointer;
+  color: #999; font-size: 14px; padding: 0 2px; transition: color .15s; line-height: 1;
+}
+.pv-spec-item button:hover { color: #c62828; }
 </style>
 
 <div class="pv-card">
@@ -205,12 +282,53 @@
     </div>
   </div>
 
-  <!-- ── Formation ── -->
+  <!-- ── Promotion & Parcours ── -->
   <div class="pv-section">
-    <h2>Formation</h2>
+    <h2>Promotion & Parcours</h2>
     <div class="pv-tags">
       <span class="pv-tag"      id="pvPromoTag">—</span>
       <span class="pv-tag grey" id="pvParcoursTag">—</span>
+    </div>
+  </div>
+
+  <!-- ── Spécialités ── -->
+  <div class="pv-section">
+    <div class="pv-section-header">
+      <h2><i class="bi bi-star-fill"></i> Spécialités</h2>
+      <button class="pv-btn-add" onclick="pvOpenModal('modalAddSpec')"><i class="bi bi-plus-lg"></i> Ajouter</button>
+    </div>
+    <div id="pvSpecialites" style="display:flex;flex-wrap:wrap;gap:8px;">
+      <% if (specProfils.length == 0) { %>
+        <em style="color:#aaa;font-size:13px">Aucune spécialité renseignée.</em>
+      <% } else {
+        for (int si = 0; si < specProfils.length; si++) {
+          String specLib = "";
+          for (int ai = 0; ai < allSpecialites.length; ai++) {
+            if (allSpecialites[ai].getIdspecialite() != null
+                && allSpecialites[ai].getIdspecialite().equals(specProfils[si].getIdspecialite())) {
+              specLib = allSpecialites[ai].getLibelle() != null ? allSpecialites[ai].getLibelle() : "";
+              break;
+            }
+          }
+      %>
+        <%
+          String specPhoto = "";
+          for (int api = 0; api < allSpecialites.length; api++) {
+            if (allSpecialites[api].getIdspecialite() != null
+                && allSpecialites[api].getIdspecialite().equals(specProfils[si].getIdspecialite())
+                && allSpecialites[api].getPhoto() != null && !allSpecialites[api].getPhoto().isEmpty()) {
+              specPhoto = allSpecialites[api].getPhoto();
+              break;
+            }
+          }
+        %>
+        <div class="pv-spec-item" id="spec-<%= specProfils[si].getSpecialiteprofil() %>">
+          <% if (!specPhoto.isEmpty()) { %><img src="<%= request.getContextPath() + "/" + specPhoto %>" alt="" style="width:22px;height:22px;border-radius:50%;object-fit:cover;"><% } %>
+          <span><%= specLib %></span>
+          <span class="pv-spec-niveau">Niv. <%= specProfils[si].getNiveau() %></span>
+          <button title="Supprimer" onclick="pvDeleteSpec('<%= specProfils[si].getSpecialiteprofil() %>')">×</button>
+        </div>
+      <% } } %>
     </div>
   </div>
 
@@ -231,8 +349,36 @@
 
   <!-- ── Expériences ── -->
   <div class="pv-section">
-    <h2>Expériences</h2>
-    <div id="pvExperiences"><em style="color:#aaa">Aucune expérience.</em></div>
+    <div class="pv-section-header">
+      <h2><i class="bi bi-briefcase-fill"></i> Expériences</h2>
+      <button class="pv-btn-add" onclick="pvShowExpForm()"><i class="bi bi-plus-lg"></i> Ajouter</button>
+    </div>
+    <div id="pvExperiences">
+      <% if (experiences.length == 0) { %>
+        <em style="color:#aaa;font-size:13px">Aucune expérience.</em>
+      <% } else {
+        for (int ei = 0; ei < experiences.length; ei++) {
+          ExperienceLib ex = experiences[ei];
+          String eId    = ex.getIdexperience() != null ? ex.getIdexperience() : "";
+          String eEnt   = ex.getEntreprise()   != null ? ex.getEntreprise()   : "";
+          String ePoste = ex.getPostelib()     != null ? ex.getPostelib()     : "";
+          String eDeb   = ex.getDebut()        != null ? ex.getDebut().toString() : "";
+          String eFin   = ex.getFin()          != null ? ex.getFin().toString()   : "";
+          String eDesc  = ex.getDescription()  != null ? ex.getDescription()  : "";
+          String eIdp   = ex.getIdposte()      != null ? ex.getIdposte()      : "";
+      %>
+        <div class="pv-exp-item" id="exp-<%= eId %>">
+          <div class="pv-exp-actions">
+            <button title="Modifier" onclick="pvEditExp('<%= eId %>','<%= eEnt.replace("'","\\'") %>','<%= eDeb %>','<%= eFin %>','<%= eDesc.replace("'","\\'").replace("\n","\\n") %>','<%= eIdp %>')"><i class="bi bi-pencil-fill"></i></button>
+            <button class="del" title="Supprimer" onclick="pvDeleteExp('<%= eId %>')"><i class="bi bi-trash-fill"></i></button>
+          </div>
+          <% if (!eEnt.isEmpty()) { %><div class="pv-exp-company"><%= eEnt.replace("<","&lt;") %></div><% } %>
+          <% if (!ePoste.isEmpty()) { %><div class="pv-exp-poste"><%= ePoste.replace("<","&lt;") %></div><% } %>
+          <div class="pv-exp-dates"><%= eDeb %> → <%= eFin.isEmpty() ? "Actuel" : eFin %></div>
+          <% if (!eDesc.isEmpty()) { %><div class="pv-exp-desc"><%= eDesc.replace("<","&lt;").replace("\n","<br>") %></div><% } %>
+        </div>
+      <% } } %>
+    </div>
   </div>
 
 </div>
@@ -242,7 +388,8 @@
   <% if (_erreur != null) { %>
   alert("Erreur chargement profil : <%= _erreur.replace("\"", "'").replace("\n", " ") %>");
   <% } %>
-  /* ── Données depuis ProfilLib (session) ── */
+
+  var ctx  = "<%= request.getContextPath() %>";
   var p = {
     idprofil     : "<%= _idprofil %>",
     email        : "<%= _email %>",
@@ -288,41 +435,112 @@
   /* Grille */
   document.getElementById("fi-nom").textContent      = p.nom;
   document.getElementById("fi-prenom").textContent   = p.prenom;
-  document.getElementById("fi-dtn").textContent      = p.dtn.split("-").reverse().join("/");
+  document.getElementById("fi-dtn").textContent      = p.dtn ? p.dtn.split("-").reverse().join("/") : "";
   document.getElementById("fi-tel").textContent      = p.telephone;
   document.getElementById("fi-email").textContent    = p.email;
   document.getElementById("fi-id").textContent       = p.idprofil;
   document.getElementById("fi-promo").textContent    = p.promotionLib + " (" + p.idpromotion + ")";
   document.getElementById("fi-parcours").textContent = p.parcoursLib  + " (" + p.idparcours  + ")";
-  /* Expériences */
-  var exps = [
-    <% if (experiences != null) { for (int experienceIndex = 0; experienceIndex < experiences.length; experienceIndex++) { ExperienceLib ex = experiences[experienceIndex]; %>
-    {
-      entreprise : "<%= ex.getEntreprise() != null ? ex.getEntreprise().replace("\"","&quot;") : "" %>",
-      poste      : "<%= ex.getPostelib()   != null ? ex.getPostelib()  .replace("\"","&quot;") : "" %>",
-      debut      : "<%= ex.getDebut()      != null ? ex.getDebut()                            : "" %>",
-      fin        : "<%= ex.getFin()        != null ? ex.getFin()                              : "" %>",
-      description: "<%= ex.getDescription()!= null ? ex.getDescription().replace("\"","&quot;").replace("\n"," ") : "" %>"
-    }<%= experienceIndex < experiences.length - 1 ? "," : "" %>
-    <% } } %>
-  ];
-  (function () {
-    var wrap = document.getElementById("pvExperiences");
-    if (!exps.length) return;
-    wrap.innerHTML = "";
-    exps.forEach(function (e) {
-      var div = document.createElement("div");
-      div.style.cssText = "border-left:3px solid #0a66c2;padding:8px 0 8px 14px;margin-bottom:14px";
-      div.innerHTML =
-        '<div style="font-weight:700;font-size:14px">' + e.entreprise + '</div>' +
-        '<div style="font-size:13px;color:#0a66c2">' + e.poste + '</div>' +
-        '<div style="font-size:12px;color:#888;margin:2px 0">' + e.debut + ' → ' + e.fin + '</div>' +
-        (e.description ? '<div style="font-size:13px;color:#444;margin-top:4px">' + e.description + '</div>' : '');
-      wrap.appendChild(div);
-    });
-  })();
 
 })();
+
+/* ════════════════════════════════════════
+   EXPERIENCE CRUD
+   ════════════════════════════════════════ */
+var _expUrl = "<%= request.getContextPath() %>/pages/profil/ajax/traitement-experience.jsp";
+
+function pvShowExpForm(editId, ent, deb, fin, desc, idp) {
+  document.getElementById("expFormId").value        = editId || "";
+  document.getElementById("expEntreprise").value    = editId ? ent : "";
+  document.getElementById("expDebut").value         = editId ? deb : "";
+  document.getElementById("expFin").value           = editId ? fin : "";
+  document.getElementById("expDescription").value   = editId ? desc.replace(/\\n/g, "\n") : "";
+  document.getElementById("expPoste").value         = editId ? idp : "";
+  document.getElementById("expModalTitle").textContent = editId ? "Modifier l'expérience" : "Ajouter une expérience";
+  pvOpenModal("modalExp");
+}
+
+function pvEditExp(id, ent, deb, fin, desc, idp) {
+  pvShowExpForm(id, ent, deb, fin, desc, idp);
+}
+
+function pvSaveExp() {
+  var id   = document.getElementById("expFormId").value;
+  var data = new URLSearchParams();
+  data.append("action",      id ? "update" : "create");
+  if (id) data.append("idexperience", id);
+  data.append("entreprise",  document.getElementById("expEntreprise").value);
+  data.append("debut",       document.getElementById("expDebut").value);
+  data.append("fin",         document.getElementById("expFin").value);
+  data.append("description", document.getElementById("expDescription").value);
+  data.append("idposte",     document.getElementById("expPoste").value);
+
+  fetch(_expUrl, { method: "POST", body: data,
+    headers: {"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","X-Requested-With":"XMLHttpRequest"}
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.success) { pvCloseModal("modalExp"); location.reload(); }
+    else alert("Erreur : " + d.error);
+  })
+  .catch(function(e) { alert("Erreur réseau : " + e); });
+}
+
+function pvDeleteExp(id) {
+  if (!confirm("Supprimer cette expérience ?")) return;
+  fetch(_expUrl + "?action=delete&idexperience=" + encodeURIComponent(id), {
+    headers: {"X-Requested-With":"XMLHttpRequest"}
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.success) {
+      var el = document.getElementById("exp-" + id);
+      if (el) el.remove();
+    } else alert("Erreur : " + d.error);
+  })
+  .catch(function(e) { alert("Erreur réseau : " + e); });
+}
+
+/* ════════════════════════════════════════
+   SPECIALITE CRUD
+   ════════════════════════════════════════ */
+var _specUrl = "<%= request.getContextPath() %>/pages/profil/ajax/traitement-specialite.jsp";
+
+function pvAddSpec() {
+  var sel    = document.getElementById("specSelect");
+  var nivSel = document.getElementById("specNiveau");
+  if (!sel.value) { alert("Sélectionnez une spécialité"); return; }
+
+  var data = new URLSearchParams();
+  data.append("action", "add");
+  data.append("idspecialite", sel.value);
+  data.append("niveau", nivSel.value);
+
+  fetch(_specUrl, { method: "POST", body: data,
+    headers: {"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","X-Requested-With":"XMLHttpRequest"}
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.success) { pvCloseModal("modalAddSpec"); location.reload(); }
+    else alert("Erreur : " + d.error);
+  })
+  .catch(function(e) { alert("Erreur réseau : " + e); });
+}
+
+function pvDeleteSpec(spId) {
+  if (!confirm("Supprimer cette spécialité ?")) return;
+  fetch(_specUrl + "?action=delete&specialiteprofil=" + encodeURIComponent(spId), {
+    headers: {"X-Requested-With":"XMLHttpRequest"}
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.success) {
+      var el = document.getElementById("spec-" + spId);
+      if (el) el.remove();
+    } else alert("Erreur : " + d.error);
+  })
+  .catch(function(e) { alert("Erreur réseau : " + e); });
+}
 
 /* ── Helpers modals ── */
 function pvOpenModal(id)  { document.getElementById(id).style.display = "flex"; }
@@ -356,7 +574,6 @@ function pvUploadPhoto(inputId, typeVal, apresOk) {
   })
   .catch(function(e){ alert("Erreur réseau : " + e); });
 }
-
 </script>
 
 <!-- ═══════════════ MODALS ═══════════════ -->
@@ -368,17 +585,23 @@ function pvUploadPhoto(inputId, typeVal, apresOk) {
 }
 .pv-modal {
   background: #fff; border-radius: 12px;
-  padding: 28px 28px 20px; width: 90%; max-width: 420px;
+  padding: 28px 28px 20px; width: 90%; max-width: 480px;
   box-shadow: 0 8px 32px rgba(0,0,0,.22);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  max-height: 90vh; overflow-y: auto;
 }
 .pv-modal h3 { margin: 0 0 18px; font-size: 17px; font-weight: 700; }
 .pv-modal label { font-size: 12px; font-weight: 700; text-transform: uppercase;
   letter-spacing: .5px; color: #666; display: block; margin: 12px 0 4px; }
-.pv-modal input[type=text] {
-  width: 100%; padding: 8px 11px; border: 1px solid #ccc; border-radius: 6px;
-  font-size: 14px; box-sizing: border-box;
+.pv-modal input[type=text],
+.pv-modal input[type=date],
+.pv-modal select,
+.pv-modal textarea {
+  width: 100%; padding: 9px 12px; border: 1px solid #ccc; border-radius: 8px;
+  font-size: 14px; box-sizing: border-box; font-family: inherit;
 }
+.pv-modal textarea { min-height: 70px; resize: vertical; }
+.pv-modal select { background: #fff; }
 .pv-modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
 .pv-btn-cancel { background: #f0f0f0; border: none; border-radius: 20px;
   padding: 8px 20px; font-size: 13px; cursor: pointer; }
@@ -387,7 +610,62 @@ function pvUploadPhoto(inputId, typeVal, apresOk) {
 .pv-btn-save:hover { background: #004182; }
 .pv-preview-img { max-width:100%; max-height:160px; margin-top:10px;
   border-radius: 8px; display: none; object-fit: cover; }
+.pv-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media(max-width:440px){ .pv-form-row { grid-template-columns: 1fr; } }
 </style>
+
+<!-- Modal : Ajouter / Modifier Expérience -->
+<div class="pv-modal-overlay" id="modalExp">
+  <div class="pv-modal">
+    <h3 id="expModalTitle">Ajouter une expérience</h3>
+    <input type="hidden" id="expFormId">
+    <label>Entreprise *</label>
+    <input type="text" id="expEntreprise" placeholder="Nom de l'entreprise">
+    <label>Poste *</label>
+    <select id="expPoste">
+      <option value="">— Sélectionner —</option>
+      <% for (int pi = 0; pi < allPostes.length; pi++) { %>
+      <option value="<%= allPostes[pi].getIdposte() %>"><%= allPostes[pi].getLibelle() != null ? allPostes[pi].getLibelle().replace("<","&lt;") : "" %></option>
+      <% } %>
+    </select>
+    <div class="pv-form-row">
+      <div><label>Date début</label><input type="date" id="expDebut"></div>
+      <div><label>Date fin</label><input type="date" id="expFin"></div>
+    </div>
+    <label>Description</label>
+    <textarea id="expDescription" placeholder="Décrivez votre rôle..."></textarea>
+    <div class="pv-modal-footer">
+      <button type="button" class="pv-btn-cancel" onclick="pvCloseModal('modalExp')">Annuler</button>
+      <button type="button" class="pv-btn-save" onclick="pvSaveExp()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal : Ajouter Spécialité -->
+<div class="pv-modal-overlay" id="modalAddSpec">
+  <div class="pv-modal">
+    <h3>Ajouter une spécialité</h3>
+    <label>Spécialité *</label>
+    <select id="specSelect">
+      <option value="">— Sélectionner —</option>
+      <% for (int spi = 0; spi < allSpecialites.length; spi++) { %>
+      <option value="<%= allSpecialites[spi].getIdspecialite() %>"><%= allSpecialites[spi].getLibelle() != null ? allSpecialites[spi].getLibelle().replace("<","&lt;") : "" %></option>
+      <% } %>
+    </select>
+    <label>Niveau (1–5)</label>
+    <select id="specNiveau">
+      <option value="1">1 — Débutant</option>
+      <option value="2">2 — Intermédiaire</option>
+      <option value="3" selected>3 — Confirmé</option>
+      <option value="4">4 — Avancé</option>
+      <option value="5">5 — Expert</option>
+    </select>
+    <div class="pv-modal-footer">
+      <button type="button" class="pv-btn-cancel" onclick="pvCloseModal('modalAddSpec')">Annuler</button>
+      <button type="button" class="pv-btn-save" onclick="pvAddSpec()">Ajouter</button>
+    </div>
+  </div>
+</div>
 
 <!-- Modal : Photo de profil (PDP — type=1) -->
 <div class="pv-modal-overlay" id="modalPDP">

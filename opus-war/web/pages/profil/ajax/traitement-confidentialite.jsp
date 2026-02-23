@@ -52,7 +52,7 @@
         idprofil = idprofil.trim();
 
         // Champs à traiter
-        String[] champs = {"nom", "prenom", "dtn", "experience", "specialite", "promotion", "email", "parcours"};
+        String[] champs = {"nom", "prenom", "dtn", "experience", "specialite", "promotion", "email", "parcours", "telephone"};
 
         conn = new UtilDB().GetConn();
         conn.setAutoCommit(false);
@@ -62,14 +62,8 @@
         for (int i = 0; i < champs.length; i++) {
             String champ     = champs[i];
             String statusParam = request.getParameter("status_" + champ);
-            if (statusParam == null) continue;
-
-            int status;
-            try {
-                status = Integer.parseInt(statusParam.trim());
-            } catch (NumberFormatException nfe) {
-                continue;
-            }
+            // Checkbox: present = 1 (public), absent = 0 (prive)
+            int status = (statusParam != null && !statusParam.trim().isEmpty()) ? 1 : 0;
 
             // Chercher si une ligne existe déjà
             Visibilite[] existing = (Visibilite[]) CGenUtil.rechercher(

@@ -136,11 +136,12 @@
     boolean vParcours  = isPublic(champVis, "parcours");
     boolean vSpec      = isPublic(champVis, "specialite");
     boolean vExp       = isPublic(champVis, "experience");
+    boolean vTel       = isPublic(champVis, "telephone");
 
     String nom       = (vNom && profil.getNom() != null)            ? profil.getNom()            : "";
     String prenom    = (vPrenom && profil.getPrenom() != null)       ? profil.getPrenom()         : "";
     String email     = (vEmail && profil.getEmail() != null)         ? profil.getEmail()          : "";
-    String telephone = profil.getTelephone() != null                 ? profil.getTelephone()      : "";
+    String telephone = (vTel && profil.getTelephone() != null)       ? profil.getTelephone()      : "";
     String dtn       = (vDtn && profil.getDtn() != null)             ? profil.getDtn().toString() : "";
     String promoLib  = (vPromo && profil.getPromotionLib() != null)  ? profil.getPromotionLib()   : "";
     int promoAnnee   = vPromo                                        ? profil.getPromotionAnnee() : 0;
@@ -289,13 +290,13 @@
             </div>
         </div>
 
-        <!-- Formation -->
+        <!-- Promotion & Parcours -->
         <% if (vPromo || vParcours) { %>
         <div class="fu-section">
-            <h2><i class="bi bi-mortarboard-fill"></i> Formation</h2>
+            <h2><i class="bi bi-mortarboard-fill"></i> Promotion & Parcours</h2>
             <div class="fu-tags">
-                <% if (!promoLib.isEmpty()) { %><span class="fu-tag">&nbsp;<%= h(promoLib) %><%= promoAnnee > 0 ? " (" + promoAnnee + ")" : "" %></span><% } %>
-                <% if (!parcLib.isEmpty()) { %><span class="fu-tag grey">&nbsp;<%= h(parcLib) %></span><% } %>
+                <% if (!promoLib.isEmpty()) { %><span class="fu-tag">🎓&nbsp;<%= h(promoLib) %><%= promoAnnee > 0 ? " (" + promoAnnee + ")" : "" %></span><% } %>
+                <% if (!parcLib.isEmpty()) { %><span class="fu-tag grey">📚&nbsp;<%= h(parcLib) %></span><% } %>
             </div>
         </div>
         <% } %>
@@ -334,7 +335,7 @@
                 <% if (vEmail) { %>
                 <div class="fu-field"><label>Email</label><span><%= h(email.isEmpty() ? "—" : email) %></span></div>
                 <% } %>
-                <% if (!telephone.isEmpty()) { %>
+                <% if (vTel && !telephone.isEmpty()) { %>
                 <div class="fu-field"><label>T&eacute;l&eacute;phone</label><span><%= h(telephone) %></span></div>
                 <% } %>
                 <% if (vPromo && !promoLib.isEmpty()) { %>
@@ -353,6 +354,7 @@
                 if (!vEmail) privCount++;
                 if (!vPromo) privCount++;
                 if (!vParcours) privCount++;
+                if (!vTel) privCount++;
                 if (privCount > 0) {
             %>
             <div class="fu-private" style="margin-top:14px">

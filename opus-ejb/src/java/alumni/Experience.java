@@ -2,13 +2,14 @@ package alumni;
 
 import bean.ClassMAPTable;
 import java.sql.Connection;
+import java.sql.Date;
 
 public class Experience extends ClassMAPTable {
 
     private String idexperience;
     private String entreprise;
-    private String debut;
-    private String fin;
+    private Date debut;
+    private Date fin;
     private String description;
     private int etat;
     private String idprofil;
@@ -50,19 +51,19 @@ public class Experience extends ClassMAPTable {
         this.entreprise = entreprise;
     }
 
-    public String getDebut() {
+    public Date getDebut() {
         return debut;
     }
 
-    public void setDebut(String debut) {
+    public void setDebut(Date debut) {
         this.debut = debut;
     }
 
-    public String getFin() {
+    public Date getFin() {
         return fin;
     }
 
-    public void setFin(String fin) {
+    public void setFin(Date fin) {
         this.fin = fin;
     }
 

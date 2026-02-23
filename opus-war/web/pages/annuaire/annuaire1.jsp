@@ -596,12 +596,11 @@
             boolean vParcours  = isSelf || isPublic(visMap, pid, "parcours");
             boolean vSpec      = isSelf || isPublic(visMap, pid, "specialite");
             boolean vExp       = isSelf || isPublic(visMap, pid, "experience");
-            boolean vTel       = isSelf || isPublic(visMap, pid, "telephone");
 
             String nom       = (vNom && p.getNom() != null) ? p.getNom() : "";
             String prenom    = (vPrenom && p.getPrenom() != null) ? p.getPrenom() : "";
             String emailP    = (vEmail && p.getEmail() != null) ? p.getEmail() : "";
-            String telephone = (vTel && p.getTelephone() != null) ? p.getTelephone() : "";
+            String telephone = p.getTelephone() != null ? p.getTelephone() : "";
             String promoLib  = (vPromo && p.getPromotionLib() != null) ? p.getPromotionLib() : "";
             int    promoAn   = vPromo ? p.getPromotionAnnee() : 0;
             String parcLib   = (vParcours && p.getParcoursLib() != null) ? p.getParcoursLib() : "";
