@@ -2,13 +2,14 @@ package alumni;
 
 import bean.ClassMAPTable;
 import java.sql.Connection;
+import java.sql.Date;
 
 public class Visibilite extends ClassMAPTable {
 
     private String idvisibilite;
-    private String champ;
+    private String champvisibilite;
     private int status;
-    private String daty;
+    private Date daty;
     private String idprofil;
 
     public Visibilite() {
@@ -39,12 +40,12 @@ public class Visibilite extends ClassMAPTable {
         this.idvisibilite = idvisibilite;
     }
 
-    public String getChampVisibilite() {
-        return champ;
+    public String getChampvisibilite() {
+        return champvisibilite;
     }
 
-    public void setChampVisibilite(String champ) {
-        this.champ = champ;
+    public void setChampvisibilite(String champvisibilite) {
+        this.champvisibilite = champvisibilite;
     }
 
     public int getStatus() {
@@ -55,11 +56,11 @@ public class Visibilite extends ClassMAPTable {
         this.status = status;
     }
 
-    public String getDaty() {
+    public Date getDaty() {
         return daty;
     }
 
-    public void setDaty(String daty) {
+    public void setDaty(Date daty) {
         this.daty = daty;
     }
 

@@ -119,4 +119,12 @@ public class Profil extends ClassMAPTable {
     public void setIdutilisateur(int idutilisateur) {
         this.idutilisateur = idutilisateur;
     }
+
+    public static Profil findByRefUser(int refuser, Connection c) throws Exception {
+        Profil filtre = new Profil();
+        Profil[] res = (Profil[]) CGenUtil.rechercher(
+            filtre, null, null, c, " and idutilisateur=" + refuser
+        );
+        return (res != null && res.length > 0) ? res[0] : null;
+    }
 }

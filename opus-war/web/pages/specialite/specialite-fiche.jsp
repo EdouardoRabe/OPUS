@@ -6,12 +6,11 @@
         SpecialiteCpl t = new SpecialiteCpl();
         PageConsulte pc = new PageConsulte(t, request, (user.UserEJB) session.getValue("u"));
         t = (SpecialiteCpl) pc.getBase();
-        String id = request.getParameter("idspecialite");
+        String id = request.getParameter("id");
         if (id == null || id.isEmpty()) id = t.getTuppleID();
 
         pc.getChampByName("idspecialite").setLibelle("ID");
         pc.getChampByName("libelle").setLibelle("Libell&eacute;");
-        pc.getChampByName("description").setLibelle("Description");
         pc.getChampByName("photo").setVisible(false);
         pc.getChampByName("photohtml").setVisible(false);
         pc.setTitre("Fiche sp&eacute;cialit&eacute;");
@@ -38,20 +37,19 @@
                             html = html.replace("__CTX__", request.getContextPath());
                             out.println(html);
                         %>
-                        <% if (t.getPhoto() != null && !t.getPhoto().isEmpty()) { %>
+                        <% if (t.getPhotohtml() != null && !t.getPhotohtml().isEmpty()) { %>
                         <table class="table table-bordered" style="margin-top:10px;">
                             <tr>
                                 <td width="33%"><b>Photo</b></td>
                                 <td>
-                                    <img src="<%= request.getContextPath() + "/" + t.getPhoto() %>"
-                                         style="max-height:200px; max-width:300px;">
+                                    <%= t.getPhotohtml().replace("__CTX__", request.getContextPath()) %>
                                 </td>
                             </tr>
                         </table>
                         <% } %>
                         <br/>
                         <div class="box-footer">
-                            <a class="pull-right" href="<%= lien + "?but=specialite/specialite-modif.jsp&idspecialite=" + id %>"><button class="btn btn-warning">Modifier</button></a>
+                            <a class="pull-right" href="<%= lien + "?but=specialite/specialite-saisie.jsp&id=" + id %>"><button class="btn btn-warning">Modifier</button></a>
                             <a class="pull-right" href="<%= lien + "?but=apresTarif.jsp&id=" + id + "&acte=delete&bute=specialite/specialite-list.jsp&classe=" + classe + "&nomtable=" + nomTable %>"><button class="btn btn-danger">Supprimer</button></a>
                         </div>
                     </div>
