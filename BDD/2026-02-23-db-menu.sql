@@ -35,7 +35,7 @@ INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALU
 -- Sous-menus de RÉSEAU
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
 ('MENDYN000005', 'Annuaire', 'bi-book-fill', 'module.jsp?but=annuaire/annuaire.jsp', 1, 1, 'MENDYN000002'),
-('MENDYN000006', 'Spécialités', 'bi-tags-fill', 'module.jsp?but=specialites/specialites.jsp', 2, 1, 'MENDYN000002');
+('MENDYN000006', 'Spécialités', 'bi-tags-fill', 'module.jsp?but=specialite/specialite-list.jsp', 2, 1, 'MENDYN000002');
 
 -- Sous-menus de CARRIÈRE
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
@@ -107,13 +107,13 @@ INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALU
 
 -- Droits: role etu
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
-('USRM000023', 'MENDYN000012', '*', 0, 'etu'),
-('USRM000024', 'MENDYN000013', '*', 0, 'etu');
+('USRM000043', 'MENDYN000012', '*', 0, 'etu'),
+('USRM000044', 'MENDYN000013', '*', 0, 'etu');
 
 -- Droits: role md
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
-('USRM000025', 'MENDYN000012', '*', 0, 'md'),
-('USRM000026', 'MENDYN000013', '*', 0, 'md');
+('USRM000045', 'MENDYN000012', '*', 0, 'md'),
+('USRM000046', 'MENDYN000013', '*', 0, 'md');
 
 -- ═══ ÉTAPE 6: MENU NOTIFICATIONS ═══
 
