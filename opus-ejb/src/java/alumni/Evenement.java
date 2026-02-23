@@ -2,15 +2,16 @@ package alumni;
 
 import bean.ClassMAPTable;
 import java.sql.Connection;
+import java.sql.Date;
 
 public class Evenement extends ClassMAPTable {
 
     private String idevenement;
     private String description;
-    private String daty;
-    private String datefin;
-    private String datedebut;
-    private String idutilisateur;
+    private Date daty;
+    private Date datefin;
+    private Date datedebut;
+    private int idutilisateur;
 
     public Evenement() {
         setNomTable("evenement");
@@ -48,35 +49,35 @@ public class Evenement extends ClassMAPTable {
         this.description = description;
     }
 
-    public String getDaty() {
+    public Date getDaty() {
         return daty;
     }
 
-    public void setDaty(String daty) {
+    public void setDaty(Date daty) {
         this.daty = daty;
     }
 
-    public String getDatefin() {
+    public Date getDatefin() {
         return datefin;
     }
 
-    public void setDatefin(String datefin) {
+    public void setDatefin(Date datefin) {
         this.datefin = datefin;
     }
 
-    public String getDatedebut() {
+    public Date getDatedebut() {
         return datedebut;
     }
 
-    public void setDatedebut(String datedebut) {
+    public void setDatedebut(Date datedebut) {
         this.datedebut = datedebut;
     }
 
-    public String getIdutilisateur() {
+    public int getIdutilisateur() {
         return idutilisateur;
     }
 
-    public void setIdutilisateur(String idutilisateur) {
+    public void setIdutilisateur(int idutilisateur) {
         this.idutilisateur = idutilisateur;
     }
 }
