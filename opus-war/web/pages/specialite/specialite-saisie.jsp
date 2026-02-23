@@ -12,8 +12,12 @@
         PageInsert pi = new PageInsert(a, request, (user.UserEJB) session.getValue("u"));
         pi.setLien(lienSaisie);
         pi.getFormu().getChamp("libelle").setLibelle("Libell&eacute;");
+        pi.getFormu().getChamp("description").setLibelle("Description");
         pi.getFormu().getChamp("photo").setLibelle("Photo");
-        String[] ordre = {"libelle", "photo"};
+
+        //Variables de navigation
+        String butApresPost = "specialite/specialite-list.jsp";
+        String[] ordre   = {"libelle", "description", "photo"};
         pi.getFormu().setOrdre(ordre);
         pi.preparerDataFormu();
         pi.getFormu().makeHtmlInsertTabIndex();

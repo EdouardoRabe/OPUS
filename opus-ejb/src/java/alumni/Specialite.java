@@ -7,6 +7,7 @@ public class Specialite extends ClassMAPTable {
 
     private String idspecialite;
     private String libelle;
+    private String description;
     private String photo;
 
     public Specialite() {
@@ -43,6 +44,14 @@ public class Specialite extends ClassMAPTable {
 
     public void setLibelle(String libelle) {
         this.libelle = libelle;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getPhoto() {
