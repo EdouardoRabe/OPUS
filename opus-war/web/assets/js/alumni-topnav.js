@@ -9,7 +9,6 @@
     var moreBtn = nav.querySelector('.topnav-more-btn');
     var searchToggle = nav.querySelector('.topnav-search-toggle');
     var searchInput = nav.querySelector('.topnav-search');
-    var submenuGroups = Array.prototype.slice.call(nav.querySelectorAll('.topnav-link-group'));
     var userDropdown = nav.querySelector('.topnav-user-dropdown');
 
     if (!primaryLinks || !overflowMenu || !moreBtn) {
@@ -21,6 +20,11 @@
       return window.matchMedia('(max-width: 768px)').matches;
     };
 
+    // Function to get all submenu groups (including those in overflow)
+    function getAllSubmenuGroups() {
+      return Array.prototype.slice.call(nav.querySelectorAll('.topnav-link-group'));
+    }
+
     function closeOverflowMenu() {
       overflowMenu.classList.remove('is-open');
       moreBtn.classList.remove('is-open');
@@ -28,7 +32,7 @@
     }
 
     function closeSubmenus(exceptionGroup) {
-      submenuGroups.forEach(function (group) {
+      getAllSubmenuGroups().forEach(function (group) {
         if (exceptionGroup && group === exceptionGroup) {
           return;
         }
@@ -105,19 +109,59 @@
       }
     });
 
-    submenuGroups.forEach(function (group) {
-      var trigger = group.querySelector('.topnav-link');
-      if (!trigger) {
-        return;
-      }
+    // Use event delegation for submenu groups (works even after DOM moves)
+    nav.addEventListener('click', function(event) {
+      var trigger = event.target.closest('.topnav-link-group > .topnav-link');
+      if (!trigger) return;
 
-      trigger.addEventListener('click', function (event) {
+      var group = trigger.closest('.topnav-link-group');
+      if (!group) return;
+
+      // Don't handle if it's in mobile links (they have their own handler)
+      if (group.closest('.topnav-mobile-links')) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      var willOpen = !group.classList.contains('is-open');
+
+      // Close other submenus but keep overflow open
+      closeSubmenus(group);
+      closeUserDropdown();
+
+      if (willOpen) {
+        group.classList.add('is-open');
+        trigger.setAttribute('aria-expanded', 'true');
+      } else {
+        group.classList.remove('is-open');
+        trigger.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Mobile submenu groups
+    var mobileLinks = nav.querySelector('.topnav-mobile-links');
+    if (mobileLinks) {
+      mobileLinks.addEventListener('click', function(event) {
+        var trigger = event.target.closest('.topnav-link-group > .topnav-link');
+        if (!trigger) return;
+
+        var group = trigger.closest('.topnav-link-group');
+        if (!group) return;
+
         event.preventDefault();
         event.stopPropagation();
 
         var willOpen = !group.classList.contains('is-open');
-        closeSubmenus(group);
-        closeUserDropdown();
+
+        // Close other mobile submenus
+        var mobileGroups = mobileLinks.querySelectorAll('.topnav-link-group');
+        mobileGroups.forEach(function(g) {
+          if (g !== group) {
+            g.classList.remove('is-open');
+            var t = g.querySelector('.topnav-link');
+            if (t) t.setAttribute('aria-expanded', 'false');
+          }
+        });
 
         if (willOpen) {
           group.classList.add('is-open');
@@ -127,7 +171,7 @@
           trigger.setAttribute('aria-expanded', 'false');
         }
       });
-    });
+    }
 
     // User dropdown toggle
     if (userDropdown) {
