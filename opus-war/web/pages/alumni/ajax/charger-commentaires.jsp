@@ -112,6 +112,7 @@
                 sbComm.append("\"id\":\"").append(ej(idcomm)).append("\"");
                 sbComm.append(",\"description\":\"").append(ej(c.getDescription())).append("\"");
                 sbComm.append(",\"auteur\":\"").append(ej(auteur)).append("\"");
+                sbComm.append(",\"idutilisateur\":").append(c.getIdutilisateur());
                 String parent = c.getIdpublicationcommentaire_1();
                 sbComm.append(",\"idparent\":\"").append(parent != null ? ej(parent) : "").append("\"");
                 sbComm.append(",\"reactions\":").append(sbReact.toString());

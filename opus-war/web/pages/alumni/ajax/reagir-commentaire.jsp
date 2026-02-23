@@ -79,7 +79,7 @@
                     }
 
                     String nomSource = Notification.getNomUtilisateur(conn, refuser);
-                    String lien = "module.jsp?but=alumni/fil-actualite.jsp#pub-" + comms[0].getIdpublication();
+                    String lien = "module.jsp?but=alumni/fil-actualite.jsp#comm-" + idcomm;
                     Notification.creerEtEnvoyer(conn, userId, commOwner,
                         nomSource + " a reagit " + reactionLib + " a votre commentaire",
                         Notification.TYPE_COMM_REACTION, lien);

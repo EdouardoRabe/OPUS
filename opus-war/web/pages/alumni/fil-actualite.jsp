@@ -163,6 +163,24 @@
                     if (comments == null) comments = new Publicationcommentaire[0];
                     int nbComm = comments.length;
 
+                    // --- APJ: Personnes identifiees dans cette publication ---
+                    Identification[] identTags = (Identification[]) CGenUtil.rechercher(
+                        new Identification(), null, null, conn,
+                        " and idpublication = '" + idpub + "'");
+                    if (identTags == null) identTags = new Identification[0];
+                    String taggedNames = "";
+                    if (identTags.length > 0) {
+                        StringBuffer sbTags = new StringBuffer();
+                        for (int tg = 0; tg < identTags.length; tg++) {
+                            String tName = (String) userNames.get(new Integer(identTags[tg].getIdutilisateur()));
+                            if (tName != null) {
+                                if (sbTags.length() > 0) sbTags.append(", ");
+                                sbTags.append(tName);
+                            }
+                        }
+                        if (sbTags.length() > 0) taggedNames = sbTags.toString();
+                    }
+
                     // Echapper description
                     String desc = pub.getDescritpion();
                     String descSafe = "";
@@ -176,6 +194,11 @@
             <!-- En-tete -->
             <div style="margin-bottom:10px;">
                 <strong><%= auteur %></strong>
+                <% if (!taggedNames.isEmpty()) { %>
+                    <span style="color:#555;font-size:13px;"> &mdash; avec
+                        <strong style="color:#1a73e8;"><%= taggedNames %></strong>
+                    </span>
+                <% } %>
                 &nbsp;&mdash;&nbsp;
                 <small><%= pub.getDaty() %> &agrave; <%= pub.getHeure() != null ? pub.getHeure() : "" %></small>
             </div>
@@ -610,7 +633,7 @@ function chargerCommentaires(idpub) {
         function renderComment(c, depth) {
             var indent = Math.min(depth, 5) * 25; // max 5 niveaux d'indentation
             var html = '';
-            html += '<div style="padding:8px 0;border-bottom:1px solid #f0f0f0;margin-left:' + indent + 'px;">';
+            html += '<div id="comm-' + c.id + '" style="padding:8px 0;border-bottom:1px solid #f0f0f0;margin-left:' + indent + 'px;">';
             if (depth > 0) html += '<small style="color:#999;">&#8627; r&eacute;ponse</small> ';
             html += '<strong>' + escHtml(c.auteur) + '</strong>: ' + formatMentions(c.description);
 
@@ -629,7 +652,7 @@ function chargerCommentaires(idpub) {
             html += '</span>';
 
             // Bouton repondre - sur TOUS les commentaires (pas juste top-level)
-            html += ' <a href="javascript:void(0)" onclick="montrerReponse(\'' + c.id + '\',\'' + idpub + '\')" style="font-size:11px;color:#337ab7;">R&eacute;pondre</a>';
+            html += ' <a href="javascript:void(0)" onclick="montrerReponse(\'' + c.id + '\',\'' + idpub + '\',\'' + escAttr(c.auteur) + '\',\'' + c.idutilisateur + '\')" style="font-size:11px;color:#337ab7;">R&eacute;pondre</a>';
             html += '<div id="reponse-form-' + c.id + '" style="display:none;margin-top:5px;margin-left:15px;position:relative;">';
             html += '<input type="text" id="reponse-text-' + c.id + '" placeholder="Votre r&eacute;ponse... (tapez @ pour mentionner)" style="width:60%;padding:4px;"'
                 + ' oninput="onReplyInput(this,\'' + c.id + '\',\'' + idpub + '\')"'
@@ -702,9 +725,25 @@ function ajouterCommentaire(idpub) {
     .catch(function(e) { alert('Erreur reseau (commentaire): ' + e); });
 }
 
-function montrerReponse(idcomm, idpub) {
+function montrerReponse(idcomm, idpub, auteurNom, auteurId) {
     var div = document.getElementById('reponse-form-' + idcomm);
-    div.style.display = (div.style.display === 'none') ? 'block' : 'none';
+    var wasHidden = (div.style.display === 'none');
+    div.style.display = wasHidden ? 'block' : 'none';
+
+    if (wasHidden && auteurNom && auteurId && String(auteurId) !== String(CURRENT_USER_ID)) {
+        var input = document.getElementById('reponse-text-' + idcomm);
+        if (input && !input.value) {
+            input.value = '@' + auteurNom + ' ';
+            var state = getReplyMentionState(idcomm);
+            var uid = parseInt(auteurId);
+            if (state.mentionIds.indexOf(uid) === -1) {
+                state.mentionIds.push(uid);
+            }
+            document.getElementById('reponse-mentions-' + idcomm).value = state.mentionIds.join(',');
+            input.focus();
+            input.setSelectionRange(input.value.length, input.value.length);
+        }
+    }
 }
 
 // Mention dans les reponses - reutilise le meme mecanisme
@@ -925,4 +964,41 @@ function renderPubTags() {
     // Mettre a jour le champ hidden
     document.getElementById('pub-identifications').value = pubTagUsers.map(function(u) { return u.id; }).join(',');
 }
+
+// ========== SCROLL TO ANCHOR (pour les notifications) ==========
+$(document).ready(function() {
+    var hash = window.location.hash;
+    if (hash && hash.startsWith('#comm-')) {
+        var idpub = null;
+        // Trouver la publication parente du commentaire
+        // D'abord ouvrir tous les commentaires, puis scroller
+        var commId = hash.substring(1); // 'comm-PCM000123'
+        // On ouvre toutes les zones de commentaires et on attend le scroll
+        var pubDivs = document.querySelectorAll('[id^="pub-"]');
+        pubDivs.forEach(function(div) {
+            var pubId = div.id.replace('pub-', '');
+            var commDiv = document.getElementById('commentaires-' + pubId);
+            if (commDiv && commDiv.style.display === 'none') {
+                commDiv.style.display = 'block';
+                chargerCommentaires(pubId);
+            }
+        });
+        // Attendre le chargement puis scroller
+        setTimeout(function() {
+            var el = document.getElementById(commId);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.style.background = '#fff9c4';
+                setTimeout(function() { el.style.background = ''; }, 3000);
+            }
+        }, 1500);
+    } else if (hash && hash.startsWith('#pub-')) {
+        var el = document.getElementById(hash.substring(1));
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.style.background = '#fff9c4';
+            setTimeout(function() { el.style.background = ''; }, 3000);
+        }
+    }
+});
 </script>

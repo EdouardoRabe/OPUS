@@ -115,3 +115,17 @@ INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
 ('USRM000025', 'MENDYN000012', '*', 0, 'md'),
 ('USRM000026', 'MENDYN000013', '*', 0, 'md');
 
+-- ═══ ÉTAPE 6: MENU NOTIFICATIONS ═══
+
+-- Sous-menu Notifications sous Publications (Niveau 1)
+INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
+('MENDYN000014', 'Notifications', 'bi-bell-fill', 'module.jsp?but=alumni/notifications.jsp', 2, 1, 'MENDYN000012');
+
+-- Droits: role etu
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
+('USRM000027', 'MENDYN000014', '*', 0, 'etu');
+
+-- Droits: role md
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
+('USRM000028', 'MENDYN000014', '*', 0, 'md');
+
