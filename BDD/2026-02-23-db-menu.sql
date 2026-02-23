@@ -24,7 +24,9 @@ INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALU
 ('MENDYN000003', 'Carrière', 'fa-briefcase', '#', 3, 0, NULL),
 
 -- 4. Mon Profil (Dropdown User à droite - Niveau 0)
-('MENDYN000004', 'Mon Profil', 'fa-user-circle', '#', 4, 0, NULL);
+('MENDYN000004', 'Mon Profil', 'fa-user-circle', '#', 4, 0, NULL),
+
+('MENDYN000999', 'Administration', 'fa-cogs', '#', 99, 0, NULL);
 
 -- ═══ ÉTAPE 3: INSÉRER LES SOUS-MENUS (NIVEAU 1) ═══
 
@@ -43,6 +45,13 @@ INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALU
 ('MENDYN000009', 'Voir ma fiche', 'fa-id-card', 'module.jsp?but=profil/voir.jsp', 1, 1, 'MENDYN000004'),
 ('MENDYN000010', 'mdifier le profil', 'fa-edit', 'module.jsp?but=profil/mdifier.jsp', 2, 1, 'MENDYN000004'),
 ('MENDYN000011', 'Déconnexion', 'fa-sign-out', 'deconnexion.jsp', 3, 1, 'MENDYN000004');
+
+-- Sous-menus de ADMINISTRATION (exemple pour le rôle 'md')
+
+INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
+('MENDYN000023', 'Gestion des utilisateurs', 'fa-users-cog', 'module.jsp?but=admin/gestion-utilisateurs.jsp', 1, 1, 'MENDYN000999'),
+('MENDYN000024', 'Gestion des signalements', 'fa-user-shield', 'module.jsp?but=admin/gestion-roles.jsp', 2, 1, 'MENDYN000999');
+
 
 -- ═══ ÉTAPE 4: INSÉRER LES DROITS D'ACCÈS (USERMENU) ═══
 
@@ -80,5 +89,8 @@ VALUES ('USRM000012', 'MENDYN000001', '*', 0, 'md'),
        ('USRM000019', 'MENDYN000008', '*', 0, 'md'),
        ('USRM000020', 'MENDYN000009', '*', 0, 'md'),
        ('USRM000021', 'MENDYN000010', '*', 0, 'md'),
-       ('USRM000022', 'MENDYN000011', '*', 0, 'md');
+       ('USRM000022', 'MENDYN000011', '*', 0, 'md'),
+       ('USRM000099', 'MENDYN000999', '*', 0, 'md'),
+       ('USRM000023', 'MENDYN000023', '*', 0, 'md'),
+       ('USRM000024', 'MENDYN000024', '*', 0, 'md');
 
