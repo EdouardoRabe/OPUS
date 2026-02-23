@@ -1,5 +1,4 @@
 <%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
-<%@page import="utilitaireAcade.UtilitaireAcade"%>
 <%
     String queryString = request.getQueryString();
     String but = "pages/testLogin.jsp";

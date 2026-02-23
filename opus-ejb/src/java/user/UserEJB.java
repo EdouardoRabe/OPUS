@@ -86,6 +86,8 @@ public interface UserEJB {
 
     public void testLogin(String user, String pass, String param) throws Exception;
 
+    public void testLoginAlumni(String etu, String pass) throws Exception;
+
     public String findHomePageServices(String codeService) throws Exception;
 
     public String mapperMereFille(ClassMAPTable e, String idMere, String[] idFille, String rem, String montant, String etat) throws Exception;
