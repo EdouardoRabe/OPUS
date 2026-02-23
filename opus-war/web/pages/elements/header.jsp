@@ -11,34 +11,73 @@
 
 <!-- Include Alumni TopNav CSS -->
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/alumni-topnav.css">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <%!
-    // Function to convert Font Awesome to Ionicons
-    public String convertToIonicon(String faIcon) {
-        if (faIcon == null) return "ion ion-link";
+    // Function to convert icon format to Bootstrap Icons
+    public String convertToBootstrapIcon(String icon) {
+        if (icon == null || icon.isEmpty()) return "bi bi-link-45deg";
 
+        // Si c'est déjà une icône Bootstrap Icons, retourner tel quel
+        if (icon.startsWith("bi-") || icon.startsWith("bi ")) {
+            if (icon.startsWith("bi-")) {
+                return "bi " + icon;
+            }
+            return icon;
+        }
+
+        // Mapping Font Awesome vers Bootstrap Icons
         java.util.Map<String, String> iconMap = new java.util.HashMap<>();
-        iconMap.put("fa-users", "ion ion-people");
-        iconMap.put("fa-briefcase", "ion ion-briefcase");
-        iconMap.put("fa-comment-dots", "ion ion-chatboxes");
-        iconMap.put("fa-bell", "ion ion-alert");
-        iconMap.put("fa-home", "ion ion-home");
-        iconMap.put("fa-user", "ion ion-person");
-        iconMap.put("fa-search", "ion ion-search");
-        iconMap.put("fa-ellipsis-h", "ion ion-navicon-round");
-        iconMap.put("fa-graduation-cap", "ion ion-university");
-        iconMap.put("fa-cog", "ion ion-gear-a");
-        iconMap.put("fa-cogs", "ion ion-gear-b");
-        iconMap.put("fa-file", "ion ion-document");
-        iconMap.put("fa-folder", "ion ion-folder");
-        iconMap.put("fa-list", "ion ion-navicon");
-        iconMap.put("fa-dashboard", "ion ion-speedometer");
-        iconMap.put("fa-chart", "ion ion-stats-bars");
-        iconMap.put("fa-money", "ion ion-cash");
-        iconMap.put("fa-calendar", "ion ion-calendar");
-        iconMap.put("fa-sign-out", "ion ion-log-out");
 
-        if (faIcon.startsWith("fa")) {
+        // Menus principaux
+        iconMap.put("fa-home", "bi bi-house-door-fill");
+        iconMap.put("fa-users", "bi bi-people-fill");
+        iconMap.put("fa-briefcase", "bi bi-briefcase-fill");
+        iconMap.put("fa-user-circle", "bi bi-person-circle");
+        iconMap.put("fa-cogs", "bi bi-gear-fill");
+        iconMap.put("fa-cog", "bi bi-gear-fill");
+
+        // Sous-menus Réseau
+        iconMap.put("fa-address-book", "bi bi-book-fill");
+        iconMap.put("fa-tags", "bi bi-tags-fill");
+
+        // Sous-menus Carrière
+        iconMap.put("fa-list-alt", "bi bi-list-ul");
+        iconMap.put("fa-list", "bi bi-list-ul");
+        iconMap.put("fa-plus-circle", "bi bi-plus-circle-fill");
+
+        // Sous-menus Profil
+        iconMap.put("fa-id-card", "bi bi-person-badge-fill");
+        iconMap.put("fa-edit", "bi bi-pencil-square");
+        iconMap.put("fa-sign-out", "bi bi-box-arrow-right");
+        iconMap.put("fa-user", "bi bi-person-fill");
+
+        // Administration
+        iconMap.put("fa-users-cog", "bi bi-people");
+        iconMap.put("fa-user-shield", "bi bi-shield-exclamation");
+
+        // Autres icônes communes
+        iconMap.put("fa-search", "bi bi-search");
+        iconMap.put("fa-bell", "bi bi-bell-fill");
+        iconMap.put("fa-envelope", "bi bi-envelope-fill");
+        iconMap.put("fa-dashboard", "bi bi-speedometer2");
+        iconMap.put("fa-file", "bi bi-file-earmark-fill");
+        iconMap.put("fa-folder", "bi bi-folder-fill");
+        iconMap.put("fa-calendar", "bi bi-calendar-fill");
+        iconMap.put("fa-money", "bi bi-cash-stack");
+        iconMap.put("fa-chart", "bi bi-bar-chart-fill");
+        iconMap.put("fa-graduation-cap", "bi bi-mortarboard-fill");
+        iconMap.put("fa-circle", "bi bi-circle-fill");
+        iconMap.put("fa-link", "bi bi-link-45deg");
+
+        // Chercher dans le map
+        if (icon.startsWith("fa-") || icon.startsWith("fa ")) {
+            String faIcon = icon.replace("fa ", "fa-");
+            if (iconMap.containsKey(faIcon)) {
+                return iconMap.get(faIcon);
+            }
+            // Essayer de trouver une correspondance partielle
             for (String key : iconMap.keySet()) {
                 if (faIcon.contains(key.replace("fa-", ""))) {
                     return iconMap.get(key);
@@ -46,12 +85,8 @@
             }
         }
 
-        if (faIcon.startsWith("fa-") || faIcon.startsWith("fa ")) {
-            String iconName = faIcon.replace("fa-", "").replace("fa ", "");
-            return "ion ion-" + iconName;
-        }
-
-        return faIcon;
+        // Par défaut, retourner une icône générique
+        return "bi bi-link-45deg";
     }
 %>
 
@@ -159,7 +194,7 @@
       <form action="<%=lien%>" method="GET" style="display: flex; align-items: center; flex: 1;">
         <input value="recherche-global.jsp" name="but" type="hidden">
         <div class="topnav-search-container">
-          <i class="ion ion-search"></i>
+          <i class="bi bi-search"></i>
           <input class="topnav-search" type="text" name="remarque" placeholder="Rechercher...">
         </div>
       </form>
@@ -174,8 +209,8 @@
 
             String menuId = menuParent.getId();
             String libelle = menuParent.getLibelle() != null ? menuParent.getLibelle() : "Menu";
-            String icone = menuParent.getIcone() != null ? menuParent.getIcone() : "fa-link";
-            String ionIcon = convertToIonicon(icone);
+            String icone = menuParent.getIcone() != null ? menuParent.getIcone() : "bi-link-45deg";
+            String bsIcon = convertToBootstrapIcon(icone);
 
             // Verifier si ce menu a des sous-menus
             ArrayList<MenuDynamique> sousMenus = sousMenusParParent.get(menuId);
@@ -186,10 +221,10 @@
         %>
         <div class="topnav-link-group" data-overflow-item="true">
             <button class="topnav-link" type="button" aria-expanded="false" title="<%= libelle %>">
-                <i class="<%= ionIcon %>"></i>
+                <i class="<%= bsIcon %>"></i>
                 <span class="topnav-link-label">
                     <%= libelle %>
-                    <i class="ion ion-chevron-down topnav-link-caret"></i>
+                    <i class="bi bi-chevron-down topnav-link-caret"></i>
                 </span>
             </button>
             <div class="topnav-submenu">
@@ -201,11 +236,11 @@
                         sousHref = sousMenu.getHref() + "?currentMenu=" + sousMenu.getId();
                     }
                     String sousLibelle = sousMenu.getLibelle() != null ? sousMenu.getLibelle() : "Sous-menu";
-                    String sousIcone = sousMenu.getIcone() != null ? sousMenu.getIcone() : "fa-circle";
-                    String sousIonIcon = convertToIonicon(sousIcone);
+                    String sousIcone = sousMenu.getIcone() != null ? sousMenu.getIcone() : "bi-circle-fill";
+                    String sousBsIcon = convertToBootstrapIcon(sousIcone);
                 %>
                 <a class="topnav-sublink" href="<%= sousHref %>" title="<%= sousLibelle %>">
-                    <i class="<%= sousIonIcon %>"></i>
+                    <i class="<%= sousBsIcon %>"></i>
                     <%= sousLibelle %>
                 </a>
                 <%
@@ -222,7 +257,7 @@
                 }
         %>
         <a class="topnav-link" href="<%= href %>" data-overflow-item="true" title="<%= libelle %>">
-            <i class="<%= ionIcon %>"></i>
+            <i class="<%= bsIcon %>"></i>
             <span><%= libelle %></span>
         </a>
         <%
@@ -234,7 +269,7 @@
     <!-- More Button (Overflow) -->
     <div class="topnav-overflow">
       <button class="topnav-more-btn" type="button" title="Plus d'options" aria-expanded="false">
-        <i class="ion ion-navicon-round"></i>
+        <i class="bi bi-three-dots"></i>
         <span>Plus</span>
       </button>
       <div class="topnav-overflow-menu"></div>
@@ -242,7 +277,7 @@
 
     <!-- Search Toggle (Mobile) -->
     <button class="topnav-search-toggle" type="button" title="Rechercher">
-      <i class="ion ion-search"></i>
+      <i class="bi bi-search"></i>
     </button>
 
     <!-- User Profile Dropdown -->
@@ -253,12 +288,12 @@
       </button>
       <div class="topnav-user-menu">
         <a class="topnav-user-menu-item" href="<%=lien%>?but=utilisateur/utilisateur-modif.jsp&id=<%=map.getRefuser()%>">
-          <i class="ion ion-person"></i>
+          <i class="bi bi-person-fill"></i>
           Modifier Profil
         </a>
         <div class="topnav-user-menu-divider"></div>
         <a class="topnav-user-menu-item" href="deconnexion.jsp">
-          <i class="ion ion-log-out"></i>
+          <i class="bi bi-box-arrow-right"></i>
           Déconnexion
         </a>
       </div>
@@ -274,35 +309,35 @@
         if (mobileCount >= 3) break;
         if (menuParent == null) continue;
 
-        String menuId = menuParent.getId();
-        String libelle = menuParent.getLibelle() != null ? menuParent.getLibelle() : "Menu";
-        String icone = menuParent.getIcone() != null ? menuParent.getIcone() : "fa-link";
-        String ionIcon = convertToIonicon(icone);
+        String menuIdMobile = menuParent.getId();
+        String libelleMobile = menuParent.getLibelle() != null ? menuParent.getLibelle() : "Menu";
+        String iconeMobile = menuParent.getIcone() != null ? menuParent.getIcone() : "bi-link-45deg";
+        String bsIconMobile = convertToBootstrapIcon(iconeMobile);
 
-        ArrayList<MenuDynamique> sousMenus = sousMenusParParent.get(menuId);
-        boolean hasSousMenus = (sousMenus != null && !sousMenus.isEmpty());
+        ArrayList<MenuDynamique> sousMenusMobile = sousMenusParParent.get(menuIdMobile);
+        boolean hasSousMenusMobile = (sousMenusMobile != null && !sousMenusMobile.isEmpty());
 
-        if (hasSousMenus) {
+        if (hasSousMenusMobile) {
     %>
     <div class="topnav-link-group">
-        <button class="topnav-link" type="button" aria-expanded="false" title="<%= libelle %>">
-            <i class="<%= ionIcon %>"></i>
+        <button class="topnav-link" type="button" aria-expanded="false" title="<%= libelleMobile %>">
+            <i class="<%= bsIconMobile %>"></i>
         </button>
         <div class="topnav-submenu">
             <%
-            for (MenuDynamique sousMenu : sousMenus) {
-                if (sousMenu == null) continue;
-                String sousHref = "#";
-                if (sousMenu.getHref() != null && !sousMenu.getHref().isEmpty()) {
-                    sousHref = sousMenu.getHref() + "?currentMenu=" + sousMenu.getId();
+            for (MenuDynamique sousMenuMobile : sousMenusMobile) {
+                if (sousMenuMobile == null) continue;
+                String sousHrefMobile = "#";
+                if (sousMenuMobile.getHref() != null && !sousMenuMobile.getHref().isEmpty()) {
+                    sousHrefMobile = sousMenuMobile.getHref() + "?currentMenu=" + sousMenuMobile.getId();
                 }
-                String sousLibelle = sousMenu.getLibelle() != null ? sousMenu.getLibelle() : "Sous-menu";
-                String sousIcone = sousMenu.getIcone() != null ? sousMenu.getIcone() : "fa-circle";
-                String sousIonIcon = convertToIonicon(sousIcone);
+                String sousLibelleMobile = sousMenuMobile.getLibelle() != null ? sousMenuMobile.getLibelle() : "Sous-menu";
+                String sousIconeMobile = sousMenuMobile.getIcone() != null ? sousMenuMobile.getIcone() : "bi-circle-fill";
+                String sousBsIconMobile = convertToBootstrapIcon(sousIconeMobile);
             %>
-            <a class="topnav-sublink" href="<%= sousHref %>" title="<%= sousLibelle %>">
-                <i class="<%= sousIonIcon %>"></i>
-                <%= sousLibelle %>
+            <a class="topnav-sublink" href="<%= sousHrefMobile %>" title="<%= sousLibelleMobile %>">
+                <i class="<%= sousBsIconMobile %>"></i>
+                <%= sousLibelleMobile %>
             </a>
             <%
             }
@@ -311,13 +346,13 @@
     </div>
     <%
         } else {
-            String href = "#";
+            String hrefMobile = "#";
             if (menuParent.getHref() != null && !menuParent.getHref().isEmpty()) {
-                href = menuParent.getHref() + "?currentMenu=" + menuId;
+                hrefMobile = menuParent.getHref() + "?currentMenu=" + menuIdMobile;
             }
     %>
-    <a class="topnav-link" href="<%= href %>" title="<%= libelle %>">
-        <i class="<%= ionIcon %>"></i>
+    <a class="topnav-link" href="<%= hrefMobile %>" title="<%= libelleMobile %>">
+        <i class="<%= bsIconMobile %>"></i>
     </a>
     <%
         }
@@ -326,7 +361,7 @@
     %>
 
     <a class="topnav-link" href="#" title="Mon profil">
-      <i class="ion ion-person"></i>
+      <i class="bi bi-person-fill"></i>
     </a>
   </div>
 </nav>
