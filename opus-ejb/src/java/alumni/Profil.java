@@ -11,11 +11,13 @@ public class Profil extends ClassMAPTable {
     private String email;
     private String nom;
     private String prenom;
-    private Date dtn;
+    private java.sql.Date dtn;
     private String telephone;
     private String idpromotion;
     private String idparcours;
-    private int idutilisateur;
+    // linked genre (homme / femme etc)
+    private String idgenre;
+    private Integer idutilisateur;
 
     public Profil() {
         setNomTable("profil");
@@ -100,6 +102,14 @@ public class Profil extends ClassMAPTable {
 
     public void setIdparcours(String idparcours) {
         this.idparcours = idparcours;
+    }
+
+    public String getIdgenre() {
+        return idgenre;
+    }
+
+    public void setIdgenre(String idgenre) {
+        this.idgenre = idgenre;
     }
 
     public int getIdutilisateur() {

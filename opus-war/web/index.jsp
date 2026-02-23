@@ -76,6 +76,9 @@
                 <span id="login-btn-text">Se connecter</span> <i class="fa fa-arrow-right" style="margin-left: 8px;"></i>
               </button>
             </form>
+            <div class="text-center" style="margin-top:1rem;">
+              <em>Pas encore de compte ? <a href="${pageContext.request.contextPath}/pages/inscription.jsp">Inscrivez-vous</a></em>
+            </div>
           </div>
 
           <!-- REGISTER FORM -->
@@ -128,6 +131,23 @@
     <script src="${pageContext.request.contextPath}/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
 
     <script>
+      // show success message if redirected after registration
+      (function(){
+        var params = new URLSearchParams(window.location.search);
+        if(params.get('inscription') === 'success'){
+          Swal.fire({
+            title: 'Inscription réussie',
+            text: 'Vous pouvez maintenant vous connecter.',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          });
+          // remove param from URL without reloading
+          params.delete('inscription');
+          var newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+          window.history.replaceState({}, '', newUrl);
+        }
+      })();
+
       // Fonction pour basculer entre les onglets
       function switchTab(tab, event) {
         if (event) {
@@ -179,6 +199,19 @@
             title: "Oups !",
             text: "<%= loginError.replace("\"", "\\\"") %>",
             icon: "error",
+            confirmButtonText: "OK"
+        });
+    </script>
+    <%
+        }
+        String insc = request.getParameter("inscription");
+        if("success".equals(insc)){
+    %>
+    <script>
+        Swal.fire({
+            title: "Bravo !",
+            text: "Inscription réussie, vous pouvez maintenant vous connecter.",
+            icon: "success",
             confirmButtonText: "OK"
         });
     </script>

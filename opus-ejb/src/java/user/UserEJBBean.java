@@ -44,6 +44,7 @@ import utilisateurAcade.UtilisateurAcade;
 import constanteAcade.ConstanteEtatAcade;
 import utilitaire.ConstanteUser;
 import utilitaire.UtilDB;
+import utilitaire.Utilitaire;
 import utilitaireAcade.UtilitaireAcade;
 import utilitaire.UtilitaireMetier;
 import mg.cnaps.configuration.Configuration;
@@ -236,18 +237,65 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     @Override
     public String createUtilisateurs(String loginuser, String pwduser, String nomuser, String adruser, String teluser,
             String idrole) throws Exception {
-        HistoriqueLocal rl = null;
+        // Droit : autoriser si aucun user connecte (inscription) ou si DG
+        if (u != null && u.getIdrole().compareTo("dg") != 0) {
+            throw new Exception("Erreur de droit");
+        }
+
+        Connection c = null;
         try {
-            if (u.getIdrole().compareTo("dg") == 0) {
-                rl = HistoriqueEJBClient.lookupHistoriqueEJBBeanLocal();
-                String s = rl.createUtilisateurs(loginuser, pwduser, nomuser, adruser, teluser, idrole,
-                        u.getTuppleID());
-                return s;
-            } else {
-                throw new Exception("Erreur de droit");
+            c = new UtilDB().GetConn();
+            c.setAutoCommit(false);
+
+            // 1. Verifier si le login existe deja
+            MapUtilisateur crit = new MapUtilisateur();
+            crit.setNomTable("utilisateur");
+            crit.setLoginuser(loginuser);
+            MapUtilisateur[] existing = (MapUtilisateur[]) CGenUtil.rechercher(crit, null, null, "");
+            if (existing.length > 0) {
+                throw new Exception("Login deja utilise!");
             }
-        } catch (CreateException ex) {
-            throw new Exception(ex.getMessage());
+
+            // 2. Recuperer adruser depuis la table direction (premier idDir)
+            Direction dirCrit = new Direction();
+            Direction[] directions = (Direction[]) CGenUtil.rechercher(dirCrit, null, null, "");
+            if (directions == null || directions.length == 0) {
+                throw new Exception("Aucune direction trouvee dans la base");
+            }
+            String adrDirection = directions[0].getIdDir();
+
+            // 3. Crypter le mot de passe
+            int niveau = (int) Math.round(Math.random() * 10.0);
+            int sens   = (int) Math.round(Math.random());
+            if (niveau == 0) niveau = -5;
+            String passCrypt = Utilitaire.cryptWord(pwduser.toLowerCase(), niveau, sens == 0);
+
+            // 4. Inserer l'utilisateur via le framework
+            String refUser = (u != null ? u.getTuppleID() : "0");
+            
+            MapUtilisateur newUser = new MapUtilisateur(loginuser, passCrypt, nomuser, adrDirection, teluser, idrole);
+            newUser.setEstActif("1");
+            System.out.println("Avant creation utilisateur avec ref hhhh : " + newUser.getLoginuser() + " " + newUser.getAdruser() + " " + newUser.getTeluser());
+            newUser.createObject(refUser, c);
+
+            // 4. Inserer le CNAPSUser
+            CNAPSUser cnapsUser = new CNAPSUser(idrole, "1", "1", "1", loginuser, "1", newUser.getTuppleID());
+            // cnapsUser.createObject(refUser, c);
+
+            // 5. Inserer les parametres de cryptage
+            historique.ParamCrypt pc = new historique.ParamCrypt(niveau, sens, newUser.getTuppleID());
+            pc.createObject(refUser, c);
+
+            c.commit();
+            System.out.println("Utilisateur cree avec ref hhhh : " + newUser.getTuppleID());
+            return newUser.getTuppleID();
+
+        } catch (Exception e) {
+            if (c != null) { try { c.rollback(); } catch (Exception ignored) {} }
+            e.printStackTrace();
+            throw new Exception("Erreur lors de la creation de l'utilisateur : " + e.getMessage());
+        } finally {
+            if (c != null) { try { c.close(); } catch (Exception ignored) {} }
         }
     }
 
