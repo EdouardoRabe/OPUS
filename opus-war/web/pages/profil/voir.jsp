@@ -8,6 +8,7 @@
 <%@ page import="java.sql.Connection" %>
 <%
     UserEJB    uEJB  = (UserEJB) session.getAttribute("u");
+    String     _lien = (String) session.getValue("lien");
     ProfilLib      profil = null;
     ExperienceLib[] experiences = null;
     String     _erreur = null;
@@ -47,6 +48,8 @@
     String _parcourslib = profil != null && profil.getParcoursLib()    != null ? profil.getParcoursLib()    : "";
     String _photo       = profil != null && profil.getPhotoProfil()    != null ? profil.getPhotoProfil()    : "";
     String _photoCover  = profil != null && profil.getPhotoCouverture()!= null ? profil.getPhotoCouverture(): "";
+    String _photoUrl      = _photo.isEmpty()      ? "" : request.getContextPath() + "/" + _photo;
+    String _photoCoverUrl = _photoCover.isEmpty() ? "" : request.getContextPath() + "/" + _photoCover;
 %>
 <style>
 .pv-card {
@@ -158,35 +161,47 @@
 
   <!-- ── Cover ── -->
   <div class="pv-cover" id="pvCover" style="position:relative">
-    <button class="pv-cover-edit" title="Modifier la couverture" onclick="document.getElementById('inputCover').click()">
+    <button class="pv-cover-edit" title="Modifier la couverture" onclick="pvOpenModal('modalPDC')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
         <circle cx="12" cy="13" r="4"/>
       </svg>
     </button>
-    <input type="file" id="inputCover" accept="image/*" style="display:none">
   </div>
 
   <!-- ── Avatar ── -->
   <div class="pv-avatar-wrap">
     <div class="pv-avatar" id="pvAvatar"></div>
-    <button class="pv-edit-btn" title="Modifier la photo de profil" onclick="document.getElementById('inputPhoto').click()">
+    <button class="pv-edit-btn" title="Modifier la photo de profil" onclick="pvOpenModal('modalPDP')">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0a66c2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
         <circle cx="12" cy="13" r="4"/>
       </svg>
     </button>
-    <input type="file" id="inputPhoto" accept="image/*" style="display:none">
   </div>
 
   <!-- ── Identité ── -->
   <div class="pv-top">
-    <div class="pv-name"     id="pvName">—</div>
-    <div class="pv-headline" id="pvHeadline">—</div>
-    <div class="pv-meta">
-      <span>📍 Antananarivo, Madagascar</span>
-      <a id="pvEmail" href="#">—</a>
-      <span id="pvPhone">—</span>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div class="pv-name"     id="pvName">—</div>
+        <div class="pv-headline" id="pvHeadline">—</div>
+        <div class="pv-meta">
+          <span>📍 Antananarivo, Madagascar</span>
+          <a id="pvEmail" href="#">—</a>
+          <span id="pvPhone">—</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+        <a href="<%= _lien %>?but=profil/profil-modif.jsp&idprofil=<%= _idprofil %>"
+           style="padding:6px 16px;background:#0a66c2;color:#fff;border:none;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block">
+          Modifier le profil
+        </a>
+        <a href="<%= _lien %>?but=profil/confidentialite.jsp"
+           style="padding:6px 16px;background:#fff;color:#0a66c2;border:1px solid #0a66c2;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block">
+          <i class="fa fa-lock"></i> Confidentialité
+        </a>
+      </div>
     </div>
   </div>
 
@@ -225,7 +240,7 @@
 <script>
 (function () {
   <% if (_erreur != null) { %>
-  alert("Erreur chargement profil : <%= _erreur.replace("\"", "&quot;").replace("\n", " ") %>");
+  alert("Erreur chargement profil : <%= _erreur.replace("\"", "'").replace("\n", " ") %>");
   <% } %>
   /* ── Données depuis ProfilLib (session) ── */
   var p = {
@@ -239,8 +254,8 @@
     promotionLib : "<%= _promolib %>",
     idparcours   : "<%= _idparcours %>",
     parcoursLib  : "<%= _parcourslib %>",
-    photo        : "<%= _photo %>",
-    photoCover   : "<%= _photoCover %>"
+    photo        : "<%= _photoUrl %>",
+    photoCover   : "<%= _photoCoverUrl %>"
   };
 
   /* Cover */
@@ -307,29 +322,108 @@
     });
   })();
 
-  /* Modifier photo de profil */
-  document.getElementById("inputPhoto").addEventListener("change", function () {
-    var f = this.files[0];
-    if (!f) return;
-    var url = URL.createObjectURL(f);
-    var av = document.getElementById("pvAvatar");
-    av.innerHTML = '<img src="' + url + '" alt="">';
-  });
-
-  /* Modifier couverture */
-  document.getElementById("inputCover").addEventListener("change", function () {
-    var f = this.files[0];
-    if (!f) return;
-    var url = URL.createObjectURL(f);
-    var cover = document.getElementById("pvCover");
-    var existing = cover.querySelector(".pv-cover-img");
-    if (existing) { existing.src = url; }
-    else {
-      var img = document.createElement("img");
-      img.src = url; img.className = "pv-cover-img";
-      cover.insertBefore(img, cover.firstChild);
-    }
-  });
-
 })();
+
+/* ── Helpers modals ── */
+function pvOpenModal(id)  { document.getElementById(id).style.display = "flex"; }
+function pvCloseModal(id) { document.getElementById(id).style.display = "none"; }
+
+/* ── Aperçu image avant upload ── */
+function pvPreview(inputId, previewId) {
+  var f = document.getElementById(inputId).files[0];
+  if (!f) return;
+  var img = document.getElementById(previewId);
+  img.src = URL.createObjectURL(f);
+  img.style.display = "block";
+}
+
+/* ── Upload PDP (type=1) ou PDC (type=0) ── */
+function pvUploadPhoto(inputId, typeVal, apresOk) {
+  var fi = document.getElementById(inputId);
+  if (!fi.files[0]) { alert("Sélectionnez une image."); return; }
+  var fd = new FormData();
+  fd.append("photo", fi.files[0]);
+  fd.append("type",  String(typeVal));
+  fetch("<%= request.getContextPath() %>/pages/profil/ajax/traitement-photo.jsp", {
+    method: "POST", body: fd
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if (d.success) {
+      apresOk("<%= request.getContextPath() %>/" + d.image);
+      pvCloseModal(typeVal === 1 ? "modalPDP" : "modalPDC");
+    } else { alert("Erreur : " + d.error); }
+  })
+  .catch(function(e){ alert("Erreur réseau : " + e); });
+}
+
 </script>
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+<style>
+.pv-modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.45); z-index: 9999;
+  align-items: center; justify-content: center;
+}
+.pv-modal {
+  background: #fff; border-radius: 12px;
+  padding: 28px 28px 20px; width: 90%; max-width: 420px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.22);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.pv-modal h3 { margin: 0 0 18px; font-size: 17px; font-weight: 700; }
+.pv-modal label { font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .5px; color: #666; display: block; margin: 12px 0 4px; }
+.pv-modal input[type=text] {
+  width: 100%; padding: 8px 11px; border: 1px solid #ccc; border-radius: 6px;
+  font-size: 14px; box-sizing: border-box;
+}
+.pv-modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.pv-btn-cancel { background: #f0f0f0; border: none; border-radius: 20px;
+  padding: 8px 20px; font-size: 13px; cursor: pointer; }
+.pv-btn-save { background: #0a66c2; color: #fff; border: none; border-radius: 20px;
+  padding: 8px 20px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.pv-btn-save:hover { background: #004182; }
+.pv-preview-img { max-width:100%; max-height:160px; margin-top:10px;
+  border-radius: 8px; display: none; object-fit: cover; }
+</style>
+
+<!-- Modal : Photo de profil (PDP — type=1) -->
+<div class="pv-modal-overlay" id="modalPDP">
+  <div class="pv-modal">
+    <h3>Changer la photo de profil</h3>
+    <input type="file" id="filePDP" accept="image/*"
+           onchange="pvPreview('filePDP','previewPDP')" style="margin-top:8px">
+    <img id="previewPDP" class="pv-preview-img" alt="Aperçu">
+    <div class="pv-modal-footer">
+      <button type="button" class="pv-btn-cancel" onclick="pvCloseModal('modalPDP')">Annuler</button>
+      <button type="button" class="pv-btn-save" onclick="pvUploadPhoto('filePDP', 1, function(img){
+        var av = document.getElementById('pvAvatar');
+        av.innerHTML = '<img src=&quot;' + img + '&quot; alt=&quot;&quot;>';
+      })">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal : Photo de couverture (PDC — type=0) -->
+<div class="pv-modal-overlay" id="modalPDC">
+  <div class="pv-modal">
+    <h3>Changer la photo de couverture</h3>
+    <input type="file" id="filePDC" accept="image/*"
+           onchange="pvPreview('filePDC','previewPDC')" style="margin-top:8px">
+    <img id="previewPDC" class="pv-preview-img" alt="Aperçu">
+    <div class="pv-modal-footer">
+      <button type="button" class="pv-btn-cancel" onclick="pvCloseModal('modalPDC')">Annuler</button>
+      <button type="button" class="pv-btn-save" onclick="pvUploadPhoto('filePDC', 0, function(img){
+        var cover = document.getElementById('pvCover');
+        var ex = cover.querySelector('.pv-cover-img');
+        if (ex) { ex.src = img; } else {
+          var i = document.createElement('img');
+          i.src = img; i.className = 'pv-cover-img';
+          cover.insertBefore(i, cover.firstChild);
+        }
+      })">Enregistrer</button>
+    </div>
+  </div>
+</div>

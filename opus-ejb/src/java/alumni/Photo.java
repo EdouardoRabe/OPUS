@@ -2,14 +2,16 @@ package alumni;
 
 import bean.ClassMAPTable;
 import java.sql.Connection;
+import java.sql.Date;
+import java.sql.Time;
 
 public class Photo extends ClassMAPTable {
 
     private String idphoto;
     private String image;
     private int type;
-    private String daty;
-    private String heure;
+    private Date daty;
+    private Time heure;
     private String idprofil;
 
     public Photo() {
@@ -56,19 +58,19 @@ public class Photo extends ClassMAPTable {
         this.type = type;
     }
 
-    public String getDaty() {
+    public Date getDaty() {
         return daty;
     }
 
-    public void setDaty(String daty) {
+    public void setDaty(Date daty) {
         this.daty = daty;
     }
 
-    public String getHeure() {
+    public Time getHeure() {
         return heure;
     }
 
-    public void setHeure(String heure) {
+    public void setHeure(Time heure) {
         this.heure = heure;
     }
 
