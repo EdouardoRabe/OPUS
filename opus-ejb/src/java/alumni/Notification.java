@@ -20,6 +20,7 @@ public class Notification extends ClassMAPTable {
     public static final String TYPE_COMM_REACTION = "COMM_REACTION";
     public static final String TYPE_MENTION = "MENTION";
     public static final String TYPE_IDENTIFICATION = "IDENTIFICATION";
+    public static final String TYPE_EVENEMENT = "EVENEMENT";
 
     private String idnotification;
     private String objet;
@@ -52,7 +53,7 @@ public class Notification extends ClassMAPTable {
     }
 
     public static void creerEtEnvoyer(Connection conn, String userId, int targetUser, 
-                                       String objet, String typenotif, String lien) throws Exception {
+                                        String objet, String typenotif, String lien) throws Exception {
         if (String.valueOf(targetUser).equals(userId)) return;
 
         Notification notif = new Notification();
