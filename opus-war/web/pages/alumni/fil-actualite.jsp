@@ -21,6 +21,12 @@
     int refuserConnecte = mapFil.getRefuser();
     String nomConnecte = mapFil.getNomuser() != null ? mapFil.getNomuser() : "";
     String ctx = request.getContextPath();
+    // Initiales du user connecte
+    String[] _partsConn = nomConnecte.trim().split("\\s+");
+    String initialConnecte = (_partsConn.length > 0 && _partsConn[0].length() > 0)
+        ? String.valueOf(Character.toUpperCase(_partsConn[0].charAt(0))) : "U";
+    if (_partsConn.length > 1 && _partsConn[_partsConn.length-1].length() > 0)
+        initialConnecte += Character.toUpperCase(_partsConn[_partsConn.length-1].charAt(0));
 
     // Messages flash
     String msgSucces = (String) session.getAttribute("pubSucces");
@@ -34,63 +40,110 @@
     if (typesPub == null) typesPub = new Typepublication[0];
 %>
 
-<div class="content-wrapper">
-    <section class="content-header">
-        <h1>Fil d'actualit&eacute;</h1>
-    </section>
-    <section class="content">
+<div class="fa-layout">
 
+    <!-- ===== COLONNE GAUCHE : Profil ===== -->
+    <aside class="fa-sidebar-left">
+        <div class="fa-profile-card">
+            <div class="fa-profile-cover"></div>
+            <div class="fa-profile-body">
+                <div class="fa-profile-avatar-wrap">
+                    <div class="fa-avatar fa-avatar--lg"><%= initialConnecte %></div>
+                </div>
+                <div class="fa-profile-name"><%= nomConnecte %></div>
+                <hr class="fa-divider">
+                <nav class="fa-profile-nav">
+                    <a href="<%= ctx %>/pages/module.jsp?but=alumni/profil.jsp" class="fa-nav-link">
+                        <i class="bi bi-person-fill"></i> Mon profil
+                    </a>
+                    <a href="#" class="fa-nav-link fa-nav-link--active">
+                        <i class="bi bi-newspaper"></i> Fil d&apos;actualit&eacute;
+                    </a>
+                    <a href="<%= ctx %>/pages/module.jsp?but=alumni/notifications.jsp" class="fa-nav-link">
+                        <i class="bi bi-bell-fill"></i> Notifications
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ===== COLONNE CENTRALE : Fil ===== -->
+    <main class="fa-feed-center">
+
+        <!-- Flash messages via Swal -->
         <% if (msgSucces != null) { %>
-            <div style="background:#dff0d8;padding:10px;margin-bottom:10px;border:1px solid #d6e9c6;"><%= msgSucces %></div>
+        <script>document.addEventListener('DOMContentLoaded',function(){Swal.fire({toast:true,position:'top-end',icon:'success',title:'<%= msgSucces.replace("'","\\'").replace("<","&lt;") %>',timer:3000,showConfirmButton:false});});</script>
         <% } %>
         <% if (msgErreur != null) { %>
-            <div style="background:#f2dede;padding:10px;margin-bottom:10px;border:1px solid #ebccd1;"><%= msgErreur %></div>
+        <script>document.addEventListener('DOMContentLoaded',function(){Swal.fire({icon:'error',title:'Erreur',text:'<%= msgErreur.replace("'","\\'").replace("<","&lt;") %>',confirmButtonColor:'var(--itu-blue)'});});</script>
         <% } %>
 
-        <!-- ==================== FORMULAIRE NOUVELLE PUBLICATION ==================== -->
-        <div style="border:1px solid #ccc;padding:15px;margin-bottom:20px;background:#fafafa;border-radius:8px;">
-            <h3>Nouvelle publication</h3>
-            <form method="POST" enctype="multipart/form-data" id="form-pub"
-                  action="<%= ctx %>/pages/alumni/ajax/creer-publication.jsp">
-                <div style="margin-bottom:8px;">
-                    <label>Type de publication :</label>
-                    <select name="idtypepublication" style="padding:5px;margin-left:5px;">
-                        <% for (int t = 0; t < typesPub.length; t++) { %>
-                            <option value="<%= typesPub[t].getIdtypepublication() %>"><%= typesPub[t].getLibelle() %></option>
-                        <% } %>
-                    </select>
-                </div>
-                <div>
-                    <textarea name="description" rows="3" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ccc;"
-                              placeholder="Quoi de neuf, <%= nomConnecte %> ?"></textarea>
-                </div>
-                <div style="margin-top:8px;">
-                    <label>Image (optionnel) :</label>
-                    <input type="file" name="image" accept="image/*">
-                </div>
-
-                <!-- Identifier des personnes (comme Facebook) -->
-                <div style="margin-top:10px;">
-                    <a href="javascript:void(0)" onclick="togglePubTag()" style="text-decoration:none;color:#337ab7;font-size:13px;">
-                        <i class="bi bi-tag-fill"></i> Identifier des personnes
-                    </a>
-                    <div id="pub-tag-zone" style="display:none;margin-top:8px;padding:10px;background:#f0f4ff;border:1px solid #d0d8f0;border-radius:6px;">
-                        <input type="text" id="pub-tag-search" placeholder="Rechercher un utilisateur..."
-                               oninput="rechercherPourPubTag()" autocomplete="off"
-                               style="width:70%;padding:5px;border:1px solid #ccc;border-radius:4px;">
-                        <div id="pub-tag-suggestions" style="max-height:150px;overflow-y:auto;border:1px solid #eee;border-radius:4px;background:#fff;"></div>
-                        <div id="pub-tag-selected" style="margin-top:5px;display:flex;flex-wrap:wrap;gap:5px;"></div>
+        <!-- ===== COMPOSER ===== -->
+        <div class="fa-composer-card" id="composer-card">
+            <div class="fa-composer-trigger" id="composer-trigger" onclick="openComposer()">
+                <div class="fa-avatar fa-avatar--sm"><%= initialConnecte %></div>
+                <div class="fa-composer-placeholder">Quoi de neuf&nbsp;?</div>
+            </div>
+            <div class="fa-composer-quick-actions" id="composer-quick-actions">
+                <button class="fa-quick-action-btn" type="button"
+                    onclick="openComposer();setTimeout(function(){document.getElementById('composer-img-input').click();},120)">
+                    <i class="bi bi-image-fill" style="color:#45bd62;"></i>&nbsp;Photo
+                </button>
+                <button class="fa-quick-action-btn" type="button"
+                    onclick="openComposer();setTimeout(function(){togglePubTag();},120)">
+                    <i class="bi bi-tag-fill" style="color:#f7b928;"></i>&nbsp;Identifier
+                </button>
+            </div>
+            <!-- Formulaire complet (masqué par défaut) -->
+            <div class="fa-composer-full" id="composer-full" style="display:none;">
+                <form method="POST" enctype="multipart/form-data" id="form-pub"
+                      action="<%= ctx %>/pages/alumni/ajax/creer-publication.jsp">
+                    <div class="fa-composer-header">
+                        <div class="fa-avatar fa-avatar--md"><%= initialConnecte %></div>
+                        <div>
+                            <strong><%= nomConnecte %></strong>
+                            <select name="idtypepublication" class="fa-type-select">
+                                <% for (int t = 0; t < typesPub.length; t++) { %>
+                                <option value="<%= typesPub[t].getIdtypepublication() %>"><%= typesPub[t].getLibelle() %></option>
+                                <% } %>
+                            </select>
+                        </div>
                     </div>
-                    <input type="hidden" name="identifications" id="pub-identifications" value="">
-                </div>
-
-                <div style="margin-top:10px;">
-                    <button type="submit" style="padding:8px 20px;background:#337ab7;color:#fff;border:none;border-radius:6px;cursor:pointer;">Publier</button>
-                </div>
-            </form>
+                    <textarea name="description" class="fa-composer-textarea" rows="4"
+                              placeholder="Quoi de neuf, <%= nomConnecte %> ?"></textarea>
+                    <div id="composer-img-preview" style="display:none;" class="fa-img-preview-wrap">
+                        <img id="composer-img-previewImg" src="" class="fa-img-preview" alt="apercu">
+                        <button type="button" class="fa-img-remove-btn" onclick="removeComposerImg()"><i class="bi bi-x-lg"></i></button>
+                    </div>
+                    <!-- Zone identification -->
+                    <div class="fa-composer-tags-area">
+                        <a href="javascript:void(0)" onclick="togglePubTag()" class="fa-tag-toggle">
+                            <i class="bi bi-tag-fill"></i> Identifier des personnes
+                        </a>
+                        <div id="pub-tag-zone" style="display:none;margin-top:8px;">
+                            <input type="text" id="pub-tag-search" placeholder="Rechercher un utilisateur..."
+                                   oninput="rechercherPourPubTag()" autocomplete="off" class="fa-input">
+                            <div id="pub-tag-suggestions" class="fa-suggestions-list"></div>
+                            <div id="pub-tag-selected" class="fa-chips-row"></div>
+                        </div>
+                        <input type="hidden" name="identifications" id="pub-identifications" value="">
+                    </div>
+                    <div class="fa-composer-footer">
+                        <label class="fa-attach-btn">
+                            <i class="bi bi-image"></i>&nbsp;Photo/Vid&eacute;o
+                            <input type="file" id="composer-img-input" name="image" accept="image/*" style="display:none;"
+                                   onchange="previewComposerImg(this)">
+                        </label>
+                        <div class="fa-composer-submit-group">
+                            <button type="button" class="fa-btn-cancel" onclick="closeComposer()">Annuler</button>
+                            <button type="submit" class="fa-btn-publish">Publier</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
 
-        <!-- ==================== LISTE DES PUBLICATIONS (100% APJ) ==================== -->
+        <!-- ===== PUBLICATIONS ===== -->
         <%
             Connection conn = null;
             try {
@@ -118,8 +171,9 @@
 
                 if (pubs.length == 0) {
         %>
-            <div style="text-align:center;padding:40px;color:#999;">
-                <p>Aucune publication pour le moment. Soyez le premier &agrave; publier !</p>
+            <div class="fa-empty-feed">
+                <i class="bi bi-newspaper"></i>
+                <p>Aucune publication pour le moment.<br>Soyez le premier &agrave; publier&nbsp;!</p>
             </div>
         <%
                 }
@@ -130,19 +184,21 @@
                     String auteur = (String) userNames.get(new Integer(pub.getIdutilisateur()));
                     if (auteur == null) auteur = "Utilisateur";
 
-                    // --- APJ: Medias de cette publication ---
+                    // Initiales auteur
+                    String[] _partsA = auteur.trim().split("\\s+");
+                    String initA = String.valueOf(Character.toUpperCase(_partsA[0].charAt(0)));
+                    if (_partsA.length > 1) initA += Character.toUpperCase(_partsA[_partsA.length-1].charAt(0));
+
+                    // --- APJ: Medias ---
                     Media[] medias = (Media[]) CGenUtil.rechercher(
-                        new Media(), null, null, conn,
-                        " and idpublication = '" + idpub + "'");
+                        new Media(), null, null, conn, " and idpublication = '" + idpub + "'");
                     if (medias == null) medias = new Media[0];
 
-                    // --- APJ: Reactions sur cette publication ---
+                    // --- APJ: Reactions ---
                     Publicationreaction[] reactions = (Publicationreaction[]) CGenUtil.rechercher(
-                        new Publicationreaction(), null, null, conn,
-                        " and idpublication = '" + idpub + "'");
+                        new Publicationreaction(), null, null, conn, " and idpublication = '" + idpub + "'");
                     if (reactions == null) reactions = new Publicationreaction[0];
 
-                    // Compter par type + trouver ma reaction
                     Map reactCounts = new HashMap();
                     int totalReactions = 0;
                     String myReaction = "";
@@ -151,32 +207,26 @@
                         Integer cnt = (Integer) reactCounts.get(type);
                         reactCounts.put(type, cnt == null ? new Integer(1) : new Integer(cnt.intValue() + 1));
                         totalReactions++;
-                        if (reactions[r].getIdutilisateur() == refuserConnecte) {
-                            myReaction = type;
-                        }
+                        if (reactions[r].getIdutilisateur() == refuserConnecte) myReaction = type;
                     }
 
-                    // --- APJ: Commentaires de cette publication ---
+                    // --- APJ: Commentaires ---
                     Publicationcommentaire[] comments = (Publicationcommentaire[]) CGenUtil.rechercher(
                         new Publicationcommentaire(), null, null, conn,
                         " and idpublication = '" + idpub + "' and etat = 1");
                     if (comments == null) comments = new Publicationcommentaire[0];
                     int nbComm = comments.length;
 
-                    // --- APJ: Personnes identifiees dans cette publication ---
+                    // --- APJ: Personnes identifiees ---
                     Identification[] identTags = (Identification[]) CGenUtil.rechercher(
-                        new Identification(), null, null, conn,
-                        " and idpublication = '" + idpub + "'");
+                        new Identification(), null, null, conn, " and idpublication = '" + idpub + "'");
                     if (identTags == null) identTags = new Identification[0];
                     String taggedNames = "";
                     if (identTags.length > 0) {
                         StringBuffer sbTags = new StringBuffer();
                         for (int tg = 0; tg < identTags.length; tg++) {
                             String tName = (String) userNames.get(new Integer(identTags[tg].getIdutilisateur()));
-                            if (tName != null) {
-                                if (sbTags.length() > 0) sbTags.append(", ");
-                                sbTags.append(tName);
-                            }
+                            if (tName != null) { if (sbTags.length() > 0) sbTags.append(", "); sbTags.append(tName); }
                         }
                         if (sbTags.length() > 0) taggedNames = sbTags.toString();
                     }
@@ -188,145 +238,370 @@
                         descSafe = desc.replace("&", "&amp;").replace("<", "&lt;")
                                        .replace(">", "&gt;").replace("\n", "<br>");
                     }
+
+                    // Libelle type publication
+                    String typePubLib = pub.getIdtypepublication() != null ? pub.getIdtypepublication() : "";
+                    for (int t = 0; t < typesPub.length; t++) {
+                        if (typesPub[t].getIdtypepublication().equals(typePubLib)) { typePubLib = typesPub[t].getLibelle(); break; }
+                    }
+
+                    // Libelle de ma reaction active
+                    String defaultReactId = reactTypes.length > 0 ? reactTypes[0].getIdreactiontype() : "";
+                    String myReactLib = "";
+                    for (int rt = 0; rt < reactTypes.length; rt++) {
+                        if (reactTypes[rt].getIdreactiontype().equals(myReaction)) { myReactLib = reactTypes[rt].getLibelle(); break; }
+                    }
         %>
-        <!-- ====== PUBLICATION ====== -->
-        <div id="pub-<%= idpub %>" style="border:1px solid #ddd;padding:15px;margin-bottom:15px;background:#fff;">
-            <!-- En-tete -->
-            <div style="margin-bottom:10px;">
-                <strong><%= auteur %></strong>
-                <% if (!taggedNames.isEmpty()) { %>
-                    <span style="color:#555;font-size:13px;"> &mdash; avec
-                        <strong style="color:#1a73e8;"><%= taggedNames %></strong>
-                    </span>
-                <% } %>
-                &nbsp;&mdash;&nbsp;
-                <small><%= pub.getDaty() %> &agrave; <%= pub.getHeure() != null ? pub.getHeure() : "" %></small>
+        <!-- ====== CARD PUBLICATION ====== -->
+        <div id="pub-<%= idpub %>" class="fa-post-card">
+
+            <!-- EN-TETE -->
+            <div class="fa-post-header">
+                <div class="fa-avatar fa-avatar--md"><%= initA %></div>
+                <div class="fa-post-meta">
+                    <div class="fa-post-author">
+                        <%= auteur %>
+                        <% if (!taggedNames.isEmpty()) { %>
+                        <span class="fa-post-with">avec <strong><%= taggedNames %></strong></span>
+                        <% } %>
+                    </div>
+                    <div class="fa-post-date">
+                        <%= pub.getDaty() %>&nbsp;&agrave;&nbsp;<%= pub.getHeure() != null ? pub.getHeure() : "" %>
+                        <span class="fa-type-badge"><%= typePubLib %></span>
+                    </div>
+                </div>
             </div>
 
-            <!-- Contenu -->
-            <div style="margin-bottom:10px;">
-                <p><%= descSafe %></p>
+            <!-- CORPS -->
+            <div class="fa-post-body">
+                <% if (descSafe != null && !descSafe.isEmpty()) { %>
+                <p class="fa-post-text"><%= descSafe %></p>
+                <% } %>
                 <% for (int m = 0; m < medias.length; m++) {
                     String mUrl = medias[m].getMediaurl();
                     if (mUrl != null && !mUrl.startsWith("http")) {
                         mUrl = ctx + "/UploadDownloadFileServlet?fileName=" + java.net.URLEncoder.encode(mUrl, "UTF-8");
                     }
                 %>
-                    <div style="margin-top:8px;">
-                        <img src="<%= mUrl %>" style="max-width:100%;max-height:400px;border:1px solid #eee;" alt="media">
-                    </div>
+                <div class="fa-post-media">
+                    <img src="<%= mUrl %>" class="fa-post-img" alt="media" onclick="openMediaZoom(this.src)">
+                </div>
                 <% } %>
             </div>
 
-            <!-- Resume reactions -->
-            <div style="color:#666;font-size:12px;margin-bottom:5px;">
+            <!-- COMPTEURS -->
+            <div class="fa-post-counters">
                 <% if (totalReactions > 0) { %>
-                    <%= totalReactions %> r&eacute;action(s)
-                <% } %>
+                <span class="fa-counter"><i class="bi bi-hand-thumbs-up-fill" style="color:var(--itu-blue,#008BFF);"></i>&nbsp;<%= totalReactions %></span>
+                <% } else { %><span></span><% } %>
+                <span id="nb-comm-<%= idpub %>" class="fa-counter fa-counter--link"
+                      onclick="toggleCommentaires('<%= idpub %>')">
+                    <%= nbComm > 0 ? nbComm + " commentaire" + (nbComm > 1 ? "s" : "") : "" %>
+                </span>
             </div>
 
-            <hr style="margin:5px 0;">
+            <div class="fa-post-divider"></div>
 
-            <!-- Boutons reactions -->
-            <div id="reactions-<%= idpub %>" style="margin-bottom:8px;">
-                <% for (int rt = 0; rt < reactTypes.length; rt++) {
-                    String rtId = reactTypes[rt].getIdreactiontype();
-                    String rtLib = reactTypes[rt].getLibelle();
-                    Integer cntObj = (Integer) reactCounts.get(rtId);
-                    int count = cntObj != null ? cntObj.intValue() : 0;
-                    boolean isMyReaction = rtId.equals(myReaction);
-                    String btnStyle = isMyReaction
-                        ? "font-weight:bold;background:#d0e8ff;border:1px solid #80b3e0;padding:3px 8px;margin-right:3px;cursor:pointer;"
-                        : "padding:3px 8px;margin-right:3px;cursor:pointer;border:1px solid #ccc;background:#f5f5f5;";
-                %>
-                <button onclick="toggleReaction('<%= idpub %>', '<%= rtId %>')"
-                        style="<%= btnStyle %>">
-                    <%= rtLib %><% if (count > 0) { %> (<%= count %>)<% } %>
+            <!-- BARRE D'ACTIONS -->
+            <div class="fa-post-actions">
+
+                <!-- Reaction + barre clic -->
+                <div class="fa-reaction-wrap" id="reaction-wrap-<%= idpub %>">
+                    <button class="fa-action-btn <%= !myReaction.isEmpty() ? "fa-action-btn--reacted" : "" %>"
+                            id="react-btn-<%= idpub %>"
+                            onclick="toggleReactionBar('<%= idpub %>', event)">
+                        <i class="bi bi-hand-thumbs-up<%= !myReaction.isEmpty() ? "-fill" : "" %>"></i>
+                        <span><%= !myReaction.isEmpty() ? myReactLib : "J&apos;aime" %></span>
+                    </button>
+                    <div class="fa-reaction-bar" id="reaction-bar-<%= idpub %>">
+                        <% for (int rt = 0; rt < reactTypes.length; rt++) {
+                            String rtId = reactTypes[rt].getIdreactiontype();
+                            String rtLib = reactTypes[rt].getLibelle();
+                            boolean isMyR = rtId.equals(myReaction);
+                            String rtLibLow = rtLib.toLowerCase();
+                            String rtEmoji = "\uD83D\uDC4D";
+                            if (rtLibLow.contains("adore") || rtLibLow.contains("love")) rtEmoji = "\u2764\uFE0F";
+                            else if (rtLibLow.contains("haha") || rtLibLow.contains("humour")) rtEmoji = "\uD83D\uDE02";
+                            else if (rtLibLow.contains("surprise") || rtLibLow.contains("wow")) rtEmoji = "\uD83D\uDE2E";
+                            else if (rtLibLow.contains("triste") || rtLibLow.contains("sad")) rtEmoji = "\uD83D\uDE22";
+                            else if (rtLibLow.contains("grrr") || rtLibLow.contains("ang")) rtEmoji = "\uD83D\uDE20";
+                        %>
+                        <button class="fa-reaction-item <%= isMyR ? "fa-reaction-item--active" : "" %>"
+                                onclick="selectReaction('<%= idpub %>', '<%= rtId %>', event)" title="<%= rtLib %>">
+                            <span class="fa-reaction-emoji"><%= rtEmoji %></span>
+                            <span class="fa-reaction-label"><%= rtLib %></span>
+                        </button>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Commenter -->
+                <button class="fa-action-btn" onclick="toggleCommentaires('<%= idpub %>')">
+                    <i class="bi bi-chat-left-text"></i>&nbsp;<span>Commenter</span>
                 </button>
-                <% } %>
+
+                <!-- Identifier -->
+                <button class="fa-action-btn" onclick="toggleIdentifier('<%= idpub %>')">
+                    <i class="bi bi-tag"></i>&nbsp;<span>Identifier</span>
+                </button>
             </div>
 
-            <!-- Lien commentaires + Identifier -->
-            <div style="display:flex;gap:15px;align-items:center;">
-                <a href="javascript:void(0)" onclick="toggleCommentaires('<%= idpub %>')" style="text-decoration:none;color:#333;">
-                    &#128172; <span id="nb-comm-<%= idpub %>"><%= nbComm %></span> commentaire(s)
-                </a>
-                <a href="javascript:void(0)" onclick="toggleIdentifier('<%= idpub %>')" style="text-decoration:none;color:#337ab7;font-size:13px;">
-                    <i class="bi bi-tag"></i> Identifier
-                </a>
-            </div>
-
-            <!-- Zone identification (cachee) -->
-            <div id="identifier-<%= idpub %>" style="display:none;margin-top:8px;padding:10px;background:#f9f9ff;border:1px solid #e0e0ff;border-radius:6px;">
-                <div style="margin-bottom:5px;font-size:13px;color:#555;">Identifier des personnes :</div>
+            <!-- ZONE IDENTIFIER -->
+            <div id="identifier-<%= idpub %>" style="display:none;" class="fa-tag-zone">
+                <p class="fa-tag-zone-title">Identifier des personnes :</p>
                 <input type="text" id="tag-search-<%= idpub %>" placeholder="Rechercher un utilisateur..."
-                       oninput="rechercherPourTag('<%= idpub %>')" 
-                       style="width:70%;padding:5px;border:1px solid #ccc;border-radius:4px;">
-                <div id="tag-suggestions-<%= idpub %>" style="max-height:150px;overflow-y:auto;"></div>
-                <div id="tag-selected-<%= idpub %>" style="margin-top:5px;display:flex;flex-wrap:wrap;gap:5px;"></div>
-                <button onclick="envoyerIdentifications('<%= idpub %>')" 
-                        style="margin-top:8px;padding:5px 15px;background:#337ab7;color:#fff;border:none;border-radius:4px;cursor:pointer;">Valider</button>
+                       oninput="rechercherPourTag('<%= idpub %>')" class="fa-input">
+                <div id="tag-suggestions-<%= idpub %>" class="fa-suggestions-list"></div>
+                <div id="tag-selected-<%= idpub %>" class="fa-chips-row"></div>
+                <button onclick="envoyerIdentifications('<%= idpub %>')" class="fa-btn-primary fa-btn-sm" style="margin-top:8px;">Valider</button>
             </div>
 
-            <!-- Zone commentaires (cachee) -->
-            <div id="commentaires-<%= idpub %>" style="display:none;margin-top:10px;padding-left:15px;border-left:2px solid #eee;">
-                <div id="liste-comm-<%= idpub %>"><em>Chargement...</em></div>
-                <div style="margin-top:8px;padding-top:8px;border-top:1px solid #eee;position:relative;">
-                    <input type="text" id="comm-text-<%= idpub %>" 
-                           placeholder="Ecrire un commentaire... (tapez @ pour mentionner)" 
-                           style="width:75%;padding:5px;"
-                           oninput="onCommentInput(this, '<%= idpub %>')"
-                           onkeydown="onCommentKeydown(event, '<%= idpub %>')">
-                    <input type="hidden" id="comm-mentions-<%= idpub %>" value="">
-                    <div id="mention-suggestions-<%= idpub %>" class="mention-dropdown" style="display:none;"></div>
-                    <button onclick="ajouterCommentaire('<%= idpub %>')" style="padding:5px 12px;">Envoyer</button>
+            <!-- ZONE COMMENTAIRES -->
+            <div id="commentaires-<%= idpub %>" style="display:none;" class="fa-comments-zone">
+                <div id="liste-comm-<%= idpub %>"></div>
+                <div class="fa-comment-input-wrap">
+                    <div class="fa-avatar fa-avatar--sm"><%= initialConnecte %></div>
+                    <div class="fa-comment-input-box">
+                        <input type="text" id="comm-text-<%= idpub %>"
+                               placeholder="&Eacute;crire un commentaire... (@ pour mentionner)"
+                               class="fa-comment-input"
+                               oninput="onCommentInput(this, '<%= idpub %>')"
+                               onkeydown="onCommentKeydown(event, '<%= idpub %>')">
+                        <input type="hidden" id="comm-mentions-<%= idpub %>" value="">
+                        <div id="mention-suggestions-<%= idpub %>" class="mention-dropdown" style="display:none;"></div>
+                        <button class="fa-comment-send-btn" onclick="ajouterCommentaire('<%= idpub %>')">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+
+        </div><!-- /fa-post-card -->
         <%
                 } // fin for publications
             } catch (Exception e) {
                 e.printStackTrace();
         %>
-            <div style="background:#f2dede;padding:10px;border:1px solid #ebccd1;">
-                Erreur lors du chargement: <%= e.getMessage() %>
-            </div>
+        <div class="fa-error-box">
+            <i class="bi bi-exclamation-triangle-fill"></i>&nbsp;Erreur lors du chargement&nbsp;: <%= e.getMessage() %>
+        </div>
         <%
             } finally {
                 if (conn != null) try { conn.close(); } catch (Exception ex) {}
             }
         %>
-    </section>
-</div>
 
-<!-- ==================== STYLES MENTION / IDENTIFICATION ==================== -->
+    </main><!-- /fa-feed-center -->
+
+    <!-- ===== COLONNE DROITE (a implementer) ===== -->
+    <aside class="fa-sidebar-right">
+        <!-- widgets futurs -->
+    </aside>
+
+</div><!-- /fa-layout -->
+
+<!-- ==================== STYLES FIL D'ACTUALITE ==================== -->
 <style>
+/* ---- Variables locales ---- */
+:root {
+    --fa-bg: #f0f2f5;
+    --fa-card-bg: #ffffff;
+    --fa-border: #e4e6eb;
+    --fa-text: #050505;
+    --fa-text-secondary: #65676b;
+}
+/* ---- Layout 3 colonnes ---- */
+.fa-layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0,1fr) 220px;
+    gap: 16px;
+    padding: 0;
+    align-items: start;
+}
+@media(max-width:1000px) {
+    .fa-layout { grid-template-columns: 200px 1fr; }
+    .fa-sidebar-right { display: none; }
+}
+@media(max-width:768px) {
+    .fa-layout { grid-template-columns: 1fr; }
+    .fa-sidebar-left { display: none; }
+}
+.fa-sidebar-left, .fa-sidebar-right { position: sticky; top: 80px; }
+.fa-feed-center { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+/* ---- Avatar ---- */
+.fa-avatar {
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 50%; font-weight: 700; color: #fff; flex-shrink: 0;
+    user-select: none;
+    background: linear-gradient(135deg, var(--itu-dark,#362F4F) 0%, var(--itu-blue,#008BFF) 100%);
+}
+.fa-avatar--xs { width: 28px; height: 28px; font-size: 10px; }
+.fa-avatar--sm { width: 36px; height: 36px; font-size: 13px; }
+.fa-avatar--md { width: 44px; height: 44px; font-size: 16px; }
+.fa-avatar--lg { width: 72px; height: 72px; font-size: 26px; }
+/* ---- Carte profil gauche ---- */
+.fa-profile-card { background: var(--fa-card-bg); border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.12); overflow: hidden; }
+.fa-profile-cover { height: 72px; background: linear-gradient(135deg, var(--itu-dark,#362F4F) 0%, var(--itu-violet,#5B23FF) 100%); }
+.fa-profile-body { padding: 0 16px 16px; }
+.fa-profile-avatar-wrap { margin-top: -36px; margin-bottom: 8px; }
+.fa-profile-name { font-weight: 700; font-size: 16px; color: var(--fa-text); margin-bottom: 12px; }
+.fa-divider { border: none; border-top: 1px solid var(--fa-border); margin: 10px 0; }
+.fa-profile-nav { display: flex; flex-direction: column; gap: 2px; }
+.fa-nav-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    color: var(--fa-text); text-decoration: none; font-size: 15px; transition: background .15s;
+}
+.fa-nav-link:hover { background: #f0f2f5; color: var(--itu-blue,#008BFF); }
+.fa-nav-link--active { background: #e7f3ff; color: var(--itu-blue,#008BFF); font-weight: 600; }
+/* ---- Composer ---- */
+.fa-composer-card { background: var(--fa-card-bg); border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.12); padding: 12px 16px; }
+.fa-composer-trigger { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.fa-composer-placeholder {
+    flex: 1; background: #f0f2f5; border-radius: 20px;
+    padding: 10px 16px; color: var(--fa-text-secondary); font-size: 15px; transition: background .15s;
+}
+.fa-composer-placeholder:hover { background: #e4e6eb; }
+.fa-composer-quick-actions { display: flex; border-top: 1px solid var(--fa-border); margin-top: 10px; padding-top: 8px; }
+.fa-quick-action-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+    background: none; border: none; padding: 8px; border-radius: 8px;
+    font-size: 14px; font-weight: 600; color: var(--fa-text-secondary); cursor: pointer; transition: background .15s;
+}
+.fa-quick-action-btn:hover { background: #f0f2f5; }
+.fa-composer-full { margin-top: 10px; border-top: 1px solid var(--fa-border); padding-top: 12px; }
+.fa-composer-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.fa-type-select { margin-left: 6px; padding: 3px 8px; border: 1px solid var(--fa-border); border-radius: 6px; font-size: 13px; background: #f0f2f5; }
+.fa-composer-textarea {
+    width: 100%; border: none; outline: none; resize: none;
+    font-size: 16px; color: var(--fa-text); background: transparent;
+    padding: 4px 0; font-family: inherit; min-height: 80px;
+}
+.fa-composer-textarea::placeholder { color: var(--fa-text-secondary); }
+.fa-img-preview-wrap { position: relative; margin: 8px 0; display: inline-block; }
+.fa-img-preview { max-width: 100%; max-height: 300px; border-radius: 8px; display: block; }
+.fa-img-remove-btn {
+    position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,.6);
+    border: none; color: #fff; border-radius: 50%; width: 28px; height: 28px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.fa-composer-tags-area { margin-top: 8px; }
+.fa-tag-toggle { font-size: 13px; color: var(--itu-blue,#008BFF); text-decoration: none; }
+.fa-tag-toggle:hover { text-decoration: underline; }
+.fa-composer-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--fa-border); flex-wrap: wrap; gap: 8px;
+}
+.fa-attach-btn {
+    display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 8px;
+    font-size: 14px; font-weight: 600; color: var(--fa-text-secondary); cursor: pointer; transition: background .15s;
+}
+.fa-attach-btn:hover { background: #f0f2f5; }
+.fa-composer-submit-group { display: flex; gap: 8px; }
+.fa-btn-cancel { padding: 8px 16px; background: #e4e6eb; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .15s; }
+.fa-btn-cancel:hover { background: #d8dadf; }
+.fa-btn-publish { padding: 8px 20px; background: var(--itu-blue,#008BFF); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .15s; }
+.fa-btn-publish:hover { background: #0069cc; }
+.fa-btn-primary { background: var(--itu-blue,#008BFF); color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.fa-btn-sm { padding: 6px 14px !important; font-size: 13px !important; }
+/* ---- Post card ---- */
+.fa-post-card { background: var(--fa-card-bg); border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.12); overflow: hidden; }
+.fa-post-header { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px 8px; }
+.fa-post-meta { flex: 1; min-width: 0; }
+.fa-post-author { font-weight: 700; font-size: 15px; color: var(--fa-text); }
+.fa-post-with { font-weight: 400; font-size: 14px; color: var(--fa-text-secondary); }
+.fa-post-date { font-size: 12px; color: var(--fa-text-secondary); margin-top: 2px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.fa-type-badge { display: inline-block; background: #f0f2f5; color: var(--itu-blue,#008BFF); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+.fa-post-body { padding: 4px 16px 12px; }
+.fa-post-text { font-size: 15px; color: var(--fa-text); line-height: 1.5; margin: 0 0 8px; }
+.fa-post-media { margin: 0; }
+.fa-post-img { width: 100%; max-height: 500px; object-fit: cover; display: block; cursor: zoom-in; }
+.fa-post-counters { display: flex; align-items: center; justify-content: space-between; padding: 6px 16px; font-size: 13px; color: var(--fa-text-secondary); min-height: 28px; }
+.fa-counter { display: flex; align-items: center; gap: 4px; }
+.fa-counter--link { cursor: pointer; }
+.fa-counter--link:hover { text-decoration: underline; }
+.fa-post-divider { height: 1px; background: var(--fa-border); margin: 0 16px; }
+/* ---- Barre d'actions ---- */
+.fa-post-actions { display: flex; padding: 4px 8px; gap: 2px; }
+.fa-action-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 8px 4px; background: none; border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 600; color: var(--fa-text-secondary); cursor: pointer; transition: background .15s;
+}
+.fa-action-btn:hover { background: #f0f2f5; color: var(--fa-text); }
+.fa-action-btn--reacted { color: var(--itu-blue,#008BFF); }
+.fa-action-btn--reacted:hover { color: var(--itu-blue,#008BFF); background: #e7f3ff; }
+/* ---- Hover bar réactions ---- */
+.fa-reaction-wrap { flex: 1; position: relative; display: flex; }
+.fa-reaction-bar {
+    position: absolute; bottom: calc(100% + 8px); left: 0;
+    display: flex; gap: 4px;
+    background: #fff; border-radius: 28px; box-shadow: 0 4px 20px rgba(0,0,0,.2);
+    padding: 6px 10px; z-index: 100; white-space: nowrap;
+    opacity: 0; pointer-events: none;
+    transform: scale(.7) translateY(8px); transform-origin: bottom left;
+    transition: opacity .18s, transform .18s;
+}
+.fa-reaction-bar--open { opacity: 1 !important; pointer-events: all !important; transform: scale(1) translateY(0) !important; }
+.fa-reaction-item { background: none; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 8px; transition: transform .15s; }
+.fa-reaction-item:hover { transform: scale(1.4) translateY(-6px); }
+.fa-reaction-item--active { filter: drop-shadow(0 0 4px var(--itu-blue,#008BFF)); }
+.fa-reaction-emoji { font-size: 26px; line-height: 1; }
+.fa-reaction-label { font-size: 11px; color: #1c1e21; margin-top: 3px; white-space: nowrap; }
+/* ---- Zone identification ---- */
+.fa-tag-zone { padding: 12px 16px; border-top: 1px solid var(--fa-border); background: #f8f9fb; }
+.fa-tag-zone-title { font-size: 13px; color: var(--fa-text-secondary); margin: 0 0 8px; }
+/* ---- Zone commentaires ---- */
+.fa-comments-zone { padding: 8px 16px 12px; border-top: 1px solid var(--fa-border); display: flex; flex-direction: column; gap: 8px; }
+.fa-comment-item { display: flex; flex-direction: column; }
+.fa-comment-inner { display: flex; gap: 8px; align-items: flex-start; }
+.fa-comment-content { flex: 1; min-width: 0; }
+.fa-comment-bubble { background: #f0f2f5; border-radius: 14px; padding: 8px 12px; display: inline-block; max-width: 100%; }
+.fa-comment-author { font-weight: 700; font-size: 13px; display: block; margin-bottom: 2px; }
+.fa-comment-text { font-size: 14px; color: var(--fa-text); }
+.fa-comment-actions { display: flex; align-items: center; gap: 8px; padding: 4px 4px 0; font-size: 12px; }
+.fa-comment-react-btn { background: none; border: none; font-size: 12px; font-weight: 600; color: var(--fa-text-secondary); cursor: pointer; padding: 0; }
+.fa-comment-react-btn:hover, .fa-comment-react-btn--active { color: var(--itu-blue,#008BFF); text-decoration: underline; }
+.fa-comment-reply-link { color: var(--fa-text-secondary); font-weight: 600; text-decoration: none; }
+.fa-comment-reply-link:hover { text-decoration: underline; color: var(--fa-text); }
+.fa-comment-input-wrap { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.fa-comment-input-box {
+    flex: 1; display: flex; align-items: center;
+    background: #f0f2f5; border-radius: 20px; padding: 0 8px 0 14px; position: relative;
+}
+.fa-comment-input { flex: 1; background: transparent; border: none; outline: none; padding: 9px 4px; font-size: 14px; color: var(--fa-text); font-family: inherit; }
+.fa-comment-input::placeholder { color: var(--fa-text-secondary); }
+.fa-comment-send-btn { background: none; border: none; color: var(--itu-blue,#008BFF); font-size: 16px; cursor: pointer; padding: 4px 6px; border-radius: 50%; transition: background .15s; }
+.fa-comment-send-btn:hover { background: rgba(0,139,255,.1); }
+/* ---- Etats vides / erreurs ---- */
+.fa-empty-feed { text-align: center; padding: 48px 20px; color: var(--fa-text-secondary); font-size: 16px; }
+.fa-empty-feed i { font-size: 52px; display: block; margin-bottom: 16px; opacity: .4; }
+.fa-error-box { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 12px 16px; color: #856404; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+/* ---- Inputs / chips ---- */
+.fa-input { width: 100%; padding: 8px 12px; border: 1px solid var(--fa-border); border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; box-sizing: border-box; }
+.fa-input:focus { border-color: var(--itu-blue,#008BFF); }
+.fa-suggestions-list { max-height: 160px; overflow-y: auto; border: 1px solid var(--fa-border); border-top: none; border-radius: 0 0 8px 8px; background: #fff; }
+.fa-chips-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+/* ---- Overlay zoom media ---- */
+.fa-media-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.9); display: flex; align-items: center; justify-content: center; z-index: 9999; cursor: zoom-out; }
+.fa-media-overlay img { max-width: 92vw; max-height: 92vh; border-radius: 4px; object-fit: contain; }
+/* ---- Mention dropdown (conservé) ---- */
 .mention-dropdown {
     position: absolute; bottom: 45px; left: 0;
-    background: #fff; border: 1px solid #ddd; border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000;
+    background: #fff; border: 1px solid #ddd; border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.15); z-index: 1000;
     max-height: 200px; overflow-y: auto; width: 280px;
 }
-.mention-dropdown .mention-item {
-    padding: 8px 12px; cursor: pointer; font-size: 13px;
-    border-bottom: 1px solid #f0f0f0;
-}
-.mention-dropdown .mention-item:hover, .mention-dropdown .mention-item.active {
-    background: #e8f0fe; color: #1a73e8;
-}
-.tag-chip {
-    display: inline-flex; align-items: center; gap: 4px;
-    background: #e8f0fe; color: #1a73e8; padding: 3px 8px;
-    border-radius: 12px; font-size: 12px;
-}
-.tag-chip .remove-tag {
-    cursor: pointer; font-weight: bold; color: #999; margin-left: 4px;
-}
+.mention-dropdown .mention-item { padding: 8px 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #f0f2f5; }
+.mention-dropdown .mention-item:hover, .mention-dropdown .mention-item.active { background: #e7f3ff; color: var(--itu-blue,#008BFF); }
+/* ---- Tag chips ---- */
+.tag-chip { display: inline-flex; align-items: center; gap: 4px; background: #e7f3ff; color: var(--itu-blue,#008BFF); padding: 3px 10px; border-radius: 14px; font-size: 12px; }
+.tag-chip .remove-tag { cursor: pointer; font-weight: bold; color: #888; margin-left: 4px; }
 .tag-chip .remove-tag:hover { color: #e00; }
-.mention-badge {
-    color: #1a73e8; font-weight: bold; background: #e8f0fe;
-    padding: 1px 4px; border-radius: 3px; font-size: 12px;
-}
+/* ---- Mention badge ---- */
+.mention-badge { color: var(--itu-blue,#008BFF); font-weight: 600; background: #e7f3ff; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+/* ---- Highlight scroll (notifications) ---- */
+.fa-highlight { background: #fffde7 !important; border-left: 4px solid #f9a825 !important; transition: background 2s !important; }
 </style>
 
 <!-- ==================== JAVASCRIPT ==================== -->
@@ -560,6 +835,31 @@ function selectMention(idpub, user) {
 
     hideMentionDropdown(idpub);
 }
+
+// ========== REACTION BAR (clic) ==========
+function closeAllReactionBars() {
+    document.querySelectorAll('.fa-reaction-bar--open').forEach(function(bar) {
+        bar.classList.remove('fa-reaction-bar--open');
+    });
+}
+function toggleReactionBar(idpub, event) {
+    event.stopPropagation();
+    var bar = document.getElementById('reaction-bar-' + idpub);
+    var isOpen = bar.classList.contains('fa-reaction-bar--open');
+    closeAllReactionBars();
+    if (!isOpen) {
+        bar.classList.add('fa-reaction-bar--open');
+    }
+}
+function selectReaction(idpub, idreactiontype, event) {
+    event.stopPropagation();
+    closeAllReactionBars();
+    toggleReaction(idpub, idreactiontype);
+}
+// Fermer les bars si clic sur espace vide
+document.addEventListener('click', function() {
+    closeAllReactionBars();
+});
 
 // ========== REACTIONS PUBLICATION ==========
 function toggleReaction(idpub, idreactiontype) {
@@ -1022,4 +1322,47 @@ $(document).ready(function() {
         }, 300);
     }
 });
+
+// ========== COMPOSER UI ==========
+function openComposer() {
+    document.getElementById('composer-trigger').style.display = 'none';
+    document.getElementById('composer-quick-actions').style.display = 'none';
+    document.getElementById('composer-full').style.display = 'block';
+    var ta = document.querySelector('#composer-full textarea[name="description"]');
+    if (ta) setTimeout(function(){ ta.focus(); }, 50);
+}
+function closeComposer() {
+    document.getElementById('composer-trigger').style.display = 'flex';
+    document.getElementById('composer-quick-actions').style.display = 'flex';
+    document.getElementById('composer-full').style.display = 'none';
+    removeComposerImg();
+    var ta = document.querySelector('#composer-full textarea[name="description"]');
+    if (ta) ta.value = '';
+}
+function previewComposerImg(input) {
+    if (!input.files || !input.files[0]) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('composer-img-previewImg').src = e.target.result;
+        document.getElementById('composer-img-preview').style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+}
+function removeComposerImg() {
+    var inp = document.getElementById('composer-img-input');
+    if (inp) inp.value = '';
+    document.getElementById('composer-img-preview').style.display = 'none';
+    document.getElementById('composer-img-previewImg').src = '';
+}
+// ========== MEDIA ZOOM ==========
+function openMediaZoom(src) {
+    var overlay = document.createElement('div');
+    overlay.className = 'fa-media-overlay';
+    var img = document.createElement('img');
+    img.src = src;
+    overlay.appendChild(img);
+    overlay.addEventListener('click', function(){ document.body.removeChild(overlay); });
+    document.addEventListener('keydown', function esc(e){ if(e.key==='Escape'){ document.body.removeChild(overlay); document.removeEventListener('keydown',esc); } });
+    document.body.appendChild(overlay);
+}
 </script>
