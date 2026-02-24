@@ -38,8 +38,8 @@ CREATE OR REPLACE VIEW profillib AS
     COALESCE(( SELECT
                 CASE
                     WHEN (ha.estactif = 0) THEN 'Banni'::text
-                    WHEN (ha.estactif = 1) THEN 'Créé'::text
-                    WHEN (ha.estactif = 11) THEN 'Validé'::text
+                    WHEN (ha.estactif = 1) THEN 'Cree'::text
+                    WHEN (ha.estactif = 11) THEN 'Valide'::text
                     WHEN (ha.estactif = 100) THEN 'Actif'::text
                     ELSE 'Inconnu'::text
                 END AS "case"
@@ -48,7 +48,7 @@ CREATE OR REPLACE VIEW profillib AS
           ORDER BY ha.daty DESC, ha.id DESC
          LIMIT 1),
         CASE
-            WHEN (u.estactif = 1) THEN 'Validé'::text
+            WHEN (u.estactif = 1) THEN 'Valide'::text
             ELSE 'Banni'::text
         END) AS etatlib,
         pr.idgenre,
