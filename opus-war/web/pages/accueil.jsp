@@ -14,6 +14,8 @@
 <%@ page import="alumni.ProfilLib" %>
 <%@ page import="alumni.Evenement" %>
 <%@ page import="alumni.Identification" %>
+<%@ page import="alumni.Specialite" %>
+<%@ page import="alumni.Promotion" %>
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.sql.Statement" %>
 <%@ page import="java.sql.ResultSet" %>
@@ -44,6 +46,12 @@
     Typepublication[] typesPub = (Typepublication[]) CGenUtil.rechercher(
             new Typepublication(), null, null, " order by idtypepublication");
     if (typesPub == null) typesPub = new Typepublication[0];
+
+    // --- Charger specialites et promotions (hashtag / filtre / visibilite) ---
+    Specialite[] allSpecialites = (Specialite[]) CGenUtil.rechercher(new Specialite(), null, null, " order by libelle");
+    if (allSpecialites == null) allSpecialites = new Specialite[0];
+    Promotion[] allPromotions = (Promotion[]) CGenUtil.rechercher(new Promotion(), null, null, " order by annee desc");
+    if (allPromotions == null) allPromotions = new Promotion[0];
 
     // Charger photo profil/couverture du connecte + 3 evenements a venir
     String _connPhotoUrl = "";
@@ -105,6 +113,33 @@
         <script>document.addEventListener('DOMContentLoaded',function(){Swal.fire({icon:'error',title:'Erreur',text:'<%= msgErreur.replace("'","\\'").replace("<","&lt;") %>',confirmButtonColor:'var(--itu-blue)'});});</script>
         <% } %>
 
+        <!-- ===== FILTRE DU FIL ===== -->
+        <div class="fa-filter-bar" id="feed-filter-bar">
+            <select id="filter-spec" class="fa-filter-select">
+                <option value="">Toutes les sp&eacute;cialit&eacute;s</option>
+                <% for (int _fi = 0; _fi < allSpecialites.length; _fi++) { %>
+                <option value="<%= allSpecialites[_fi].getIdspecialite() %>"><%= allSpecialites[_fi].getLibelle() %></option>
+                <% } %>
+            </select>
+            <select id="filter-promo" class="fa-filter-select">
+                <option value="">Toutes les promotions</option>
+                <% for (int _fi = 0; _fi < allPromotions.length; _fi++) { %>
+                <option value="<%= allPromotions[_fi].getIdpromotion() %>"><%= allPromotions[_fi].getLibelle() %></option>
+                <% } %>
+            </select>
+            <select id="filter-typepub" class="fa-filter-select">
+                <option value="">Tous les types</option>
+                <% for (int _fi = 0; _fi < typesPub.length; _fi++) { %>
+                <option value="<%= typesPub[_fi].getIdtypepublication() %>"><%= typesPub[_fi].getLibelle() %></option>
+                <% } %>
+            </select>
+            <label class="fa-filter-lier-label" title="Les deux crit&egrave;res doivent correspondre">
+                <input type="checkbox" id="filter-lier">&nbsp;Lier
+            </label>
+            <button type="button" class="fa-filter-apply" onclick="appliquerFiltre()"><i class="bi bi-sliders"></i>&nbsp;Filtrer</button>
+            <button type="button" class="fa-filter-reset" onclick="reinitialiserFiltre()" id="filter-reset-btn" style="display:none"><i class="bi bi-x-lg"></i></button>
+        </div>
+
         <!-- ===== COMPOSER ===== -->
         <div class="fa-composer-card" id="composer-card">
             <div class="fa-composer-trigger" id="composer-trigger" onclick="openComposer()">
@@ -154,6 +189,46 @@
                             <div id="pub-tag-selected" class="fa-chips-row"></div>
                         </div>
                         <input type="hidden" name="identifications" id="pub-identifications" value="">
+                    </div>
+                    <!-- Zone visibilite -->
+                    <div class="fa-vis-section" id="vis-section">
+                        <div class="fa-vis-header" onclick="toggleVisSection()">
+                            <i class="bi bi-globe2" id="vis-icon"></i>
+                            <span id="vis-summary">Visible par tous</span>
+                            <i class="bi bi-chevron-down" id="vis-chevron" style="margin-left:auto;font-size:12px;"></i>
+                        </div>
+                        <div class="fa-vis-body" id="vis-body" style="display:none;">
+                            <div class="fa-vis-group">
+                                <div class="fa-vis-label">Sp&eacute;cialit&eacute;(s)</div>
+                                <div class="fa-vis-chips" id="vis-spec-chips">
+                                    <button type="button" class="fa-vis-chip fa-vis-chip--active" data-id="ALL" onclick="toggleVisSpec(this)">Toutes</button>
+                                    <% for (int _vi = 0; _vi < allSpecialites.length; _vi++) { %>
+                                    <button type="button" class="fa-vis-chip" data-id="<%= allSpecialites[_vi].getIdspecialite() %>" onclick="toggleVisSpec(this)"><%= allSpecialites[_vi].getLibelle() %></button>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div class="fa-vis-group">
+                                <div class="fa-vis-label">Promotion</div>
+                                <div class="fa-vis-promo-row">
+                                    <select id="vis-promo-select" onchange="onVisPromoChange()" class="fa-input" style="max-width:220px;">
+                                        <option value="">Toutes les promotions</option>
+                                        <% for (int _vi = 0; _vi < allPromotions.length; _vi++) { %>
+                                        <option value="<%= allPromotions[_vi].getIdpromotion() %>" data-annee="<%= allPromotions[_vi].getAnnee() %>"><%= allPromotions[_vi].getLibelle() %> (<%= allPromotions[_vi].getAnnee() %>)</option>
+                                        <% } %>
+                                    </select>
+                                    <span id="vis-promo-note" style="display:none;font-size:12px;color:var(--itu-blue,#008BFF);"><i class="bi bi-info-circle"></i>&nbsp;et plus r&eacute;centes</span>
+                                </div>
+                            </div>
+                            <div class="fa-vis-group" id="vis-lier-group" style="display:none;">
+                                <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                                    <input type="checkbox" id="vis-lier-check" onchange="updateVisHidden()">
+                                    Lier les crit&egrave;res (les deux conditions doivent &ecirc;tre remplies)
+                                </label>
+                            </div>
+                            <input type="hidden" name="vis_spec" id="vis-spec-hidden" value="ALL">
+                            <input type="hidden" name="vis_promo_anneemin" id="vis-promo-anneemin-hidden" value="">
+                            <input type="hidden" name="vis_lier" id="vis-lier-hidden" value="OR">
+                        </div>
                     </div>
                     <div class="fa-composer-footer">
                         <label class="fa-attach-btn">
@@ -205,7 +280,17 @@
                     + "+COALESCE((SELECT COUNT(*) FROM publicationcommentaire pc WHERE pc.idpublication=p.idpublication AND pc.etat=1),0)*3"
                     + "-COALESCE((SELECT pv.nbvue FROM publicationvue pv WHERE pv.idpublication=p.idpublication AND pv.idutilisateur=" + refuserConnecte + "),0)*4"
                     + "+CASE WHEN p.daty::date=CURRENT_DATE THEN 15 WHEN p.daty::date>=CURRENT_DATE-7 THEN 8 WHEN p.daty::date>=CURRENT_DATE-30 THEN 3 ELSE 0 END";
-                String _initSql = "SELECT p.idpublication,(" + _sE + ") AS score FROM publication p WHERE p.etat=1 ORDER BY score DESC,p.idpublication DESC LIMIT 10";
+                // Filtre de visibilite : seules les publications accessibles au user connecte
+                String _visSpecSub = "(SELECT sp.idspecialite FROM specialiteprofil sp JOIN profil _pr ON sp.idprofil=_pr.idprofil WHERE _pr.idutilisateur=" + refuserConnecte + ")";
+                String _visPromoSub = "(SELECT _pt.annee FROM promotion _pt JOIN profil _pr ON _pt.idpromotion=_pr.idpromotion WHERE _pr.idutilisateur=" + refuserConnecte + ")";
+                String _visW = " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication)"
+                    + " OR (COALESCE(p.logique_visibilite,'OR')='OR' AND ("
+                    + "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE' AND _pv.idref IN " + _visSpecSub + ")"
+                    + " OR EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PROMOTION' AND _pv.anneemin<=" + _visPromoSub + ")))"
+                    + " OR (p.logique_visibilite='AND'"
+                    + " AND EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE' AND _pv.idref IN " + _visSpecSub + ")"
+                    + " AND EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PROMOTION' AND _pv.anneemin<=" + _visPromoSub + ")))";
+                String _initSql = "SELECT p.idpublication,(" + _sE + ") AS score FROM publication p WHERE p.etat=1" + _visW + " ORDER BY score DESC,p.idpublication DESC LIMIT 10";
                 List _pids = new ArrayList(); List _pscores = new ArrayList();
                 Statement _st = null; ResultSet _rs = null;
                 try {
@@ -407,6 +492,30 @@
     .fa-composer-full { margin-top: 10px; border-top: 1px solid var(--fa-border); padding-top: 12px; }
     .fa-composer-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
     .fa-type-select { margin-left: 6px; padding: 3px 8px; border: 1px solid var(--fa-border); border-radius: 6px; font-size: 13px; background: #f0f2f5; }
+    /* ---- Barre de filtre ---- */
+    .fa-filter-bar { display:flex; align-items:center; gap:8px; background:var(--fa-card-bg); border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.12); padding:10px 14px; flex-wrap:wrap; }
+    .fa-filter-select { padding:5px 8px; border:1px solid var(--fa-border); border-radius:8px; font-size:13px; background:#f0f2f5; color:var(--fa-text); cursor:pointer; }
+    .fa-filter-lier-label { font-size:13px; color:var(--fa-text-secondary); display:flex; align-items:center; gap:4px; cursor:pointer; white-space:nowrap; }
+    .fa-filter-apply { padding:6px 14px; background:var(--itu-blue,#008BFF); color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:5px; }
+    .fa-filter-apply:hover { background:#0069cc; }
+    .fa-filter-reset { padding:6px 10px; background:#e4e6eb; border:none; border-radius:8px; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; }
+    .fa-filter-reset:hover { background:#d8dadf; }
+    /* ---- Visibilite composer ---- */
+    .fa-vis-section { margin-top:8px; border:1px solid var(--fa-border); border-radius:8px; overflow:hidden; }
+    .fa-vis-header { display:flex; align-items:center; gap:7px; padding:8px 12px; cursor:pointer; background:#f8f9fb; font-size:13px; color:var(--fa-text-secondary); user-select:none; }
+    .fa-vis-header:hover { background:#f0f2f5; }
+    .fa-vis-body { padding:10px 12px; display:flex; flex-direction:column; gap:10px; background:#fff; }
+    .fa-vis-group { display:flex; flex-direction:column; gap:5px; }
+    .fa-vis-label { font-size:12px; font-weight:600; color:var(--fa-text-secondary); text-transform:uppercase; letter-spacing:.4px; }
+    .fa-vis-chips { display:flex; flex-wrap:wrap; gap:5px; }
+    .fa-vis-chip { padding:4px 10px; border:1px solid var(--fa-border); border-radius:12px; background:#f0f2f5; font-size:12px; cursor:pointer; color:var(--fa-text); transition:all .15s; }
+    .fa-vis-chip--active { background:var(--itu-blue,#008BFF); color:#fff; border-color:var(--itu-blue,#008BFF); }
+    .fa-vis-promo-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    /* ---- Hashtag autocomplete ---- */
+    .fa-hashtag-dd { display:none; position:absolute; bottom:calc(100% + 4px); left:0; z-index:300; background:#fff; border:1px solid #dde3ec; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,.14); min-width:220px; max-height:200px; overflow-y:auto; }
+    .fa-hashtag-item { padding:8px 12px; cursor:pointer; font-size:13px; border-bottom:1px solid #f0f2f5; }
+    .fa-hashtag-item:hover { background:#e7f3ff; }
+    .fa-hashtag-item:last-child { border-bottom:none; }
     .fa-composer-textarea {
         width: 100%; border: none; outline: none; resize: none;
         font-size: 16px; color: var(--fa-text); background: transparent;
@@ -1589,44 +1698,36 @@
         document.body.appendChild(overlay);
     }
 
-    // ========== INFINITE SCROLL (cursor-based pagination) ==========
+    // ========== INFINITE SCROLL (score-based + filtre) ==========
     (function() {
-        var loading   = false;
-        var cursor    = document.getElementById('feed-cursor');
-        var sentinel  = document.getElementById('feed-sentinel');
-        var loader    = document.getElementById('feed-loader');
-        var feed      = document.querySelector('.fa-feed-center');
+        var loading  = false;
+        var cursor   = document.getElementById('feed-cursor');
+        var sentinel = document.getElementById('feed-sentinel');
+        var loader   = document.getElementById('feed-loader');
+        var feed     = document.querySelector('.fa-feed-center');
         if (!cursor || !sentinel || !feed) return;
 
-        var observer = new IntersectionObserver(function(entries) {
-            if (!entries[0].isIntersecting) return;
-            if (loading) return;
-            if (cursor.getAttribute('data-has-more') !== 'true') {
-                observer.disconnect();
-                return;
-            }
-
-            var score = cursor.getAttribute('data-score');
-            var id    = cursor.getAttribute('data-id');
-            if (!id) return;
-
+        function doFetch(score, id) {
             loading = true;
             loader.style.display = 'block';
-
+            var fs = cursor.getAttribute('data-filter-spec')    || '';
+            var fp = cursor.getAttribute('data-filter-promo')   || '';
+            var ft = cursor.getAttribute('data-filter-typepub') || '';
+            var fl = cursor.getAttribute('data-filter-lier')    || '';
             var url = CTX + '/pages/alumni/ajax/charger-feed.jsp'
-                + '?cursor_score=' + encodeURIComponent(score)
-                + '&cursor_id='    + encodeURIComponent(id);
-
+                + '?cursor_score='    + encodeURIComponent(score)
+                + '&cursor_id='       + encodeURIComponent(id)
+                + '&filter_spec='     + encodeURIComponent(fs)
+                + '&filter_promo='    + encodeURIComponent(fp)
+                + '&filter_typepub='  + encodeURIComponent(ft)
+                + '&filter_lier='     + encodeURIComponent(fl);
             fetch(url)
                 .then(function(r) { return r.text(); })
                 .then(function(html) {
                     loader.style.display = 'none';
                     loading = false;
-
                     var tmp = document.createElement('div');
                     tmp.innerHTML = html;
-
-                    // Lire le meta (curseur suivant)
                     var meta = tmp.querySelector('#feed-meta-new');
                     if (meta) {
                         cursor.setAttribute('data-score',    meta.getAttribute('data-score')    || '0');
@@ -1636,18 +1737,10 @@
                     } else {
                         cursor.setAttribute('data-has-more', 'false');
                     }
-
-                    // Injecter les nouvelles cartes avant le sentinel
                     var cards = tmp.querySelectorAll('.fa-post-card');
-                    if (cards.length === 0) {
-                        cursor.setAttribute('data-has-more', 'false');
-                    }
-                    cards.forEach(function(card) {
-                        feed.insertBefore(card, sentinel);
-                    });
+                    if (cards.length === 0) cursor.setAttribute('data-has-more', 'false');
+                    cards.forEach(function(card) { feed.insertBefore(card, sentinel); });
                     observeViewCards(feed);
-
-                    // Plus rien a charger
                     if (cursor.getAttribute('data-has-more') !== 'true') {
                         observer.disconnect();
                         sentinel.style.display = 'none';
@@ -1662,11 +1755,26 @@
                     loading = false;
                     console.error('Feed load error:', e);
                 });
-        }, { rootMargin: '300px' });
+        }
 
+        var observer = new IntersectionObserver(function(entries) {
+            if (!entries[0].isIntersecting || loading) return;
+            if (cursor.getAttribute('data-has-more') !== 'true') { observer.disconnect(); return; }
+            var score = cursor.getAttribute('data-score');
+            var id    = cursor.getAttribute('data-id');
+            if (!id) return;
+            doFetch(score, id);
+        }, { rootMargin: '300px' });
         observer.observe(sentinel);
 
-        // --- Suivi des vues (tire le score vers le bas apres lecture) ---
+        // Expose pour le filtre
+        window.triggerFeedLoad = function() {
+            if (!loading && cursor.getAttribute('data-has-more') === 'true') {
+                doFetch(cursor.getAttribute('data-score'), cursor.getAttribute('data-id'));
+            }
+        };
+
+        // --- Suivi des vues ---
         var vued = {};
         function observeViewCards(container) {
             var vueObs = new IntersectionObserver(function(entries) {
@@ -1688,6 +1796,158 @@
                 vueObs.observe(c);
             });
         }
+        window.observeViewCards = observeViewCards;
         observeViewCards();
     })();
+
+    // ========== FILTRE DU FIL ==========
+    function appliquerFiltre() {
+        var spec    = document.getElementById('filter-spec').value;
+        var promo   = document.getElementById('filter-promo').value;
+        var typepub = document.getElementById('filter-typepub').value;
+        var lier    = document.getElementById('filter-lier').checked ? '1' : '';
+        var cursor  = document.getElementById('feed-cursor');
+        var feed    = document.querySelector('.fa-feed-center');
+        var sentinel= document.getElementById('feed-sentinel');
+        if (!cursor || !feed) return;
+        cursor.setAttribute('data-filter-spec',    spec);
+        cursor.setAttribute('data-filter-promo',   promo);
+        cursor.setAttribute('data-filter-typepub', typepub);
+        cursor.setAttribute('data-filter-lier',    lier);
+        cursor.setAttribute('data-score',    '9999999');
+        cursor.setAttribute('data-id',       'ZZZZZZZZZZZZZZZZZZZ');
+        cursor.setAttribute('data-has-more', 'true');
+        // Effacer cartes actuelles
+        feed.querySelectorAll('.fa-post-card, .fa-feed-end').forEach(function(el){ el.remove(); });
+        if (sentinel) sentinel.style.display = 'block';
+        document.getElementById('filter-reset-btn').style.display = (spec||promo||typepub) ? 'inline-flex' : 'none';
+        if (window.triggerFeedLoad) window.triggerFeedLoad();
+    }
+    function reinitialiserFiltre() {
+        document.getElementById('filter-spec').value = '';
+        document.getElementById('filter-promo').value = '';
+        document.getElementById('filter-typepub').value = '';
+        document.getElementById('filter-lier').checked = false;
+        appliquerFiltre();
+    }
+
+    // ========== VISIBILITE FORM ==========
+    function toggleVisSection() {
+        var body = document.getElementById('vis-body');
+        var chev = document.getElementById('vis-chevron');
+        var open = body.style.display !== 'none';
+        body.style.display = open ? 'none' : 'block';
+        chev.className = open ? 'bi bi-chevron-down' : 'bi bi-chevron-up';
+    }
+    function toggleVisSpec(btn) {
+        var isAll = btn.getAttribute('data-id') === 'ALL';
+        var chips = document.querySelectorAll('#vis-spec-chips .fa-vis-chip');
+        chips.forEach(function(c){ c.classList.remove('fa-vis-chip--active'); });
+        if (isAll) {
+            chips[0].classList.add('fa-vis-chip--active');
+        } else {
+            chips[0].classList.remove('fa-vis-chip--active');
+            btn.classList.toggle('fa-vis-chip--active');
+        }
+        updateVisHidden();
+    }
+    function onVisPromoChange() {
+        var sel  = document.getElementById('vis-promo-select');
+        var note = document.getElementById('vis-promo-note');
+        if (note) note.style.display = sel.value ? 'inline' : 'none';
+        updateVisHidden();
+    }
+    function updateVisHidden() {
+        // Spec
+        var active = document.querySelectorAll('#vis-spec-chips .fa-vis-chip--active');
+        var allBtn = document.querySelector('#vis-spec-chips .fa-vis-chip[data-id="ALL"]');
+        var isAll  = allBtn && allBtn.classList.contains('fa-vis-chip--active');
+        var specIds = [];
+        if (!isAll) active.forEach(function(c){ if(c.getAttribute('data-id')!=='ALL') specIds.push(c.getAttribute('data-id')); });
+        document.getElementById('vis-spec-hidden').value = (isAll || !specIds.length) ? 'ALL' : specIds.join(',');
+        // Promo
+        var promoSel = document.getElementById('vis-promo-select');
+        var anneeMin = '';
+        if (promoSel && promoSel.value) {
+            var opt = promoSel.options[promoSel.selectedIndex];
+            anneeMin = opt.getAttribute('data-annee') || '';
+        }
+        document.getElementById('vis-promo-anneemin-hidden').value = anneeMin;
+        // Lier
+        var lierChk = document.getElementById('vis-lier-check');
+        document.getElementById('vis-lier-hidden').value = (lierChk && lierChk.checked) ? 'AND' : 'OR';
+        // Montrer groupe lier
+        var specOk  = document.getElementById('vis-spec-hidden').value !== 'ALL';
+        var promoOk = anneeMin !== '';
+        var lierGrp = document.getElementById('vis-lier-group');
+        if (lierGrp) lierGrp.style.display = (specOk && promoOk) ? 'block' : 'none';
+        // Resume
+        var icon = document.getElementById('vis-icon');
+        var summ = document.getElementById('vis-summary');
+        if (!specOk && !promoOk) {
+            if (icon) icon.className = 'bi bi-globe2';
+            if (summ) summ.textContent = 'Visible par tous';
+        } else {
+            var parts = [];
+            if (specOk) {
+                document.querySelectorAll('#vis-spec-chips .fa-vis-chip--active').forEach(function(c){
+                    if (c.getAttribute('data-id') !== 'ALL') parts.push(c.textContent.trim());
+                });
+            }
+            if (promoOk && promoSel) parts.push(promoSel.options[promoSel.selectedIndex].text + ' et +');
+            var lier = document.getElementById('vis-lier-hidden').value;
+            if (icon) icon.className = 'bi bi-lock-fill';
+            if (summ) summ.textContent = parts.join(lier === 'AND' ? ' ET ' : ' OU ');
+        }
+    }
+
+    // ========== HASHTAG AUTOCOMPLETE ==========
+    function setupHashtagAutocomplete(ta) {
+        var dd = document.createElement('div');
+        dd.className = 'fa-hashtag-dd';
+        var wrap = ta.parentNode;
+        if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+        wrap.appendChild(dd);
+        var _lq = null, _tm = null;
+        ta.addEventListener('input', function() {
+            clearTimeout(_tm);
+            _tm = setTimeout(function() {
+                var pos = ta.selectionStart;
+                var m = ta.value.substring(0, pos).match(/#([A-Za-z0-9]{1,})$/);
+                if (!m) { dd.style.display = 'none'; return; }
+                var q = m[1];
+                if (q === _lq) return;
+                _lq = q;
+                fetch(CTX + '/pages/alumni/ajax/hashtag-suggest.jsp?q=' + encodeURIComponent(q))
+                    .then(function(r){ return r.json(); })
+                    .then(function(items) {
+                        if (!items || !items.length) { dd.style.display = 'none'; return; }
+                        dd.innerHTML = '';
+                        items.forEach(function(it) {
+                            var d = document.createElement('div');
+                            d.className = 'fa-hashtag-item';
+                            d.innerHTML = '<strong>' + it.tag + '</strong>&nbsp;<span style="color:#888;font-size:12px;">' + escHtml(it.label) + '</span>';
+                            d.addEventListener('mousedown', function(e) {
+                                e.preventDefault();
+                                var p = ta.selectionStart;
+                                var bef = ta.value.substring(0, p).replace(/#([A-Za-z0-9]*)$/, it.tag + ' ');
+                                ta.value = bef + ta.value.substring(p);
+                                ta.selectionStart = ta.selectionEnd = bef.length;
+                                dd.style.display = 'none';
+                                _lq = null;
+                                ta.focus();
+                            });
+                            dd.appendChild(d);
+                        });
+                        dd.style.display = 'block';
+                    }).catch(function(){}); 
+            }, 220);
+        });
+        ta.addEventListener('blur', function(){ setTimeout(function(){ dd.style.display='none'; }, 180); });
+        ta.addEventListener('keydown', function(e){ if(e.key==='Escape') dd.style.display='none'; });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        var ta = document.querySelector('.fa-composer-textarea');
+        if (ta) setupHashtagAutocomplete(ta);
+    });
 </script>

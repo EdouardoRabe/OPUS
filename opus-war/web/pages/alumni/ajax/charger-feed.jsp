@@ -47,6 +47,15 @@
     int cursorScore = 0;
     try { cursorScore = Integer.parseInt(cursorScoreStr != null ? cursorScoreStr.replaceAll("[^0-9\\-]", "") : "0"); } catch (NumberFormatException _nfe) {}
 
+    // --- Filtres hashtag ---
+    String filterSpec    = request.getParameter("filter_spec");    if (filterSpec == null) filterSpec = "";
+    String filterPromo   = request.getParameter("filter_promo");   if (filterPromo == null) filterPromo = "";
+    String filterTypepub = request.getParameter("filter_typepub"); if (filterTypepub == null) filterTypepub = "";
+    String filterLier    = request.getParameter("filter_lier");    if (filterLier == null) filterLier = "";
+    filterSpec    = filterSpec.replaceAll("[^A-Za-z0-9]","");
+    filterPromo   = filterPromo.replaceAll("[^A-Za-z0-9]","");
+    filterTypepub = filterTypepub.replaceAll("[^A-Za-z0-9]","");
+
     Connection conn = null;
     try {
         conn = new UtilDB().GetConn();
@@ -84,7 +93,29 @@
                 _connPhotoUrl = ctx + "/" + _myProfils[0].getPhotoProfil().trim();
         }
 
-        // --- Requete score-based avec curseur ---
+        // --- Requete score-based avec curseur + visibilite + filtre ---
+        // Filtre visibilite
+        String _visSpecSub2 = "(SELECT sp.idspecialite FROM specialiteprofil sp JOIN profil _pr ON sp.idprofil=_pr.idprofil WHERE _pr.idutilisateur=" + refuserConnecte + ")";
+        String _visPromoSub2= "(SELECT _pt.annee FROM promotion _pt JOIN profil _pr ON _pt.idpromotion=_pr.idpromotion WHERE _pr.idutilisateur=" + refuserConnecte + ")";
+        String _visW2 = " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication)"
+            + " OR (COALESCE(p.logique_visibilite,'OR')='OR' AND ("
+            + "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE' AND _pv.idref IN " + _visSpecSub2 + ")"
+            + " OR EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PROMOTION' AND _pv.anneemin<=" + _visPromoSub2 + ")))"
+            + " OR (p.logique_visibilite='AND'"
+            + " AND EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE' AND _pv.idref IN " + _visSpecSub2 + ")"
+            + " AND EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PROMOTION' AND _pv.anneemin<=" + _visPromoSub2 + ")))";
+        // Filtre hashtag
+        String _hashW = "";
+        if (!filterSpec.isEmpty() && !filterPromo.isEmpty()) {
+            String _sc = "EXISTS (SELECT 1 FROM publicationhashtag _ph WHERE _ph.idpublication=p.idpublication AND _ph.typetag='SPECIALITE' AND _ph.idref='" + filterSpec + "')";
+            String _pc = "EXISTS (SELECT 1 FROM publicationhashtag _ph WHERE _ph.idpublication=p.idpublication AND _ph.typetag='PROMOTION' AND _ph.idref='" + filterPromo + "')";
+            _hashW = "1".equals(filterLier) ? " AND " + _sc + " AND " + _pc : " AND (" + _sc + " OR " + _pc + ")";
+        } else if (!filterSpec.isEmpty()) {
+            _hashW = " AND EXISTS (SELECT 1 FROM publicationhashtag _ph WHERE _ph.idpublication=p.idpublication AND _ph.typetag='SPECIALITE' AND _ph.idref='" + filterSpec + "')";
+        } else if (!filterPromo.isEmpty()) {
+            _hashW = " AND EXISTS (SELECT 1 FROM publicationhashtag _ph WHERE _ph.idpublication=p.idpublication AND _ph.typetag='PROMOTION' AND _ph.idref='" + filterPromo + "')";
+        }
+        if (!filterTypepub.isEmpty()) _hashW += " AND p.idtypepublication='" + filterTypepub + "'";
         String _sC =
             "COALESCE((SELECT COUNT(*) FROM publicationreaction pr WHERE pr.idpublication=p.idpublication),0)*2"
             + "+COALESCE((SELECT COUNT(*) FROM publicationcommentaire pc WHERE pc.idpublication=p.idpublication AND pc.etat=1),0)*3"
@@ -92,7 +123,7 @@
             + "+CASE WHEN p.daty::date=CURRENT_DATE THEN 15 WHEN p.daty::date>=CURRENT_DATE-7 THEN 8 WHEN p.daty::date>=CURRENT_DATE-30 THEN 3 ELSE 0 END";
         String _pSql =
             "SELECT sub.idpublication, sub.score FROM ("
-            + "  SELECT p.idpublication,(" + _sC + ") AS score FROM publication p WHERE p.etat=1"
+            + "  SELECT p.idpublication,(" + _sC + ") AS score FROM publication p WHERE p.etat=1" + _visW2 + _hashW
             + ") sub WHERE sub.score < " + cursorScore
             + " OR (sub.score = " + cursorScore + " AND sub.idpublication < '" + cursorId + "')"
             + " ORDER BY sub.score DESC, sub.idpublication DESC LIMIT 10";
@@ -124,7 +155,11 @@
 <div id="feed-meta-new" style="display:none"
      data-score="<%= nextScore %>"
      data-id="<%= nextId %>"
-     data-has-more="<%= hasMore %>"></div>
+     data-has-more="<%= hasMore %>"
+     data-filter-spec="<%= filterSpec %>"
+     data-filter-promo="<%= filterPromo %>"
+     data-filter-typepub="<%= filterTypepub %>"
+     data-filter-lier="<%= filterLier %>"></div>
 <%
         // --- Rendu de chaque carte publication ---
         for (int p = 0; p < pubs.length; p++) {
