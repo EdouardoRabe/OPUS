@@ -259,6 +259,18 @@
             <div class="fa-post-header">
                 <div class="fa-avatar fa-avatar--md"><%= initA %></div>
                 <div class="fa-post-meta">
+                <!-- Menu 3 points -->
+                <div class="pub-menu">
+                    <button class="pub-menu-btn" onclick="togglePubMenu(this,event)" title="Plus d'options"><i class="bi bi-three-dots-vertical"></i></button>
+                    <div class="pub-menu-dropdown">
+                        <button class="pub-menu-item" onclick="savePublication('<%= idpub %>')">
+                            <i class="bi bi-bookmark"></i> Enregistrer
+                        </button>
+                        <button class="pub-menu-item" onclick="reportPublication('<%= idpub %>')">
+                            <i class="bi bi-flag"></i> Signaler
+                        </button>
+                    </div>
+                </div>
                     <div class="fa-post-author">
                         <%= auteur %>
                         <% if (!taggedNames.isEmpty()) { %>
@@ -562,8 +574,15 @@
     .fa-btn-sm { padding: 6px 14px !important; font-size: 13px !important; }
     /* ---- Post card ---- */
     .fa-post-card { background: var(--fa-card-bg); border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.12); overflow: hidden; }
-    .fa-post-header { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px 8px; }
+    .fa-post-header { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px 8px; position: relative; }
     .fa-post-meta { flex: 1; min-width: 0; }
+    /* ---- Menu 3 points publication ---- */
+    .pub-menu { position:absolute; top:10px; right:10px; z-index:10; }
+    .pub-menu-btn { background:none; border:none; font-size:18px; line-height:1; padding:4px 6px; cursor:pointer; color:#65676b; border-radius:50%; transition:background .15s,color .15s; }
+    .pub-menu-btn:hover { background:#f0f2f5; color:var(--itu-blue,#008BFF); }
+    .pub-menu-dropdown { display:none; position:absolute; right:0; top:100%; background:#fff; border:1px solid #dde3ec; border-radius:6px; box-shadow:0 6px 20px rgba(0,0,0,.12); min-width:140px; z-index:100; overflow:hidden; }
+    .pub-menu-item { width:100%; padding:8px 12px; text-align:left; border:none; background:transparent; cursor:pointer; font-size:13px; }
+    .pub-menu-item:hover { background:#f0f2f5; }
     .fa-post-author { font-weight: 700; font-size: 15px; color: var(--fa-text); }
     .fa-post-with { font-weight: 400; font-size: 14px; color: var(--fa-text-secondary); }
     .fa-post-date { font-size: 12px; color: var(--fa-text-secondary); margin-top: 2px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
@@ -1627,6 +1646,25 @@
         document.getElementById('composer-img-preview').style.display = 'none';
         document.getElementById('composer-img-previewImg').src = '';
     }
+    // ========== MENU PUBLICATION (3 points) ==========
+    function togglePubMenu(btn, e) {
+        e.stopPropagation();
+        var dd = btn.nextElementSibling;
+        var open = dd.style.display === 'block';
+        document.querySelectorAll('.pub-menu-dropdown').forEach(function(el){ el.style.display='none'; });
+        if (!open) dd.style.display='block';
+    }
+    document.addEventListener('click', function(){
+        document.querySelectorAll('.pub-menu-dropdown').forEach(function(el){ el.style.display='none'; });
+    });
+    function savePublication(idpub) {
+        fetch(CTX + '/pages/alumni/ajax/save-publication.jsp?idpublication=' + encodeURIComponent(idpub))
+        .then(function(r){return r.json();}).then(function(d){ if(d.success) Swal.fire({toast:true,position:'top-end',icon:'success',title:'Sauvegardée',timer:1500,showConfirmButton:false}); else alert('Erreur sauvegarde'); });
+    }
+    function reportPublication(idpub) {
+        window.location.href = CTX + '/pages/module.jsp?but=alumni/signaler-publication.jsp&idpublication=' + encodeURIComponent(idpub);
+    }
+
     // ========== MEDIA ZOOM ==========
     function openMediaZoom(src) {
         var overlay = document.createElement('div');

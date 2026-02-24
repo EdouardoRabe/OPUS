@@ -216,6 +216,12 @@
 .usr-badge-cree { background:#fff3cd; color:#856404; }
 .usr-badge-banni { background:#f8d7da; color:#721c24; }
 .usr-badge-role { background:#d1ecf1; color:#0c5460; }
+
+/* publication menu */
+.pub-menu-btn { background:transparent;border:none;font-size:1.2rem;cursor:pointer;color:#6b7280;}
+.pub-menu-btn:hover { color:var(--itu-blue,#008BFF); }
+.pub-menu-dropdown .pub-menu-item { display:flex; align-items:center; gap:6px; }
+.pub-menu-dropdown .pub-menu-item i { width:14px; }
 </style>
 
 <!-- ═══ USERS GRID ═══ -->

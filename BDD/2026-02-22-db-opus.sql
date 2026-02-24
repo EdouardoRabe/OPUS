@@ -57,9 +57,9 @@ CREATE TABLE reactiontype(
 );
 
 CREATE TABLE typesignalement(
-   typesignalement VARCHAR(20) ,
+   idtypesignalement VARCHAR(20) ,
    libelle VARCHAR(150)  NOT NULL,
-   PRIMARY KEY(typesignalement)
+   PRIMARY KEY(idtypesignalement)
 );
 
 CREATE TABLE profil(
