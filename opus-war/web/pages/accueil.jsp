@@ -240,6 +240,29 @@
                     totalReactions++;
                     if (reactions[r].getIdutilisateur() == refuserConnecte) myReaction = type;
                 }
+                
+                // Créer une liste de paires (id, count) et trier par count décroissant
+                java.util.List reactPairs = new java.util.ArrayList();
+                for (java.util.Iterator it = reactCounts.entrySet().iterator(); it.hasNext();) {
+                    java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
+                    Object[] pair = new Object[2];
+                    pair[0] = entry.getKey(); // rtId (String)
+                    pair[1] = entry.getValue(); // count (Integer)
+                    reactPairs.add(pair);
+                }
+                // Tri à bulles : trier par count décroissant
+                for (int ri = 0; ri < reactPairs.size(); ri++) {
+                    for (int rj = ri + 1; rj < reactPairs.size(); rj++) {
+                        Object[] pairA = (Object[]) reactPairs.get(ri);
+                        Object[] pairB = (Object[]) reactPairs.get(rj);
+                        Integer countA = (Integer) pairA[1];
+                        Integer countB = (Integer) pairB[1];
+                        if (countB.intValue() > countA.intValue()) {
+                            reactPairs.set(ri, pairB);
+                            reactPairs.set(rj, pairA);
+                        }
+                    }
+                }
 
                 // --- APJ: Commentaires ---
                 Publicationcommentaire[] comments = (Publicationcommentaire[]) CGenUtil.rechercher(
@@ -351,8 +374,31 @@
 
             <!-- COMPTEURS -->
             <div class="fa-post-counters">
-                <% if (totalReactions > 0) { %>
-                <span class="fa-counter"><i class="bi bi-hand-thumbs-up-fill" style="color:var(--itu-blue,#008BFF);"></i>&nbsp;<%= totalReactions %></span>
+                <% if (reactPairs.size() > 0) { %>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                        <% for (int rpi = 0; rpi < reactPairs.size(); rpi++) {
+                            Object[] pair = (Object[]) reactPairs.get(rpi);
+                            String rtId = (String) pair[0];
+                            Integer rtCount = (Integer) pair[1];
+                            String rtEmoji = "\uD83D\uDC4D";
+                            String rtLib = "";
+                            // Récupérer l'emoji et libellé du type de réaction
+                            for (int rt = 0; rt < reactTypes.length; rt++) {
+                                if (reactTypes[rt].getIdreactiontype().equals(rtId)) {
+                                    rtLib = reactTypes[rt].getLibelle();
+                                    String rtLibLow = rtLib.toLowerCase();
+                                    if (rtLibLow.contains("adore") || rtLibLow.contains("love")) rtEmoji = "\u2764\uFE0F";
+                                    else if (rtLibLow.contains("haha") || rtLibLow.contains("humour")) rtEmoji = "\uD83D\uDE02";
+                                    else if (rtLibLow.contains("surprise") || rtLibLow.contains("wow")) rtEmoji = "\uD83D\uDE2E";
+                                    else if (rtLibLow.contains("triste") || rtLibLow.contains("sad")) rtEmoji = "\uD83D\uDE22";
+                                    else if (rtLibLow.contains("grrr") || rtLibLow.contains("ang")) rtEmoji = "\uD83D\uDE20";
+                                    break;
+                                }
+                            }
+                        %>
+                        <span class="fa-counter" title="<%= rtLib %>"><%= rtEmoji %>&nbsp;<%= rtCount %></span>
+                        <% } %>
+                    </div>
                 <% } else { %><span></span><% } %>
                 <span id="nb-comm-<%= idpub %>" class="fa-counter fa-counter--link"
                       onclick="toggleCommentaires('<%= idpub %>')">
