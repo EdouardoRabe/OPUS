@@ -21,7 +21,7 @@
 
     // Charger les types de signalement (APJ)
     Typesignalement[] types = (Typesignalement[]) CGenUtil.rechercher(
-        new Typesignalement(), null, null, " order by typesignalement");
+        new Typesignalement(), null, null, " order by idtypesignalement");
     if (types == null) types = new Typesignalement[0];
 
     // Message flash
@@ -214,7 +214,7 @@
 
             <ul class="sig-type-list">
                 <% for (int t = 0; t < types.length; t++) {
-                    String tid = types[t].getTypesignalement();
+                    String tid = types[t].getIdTypesignalement();
                     String tlib = types[t].getLibelle();
                 %>
                 <li class="sig-type-item" onclick="toggleCheckbox(this)">
@@ -292,22 +292,16 @@
         .then(function(r) { return r.json(); })
         .then(function(d) {
             if (d.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Signalement envoy\u00e9',
-                    text: 'Merci pour votre signalement. Nous allons examiner cette publication.',
-                    confirmButtonColor: '#008BFF'
-                }).then(function() {
-                    history.back();
-                });
+                alert("Merci pour votre signalement. Nous utilisons vos retours pour améliorer la plateforme et détecter les contenus inappropriés.");
+                window.location.href = '<%= ctx %>/page/acceuil.jsp'; // Redirige vers l'accueil
             } else {
-                Swal.fire({ icon: 'error', title: 'Erreur', text: d.error || 'Erreur inconnue' });
+                alert(d.error || 'Erreur inconnue');
                 btn.disabled = false;
                 btn.innerHTML = '<i class="bi bi-flag"></i> Envoyer le signalement';
             }
         })
         .catch(function(err) {
-            Swal.fire({ icon: 'error', title: 'Erreur', text: 'Erreur réseau' });
+            alert('Erreur réseau');
             btn.disabled = false;
             btn.innerHTML = '<i class="bi bi-flag"></i> Envoyer le signalement';
         });

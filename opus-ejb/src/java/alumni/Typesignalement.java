@@ -5,7 +5,7 @@ import java.sql.Connection;
 
 public class Typesignalement extends ClassMAPTable {
 
-    private String typesignalement;
+    private String idtypesignalement;
     private String libelle;
 
     public Typesignalement() {
@@ -14,12 +14,12 @@ public class Typesignalement extends ClassMAPTable {
 
     @Override
     public String getTuppleID() {
-        return getTypesignalement();
+        return getIdTypesignalement();
     }
 
     @Override
     public String getAttributIDName() {
-        return "typesignalement";
+        return "idtypesignalement";
     }
 
     @Override
@@ -28,12 +28,12 @@ public class Typesignalement extends ClassMAPTable {
         this.setTypesignalement(makePK(c));
     }
 
-    public String getTypesignalement() {
-        return typesignalement;
+    public String getIdTypesignalement() {
+        return idtypesignalement;
     }
 
     public void setTypesignalement(String typesignalement) {
-        this.typesignalement = typesignalement;
+        this.idtypesignalement = typesignalement;
     }
 
     public String getLibelle() {

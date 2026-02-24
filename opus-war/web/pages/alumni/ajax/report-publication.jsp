@@ -33,18 +33,23 @@
         conn.setAutoCommit(false);
 
         for (int i = 0; i < typesSignalement.length; i++) {
+            String type = typesSignalement[i];
+            if (type == null || type.trim().isEmpty()) {
+                continue;
+            }
             Signalementpublication sig = new Signalementpublication();
             sig.construirePK(conn);
             sig.setIdpublication(idpub);
             sig.setIdutilisateur(userId);
-            sig.setTypesignalement(typesSignalement[i]);
+            sig.setTypesignalement(type);
             sig.setDescritpion(description != null ? description : "");
-            sig.setDaty(new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()));
+            sig.setDaty(new java.sql.Date(System.currentTimeMillis()));
+            sig.setHeure(new java.text.SimpleDateFormat("HH:mm:ss").format(new java.util.Date()));
             sig.insertToTableWithHisto(userId, conn);
         }
 
         conn.commit();
-        out.print("{\"success\":true}");
+        out.print("{\"success\":true,\"redirect\":true}");
 
     } catch (Exception e) {
         e.printStackTrace();
