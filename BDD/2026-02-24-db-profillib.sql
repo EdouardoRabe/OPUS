@@ -50,8 +50,11 @@ CREATE OR REPLACE VIEW profillib AS
         CASE
             WHEN (u.estactif = 1) THEN 'Validé'::text
             ELSE 'Banni'::text
-        END) AS etatlib
+        END) AS etatlib,
+        pr.idgenre,
+    g.libelle AS genrelib
    FROM (((utilisateur u
      LEFT JOIN profil pr ON ((pr.idutilisateur = u.refuser)))
      LEFT JOIN promotion p ON (((p.idpromotion)::text = (pr.idpromotion)::text)))
-     LEFT JOIN parcours parc ON (((parc.idparcours)::text = (pr.idparcours)::text)));
+     LEFT JOIN parcours parc ON (((parc.idparcours)::text = (pr.idparcours)::text)))
+     LEFT JOIN genre g ON (((g.idgenre)::text = (pr.idgenre)::text));
