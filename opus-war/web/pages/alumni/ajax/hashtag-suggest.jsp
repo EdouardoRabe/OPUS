@@ -64,6 +64,25 @@
         }
         _rs.close(); _ps.close();
 
+        // --- Parcours ---
+        _ps = _c.prepareStatement(
+            "SELECT idparcours, libelle FROM parcours "
+            + "WHERE UPPER(REPLACE(libelle,' ','')) LIKE ? ORDER BY libelle LIMIT 5");
+        _ps.setString(1, "%" + _q + "%");
+        _rs = _ps.executeQuery();
+        while (_rs.next()) {
+            String _lib = _rs.getString("libelle");
+            String _tag = "#" + _lib.toUpperCase().replaceAll("[^A-Z0-9]", "");
+            if (_tag.length() > 21) _tag = _tag.substring(0, 21);
+            String _idref = _rs.getString("idparcours");
+            if (!_first) _json.append(",");
+            _first = false;
+            _json.append("{\"tag\":\"").append(_tag)
+                 .append("\",\"label\":\"").append(_lib.replace("\"", "'"))
+                 .append("\",\"type\":\"PARCOURS\",\"idref\":\"").append(_idref).append("\"}");
+        }
+        _rs.close(); _ps.close();
+
     } catch (Exception _ex) {
         _ex.printStackTrace();
     } finally {

@@ -49,11 +49,13 @@
 
     // --- Filtres hashtag ---
     String filterSpec    = request.getParameter("filter_spec");    if (filterSpec == null) filterSpec = "";
+    String filterParc    = request.getParameter("filter_parc");    if (filterParc == null) filterParc = "";
     String filterPromo   = request.getParameter("filter_promo");   if (filterPromo == null) filterPromo = "";
     String filterTypepub = request.getParameter("filter_typepub"); if (filterTypepub == null) filterTypepub = "";
     String filterLier    = request.getParameter("filter_lier");    if (filterLier == null) filterLier = "";
     filterSpec    = filterSpec.replaceAll("[^A-Za-z0-9]","");
-    filterPromo   = filterPromo.replaceAll("[^A-Za-z0-9]","");
+    filterParc    = filterParc.replaceAll("[^A-Za-z0-9]","");
+    filterPromo   = filterPromo.replaceAll("[^0-9+\\-]",""); // format: yyyy+ ou yyyy-
     filterTypepub = filterTypepub.replaceAll("[^A-Za-z0-9]","");
 
     Connection conn = null;
@@ -94,28 +96,51 @@
         }
 
         // --- Requete score-based avec curseur + visibilite + filtre ---
-        // Filtre visibilite
-        String _visSpecSub2 = "(SELECT sp.idspecialite FROM specialiteprofil sp JOIN profil _pr ON sp.idprofil=_pr.idprofil WHERE _pr.idutilisateur=" + refuserConnecte + ")";
-        String _visPromoSub2= "(SELECT _pt.annee FROM promotion _pt JOIN profil _pr ON _pt.idpromotion=_pr.idpromotion WHERE _pr.idutilisateur=" + refuserConnecte + ")";
-        String _visW2 = " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication)"
+        // Filtre visibilite (avec PARCOURS + anneedirection)
+        String _vsSpec2     = "(SELECT sp.idspecialite FROM specialiteprofil sp JOIN profil _pr ON sp.idprofil=_pr.idprofil WHERE _pr.idutilisateur=" + refuserConnecte + ")";
+        String _vsParc2     = "(SELECT _pr.idparcours FROM profil _pr WHERE _pr.idutilisateur=" + refuserConnecte + " LIMIT 1)";
+        String _vsUserAnnee2= "(SELECT _pt.annee FROM promotion _pt JOIN profil _pr ON _pt.idpromotion=_pr.idpromotion WHERE _pr.idutilisateur=" + refuserConnecte + " LIMIT 1)";
+        String _vsPromoCond2= "(_pv.typecible='PROMOTION' AND ((_pv.anneedirection='+' AND " + _vsUserAnnee2 + ">=_pv.anneeref) OR (_pv.anneedirection='-' AND " + _vsUserAnnee2 + "<=_pv.anneeref)))";
+        String _vsSpecExist2 = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE' AND _pv.idref IN " + _vsSpec2 + ")";
+        String _vsPromoExist2= "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND " + _vsPromoCond2 + ")";
+        String _vsParcExist2 = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PARCOURS' AND _pv.idref=" + _vsParc2 + ")";
+        String _visW2 =
+            " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication)"
             + " OR (COALESCE(p.logique_visibilite,'OR')='OR' AND ("
-            + "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE' AND _pv.idref IN " + _visSpecSub2 + ")"
-            + " OR EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PROMOTION' AND _pv.anneemin<=" + _visPromoSub2 + ")))"
+            + _vsSpecExist2 + " OR " + _vsPromoExist2 + " OR " + _vsParcExist2
+            + "))"
             + " OR (p.logique_visibilite='AND'"
-            + " AND EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE' AND _pv.idref IN " + _visSpecSub2 + ")"
-            + " AND EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PROMOTION' AND _pv.anneemin<=" + _visPromoSub2 + ")))";
-        // Filtre hashtag
-        String _hashW = "";
-        if (!filterSpec.isEmpty() && !filterPromo.isEmpty()) {
-            String _sc = "EXISTS (SELECT 1 FROM publicationhashtag _ph WHERE _ph.idpublication=p.idpublication AND _ph.typetag='SPECIALITE' AND _ph.idref='" + filterSpec + "')";
-            String _pc = "EXISTS (SELECT 1 FROM publicationhashtag _ph WHERE _ph.idpublication=p.idpublication AND _ph.typetag='PROMOTION' AND _ph.idref='" + filterPromo + "')";
-            _hashW = "1".equals(filterLier) ? " AND " + _sc + " AND " + _pc : " AND (" + _sc + " OR " + _pc + ")";
-        } else if (!filterSpec.isEmpty()) {
-            _hashW = " AND EXISTS (SELECT 1 FROM publicationhashtag _ph WHERE _ph.idpublication=p.idpublication AND _ph.typetag='SPECIALITE' AND _ph.idref='" + filterSpec + "')";
-        } else if (!filterPromo.isEmpty()) {
-            _hashW = " AND EXISTS (SELECT 1 FROM publicationhashtag _ph WHERE _ph.idpublication=p.idpublication AND _ph.typetag='PROMOTION' AND _ph.idref='" + filterPromo + "')";
+            + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE') OR " + _vsSpecExist2 + ")"
+            + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PROMOTION') OR " + _vsPromoExist2 + ")"
+            + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PARCOURS') OR " + _vsParcExist2 + ")))";
+        // Filtre hashtag — typepub suit le flag lier comme les autres
+        java.util.List _fConds = new java.util.ArrayList();
+        if (!filterSpec.isEmpty())
+            _fConds.add("EXISTS (SELECT 1 FROM publicationhashtag _ph WHERE _ph.idpublication=p.idpublication AND _ph.typetag='SPECIALITE' AND _ph.idref='" + filterSpec + "')");
+        if (!filterParc.isEmpty())
+            _fConds.add("EXISTS (SELECT 1 FROM publicationhashtag _ph WHERE _ph.idpublication=p.idpublication AND _ph.typetag='PARCOURS' AND _ph.idref='" + filterParc + "')");
+        if (!filterPromo.isEmpty() && filterPromo.matches("\\d{4}[+-]")) {
+            int _fpAnnee = Integer.parseInt(filterPromo.substring(0,4));
+            char _fpDir  = filterPromo.charAt(4);
+            String _fpUserAnnee = "(SELECT _pt.annee FROM promotion _pt JOIN profil _pr ON _pt.idpromotion=_pr.idpromotion WHERE _pr.idutilisateur=" + refuserConnecte + " LIMIT 1)";
+            String _fpCmp = (_fpDir == '+') ? ">=" : "<=";
+            _fConds.add("EXISTS (SELECT 1 FROM publicationhashtag _ph WHERE _ph.idpublication=p.idpublication AND _ph.typetag='PROMOTION' AND (SELECT _pt2.annee FROM promotion _pt2 WHERE _pt2.idpromotion=_ph.idref LIMIT 1)" + _fpCmp + _fpAnnee + ")");
         }
-        if (!filterTypepub.isEmpty()) _hashW += " AND p.idtypepublication='" + filterTypepub + "'";
+        if (!filterTypepub.isEmpty())
+            _fConds.add("p.idtypepublication='" + filterTypepub + "'");
+        String _hashW = "";
+        if (_fConds.size() == 1) {
+            _hashW = " AND " + _fConds.get(0);
+        } else if (_fConds.size() > 1) {
+            String _join = "1".equals(filterLier) ? " AND " : " OR ";
+            StringBuilder _sb = new StringBuilder(" AND (");
+            for (int _ci = 0; _ci < _fConds.size(); _ci++) {
+                if (_ci > 0) _sb.append(_join);
+                _sb.append(_fConds.get(_ci));
+            }
+            _sb.append(")");
+            _hashW = _sb.toString();
+        }
         String _sC =
             "COALESCE((SELECT COUNT(*) FROM publicationreaction pr WHERE pr.idpublication=p.idpublication),0)*2"
             + "+COALESCE((SELECT COUNT(*) FROM publicationcommentaire pc WHERE pc.idpublication=p.idpublication AND pc.etat=1),0)*3"
@@ -157,6 +182,7 @@
      data-id="<%= nextId %>"
      data-has-more="<%= hasMore %>"
      data-filter-spec="<%= filterSpec %>"
+     data-filter-parc="<%= filterParc %>"
      data-filter-promo="<%= filterPromo %>"
      data-filter-typepub="<%= filterTypepub %>"
      data-filter-lier="<%= filterLier %>"></div>

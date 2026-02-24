@@ -39,7 +39,7 @@
         String description = null;
         String idtypepublication = null;
         String identifications = null;
-        String visSpec = null, visPromoAnneeMin = null, visLier = null;
+        String visSpec = null, visParc = null, visPromoAnnee = null, visLier = null;
         FileItem imageItem = null;
 
         if (ServletFileUpload.isMultipartContent(request)) {
@@ -56,7 +56,8 @@
                     else if ("idtypepublication".equals(fieldName)) idtypepublication = fieldValue;
                     else if ("identifications".equals(fieldName)) identifications = fieldValue;
                     else if ("vis_spec".equals(fieldName)) visSpec = fieldValue;
-                    else if ("vis_promo_anneemin".equals(fieldName)) visPromoAnneeMin = fieldValue;
+                    else if ("vis_parc".equals(fieldName)) visParc = fieldValue;
+                    else if ("vis_promo_annee".equals(fieldName)) visPromoAnnee = fieldValue;
                     else if ("vis_lier".equals(fieldName)) visLier = fieldValue;
                 } else {
                     if (item.getSize() > 0 && item.getName() != null && !item.getName().trim().isEmpty()) {
@@ -68,9 +69,10 @@
             // Fallback formulaire classique (sans fichier)
             description = request.getParameter("description");
             idtypepublication = request.getParameter("idtypepublication");
-            visSpec = request.getParameter("vis_spec");
-            visPromoAnneeMin = request.getParameter("vis_promo_anneemin");
-            visLier = request.getParameter("vis_lier");
+            visSpec      = request.getParameter("vis_spec");
+            visParc      = request.getParameter("vis_parc");
+            visPromoAnnee= request.getParameter("vis_promo_annee");
+            visLier      = request.getParameter("vis_lier");
         }
 
         if (description == null || description.trim().isEmpty()) {
@@ -177,6 +179,16 @@
                 _pn++;
             }
             _hrst.close(); _hpst.close();
+            // Parcours
+            _hpst = conn.prepareStatement("SELECT idparcours, libelle FROM parcours");
+            _hrst = _hpst.executeQuery();
+            String[] _rcIds = new String[200]; String[] _rcNorms = new String[200]; int _rcn = 0;
+            while (_hrst.next() && _rcn < 200) {
+                _rcIds[_rcn] = _hrst.getString("idparcours");
+                _rcNorms[_rcn] = _hrst.getString("libelle").toUpperCase().replaceAll("[^A-Z0-9]","");
+                _rcn++;
+            }
+            _hrst.close(); _hpst.close();
             while (_hm.find()) {
                 String _tok = _hm.group(1).toUpperCase().replaceAll("[^A-Z0-9]","");
                 if (_tok.isEmpty() || _htDone.contains(_tok)) continue;
@@ -193,6 +205,16 @@
                     for (int _xi = 0; _xi < _pn; _xi++) {
                         if (_pNorms[_xi].equals(_tok)) {
                             conn.createStatement().execute("INSERT INTO publicationhashtag(idpublication,hashtag,typetag,idref) VALUES('" + pub.getIdpublication() + "','" + _tag + "','PROMOTION','" + _pIds[_xi] + "') ON CONFLICT DO NOTHING");
+                            _found = true;
+                            break;
+                        }
+                    }
+                }
+                if (!_found) {
+                    for (int _xi = 0; _xi < _rcn; _xi++) {
+                        if (_rcNorms[_xi].equals(_tok) || _rcNorms[_xi].startsWith(_tok) || _tok.startsWith(_rcNorms[_xi])) {
+                            conn.createStatement().execute("INSERT INTO publicationhashtag(idpublication,hashtag,typetag,idref) VALUES('" + pub.getIdpublication() + "','" + _tag + "','PARCOURS','" + _rcIds[_xi] + "') ON CONFLICT DO NOTHING");
+                            _found = true;
                             break;
                         }
                     }
@@ -200,20 +222,31 @@
             }
 
             // --- Visibilite : enregistrer les restrictions ---
-            if (visSpec != null && !visSpec.trim().isEmpty() && !"ALL".equalsIgnoreCase(visSpec.trim())) {
+            if (visSpec != null && !visSpec.trim().isEmpty()) {
                 String[] _vs = visSpec.split(",");
                 for (int _vi = 0; _vi < _vs.length; _vi++) {
                     String _v = _vs[_vi].trim().replaceAll("[^A-Za-z0-9]","");
                     if (!_v.isEmpty()) {
-                        conn.createStatement().execute("INSERT INTO publicationvisibilite(idpublication,typecible,idref,anneemin) VALUES('" + pub.getIdpublication() + "','SPECIALITE','" + _v + "',NULL) ON CONFLICT DO NOTHING");
+                        conn.createStatement().execute("INSERT INTO publicationvisibilite(idpublication,typecible,idref) VALUES('" + pub.getIdpublication() + "','SPECIALITE','" + _v + "') ON CONFLICT DO NOTHING");
                     }
                 }
             }
-            if (visPromoAnneeMin != null && !visPromoAnneeMin.trim().isEmpty()) {
-                try {
-                    int _am = Integer.parseInt(visPromoAnneeMin.trim());
-                    conn.createStatement().execute("INSERT INTO publicationvisibilite(idpublication,typecible,idref,anneemin) VALUES('" + pub.getIdpublication() + "','PROMOTION',NULL," + _am + ") ON CONFLICT DO NOTHING");
-                } catch (NumberFormatException _nfe2) {}
+            if (visParc != null && !visParc.trim().isEmpty()) {
+                String[] _vp = visParc.split(",");
+                for (int _vi = 0; _vi < _vp.length; _vi++) {
+                    String _v = _vp[_vi].trim().replaceAll("[^A-Za-z0-9]","");
+                    if (!_v.isEmpty()) {
+                        conn.createStatement().execute("INSERT INTO publicationvisibilite(idpublication,typecible,idref) VALUES('" + pub.getIdpublication() + "','PARCOURS','" + _v + "') ON CONFLICT DO NOTHING");
+                    }
+                }
+            }
+            if (visPromoAnnee != null && !visPromoAnnee.trim().isEmpty()) {
+                String _vpa = visPromoAnnee.trim();
+                if (_vpa.matches("\\d{4}[+-]")) {
+                    int _anneeRef = Integer.parseInt(_vpa.substring(0, 4));
+                    String _dir   = String.valueOf(_vpa.charAt(4));
+                    conn.createStatement().execute("INSERT INTO publicationvisibilite(idpublication,typecible,idref,anneeref,anneedirection) VALUES('" + pub.getIdpublication() + "','PROMOTION',NULL," + _anneeRef + ",'" + _dir + "') ON CONFLICT DO NOTHING");
+                }
             }
             if ("AND".equalsIgnoreCase(visLier)) {
                 conn.createStatement().execute("UPDATE publication SET logique_visibilite='AND' WHERE idpublication='" + pub.getIdpublication() + "'");

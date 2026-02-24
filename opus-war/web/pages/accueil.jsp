@@ -16,6 +16,7 @@
 <%@ page import="alumni.Identification" %>
 <%@ page import="alumni.Specialite" %>
 <%@ page import="alumni.Promotion" %>
+<%@ page import="alumni.Parcours" %>
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.sql.Statement" %>
 <%@ page import="java.sql.ResultSet" %>
@@ -52,6 +53,8 @@
     if (allSpecialites == null) allSpecialites = new Specialite[0];
     Promotion[] allPromotions = (Promotion[]) CGenUtil.rechercher(new Promotion(), null, null, " order by annee desc");
     if (allPromotions == null) allPromotions = new Promotion[0];
+    Parcours[] allParcours = (Parcours[]) CGenUtil.rechercher(new Parcours(), null, null, " order by libelle");
+    if (allParcours == null) allParcours = new Parcours[0];
 
     // Charger photo profil/couverture du connecte + 3 evenements a venir
     String _connPhotoUrl = "";
@@ -114,26 +117,16 @@
         <% } %>
 
         <!-- ===== FILTRE DU FIL ===== -->
+        <!-- Datalists pour le filtre -->
+        <datalist id="dl-f-spec"><% for (int _fi=0;_fi<allSpecialites.length;_fi++){%><option value="<%= allSpecialites[_fi].getLibelle() %>"><% } %></datalist>
+        <datalist id="dl-f-parc"><% for (int _fi=0;_fi<allParcours.length;_fi++){%><option value="<%= allParcours[_fi].getLibelle() %>"><% } %></datalist>
+        <datalist id="dl-f-typepub"><% for (int _fi=0;_fi<typesPub.length;_fi++){%><option value="<%= typesPub[_fi].getLibelle() %>"><% } %></datalist>
         <div class="fa-filter-bar" id="feed-filter-bar">
-            <select id="filter-spec" class="fa-filter-select">
-                <option value="">Toutes les sp&eacute;cialit&eacute;s</option>
-                <% for (int _fi = 0; _fi < allSpecialites.length; _fi++) { %>
-                <option value="<%= allSpecialites[_fi].getIdspecialite() %>"><%= allSpecialites[_fi].getLibelle() %></option>
-                <% } %>
-            </select>
-            <select id="filter-promo" class="fa-filter-select">
-                <option value="">Toutes les promotions</option>
-                <% for (int _fi = 0; _fi < allPromotions.length; _fi++) { %>
-                <option value="<%= allPromotions[_fi].getIdpromotion() %>"><%= allPromotions[_fi].getLibelle() %></option>
-                <% } %>
-            </select>
-            <select id="filter-typepub" class="fa-filter-select">
-                <option value="">Tous les types</option>
-                <% for (int _fi = 0; _fi < typesPub.length; _fi++) { %>
-                <option value="<%= typesPub[_fi].getIdtypepublication() %>"><%= typesPub[_fi].getLibelle() %></option>
-                <% } %>
-            </select>
-            <label class="fa-filter-lier-label" title="Les deux crit&egrave;res doivent correspondre">
+            <input list="dl-f-spec" id="filter-spec-input" class="fa-filter-input" placeholder="Sp&eacute;cialit&eacute;..." autocomplete="off">
+            <input list="dl-f-parc" id="filter-parc-input" class="fa-filter-input" placeholder="Parcours..." autocomplete="off">
+            <input id="filter-promo-input" class="fa-filter-input" placeholder="Ann&eacute;e ex: 2023+" maxlength="6" autocomplete="off">
+            <input list="dl-f-typepub" id="filter-typepub-input" class="fa-filter-input" placeholder="Type de publication..." autocomplete="off">
+            <label class="fa-filter-lier-label" title="Relier les crit&egrave;res (ET)">
                 <input type="checkbox" id="filter-lier">&nbsp;Lier
             </label>
             <button type="button" class="fa-filter-apply" onclick="appliquerFiltre()"><i class="bi bi-sliders"></i>&nbsp;Filtrer</button>
@@ -197,36 +190,45 @@
                             <span id="vis-summary">Visible par tous</span>
                             <i class="bi bi-chevron-down" id="vis-chevron" style="margin-left:auto;font-size:12px;"></i>
                         </div>
+                        <!-- Datalists visibilite -->
+                        <datalist id="dl-vis-spec"><% for(int _vi=0;_vi<allSpecialites.length;_vi++){%><option value="<%= allSpecialites[_vi].getLibelle() %>"><% } %></datalist>
+                        <datalist id="dl-vis-parc"><% for(int _vi=0;_vi<allParcours.length;_vi++){%><option value="<%= allParcours[_vi].getLibelle() %>"><% } %></datalist>
                         <div class="fa-vis-body" id="vis-body" style="display:none;">
                             <div class="fa-vis-group">
-                                <div class="fa-vis-label">Sp&eacute;cialit&eacute;(s)</div>
-                                <div class="fa-vis-chips" id="vis-spec-chips">
-                                    <button type="button" class="fa-vis-chip fa-vis-chip--active" data-id="ALL" onclick="toggleVisSpec(this)">Toutes</button>
-                                    <% for (int _vi = 0; _vi < allSpecialites.length; _vi++) { %>
-                                    <button type="button" class="fa-vis-chip" data-id="<%= allSpecialites[_vi].getIdspecialite() %>" onclick="toggleVisSpec(this)"><%= allSpecialites[_vi].getLibelle() %></button>
-                                    <% } %>
+                                <div class="fa-vis-label">Sp&eacute;cialit&eacute;s</div>
+                                <div class="fa-vis-tag-row">
+                                    <input list="dl-vis-spec" id="vis-spec-input" class="fa-vis-tag-input" placeholder="Ajouter une sp&eacute;cialit&eacute;..." autocomplete="off" oninput="" onkeydown="onVisTagKey(event,'spec')">
+                                    <button type="button" class="fa-vis-tag-add" onclick="addVisTagFromInput('spec')"><i class="bi bi-plus"></i></button>
                                 </div>
+                                <div class="fa-vis-chips" id="vis-spec-chips"></div>
                             </div>
                             <div class="fa-vis-group">
-                                <div class="fa-vis-label">Promotion</div>
-                                <div class="fa-vis-promo-row">
-                                    <select id="vis-promo-select" onchange="onVisPromoChange()" class="fa-input" style="max-width:220px;">
-                                        <option value="">Toutes les promotions</option>
-                                        <% for (int _vi = 0; _vi < allPromotions.length; _vi++) { %>
-                                        <option value="<%= allPromotions[_vi].getIdpromotion() %>" data-annee="<%= allPromotions[_vi].getAnnee() %>"><%= allPromotions[_vi].getLibelle() %> (<%= allPromotions[_vi].getAnnee() %>)</option>
-                                        <% } %>
-                                    </select>
-                                    <span id="vis-promo-note" style="display:none;font-size:12px;color:var(--itu-blue,#008BFF);"><i class="bi bi-info-circle"></i>&nbsp;et plus r&eacute;centes</span>
+                                <div class="fa-vis-label">Parcours</div>
+                                <div class="fa-vis-tag-row">
+                                    <input list="dl-vis-parc" id="vis-parc-input" class="fa-vis-tag-input" placeholder="Ajouter un parcours..." autocomplete="off" onkeydown="onVisTagKey(event,'parc')">
+                                    <button type="button" class="fa-vis-tag-add" onclick="addVisTagFromInput('parc')"><i class="bi bi-plus"></i></button>
                                 </div>
+                                <div class="fa-vis-chips" id="vis-parc-chips"></div>
                             </div>
-                            <div class="fa-vis-group" id="vis-lier-group" style="display:none;">
+                            <div class="fa-vis-group">
+                                <div class="fa-vis-label">Promotion (ann&eacute;e)</div>
+                                <div class="fa-vis-tag-row" style="position:relative;">
+                                    <input id="vis-promo-input" class="fa-vis-tag-input" placeholder="ex: 2023 &rarr; 2023+ ou 2023-" maxlength="5" autocomplete="off"
+                                           oninput="onVisPromoInput()" onkeydown="onVisPromoKey(event)">
+                                    <button type="button" class="fa-vis-tag-add" onclick="addVisPromoFromInput()"><i class="bi bi-plus"></i></button>
+                                    <div class="fa-vis-promo-dd" id="vis-promo-dd" style="display:none;"></div>
+                                </div>
+                                <div class="fa-vis-chips" id="vis-promo-chips"></div>
+                            </div>
+                            <div class="fa-vis-group" id="vis-lier-group">
                                 <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;">
                                     <input type="checkbox" id="vis-lier-check" onchange="updateVisHidden()">
-                                    Lier les crit&egrave;res (les deux conditions doivent &ecirc;tre remplies)
+                                    Lier les crit&egrave;res (ET : toutes les conditions requises)
                                 </label>
                             </div>
-                            <input type="hidden" name="vis_spec" id="vis-spec-hidden" value="ALL">
-                            <input type="hidden" name="vis_promo_anneemin" id="vis-promo-anneemin-hidden" value="">
+                            <input type="hidden" name="vis_spec" id="vis-spec-hidden" value="">
+                            <input type="hidden" name="vis_parc" id="vis-parc-hidden" value="">
+                            <input type="hidden" name="vis_promo_annee" id="vis-promo-annee-hidden" value="">
                             <input type="hidden" name="vis_lier" id="vis-lier-hidden" value="OR">
                         </div>
                     </div>
@@ -280,16 +282,26 @@
                     + "+COALESCE((SELECT COUNT(*) FROM publicationcommentaire pc WHERE pc.idpublication=p.idpublication AND pc.etat=1),0)*3"
                     + "-COALESCE((SELECT pv.nbvue FROM publicationvue pv WHERE pv.idpublication=p.idpublication AND pv.idutilisateur=" + refuserConnecte + "),0)*4"
                     + "+CASE WHEN p.daty::date=CURRENT_DATE THEN 15 WHEN p.daty::date>=CURRENT_DATE-7 THEN 8 WHEN p.daty::date>=CURRENT_DATE-30 THEN 3 ELSE 0 END";
-                // Filtre de visibilite : seules les publications accessibles au user connecte
-                String _visSpecSub = "(SELECT sp.idspecialite FROM specialiteprofil sp JOIN profil _pr ON sp.idprofil=_pr.idprofil WHERE _pr.idutilisateur=" + refuserConnecte + ")";
-                String _visPromoSub = "(SELECT _pt.annee FROM promotion _pt JOIN profil _pr ON _pt.idpromotion=_pr.idpromotion WHERE _pr.idutilisateur=" + refuserConnecte + ")";
-                String _visW = " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication)"
+                // ---- Visibilite : construire sous-requetes ----
+                String _vsSpecSub = "(SELECT sp.idspecialite FROM specialiteprofil sp JOIN profil _pr ON sp.idprofil=_pr.idprofil WHERE _pr.idutilisateur=" + refuserConnecte + ")";
+                String _vsParcSub = "(SELECT _pr.idparcours FROM profil _pr WHERE _pr.idutilisateur=" + refuserConnecte + " LIMIT 1)";
+                String _vsUserAnnee = "(SELECT _pt.annee FROM promotion _pt JOIN profil _pr ON _pt.idpromotion=_pr.idpromotion WHERE _pr.idutilisateur=" + refuserConnecte + " LIMIT 1)";
+                // Condition promo : direction + ou -
+                String _vsPromoCond = "(_pv.typecible='PROMOTION' AND ((_pv.anneedirection='+' AND " + _vsUserAnnee + ">=_pv.anneeref) OR (_pv.anneedirection='-' AND " + _vsUserAnnee + "<=_pv.anneeref)))";
+                String _vsSpecExist  = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE' AND _pv.idref IN " + _vsSpecSub + ")";
+                String _vsPromoExist = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND " + _vsPromoCond + ")";
+                String _vsParcExist  = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PARCOURS' AND _pv.idref=" + _vsParcSub + ")";
+                String _visW =
+                    " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication)"
+                    // OR mode: satisfaire au moins UNE restriction
                     + " OR (COALESCE(p.logique_visibilite,'OR')='OR' AND ("
-                    + "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE' AND _pv.idref IN " + _visSpecSub + ")"
-                    + " OR EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PROMOTION' AND _pv.anneemin<=" + _visPromoSub + ")))"
+                    + _vsSpecExist + " OR " + _vsPromoExist + " OR " + _vsParcExist
+                    + "))"
+                    // AND mode: satisfaire CHAQUE type de restriction present
                     + " OR (p.logique_visibilite='AND'"
-                    + " AND EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE' AND _pv.idref IN " + _visSpecSub + ")"
-                    + " AND EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PROMOTION' AND _pv.anneemin<=" + _visPromoSub + ")))";
+                    + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE') OR " + _vsSpecExist + ")"
+                    + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PROMOTION') OR " + _vsPromoExist + ")"
+                    + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PARCOURS') OR " + _vsParcExist + ")))"; 
                 String _initSql = "SELECT p.idpublication,(" + _sE + ") AS score FROM publication p WHERE p.etat=1" + _visW + " ORDER BY score DESC,p.idpublication DESC LIMIT 10";
                 List _pids = new ArrayList(); List _pscores = new ArrayList();
                 Statement _st = null; ResultSet _rs = null;
@@ -494,7 +506,8 @@
     .fa-type-select { margin-left: 6px; padding: 3px 8px; border: 1px solid var(--fa-border); border-radius: 6px; font-size: 13px; background: #f0f2f5; }
     /* ---- Barre de filtre ---- */
     .fa-filter-bar { display:flex; align-items:center; gap:8px; background:var(--fa-card-bg); border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.12); padding:10px 14px; flex-wrap:wrap; }
-    .fa-filter-select { padding:5px 8px; border:1px solid var(--fa-border); border-radius:8px; font-size:13px; background:#f0f2f5; color:var(--fa-text); cursor:pointer; }
+    .fa-filter-input { padding:5px 10px; border:1px solid var(--fa-border); border-radius:8px; font-size:13px; background:#f0f2f5; color:var(--fa-text); width:130px; outline:none; }
+    .fa-filter-input:focus { border-color:var(--itu-blue,#008BFF); background:#fff; }
     .fa-filter-lier-label { font-size:13px; color:var(--fa-text-secondary); display:flex; align-items:center; gap:4px; cursor:pointer; white-space:nowrap; }
     .fa-filter-apply { padding:6px 14px; background:var(--itu-blue,#008BFF); color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:5px; }
     .fa-filter-apply:hover { background:#0069cc; }
@@ -507,10 +520,17 @@
     .fa-vis-body { padding:10px 12px; display:flex; flex-direction:column; gap:10px; background:#fff; }
     .fa-vis-group { display:flex; flex-direction:column; gap:5px; }
     .fa-vis-label { font-size:12px; font-weight:600; color:var(--fa-text-secondary); text-transform:uppercase; letter-spacing:.4px; }
-    .fa-vis-chips { display:flex; flex-wrap:wrap; gap:5px; }
-    .fa-vis-chip { padding:4px 10px; border:1px solid var(--fa-border); border-radius:12px; background:#f0f2f5; font-size:12px; cursor:pointer; color:var(--fa-text); transition:all .15s; }
-    .fa-vis-chip--active { background:var(--itu-blue,#008BFF); color:#fff; border-color:var(--itu-blue,#008BFF); }
-    .fa-vis-promo-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .fa-vis-tag-row { display:flex; gap:5px; align-items:center; }
+    .fa-vis-tag-input { flex:1; padding:5px 8px; border:1px solid var(--fa-border); border-radius:8px; font-size:13px; background:#f0f2f5; outline:none; }
+    .fa-vis-tag-input:focus { border-color:var(--itu-blue,#008BFF); background:#fff; }
+    .fa-vis-tag-add { padding:5px 9px; background:var(--itu-blue,#008BFF); color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:14px; line-height:1; }
+    .fa-vis-chips { display:flex; flex-wrap:wrap; gap:5px; margin-top:4px; min-height:4px; }
+    .fa-vis-chip { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; background:#e7f3ff; color:var(--itu-blue,#008BFF); border:1px solid #b8dbff; border-radius:12px; font-size:12px; }
+    .fa-vis-chip-del { background:none; border:none; color:inherit; cursor:pointer; padding:0 0 0 2px; font-size:13px; line-height:1; opacity:.7; }
+    .fa-vis-chip-del:hover { opacity:1; }
+    .fa-vis-promo-dd { position:absolute; top:100%; left:0; z-index:200; background:#fff; border:1px solid #dde3ec; border-radius:8px; box-shadow:0 4px 14px rgba(0,0,0,.13); min-width:160px; }
+    .fa-vis-promo-dd-item { padding:8px 12px; cursor:pointer; font-size:13px; }
+    .fa-vis-promo-dd-item:hover { background:#e7f3ff; }
     /* ---- Hashtag autocomplete ---- */
     .fa-hashtag-dd { display:none; position:absolute; bottom:calc(100% + 4px); left:0; z-index:300; background:#fff; border:1px solid #dde3ec; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,.14); min-width:220px; max-height:200px; overflow-y:auto; }
     .fa-hashtag-item { padding:8px 12px; cursor:pointer; font-size:13px; border-bottom:1px solid #f0f2f5; }
@@ -760,6 +780,10 @@
     var CTX = '<%= ctx %>';
     var CURRENT_USER_ID = '<%= refuserConnecte %>';
     var CONN_PHOTO = '<%= _connPhotoUrl %>';
+    // ---- Maps libelle -> idref pour les filtres ----
+    var _SPEC_MAP = {<% for(int _mi=0;_mi<allSpecialites.length;_mi++){if(_mi>0)out.print(","); out.print("\"" + allSpecialites[_mi].getLibelle().replace("\\","\\\\").replace("\"","\\\"") + "\":\"" + allSpecialites[_mi].getIdspecialite() + "\""); } %>};
+    var _PARC_MAP = {<% for(int _mi=0;_mi<allParcours.length;_mi++){if(_mi>0)out.print(","); out.print("\"" + allParcours[_mi].getLibelle().replace("\\","\\\\").replace("\"","\\\"") + "\":\"" + allParcours[_mi].getIdparcours() + "\""); } %>};
+    var _TYPEPUB_MAP = {<% for(int _mi=0;_mi<typesPub.length;_mi++){if(_mi>0)out.print(","); out.print("\"" + typesPub[_mi].getLibelle().replace("\\","\\\\").replace("\"","\\\"") + "\":\"" + typesPub[_mi].getIdtypepublication() + "\""); } %>};
 
     // ========== DONNEES TEMPORAIRES MENTIONS ==========
     var mentionData = {}; // { idpub: { suggestions: [], selectedIndex: 0, mentionIds: [], searchStart: -1 } }
@@ -1710,14 +1734,16 @@
         function doFetch(score, id) {
             loading = true;
             loader.style.display = 'block';
-            var fs = cursor.getAttribute('data-filter-spec')    || '';
-            var fp = cursor.getAttribute('data-filter-promo')   || '';
-            var ft = cursor.getAttribute('data-filter-typepub') || '';
-            var fl = cursor.getAttribute('data-filter-lier')    || '';
+            var fs  = cursor.getAttribute('data-filter-spec')    || '';
+            var fpa = cursor.getAttribute('data-filter-parc')   || '';
+            var fp  = cursor.getAttribute('data-filter-promo')  || '';
+            var ft  = cursor.getAttribute('data-filter-typepub')|| '';
+            var fl  = cursor.getAttribute('data-filter-lier')   || '';
             var url = CTX + '/pages/alumni/ajax/charger-feed.jsp'
                 + '?cursor_score='    + encodeURIComponent(score)
                 + '&cursor_id='       + encodeURIComponent(id)
                 + '&filter_spec='     + encodeURIComponent(fs)
+                + '&filter_parc='     + encodeURIComponent(fpa)
                 + '&filter_promo='    + encodeURIComponent(fp)
                 + '&filter_typepub='  + encodeURIComponent(ft)
                 + '&filter_lier='     + encodeURIComponent(fl);
@@ -1801,37 +1827,48 @@
     })();
 
     // ========== FILTRE DU FIL ==========
+    function _resolveFilterId(inputId, map) {
+        var txt = document.getElementById(inputId).value.trim();
+        if (!txt) return '';
+        return map[txt] || '';
+    }
     function appliquerFiltre() {
-        var spec    = document.getElementById('filter-spec').value;
-        var promo   = document.getElementById('filter-promo').value;
-        var typepub = document.getElementById('filter-typepub').value;
-        var lier    = document.getElementById('filter-lier').checked ? '1' : '';
+        var spec    = _resolveFilterId('filter-spec-input',    _SPEC_MAP);
+        var parc    = _resolveFilterId('filter-parc-input',    _PARC_MAP);
+        var typepub = _resolveFilterId('filter-typepub-input', _TYPEPUB_MAP);
+        // Promo: accepte format 'yyyy+' ou 'yyyy-' directement
+        var promoRaw = document.getElementById('filter-promo-input').value.trim();
+        var promo = /^\d{4}[+-]$/.test(promoRaw) ? promoRaw : '';
+        var lier  = document.getElementById('filter-lier').checked ? '1' : '';
         var cursor  = document.getElementById('feed-cursor');
         var feed    = document.querySelector('.fa-feed-center');
         var sentinel= document.getElementById('feed-sentinel');
         if (!cursor || !feed) return;
         cursor.setAttribute('data-filter-spec',    spec);
+        cursor.setAttribute('data-filter-parc',    parc);
         cursor.setAttribute('data-filter-promo',   promo);
         cursor.setAttribute('data-filter-typepub', typepub);
         cursor.setAttribute('data-filter-lier',    lier);
         cursor.setAttribute('data-score',    '9999999');
         cursor.setAttribute('data-id',       'ZZZZZZZZZZZZZZZZZZZ');
         cursor.setAttribute('data-has-more', 'true');
-        // Effacer cartes actuelles
         feed.querySelectorAll('.fa-post-card, .fa-feed-end').forEach(function(el){ el.remove(); });
         if (sentinel) sentinel.style.display = 'block';
-        document.getElementById('filter-reset-btn').style.display = (spec||promo||typepub) ? 'inline-flex' : 'none';
+        document.getElementById('filter-reset-btn').style.display = (spec||parc||promo||typepub) ? 'inline-flex' : 'none';
         if (window.triggerFeedLoad) window.triggerFeedLoad();
     }
     function reinitialiserFiltre() {
-        document.getElementById('filter-spec').value = '';
-        document.getElementById('filter-promo').value = '';
-        document.getElementById('filter-typepub').value = '';
+        ['filter-spec-input','filter-parc-input','filter-promo-input','filter-typepub-input'].forEach(function(id){
+            document.getElementById(id).value = '';
+        });
         document.getElementById('filter-lier').checked = false;
         appliquerFiltre();
     }
 
     // ========== VISIBILITE FORM ==========
+    // Etat des tags de visibilite
+    var _visTags = { spec: [], parc: [], promo: null }; // spec/parc: [{id,label}], promo: 'yyyy+' ou 'yyyy-' ou null
+
     function toggleVisSection() {
         var body = document.getElementById('vis-body');
         var chev = document.getElementById('vis-chevron');
@@ -1839,67 +1876,126 @@
         body.style.display = open ? 'none' : 'block';
         chev.className = open ? 'bi bi-chevron-down' : 'bi bi-chevron-up';
     }
-    function toggleVisSpec(btn) {
-        var isAll = btn.getAttribute('data-id') === 'ALL';
-        var chips = document.querySelectorAll('#vis-spec-chips .fa-vis-chip');
-        chips.forEach(function(c){ c.classList.remove('fa-vis-chip--active'); });
-        if (isAll) {
-            chips[0].classList.add('fa-vis-chip--active');
+
+    // Ajouter un tag spec ou parc via le bouton +
+    function addVisTagFromInput(type) {
+        var inputId = 'vis-' + type + '-input';
+        var mapObj  = (type === 'spec') ? _SPEC_MAP : _PARC_MAP;
+        var inp = document.getElementById(inputId);
+        var txt = inp.value.trim();
+        if (!txt) return;
+        var id  = mapObj[txt];
+        if (!id) return; // doit correspondre exactement
+        var arr = _visTags[type];
+        if (arr.find(function(t){ return t.id===id; })) { inp.value=''; return; }
+        arr.push({id:id, label:txt});
+        inp.value = '';
+        renderVisTags(type);
+        updateVisHidden();
+    }
+    function onVisTagKey(e, type) {
+        if (e.key === 'Enter') { e.preventDefault(); addVisTagFromInput(type); }
+    }
+    function removeVisTag(type, id) {
+        _visTags[type] = _visTags[type].filter(function(t){ return t.id!==id; });
+        renderVisTags(type);
+        updateVisHidden();
+    }
+    function renderVisTags(type) {
+        var container = document.getElementById('vis-' + type + '-chips');
+        container.innerHTML = '';
+        _visTags[type].forEach(function(t) {
+            var chip = document.createElement('span');
+            chip.className = 'fa-vis-chip';
+            chip.innerHTML = escHtml(t.label) + '<button type="button" class="fa-vis-chip-del" onclick="removeVisTag(\'' + type + '\',\'' + t.id + '\')">\u00d7</button>';
+            container.appendChild(chip);
+        });
+    }
+
+    // Promo: input annee (ex: 2023) -> suggestions 2023+ / 2023-
+    function onVisPromoInput() {
+        var inp = document.getElementById('vis-promo-input');
+        var dd  = document.getElementById('vis-promo-dd');
+        var val = inp.value.trim();
+        if (/^\d{4}$/.test(val)) {
+            dd.innerHTML = '<div class="fa-vis-promo-dd-item" onmousedown="selectVisPromo(\'' + val + '+\')">'
+                + val + '+ <small style="color:#888">('+val+' et ann&eacute;es plus r&eacute;centes)</small></div>'
+                + '<div class="fa-vis-promo-dd-item" onmousedown="selectVisPromo(\'' + val + '-\')">'
+                + val + '- <small style="color:#888">('+val+' et ann&eacute;es plus anciennes)</small></div>';
+            dd.style.display = 'block';
         } else {
-            chips[0].classList.remove('fa-vis-chip--active');
-            btn.classList.toggle('fa-vis-chip--active');
+            dd.style.display = 'none';
         }
+    }
+    function onVisPromoKey(e) {
+        if (e.key === 'Enter') { e.preventDefault(); addVisPromoFromInput(); }
+        if (e.key === 'Escape') document.getElementById('vis-promo-dd').style.display='none';
+    }
+    function selectVisPromo(expr) {
+        document.getElementById('vis-promo-dd').style.display='none';
+        document.getElementById('vis-promo-input').value = expr;
+        addVisPromoFromInput();
+    }
+    function addVisPromoFromInput() {
+        var val = document.getElementById('vis-promo-input').value.trim();
+        if (!/^\d{4}[+-]$/.test(val)) return;
+        _visTags.promo = val;
+        document.getElementById('vis-promo-input').value = '';
+        document.getElementById('vis-promo-dd').style.display='none';
+        renderVisPromo();
         updateVisHidden();
     }
-    function onVisPromoChange() {
-        var sel  = document.getElementById('vis-promo-select');
-        var note = document.getElementById('vis-promo-note');
-        if (note) note.style.display = sel.value ? 'inline' : 'none';
+    function removeVisPromo() {
+        _visTags.promo = null;
+        renderVisPromo();
         updateVisHidden();
     }
+    function renderVisPromo() {
+        var container = document.getElementById('vis-promo-chips');
+        container.innerHTML = '';
+        if (_visTags.promo) {
+            var chip = document.createElement('span');
+            chip.className = 'fa-vis-chip';
+            chip.innerHTML = escHtml(_visTags.promo) + '<button type="button" class="fa-vis-chip-del" onclick="removeVisPromo()">\u00d7</button>';
+            container.appendChild(chip);
+        }
+    }
+
     function updateVisHidden() {
-        // Spec
-        var active = document.querySelectorAll('#vis-spec-chips .fa-vis-chip--active');
-        var allBtn = document.querySelector('#vis-spec-chips .fa-vis-chip[data-id="ALL"]');
-        var isAll  = allBtn && allBtn.classList.contains('fa-vis-chip--active');
-        var specIds = [];
-        if (!isAll) active.forEach(function(c){ if(c.getAttribute('data-id')!=='ALL') specIds.push(c.getAttribute('data-id')); });
-        document.getElementById('vis-spec-hidden').value = (isAll || !specIds.length) ? 'ALL' : specIds.join(',');
-        // Promo
-        var promoSel = document.getElementById('vis-promo-select');
-        var anneeMin = '';
-        if (promoSel && promoSel.value) {
-            var opt = promoSel.options[promoSel.selectedIndex];
-            anneeMin = opt.getAttribute('data-annee') || '';
-        }
-        document.getElementById('vis-promo-anneemin-hidden').value = anneeMin;
         // Lier
         var lierChk = document.getElementById('vis-lier-check');
-        document.getElementById('vis-lier-hidden').value = (lierChk && lierChk.checked) ? 'AND' : 'OR';
-        // Montrer groupe lier
-        var specOk  = document.getElementById('vis-spec-hidden').value !== 'ALL';
-        var promoOk = anneeMin !== '';
-        var lierGrp = document.getElementById('vis-lier-group');
-        if (lierGrp) lierGrp.style.display = (specOk && promoOk) ? 'block' : 'none';
-        // Resume
+        var lier = (lierChk && lierChk.checked) ? 'AND' : 'OR';
+        document.getElementById('vis-lier-hidden').value = lier;
+        // Spec
+        document.getElementById('vis-spec-hidden').value = _visTags.spec.map(function(t){return t.id;}).join(',');
+        // Parc
+        document.getElementById('vis-parc-hidden').value = _visTags.parc.map(function(t){return t.id;}).join(',');
+        // Promo
+        document.getElementById('vis-promo-annee-hidden').value = _visTags.promo || '';
+        // Resume dans l'entete
+        var hasSpec  = _visTags.spec.length > 0;
+        var hasParc  = _visTags.parc.length > 0;
+        var hasPromo = !!_visTags.promo;
         var icon = document.getElementById('vis-icon');
         var summ = document.getElementById('vis-summary');
-        if (!specOk && !promoOk) {
+        if (!hasSpec && !hasParc && !hasPromo) {
             if (icon) icon.className = 'bi bi-globe2';
             if (summ) summ.textContent = 'Visible par tous';
         } else {
             var parts = [];
-            if (specOk) {
-                document.querySelectorAll('#vis-spec-chips .fa-vis-chip--active').forEach(function(c){
-                    if (c.getAttribute('data-id') !== 'ALL') parts.push(c.textContent.trim());
-                });
-            }
-            if (promoOk && promoSel) parts.push(promoSel.options[promoSel.selectedIndex].text + ' et +');
-            var lier = document.getElementById('vis-lier-hidden').value;
+            _visTags.spec.forEach(function(t){ parts.push(t.label); });
+            _visTags.parc.forEach(function(t){ parts.push(t.label); });
+            if (_visTags.promo) parts.push('Promo ' + _visTags.promo);
             if (icon) icon.className = 'bi bi-lock-fill';
             if (summ) summ.textContent = parts.join(lier === 'AND' ? ' ET ' : ' OU ');
         }
     }
+
+    // Fermer le dropdown promo si clic ailleurs
+    document.addEventListener('click', function(e){
+        var dd = document.getElementById('vis-promo-dd');
+        if (dd && !dd.contains(e.target) && e.target.id !== 'vis-promo-input') dd.style.display='none';
+    });
 
     // ========== HASHTAG AUTOCOMPLETE ==========
     function setupHashtagAutocomplete(ta) {
