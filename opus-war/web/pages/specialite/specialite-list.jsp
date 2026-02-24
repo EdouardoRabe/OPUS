@@ -3,7 +3,7 @@
 
 <% try {
     SpecialiteCpl t = new SpecialiteCpl();
-    String listeCrt[] = {"idspecialite", "libelle"};
+    String listeCrt[] = {"idspecialite", "libelle", "description"};
     String listeInt[] = {};
     String libEntete[] = {"idspecialite", "libelle", "description", "photohtml"};
     PageRecherche pr = new PageRecherche(t, request, listeCrt, listeInt, 3, libEntete, libEntete.length);
@@ -13,6 +13,7 @@
     pr.setApres("specialite/specialite-list.jsp");
     pr.getFormu().getChamp("idspecialite").setLibelle("Id");
     pr.getFormu().getChamp("libelle").setLibelle("Libell&eacute;");
+    pr.getFormu().getChamp("description").setLibelle("Description");
     pr.setNpp(50);
     String[] colSomme = {};
     pr.creerObjetPage(libEntete, colSomme);
@@ -70,29 +71,10 @@
     </div>
 </div>
 
-<!-- ═══ SEARCH & FILTER ═══ -->
+<!-- ═══ SEARCH & FILTER (APJ Standard) ═══ -->
 <div class="custom-card no-hover" style="margin-bottom:20px;padding:1.25rem 1.5rem;">
-    <form action="<%= pr.getLien() %>?but=<%= pr.getApres() %>" method="post">
-        <div class="specialite-search-row">
-            <input class="form-control-custom"
-                   type="text"
-                   name="libelle"
-                   value="<%= pr.getFormu().getChamp("libelle").getValeur() != null ? pr.getFormu().getChamp("libelle").getValeur() : "" %>"
-                   placeholder="Rechercher une sp&eacute;cialit&eacute;..."
-                   style="flex:1;">
-            <button class="btn btn-primary" type="submit" style="padding-left:1.5rem;padding-right:1.5rem;">
-                <i class="fa fa-search" style="margin-right:6px;"></i>Chercher
-            </button>
-        </div>
-        <div class="specialite-filter-row">
-            <!-- Filters statiques — à connecter quand les colonnes DB seront disponibles -->
-            <select class="form-control-custom" style="width:auto;min-width:175px;" disabled title="Filtre domaine (non disponible)">
-                <option>Tous les domaines</option>
-            </select>
-            <select class="form-control-custom" style="width:auto;min-width:175px;" disabled title="Filtre niveau (non disponible)">
-                <option>Tous les niveaux</option>
-            </select>
-        </div>
+    <form action="<%= pr.getLien() %>?but=<%= pr.getApres() %>" method="post" name="recherche" id="recherche">
+        <%= pr.getFormu().getHtmlEnsemble() %>
     </form>
 </div>
 
