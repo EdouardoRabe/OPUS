@@ -8,114 +8,221 @@
 %>
 
 <style>
-/* ===== RESEAU PROFESSIONNEL — Styles ===== */
+/* ===== RESEAU PROFESSIONNEL — Styles UI/UX Pro Max ===== */
+.content-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+.content-header {
+    margin-bottom: 2rem;
+    padding: 0;
+}
+.content-header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.5px;
+}
+.content-header small {
+    font-size: 1rem;
+    color: #64748b;
+    font-weight: 500;
+}
+.content {
+    padding: 0;
+}
 #reseau-container {
     background: radial-gradient(ellipse at 50% 40%, #0d1b2a 0%, #050d14 100%);
-    border-radius: 12px;
+    border-radius: 16px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
-    margin: 0 0 20px 0;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+    margin: 0 0 2rem 0;
+    border: 1px solid rgba(100,180,255,0.12);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+#reseau-container:hover {
+    box-shadow: 0 25px 70px rgba(0,139,255,0.15), inset 0 1px 0 rgba(255,255,255,0.1);
+    border-color: rgba(100,180,255,0.2);
 }
 #reseau-canvas {
     display: block;
     cursor: default;
+    width: 100%;
+    height: 100%;
 }
 #reseau-tooltip {
     position: absolute;
     pointer-events: none;
-    background: rgba(10,20,35,0.95);
-    border: 1px solid rgba(100,180,255,0.4);
-    border-radius: 10px;
-    padding: 10px 14px;
+    background: rgba(10,20,35,0.98);
+    border: 1.5px solid rgba(100,180,255,0.5);
+    border-radius: 14px;
+    padding: 14px 18px;
     color: #e0f0ff;
     font-size: 13px;
-    max-width: 220px;
-    box-shadow: 0 4px 20px rgba(0,100,200,0.3);
+    max-width: 240px;
+    box-shadow: 0 12px 40px rgba(0,100,200,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
     display: none;
     z-index: 100;
     line-height: 1.6;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(8px);
+    animation: tooltipFadeIn 0.2s ease;
 }
-#reseau-tooltip .tt-name  { font-weight: 700; font-size: 15px; color: #7dd3fc; }
-#reseau-tooltip .tt-score { font-size: 12px; color: #94a3b8; margin-top: 3px; }
+@keyframes tooltipFadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+#reseau-tooltip .tt-name  { font-weight: 800; font-size: 16px; color: #7dd3fc; margin-bottom: 6px; }
+#reseau-tooltip .tt-score { font-size: 13px; color: #cbd5e1; margin-top: 6px; margin-bottom: 8px; }
 #reseau-tooltip .tt-bar   {
-    width: 100%; height: 6px; background: #1e3a5f;
-    border-radius: 3px; margin: 5px 0;
+    width: 100%; height: 8px; background: #1e3a5f;
+    border-radius: 4px; margin: 8px 0;
     overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
 }
 #reseau-tooltip .tt-bar-fill {
-    height: 100%; border-radius: 3px;
+    height: 100%; border-radius: 4px;
     background: linear-gradient(90deg, #3b82f6, #06b6d4);
-    transition: width 0.3s;
+    transition: width 0.4s ease;
+    box-shadow: 0 0 10px rgba(59,182,254,0.6);
 }
-#reseau-tooltip .tt-tags  { font-size: 11px; color: #64748b; margin-top: 4px; }
+#reseau-tooltip .tt-tags  { font-size: 12px; color: #94a3b8; margin-top: 8px; }
 #reseau-tooltip .tt-tag   {
     display: inline-block;
-    background: rgba(59,130,246,0.2);
-    border: 1px solid rgba(59,130,246,0.35);
-    border-radius: 4px;
-    padding: 1px 6px;
-    margin: 2px 2px 0 0;
+    background: rgba(59,130,246,0.25);
+    border: 1px solid rgba(59,130,246,0.5);
+    border-radius: 6px;
+    padding: 3px 8px;
+    margin: 3px 4px 0 0;
     color: #93c5fd;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+#reseau-tooltip .tt-tag:hover {
+    background: rgba(59,130,246,0.4);
+    border-color: rgba(59,130,246,0.7);
 }
 #reseau-legend {
     position: absolute;
-    bottom: 14px;
-    left: 16px;
-    font-size: 11px;
-    color: rgba(180,210,255,0.6);
-    line-height: 1.8;
+    bottom: 18px;
+    left: 22px;
+    font-size: 12px;
+    color: rgba(180,210,255,0.65);
+    line-height: 1.9;
+    background: rgba(10,20,40,0.5);
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(100,180,255,0.15);
+    backdrop-filter: blur(4px);
 }
-#reseau-legend span { color: rgba(180,210,255,0.9); font-weight: 600; }
+#reseau-legend span { color: rgba(180,210,255,0.95); font-weight: 700; }
 #reseau-loading {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%,-50%);
     color: #7dd3fc;
-    font-size: 15px;
+    font-size: 16px;
     letter-spacing: 2px;
+    font-weight: 600;
 }
 #reseau-controls {
     display: flex;
-    gap: 10px;
+    gap: 24px;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 20px;
     flex-wrap: wrap;
+    background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(59,130,246,0.03) 100%);
+    border: 1px solid rgba(100,180,255,0.15);
+    border-radius: 14px;
+    padding: 16px 22px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.05);
 }
-#reseau-controls label { color: #7dd3fc; font-size: 13px; }
+#reseau-controls label {
+    color: #334155;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+#reseau-controls label:hover {
+    color: #0a66c2;
+}
 #reseau-controls input[type=range] {
     accent-color: #3b82f6;
-    width: 120px;
+    width: 140px;
+    height: 6px;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+    cursor: pointer;
 }
-#seuil-val { color: #f0abfc; font-weight: 700; min-width: 28px; display: inline-block; }
+#reseau-controls input[type=range]:hover {
+    accent-color: #0a66c2;
+}
+#reseau-controls input[type=checkbox] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #0a66c2;
+    transition: all 0.2s ease;
+}
+#reseau-controls input[type=checkbox]:hover {
+    transform: scale(1.1);
+}
+#seuil-val {
+    color: #0a66c2;
+    font-weight: 800;
+    min-width: 35px;
+    display: inline-block;
+    font-size: 15px;
+    transition: color 0.2s ease;
+}
 #reseau-zoom-btns {
     position: absolute;
-    top: 12px;
-    right: 14px;
+    top: 18px;
+    right: 18px;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 8px;
     z-index: 20;
 }
 #reseau-zoom-btns button {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: 1px solid rgba(100,180,255,0.3);
-    background: rgba(10,20,40,0.85);
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(100,180,255,0.35);
+    background: rgba(10,20,40,0.75);
     color: #7dd3fc;
     font-size: 18px;
     line-height: 1;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
+    font-weight: 700;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 16px rgba(0,100,200,0.15);
 }
-#reseau-zoom-btns button:hover { background: rgba(30,60,120,0.9); }
-#reseau-zoom-btns .btn-reset { font-size: 13px; }
+#reseau-zoom-btns button:hover {
+    background: rgba(59,130,246,0.2);
+    border-color: rgba(100,180,255,0.6);
+    color: #e0f0ff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,139,255,0.3);
+}
+#reseau-zoom-btns button:active {
+    transform: translateY(0);
+}
+#reseau-zoom-btns .btn-reset {
+    font-size: 14px;
+    font-weight: 700;
+}
 </style>
 
 <div class="content-wrapper">

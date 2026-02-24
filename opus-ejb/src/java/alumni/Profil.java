@@ -23,6 +23,32 @@ public class Profil extends ClassMAPTable {
         setNomTable("profil");
     }
 
+    public int getContribution() throws Exception {
+        int count = 0;
+        Connection c = null;
+        try {
+            c = new utilitaire.UtilDB().GetConn();
+            Publication filtre = new Publication();
+            // System.out.println("ID utilisateur pour contribution: " + this.idutilisateur);
+            // filtre.setIdutilisateur(this.idutilisateur);
+            filtre.setIdtypepublication("TPB000001");
+            Object[] res = CGenUtil.rechercher(filtre, null, null, c, " and idutilisateur = " + this.idutilisateur);
+            if (res != null) {
+                count = res.length;
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (Exception e) {
+                    throw e;
+                }
+            }
+        }
+        return count;
+    }
 
     @Override
     public String getTuppleID() {
@@ -123,8 +149,7 @@ public class Profil extends ClassMAPTable {
     public static Profil findByRefUser(int refuser, Connection c) throws Exception {
         Profil filtre = new Profil();
         Profil[] res = (Profil[]) CGenUtil.rechercher(
-            filtre, null, null, c, " and idutilisateur=" + refuser
-        );
+                filtre, null, null, c, " and idutilisateur=" + refuser);
         return (res != null && res.length > 0) ? res[0] : null;
     }
 }

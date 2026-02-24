@@ -8,6 +8,8 @@
 <%@ page import="alumni.Specialite" %>
 <%@ page import="alumni.Specialiteprofil" %>
 <%@ page import="alumni.Poste" %>
+<%@ page import="alumni.ReseauSocial" %>
+<%@ page import="alumni.ProfilSocialMedia" %>
 <%@ page import="java.sql.Connection" %>
 <%
     UserEJB    uEJB  = (UserEJB) session.getAttribute("u");
@@ -17,6 +19,8 @@
     Specialiteprofil[] specProfils = null;
     Specialite[] allSpecialites = null;
     Poste[] allPostes = null;
+    ReseauSocial[] allReseaux = null;
+    ProfilSocialMedia[] socialMedias = null;
     String     _erreur = null;
     if (uEJB != null && uEJB.getUser() != null) {
         MapUtilisateur mu = uEJB.getUser();
@@ -46,6 +50,17 @@
             allSpecialites = (Specialite[]) CGenUtil.rechercher(new Specialite(), null, null, conn, " order by libelle");
             allPostes = (Poste[]) CGenUtil.rechercher(new Poste(), null, null, conn, " order by libelle");
 
+            // Chargement des réseaux sociaux disponibles
+            allReseaux = (ReseauSocial[]) CGenUtil.rechercher(new ReseauSocial(), null, null, conn, " and actif=1 order by priorite desc");
+
+            // Chargement des social media du profil
+            if (profil != null && profil.getIdprofil() != null) {
+                socialMedias = (ProfilSocialMedia[]) CGenUtil.rechercher(
+                    new ProfilSocialMedia(), null, null, conn,
+                    " and idprofil='" + profil.getIdprofil() + "'"
+                );
+            }
+
         } catch (Exception e) {
             _erreur = e.getMessage();
             System.err.println("voir.jsp - erreur chargement profil: " + e.getMessage());
@@ -57,6 +72,8 @@
     if (specProfils == null) specProfils = new Specialiteprofil[0];
     if (allSpecialites == null) allSpecialites = new Specialite[0];
     if (allPostes == null) allPostes = new Poste[0];
+    if (allReseaux == null) allReseaux = new ReseauSocial[0];
+    if (socialMedias == null) socialMedias = new ProfilSocialMedia[0];
     String _idprofil    = profil != null && profil.getIdprofil()       != null ? profil.getIdprofil()       : "";
     String _nom         = profil != null && profil.getNom()            != null ? profil.getNom()            : "";
     String _prenom      = profil != null && profil.getPrenom()         != null ? profil.getPrenom()         : "";
@@ -74,10 +91,11 @@
     String _photoCoverUrl = _photoCover.isEmpty() ? "" : request.getContextPath() + "/" + _photoCover;
     String _genrelib    = profil != null && profil.getGenrelib()       != null ? profil.getGenrelib()       : "";
     String _idgenre     = profil != null && profil.getIdgenre()        != null ? profil.getIdgenre()        : "";
+    int _contribution   = profil != null ? profil.getContribution() : 0;
 %>
 <style>
 .pv-card {
-  max-width: 760px;
+  max-width: 1200px;
   margin: 20px auto 40px;
   background: #fff;
   border-radius: 10px;
@@ -89,7 +107,7 @@
 
 /* ── Cover ── */
 .pv-cover {
-  height: 148px;
+  height: 200px;
   background: linear-gradient(135deg, #003366 0%, #0a66c2 60%, #378fe9 100%);
   border-radius: 10px 10px 0 0;
   overflow: hidden;
@@ -126,41 +144,41 @@
 /* ── Avatar ── */
 .pv-avatar-wrap {
   display: inline-block;
-  margin-top: -48px;
-  margin-left: 24px;
+  margin-top: -60px;
+  margin-left: 32px;
   position: relative;
   z-index: 1;
 }
 .pv-avatar {
-  width: 96px; height: 96px;
+  width: 120px; height: 120px;
   border-radius: 50%;
-  border: 3px solid #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,.18);
+  border: 4px solid #fff;
+  box-shadow: 0 2px 12px rgba(0,0,0,.25);
   background: #0a66c2;
   display: flex; align-items: center; justify-content: center;
-  font-size: 30px; font-weight: 700; color: #fff;
+  font-size: 40px; font-weight: 700; color: #fff;
   overflow: hidden;
 }
 .pv-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
 
 /* ── Top ── */
 .pv-top {
-  padding: 10px 24px 18px;
+  padding: 16px 32px 24px;
   border-bottom: 1px solid #eee;
 }
-.pv-name     { font-size: 21px; font-weight: 700; line-height: 1.25; }
-.pv-headline { font-size: 14px; color: #555; margin-top: 3px; }
+.pv-name     { font-size: 26px; font-weight: 700; line-height: 1.25; }
+.pv-headline { font-size: 15px; color: #555; margin-top: 6px; }
 .pv-meta {
-  display: flex; flex-wrap: wrap; gap: 16px;
-  margin-top: 8px; font-size: 13px; color: #666;
+  display: flex; flex-wrap: wrap; gap: 20px;
+  margin-top: 10px; font-size: 14px; color: #666;
 }
 .pv-meta a { color: #0a66c2; text-decoration: none; font-weight: 500; }
 .pv-meta a:hover { text-decoration: underline; }
 
 /* ── Sections ── */
-.pv-section { padding: 18px 24px; border-bottom: 1px solid #eee; }
+.pv-section { padding: 24px 32px; border-bottom: 1px solid #eee; }
 .pv-section:last-child { border-bottom: none; }
-.pv-section h2 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+.pv-section h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
 
 /* Tags */
 .pv-tags { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -173,13 +191,14 @@
 .pv-tag.green { background: #e8f5e9; color: #2e7d32; }
 
 /* Info grid */
-.pv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 28px; }
+.pv-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px 32px; }
+@media(max-width:900px){ .pv-grid { grid-template-columns: 1fr 1fr; } }
 @media(max-width:520px){ .pv-grid { grid-template-columns: 1fr; } }
 .pv-field label {
-  font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .6px; color: #888; display: block; margin-bottom: 3px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .6px; color: #888; display: block; margin-bottom: 5px;
 }
-.pv-field span { font-size: 14px; }
+.pv-field span { font-size: 15px; }
 
 /* Section header */
 .pv-section-header {
@@ -234,6 +253,48 @@
   color: #999; font-size: 14px; padding: 0 2px; transition: color .15s; line-height: 1;
 }
 .pv-spec-item button:hover { color: #c62828; }
+
+/* Social Media */
+.pv-social-grid {
+  display: flex; flex-wrap: wrap; gap: 12px;
+}
+.pv-social-item {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: #f8f9fa; border: 1px solid #e9ecef;
+  border-radius: 12px; padding: 10px 14px;
+  font-size: 13px; font-weight: 500;
+  transition: all .2s ease;
+  text-decoration: none;
+  color: #191919;
+  position: relative;
+}
+.pv-social-item:hover {
+  border-color: #0a66c2; background: #f0f6ff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  text-decoration: none; color: #191919;
+}
+.pv-social-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 16px; color: #fff;
+  flex-shrink: 0;
+}
+.pv-social-info { display: flex; flex-direction: column; min-width: 0; }
+.pv-social-name { font-weight: 700; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: .3px; }
+.pv-social-val { font-size: 13px; color: #191919; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+.pv-social-del {
+  position: absolute; top: -6px; right: -6px;
+  width: 20px; height: 20px;
+  background: #fff; border: 1px solid #ddd;
+  border-radius: 50%; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: #999; line-height: 1;
+  transition: all .15s; opacity: 0;
+}
+.pv-social-item:hover .pv-social-del { opacity: 1; }
+.pv-social-del:hover { background: #ffebee; border-color: #ef5350; color: #c62828; }
 </style>
 
 <div class="pv-card">
@@ -263,7 +324,11 @@
   <div class="pv-top">
     <div style="display:flex;justify-content:space-between;align-items:flex-start">
       <div>
-        <div class="pv-name" id="pvName" style="display:flex;align-items:center;gap:10px;"><span id="pvNameText">—</span><span id="pvGenreBadge" style="display:none;font-size:12px;font-weight:600;background:#f3e8ff;color:#7c3aed;border-radius:14px;padding:3px 12px;white-space:nowrap;"><i class="bi" id="pvGenreIcon"></i> <span id="pvGenreText"></span></span></div>
+        <div class="pv-name" id="pvName" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span id="pvNameText">—</span>
+          <span id="pvGenreBadge" style="display:none;font-size:12px;font-weight:600;background:#f3e8ff;color:#7c3aed;border-radius:14px;padding:3px 12px;white-space:nowrap;"><i class="bi" id="pvGenreIcon"></i> <span id="pvGenreText"></span></span>
+          <span id="pvContributionBadge" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;background:#fff8e1;color:#f57f17;border-radius:14px;padding:3px 12px;white-space:nowrap;" title="Contribution (publications)"><i class="bi bi-award-fill"></i> <span id="pvContributionText">0</span></span>
+        </div>
         <div class="pv-headline" id="pvHeadline">—</div>
         <div class="pv-meta">
           <span>📍 Antananarivo, Madagascar</span>
@@ -350,6 +415,54 @@
     </div>
   </div>
 
+  <!-- ── Réseaux Sociaux ── -->
+  <div class="pv-section">
+    <div class="pv-section-header">
+      <h2><i class="bi bi-globe2"></i> Réseaux Sociaux</h2>
+      <button class="pv-btn-add" onclick="pvOpenModal('modalAddSocial')"><i class="bi bi-plus-lg"></i> Ajouter</button>
+    </div>
+    <div id="pvSocialMedia" class="pv-social-grid">
+      <% if (socialMedias.length == 0) { %>
+        <em style="color:#aaa;font-size:13px">Aucun réseau social renseigné.</em>
+      <% } else {
+        for (int smi = 0; smi < socialMedias.length; smi++) {
+          ProfilSocialMedia sm = socialMedias[smi];
+          // Trouver le réseau correspondant
+          String smLibelle = "";
+          String smIcone = "bi bi-link-45deg";
+          String smCouleur = "#6c757d";
+          String smUrlPattern = "";
+          for (int ri = 0; ri < allReseaux.length; ri++) {
+            if (allReseaux[ri].getIdReseauSocial() != null
+                && allReseaux[ri].getIdReseauSocial().equals(sm.getIdReseauSocial())) {
+              smLibelle = allReseaux[ri].getLibelle() != null ? allReseaux[ri].getLibelle() : "";
+              smIcone = allReseaux[ri].getIconeClass() != null ? allReseaux[ri].getIconeClass() : "bi bi-link-45deg";
+              smCouleur = allReseaux[ri].getCouleurHex() != null ? allReseaux[ri].getCouleurHex() : "#6c757d";
+              smUrlPattern = allReseaux[ri].getUrlPattern() != null ? allReseaux[ri].getUrlPattern() : "";
+              break;
+            }
+          }
+          String smValeur = sm.getValeur() != null ? sm.getValeur() : "";
+          String smUrl = smUrlPattern.replace("{value}", smValeur);
+          String smIdStr = (sm.getIdProfilSocial() != null ? sm.getIdProfilSocial() : "");
+      %>
+        <a class="pv-social-item" id="social-<%= smIdStr %>"
+           href="<%= smUrl %>" target="_blank" rel="noopener noreferrer"
+           title="<%= smLibelle %>: <%= smValeur %>">
+          <div class="pv-social-icon" style="background:<%= smCouleur %>">
+            <i class="<%= smIcone %>"></i>
+          </div>
+          <div class="pv-social-info">
+            <span class="pv-social-name"><%= smLibelle %></span>
+            <span class="pv-social-val"><%= smValeur %></span>
+          </div>
+          <button class="pv-social-del" type="button" title="Supprimer"
+                  onclick="event.preventDefault();event.stopPropagation();pvDeleteSocial('<%= smIdStr %>')">×</button>
+        </a>
+      <% } } %>
+    </div>
+  </div>
+
   <!-- ── Expériences ── -->
   <div class="pv-section">
     <div class="pv-section-header">
@@ -407,7 +520,8 @@
     photo        : "<%= _photoUrl %>",
     photoCover   : "<%= _photoCoverUrl %>",
     genreLib     : "<%= _genrelib %>",
-    idgenre      : "<%= _idgenre %>"
+    idgenre      : "<%= _idgenre %>",
+    contribution : <%= _contribution %>
   };
 
   /* Cover */
@@ -439,6 +553,7 @@
     document.getElementById("pvGenreIcon").className = "bi " + (p.idgenre === "GEN000001" ? "bi-gender-male" : "bi-gender-female");
     document.getElementById("pvGenreBadge").style.display = "inline-flex";
   }
+  document.getElementById("pvContributionText").textContent = p.contribution;
   document.getElementById("pvPromoTag").textContent    = "🎓 " + p.promotionLib;
   document.getElementById("pvParcoursTag").textContent = "📚 " + p.parcoursLib;
 
@@ -554,6 +669,53 @@ function pvDeleteSpec(spId) {
   .catch(function(e) { alert("Erreur réseau : " + e); });
 }
 
+/* ════════════════════════════════════════
+   SOCIAL MEDIA CRUD
+   ════════════════════════════════════════ */
+var _socialUrl = "<%= request.getContextPath() %>/pages/profil/ajax/traitement-socialmedia.jsp";
+
+function pvAddSocial() {
+  var sel = document.getElementById("socialSelect");
+  var val = document.getElementById("socialValeur");
+  if (!sel.value) { alert("Sélectionnez un réseau social"); return; }
+  if (!val.value.trim()) { alert("Veuillez saisir un identifiant ou URL"); return; }
+
+  var data = new URLSearchParams();
+  data.append("action", "add");
+  data.append("idreseausocial", sel.value);
+  data.append("valeur", val.value.trim());
+
+  fetch(_socialUrl, { method: "POST", body: data,
+    headers: {"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","X-Requested-With":"XMLHttpRequest"}
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.success) { pvCloseModal("modalAddSocial"); location.reload(); }
+    else alert("Erreur : " + d.error);
+  })
+  .catch(function(e) { alert("Erreur réseau : " + e); });
+}
+
+function pvDeleteSocial(smId) {
+  if (!confirm("Supprimer ce réseau social ?")) return;
+  fetch(_socialUrl + "?action=delete&idprofilsocial=" + encodeURIComponent(smId), {
+    headers: {"X-Requested-With":"XMLHttpRequest"}
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.success) {
+      var el = document.getElementById("social-" + smId);
+      if (el) el.remove();
+      // Si plus de social media, afficher le message vide
+      var container = document.getElementById("pvSocialMedia");
+      if (container && container.querySelectorAll(".pv-social-item").length === 0) {
+        container.innerHTML = '<em style="color:#aaa;font-size:13px">Aucun réseau social renseigné.</em>';
+      }
+    } else alert("Erreur : " + d.error);
+  })
+  .catch(function(e) { alert("Erreur réseau : " + e); });
+}
+
 /* ── Helpers modals ── */
 function pvOpenModal(id)  { document.getElementById(id).style.display = "flex"; }
 function pvCloseModal(id) { document.getElementById(id).style.display = "none"; }
@@ -622,8 +784,9 @@ function pvUploadPhoto(inputId, typeVal, apresOk) {
 .pv-btn-save:hover { background: #004182; }
 .pv-preview-img { max-width:100%; max-height:160px; margin-top:10px;
   border-radius: 8px; display: none; object-fit: cover; }
-.pv-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-@media(max-width:440px){ .pv-form-row { grid-template-columns: 1fr; } }
+.pv-form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+@media(max-width:900px){ .pv-form-row { grid-template-columns: 1fr 1fr; } }
+@media(max-width:520px){ .pv-form-row { grid-template-columns: 1fr; } }
 </style>
 
 <!-- Modal : Ajouter / Modifier Expérience -->
@@ -679,6 +842,30 @@ function pvUploadPhoto(inputId, typeVal, apresOk) {
   </div>
 </div>
 
+<!-- Modal : Ajouter Réseau Social -->
+<div class="pv-modal-overlay" id="modalAddSocial">
+  <div class="pv-modal">
+    <h3>Ajouter un réseau social</h3>
+    <label>Réseau social *</label>
+    <select id="socialSelect">
+      <option value="">— Sélectionner —</option>
+      <% for (int rsi = 0; rsi < allReseaux.length; rsi++) { %>
+      <option value="<%= allReseaux[rsi].getIdReseauSocial() %>"
+              data-icone="<%= allReseaux[rsi].getIconeClass() != null ? allReseaux[rsi].getIconeClass() : "" %>"
+              data-couleur="<%= allReseaux[rsi].getCouleurHex() != null ? allReseaux[rsi].getCouleurHex() : "" %>">
+        <%= allReseaux[rsi].getLibelle() != null ? allReseaux[rsi].getLibelle().replace("<","&lt;") : "" %>
+      </option>
+      <% } %>
+    </select>
+    <label>Identifiant / URL *</label>
+    <input type="text" id="socialValeur" placeholder="ex: monpseudo ou https://..." style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+    <div class="pv-modal-footer">
+      <button type="button" class="pv-btn-cancel" onclick="pvCloseModal('modalAddSocial')">Annuler</button>
+      <button type="button" class="pv-btn-save" onclick="pvAddSocial()">Ajouter</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal : Photo de profil (PDP — type=1) -->
 <div class="pv-modal-overlay" id="modalPDP">
   <div class="pv-modal">
@@ -701,7 +888,7 @@ function pvUploadPhoto(inputId, typeVal, apresOk) {
   <div class="pv-modal">
     <h3>Changer la photo de couverture</h3>
     <input type="file" id="filePDC" accept="image/*"
-           onchange="pvPreview('filePDC','previewPDC')" style="margin-top:8px">
+          onchange="pvPreview('filePDC','previewPDC')" style="margin-top:8px">
     <img id="previewPDC" class="pv-preview-img" alt="Aperçu">
     <div class="pv-modal-footer">
       <button type="button" class="pv-btn-cancel" onclick="pvCloseModal('modalPDC')">Annuler</button>

@@ -52,7 +52,7 @@
         idprofil = idprofil.trim();
 
         // Champs à traiter
-        String[] champs = {"nom", "prenom", "dtn", "experience", "specialite", "promotion", "email", "parcours", "telephone", "genre"};
+        String[] champs = {"nom", "prenom", "dtn", "experience", "specialite", "promotion", "email", "parcours", "telephone", "genre", "socialmedia"};
 
         conn = new UtilDB().GetConn();
         conn.setAutoCommit(false);
