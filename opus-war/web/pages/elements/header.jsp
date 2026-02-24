@@ -11,6 +11,8 @@
 
 <!-- Include Alumni TopNav CSS -->
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/alumni-topnav.css">
+<!-- OPUS Global Theme (must be after topnav) -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/opus-theme.css">
 <!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 

@@ -58,12 +58,15 @@
                 new alumni.ProfilLib(), null, null, conn, "");
             Map userNames = new HashMap();
             Map userPhotos = new HashMap();
+            Map userProfils = new HashMap();
             if (allProfils != null) {
                 for (int i = 0; i < allProfils.length; i++) {
                     Integer _key = new Integer(allProfils[i].getIdutilisateur());
                     userNames.put(_key, allProfils[i].getNom() + " " + allProfils[i].getPrenom());
                     if (allProfils[i].getPhotoProfil() != null && !allProfils[i].getPhotoProfil().trim().isEmpty())
                         userPhotos.put(_key, allProfils[i].getPhotoProfil().trim());
+                    if (allProfils[i].getIdprofil() != null)
+                        userProfils.put(_key, allProfils[i].getIdprofil());
                 }
             }
 
@@ -98,18 +101,62 @@
                     }
                 }
 
-                // Construire le JSON des reactions
-                StringBuilder sbReact = new StringBuilder("{");
+                // Créer une liste de paires (id, count) et trier par count décroissant
+                java.util.List reactPairs = new java.util.ArrayList();
+                for (java.util.Iterator rit = reactMap.entrySet().iterator(); rit.hasNext();) {
+                    Map.Entry entry = (Map.Entry) rit.next();
+                    Object[] pair = new Object[2];
+                    pair[0] = entry.getKey(); // rtId (String)
+                    pair[1] = entry.getValue(); // count (Integer)
+                    reactPairs.add(pair);
+                }
+                // Tri à bulles : trier par count décroissant
+                for (int ri = 0; ri < reactPairs.size(); ri++) {
+                    for (int rj = ri + 1; rj < reactPairs.size(); rj++) {
+                        Object[] pairA = (Object[]) reactPairs.get(ri);
+                        Object[] pairB = (Object[]) reactPairs.get(rj);
+                        Integer countA = (Integer) pairA[1];
+                        Integer countB = (Integer) pairB[1];
+                        if (countB.intValue() > countA.intValue()) {
+                            reactPairs.set(ri, pairB);
+                            reactPairs.set(rj, pairA);
+                        }
+                    }
+                }
+
+                // Construire le JSON des reactions avec emojis, trié par count décroissant
+                StringBuilder sbReact = new StringBuilder("[");
                 boolean firstR = true;
-                java.util.Iterator it = reactMap.entrySet().iterator();
-                while (it.hasNext()) {
-                    Map.Entry entry = (Map.Entry) it.next();
+                for (int rpi = 0; rpi < reactPairs.size(); rpi++) {
+                    Object[] pair = (Object[]) reactPairs.get(rpi);
+                    String rtId = (String) pair[0];
+                    Integer rtCount = (Integer) pair[1];
+                    
+                    // Récupérer l'emoji du type de réaction
+                    String rtEmoji = "\uD83D\uDC4D";
+                    String rtLib = "";
+                    for (int rt = 0; rt < rTypes.length; rt++) {
+                        if (rTypes[rt].getIdreactiontype().equals(rtId)) {
+                            rtLib = rTypes[rt].getLibelle();
+                            String rtLibLow = rtLib.toLowerCase();
+                            if (rtLibLow.contains("adore") || rtLibLow.contains("love")) rtEmoji = "\u2764\uFE0F";
+                            else if (rtLibLow.contains("haha") || rtLibLow.contains("humour")) rtEmoji = "\uD83D\uDE02";
+                            else if (rtLibLow.contains("surprise") || rtLibLow.contains("wow")) rtEmoji = "\uD83D\uDE2E";
+                            else if (rtLibLow.contains("triste") || rtLibLow.contains("sad")) rtEmoji = "\uD83D\uDE22";
+                            else if (rtLibLow.contains("grrr") || rtLibLow.contains("ang")) rtEmoji = "\uD83D\uDE20";
+                            break;
+                        }
+                    }
+                    
                     if (!firstR) sbReact.append(",");
-                    sbReact.append("\"").append(ej((String) entry.getKey())).append("\":");
-                    sbReact.append(((Integer) entry.getValue()).intValue());
+                    sbReact.append("{\"id\":\"").append(ej(rtId)).append("\"");
+                    sbReact.append(",\"emoji\":\"").append(rtEmoji).append("\"");
+                    sbReact.append(",\"libelle\":\"").append(ej(rtLib)).append("\"");
+                    sbReact.append(",\"count\":").append(rtCount.intValue());
+                    sbReact.append("}");
                     firstR = false;
                 }
-                sbReact.append("}");
+                sbReact.append("]");
 
                 // JSON du commentaire
                 if (i > 0) sbComm.append(",");
@@ -120,6 +167,8 @@
                 sbComm.append(",\"idutilisateur\":").append(c.getIdutilisateur());
                 String _photoPath = (String) userPhotos.get(new Integer(c.getIdutilisateur()));
                 sbComm.append(",\"photo\":\"").append(_photoPath != null ? ej(_photoPath) : "").append("\"");
+                String _idprofilAuteur = (String) userProfils.get(new Integer(c.getIdutilisateur()));
+                sbComm.append(",\"idprofil\":\"").append(_idprofilAuteur != null ? ej(_idprofilAuteur) : "").append("\"");
                 String parent = c.getIdpublicationcommentaire_1();
                 sbComm.append(",\"idparent\":\"").append(parent != null ? ej(parent) : "").append("\"");
                 sbComm.append(",\"reactions\":").append(sbReact.toString());
@@ -128,7 +177,7 @@
             }
             sbComm.append("]");
 
-            out.print("{\"success\":true,\"reactionTypes\":" + sbRT.toString()
+            out.print("{\"success\":true,\"refuser\":" + refuser + ",\"reactionTypes\":" + sbRT.toString()
                 + ",\"commentaires\":" + sbComm.toString() + "}");
 
         } finally {

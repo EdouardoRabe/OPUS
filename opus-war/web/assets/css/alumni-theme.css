@@ -578,22 +578,41 @@ select.form-control-custom {
 ═══════════════════════════════════════════ */
 .custom-card {
   background: var(--white);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 1px 2px rgba(0,0,0,.04);
-  border: 1px solid var(--gray-200);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0,0,0,.05), 0 1px 3px rgba(0,0,0,.1);
+  border: 1px solid rgba(226,232,240,.8);
   padding: 1.5rem;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
 }
+.custom-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0,139,255,0.02), rgba(91,35,255,0.02));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
 .custom-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,.08);
-  border-color: rgba(0,139,255,.25);
+  box-shadow: 0 8px 25px rgba(0,139,255,.12), 0 3px 10px rgba(0,0,0,.08);
+  border-color: rgba(0,139,255,.3);
+  transform: translateY(-2px);
+}
+.custom-card:hover::before {
+  opacity: 1;
 }
 .custom-card.no-hover:hover {
-  box-shadow: 0 1px 2px rgba(0,0,0,.04);
-  border-color: var(--gray-200);
+  box-shadow: 0 4px 6px rgba(0,0,0,.05), 0 1px 3px rgba(0,0,0,.1);
+  border-color: rgba(226,232,240,.8);
   transform: none;
+}
+.custom-card.no-hover:hover::before {
+  opacity: 0;
 }
 
 /* ═══════════════════════════════════════════
@@ -608,19 +627,44 @@ select.form-control-custom {
 
 .speciality-card {
   background: var(--white);
-  border: 1px solid var(--gray-200);
-  border-radius: var(--radius-lg);
+  border: 1px solid rgba(226,232,240,.6);
+  border-radius: 16px;
   padding: 1.75rem;
   text-align: center;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  box-shadow: 0 2px 4px rgba(0,0,0,.06), 0 8px 16px rgba(0,0,0,.04);
+  position: relative;
+  overflow: hidden;
+}
+.speciality-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0,139,255,0.03), rgba(16,185,129,0.03));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 .speciality-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,.08);
-  border-color: rgba(0,139,255,.24);
-  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,139,255,.15), 0 4px 12px rgba(0,0,0,.1);
+  border-color: rgba(0,139,255,.4);
+  transform: translateY(-4px);
+}
+.speciality-card:hover::before {
+  opacity: 1;
+}
+.custom-card.no-hover.speciality-card:hover {
+  box-shadow: 0 2px 4px rgba(0,0,0,.06), 0 8px 16px rgba(0,0,0,.04);
+  border-color: rgba(226,232,240,.6);
+  transform: none;
+}
+.custom-card.no-hover.speciality-card:hover::before {
+  opacity: 0;
 }
 
 .speciality-icon {
@@ -672,6 +716,29 @@ select.form-control-custom {
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--itu-dark);
+  background: linear-gradient(135deg, rgba(0,139,255,0.08), rgba(16,185,129,0.08));
+  padding: 0.4rem 0.8rem;
+  border-radius: 12px;
+  border: 1px solid rgba(0,139,255,0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.speciality-count::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transition: left 0.5s ease;
+}
+.speciality-card:hover .speciality-count::before {
+  left: 100%;
 }
 
 .speciality-level {
@@ -679,10 +746,27 @@ select.form-control-custom {
   font-size: 0.7rem;
   background: var(--itu-lime);
   color: var(--itu-dark);
-  padding: 0.2rem 0.6rem;
-  border-radius: var(--radius-full);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
   font-weight: 600;
   letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255,255,255,0.3);
+  position: relative;
+  overflow: hidden;
+}
+.speciality-level::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s ease;
+}
+.speciality-card:hover .speciality-level::before {
+  left: 100%;
 }
 
 .btn-speciality {

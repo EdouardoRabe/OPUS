@@ -188,12 +188,15 @@
                         new ProfilLib(), null, null, conn, "");
                 Map userNames = new HashMap();
                 Map userPhotos = new HashMap();
+                Map userProfils = new HashMap();
                 if (allProfils != null) {
                     for (int i = 0; i < allProfils.length; i++) {
                         Integer _key = new Integer(allProfils[i].getIdutilisateur());
                         userNames.put(_key, allProfils[i].getNom() + " " + allProfils[i].getPrenom());
                         if (allProfils[i].getPhotoProfil() != null && !allProfils[i].getPhotoProfil().trim().isEmpty())
                             userPhotos.put(_key, ctx + "/" + allProfils[i].getPhotoProfil().trim());
+                        if (allProfils[i].getIdprofil() != null)
+                            userProfils.put(_key, allProfils[i].getIdprofil());
                     }
                 }
 
@@ -252,6 +255,29 @@
                     totalReactions++;
                     if (reactions[r].getIdutilisateur() == refuserConnecte) myReaction = type;
                 }
+                
+                // Créer une liste de paires (id, count) et trier par count décroissant
+                java.util.List reactPairs = new java.util.ArrayList();
+                for (java.util.Iterator it = reactCounts.entrySet().iterator(); it.hasNext();) {
+                    java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
+                    Object[] pair = new Object[2];
+                    pair[0] = entry.getKey(); // rtId (String)
+                    pair[1] = entry.getValue(); // count (Integer)
+                    reactPairs.add(pair);
+                }
+                // Tri à bulles : trier par count décroissant
+                for (int ri = 0; ri < reactPairs.size(); ri++) {
+                    for (int rj = ri + 1; rj < reactPairs.size(); rj++) {
+                        Object[] pairA = (Object[]) reactPairs.get(ri);
+                        Object[] pairB = (Object[]) reactPairs.get(rj);
+                        Integer countA = (Integer) pairA[1];
+                        Integer countB = (Integer) pairB[1];
+                        if (countB.intValue() > countA.intValue()) {
+                            reactPairs.set(ri, pairB);
+                            reactPairs.set(rj, pairA);
+                        }
+                    }
+                }
 
                 // --- APJ: Commentaires ---
                 Publicationcommentaire[] comments = (Publicationcommentaire[]) CGenUtil.rechercher(
@@ -300,7 +326,22 @@
 
             <!-- EN-TETE -->
             <div class="fa-post-header">
-                <div class="fa-avatar fa-avatar--md"<%= _authorPhoto != null ? " style=\"background:transparent;\"" : "" %>><% if (_authorPhoto != null) { %><img src="<%= _authorPhoto %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initA %><% } %></div>
+                <%
+                    String authorIdprofil = (String) userProfils.get(new Integer(pub.getIdutilisateur()));
+                    String profileUrl;
+                    if (pub.getIdutilisateur() == refuserConnecte) {
+                        // C'est ma publication, aller vers mon profil
+                        profileUrl = ctx + "/pages/module.jsp?but=profil/voir.jsp";
+                    } else {
+                        // C'est le profil d'un autre utilisateur
+                        profileUrl = authorIdprofil != null && !authorIdprofil.isEmpty() 
+                            ? ctx + "/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp?idprofil=" + authorIdprofil 
+                            : "#";
+                    }
+                %>
+                <a href="<%= profileUrl %>" style="text-decoration:none;cursor:pointer;">
+                    <div class="fa-avatar fa-avatar--md" style="cursor:pointer;"<%= _authorPhoto != null ? " style=\"background:transparent;cursor:pointer;\"" : "style=\"cursor:pointer;\"" %>><% if (_authorPhoto != null) { %><img src="<%= _authorPhoto %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;cursor:pointer;"><% } else { %><%= initA %><% } %></div>
+                </a>
                 <div class="fa-post-meta">
                 <!-- Menu 3 points -->
                 <div class="pub-menu">
@@ -315,7 +356,9 @@
                     </div>
                 </div>
                     <div class="fa-post-author">
-                        <%= auteur %>
+                        <a href="<%= profileUrl %>" style="text-decoration:none;color:inherit;cursor:pointer;">
+                            <strong style="cursor:pointer;"><%= auteur %></strong>
+                        </a>
                         <% if (!taggedNames.isEmpty()) { %>
                         <span class="fa-post-with">avec <strong><%= taggedNames %></strong></span>
                         <% } %>
@@ -346,8 +389,31 @@
 
             <!-- COMPTEURS -->
             <div class="fa-post-counters">
-                <% if (totalReactions > 0) { %>
-                <span class="fa-counter"><i class="bi bi-hand-thumbs-up-fill" style="color:var(--itu-blue,#008BFF);"></i>&nbsp;<%= totalReactions %></span>
+                <% if (reactPairs.size() > 0) { %>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                        <% for (int rpi = 0; rpi < reactPairs.size(); rpi++) {
+                            Object[] pair = (Object[]) reactPairs.get(rpi);
+                            String rtId = (String) pair[0];
+                            Integer rtCount = (Integer) pair[1];
+                            String rtEmoji = "\uD83D\uDC4D";
+                            String rtLib = "";
+                            // Récupérer l'emoji et libellé du type de réaction
+                            for (int rt = 0; rt < reactTypes.length; rt++) {
+                                if (reactTypes[rt].getIdreactiontype().equals(rtId)) {
+                                    rtLib = reactTypes[rt].getLibelle();
+                                    String rtLibLow = rtLib.toLowerCase();
+                                    if (rtLibLow.contains("adore") || rtLibLow.contains("love")) rtEmoji = "\u2764\uFE0F";
+                                    else if (rtLibLow.contains("haha") || rtLibLow.contains("humour")) rtEmoji = "\uD83D\uDE02";
+                                    else if (rtLibLow.contains("surprise") || rtLibLow.contains("wow")) rtEmoji = "\uD83D\uDE2E";
+                                    else if (rtLibLow.contains("triste") || rtLibLow.contains("sad")) rtEmoji = "\uD83D\uDE22";
+                                    else if (rtLibLow.contains("grrr") || rtLibLow.contains("ang")) rtEmoji = "\uD83D\uDE20";
+                                    break;
+                                }
+                            }
+                        %>
+                        <span class="fa-counter" title="<%= rtLib %>"><%= rtEmoji %>&nbsp;<%= rtCount %></span>
+                        <% } %>
+                    </div>
                 <% } else { %><span></span><% } %>
                 <span id="nb-comm-<%= idpub %>" class="fa-counter fa-counter--link"
                       onclick="toggleCommentaires('<%= idpub %>')">
@@ -1249,37 +1315,73 @@
                     var html = '';
                     html += '<div id="comm-' + c.id + '" class="fa-comment-item' + replyClass + '">';
                     html += '<div class="fa-comment-inner">';
-                    if (c.photo) {
+                    var profileUrl;
+                    if (c.idutilisateur === data.refuser) {
+                        // C'est mon commentaire, aller vers mon profil
+                        profileUrl = CTX + '/pages/module.jsp?but=profil/voir.jsp';
+                    } else {
+                        // C'est le commentaire d'un autre utilisateur
+                        profileUrl = (c.idprofil && c.idprofil !== '') 
+                            ? CTX + '/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp?idprofil=' + encodeURIComponent(c.idprofil)
+                            : '#';
+                    }
+                    if (profileUrl !== '#' && c.photo) {
+                        html += '<a href="' + profileUrl + '" style="text-decoration:none;cursor:pointer;">';
+                        html += '<div class="fa-avatar fa-avatar--xs" style="background:transparent;cursor:pointer;"><img src="' + CTX + '/' + escHtml(c.photo) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;cursor:pointer;"></div>';
+                        html += '</a>';
+                    } else if (c.photo) {
                         html += '<div class="fa-avatar fa-avatar--xs" style="background:transparent;"><img src="' + CTX + '/' + escHtml(c.photo) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>';
+                    } else if (profileUrl !== '#') {
+                        html += '<a href="' + profileUrl + '" style="text-decoration:none;cursor:pointer;">';
+                        html += '<div class="fa-avatar fa-avatar--xs" style="cursor:pointer;">' + escHtml(initials) + '</div>';
+                        html += '</a>';
                     } else {
                         html += '<div class="fa-avatar fa-avatar--xs">' + escHtml(initials) + '</div>';
                     }
                     html += '<div class="fa-comment-content">';
                     html += '<div class="fa-comment-bubble">';
-                    html += '<span class="fa-comment-author">' + escHtml(c.auteur) + '</span>';
+                    if (profileUrl !== '#') {
+                        html += '<a href="' + profileUrl + '" style="text-decoration:none;color:inherit;cursor:pointer;">';
+                        html += '<span class="fa-comment-author" style="cursor:pointer;">' + escHtml(c.auteur) + '</span>';
+                        html += '</a>';
+                    } else {
+                        html += '<span class="fa-comment-author">' + escHtml(c.auteur) + '</span>';
+                    }
                     html += '<span class="fa-comment-text">' + formatMentions(c.description) + '</span>';
                     html += '</div>';
 
-                    // Calcul total reactions + lib de ma reaction
+                    // Calcul total reactions + lib de ma reaction (c.reactions est maintenant un tableau trié)
                     var totalCReact = 0;
                     var myCommReactLib = '';
-                    for (var jr = 0; jr < rTypes.length; jr++) {
-                        totalCReact += (c.reactions[rTypes[jr].id] || 0);
-                        if (c.myReaction === rTypes[jr].id) myCommReactLib = rTypes[jr].libelle;
+                    for (var jr = 0; jr < c.reactions.length; jr++) {
+                        totalCReact += c.reactions[jr].count || 0;
+                        if (c.myReaction === c.reactions[jr].id) myCommReactLib = c.reactions[jr].libelle;
                     }
                     var hasCommReact = (c.myReaction && c.myReaction !== '');
 
                     // Barre d'actions
                     html += '<div class="fa-comment-actions">';
 
+                    // Afficher les reactions avec emojis (triées par count)
+                    if (c.reactions.length > 0) {
+                        html += '<div style="display:flex;gap:4px;align-items:center;margin-bottom:4px;flex-wrap:wrap;">';
+                        for (var jreact = 0; jreact < c.reactions.length; jreact++) {
+                            var reactItem = c.reactions[jreact];
+                            html += '<span class="fa-counter" title="' + escHtml(reactItem.libelle) + '">';
+                            html += reactItem.emoji + '&nbsp;' + reactItem.count;
+                            html += '</span>';
+                        }
+                        html += '</div>';
+                    }
+
                     // Reaction wrap (barre popup)
+
                     html += '<div class="fa-reaction-wrap" id="creact-wrap-' + c.id + '" style="display:inline-flex;position:relative;flex:none;">';
                     html += '<button class="fa-comment-react-btn' + (hasCommReact ? ' fa-comment-react-btn--active' : '') + '" ';
                     html += 'id="creact-btn-' + c.id + '" ';
                     html += 'onclick="toggleCommReactionBar(\'' + c.id + '\', event)">';
                     html += '<i class="bi bi-hand-thumbs-up' + (hasCommReact ? '-fill' : '') + '" style="font-size:11px;margin-right:3px;"></i>';
                     html += hasCommReact ? myCommReactLib : 'J&apos;aime';
-                    if (totalCReact > 0) html += ' <span style="font-weight:400;font-size:11px;">(' + totalCReact + ')</span>';
                     html += '</button>';
                     // Barre reaction popup
                     html += '<div class="fa-reaction-bar" id="creact-bar-' + c.id + '">';
