@@ -182,12 +182,15 @@
                         new ProfilLib(), null, null, conn, "");
                 Map userNames = new HashMap();
                 Map userPhotos = new HashMap();
+                Map userProfils = new HashMap();
                 if (allProfils != null) {
                     for (int i = 0; i < allProfils.length; i++) {
                         Integer _key = new Integer(allProfils[i].getIdutilisateur());
                         userNames.put(_key, allProfils[i].getNom() + " " + allProfils[i].getPrenom());
                         if (allProfils[i].getPhotoProfil() != null && !allProfils[i].getPhotoProfil().trim().isEmpty())
                             userPhotos.put(_key, ctx + "/" + allProfils[i].getPhotoProfil().trim());
+                        if (allProfils[i].getIdprofil() != null)
+                            userProfils.put(_key, allProfils[i].getIdprofil());
                     }
                 }
 
@@ -285,7 +288,22 @@
 
             <!-- EN-TETE -->
             <div class="fa-post-header">
-                <div class="fa-avatar fa-avatar--md"<%= _authorPhoto != null ? " style=\"background:transparent;\"" : "" %>><% if (_authorPhoto != null) { %><img src="<%= _authorPhoto %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initA %><% } %></div>
+                <%
+                    String authorIdprofil = (String) userProfils.get(new Integer(pub.getIdutilisateur()));
+                    String profileUrl;
+                    if (pub.getIdutilisateur() == refuserConnecte) {
+                        // C'est ma publication, aller vers mon profil
+                        profileUrl = ctx + "/pages/module.jsp?but=profil/voir.jsp";
+                    } else {
+                        // C'est le profil d'un autre utilisateur
+                        profileUrl = authorIdprofil != null && !authorIdprofil.isEmpty() 
+                            ? ctx + "/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp?idprofil=" + authorIdprofil 
+                            : "#";
+                    }
+                %>
+                <a href="<%= profileUrl %>" style="text-decoration:none;cursor:pointer;">
+                    <div class="fa-avatar fa-avatar--md" style="cursor:pointer;"<%= _authorPhoto != null ? " style=\"background:transparent;cursor:pointer;\"" : "style=\"cursor:pointer;\"" %>><% if (_authorPhoto != null) { %><img src="<%= _authorPhoto %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;cursor:pointer;"><% } else { %><%= initA %><% } %></div>
+                </a>
                 <div class="fa-post-meta">
                 <!-- Menu 3 points -->
                 <div class="pub-menu">
@@ -300,7 +318,9 @@
                     </div>
                 </div>
                     <div class="fa-post-author">
-                        <%= auteur %>
+                        <a href="<%= profileUrl %>" style="text-decoration:none;color:inherit;cursor:pointer;">
+                            <strong style="cursor:pointer;"><%= auteur %></strong>
+                        </a>
                         <% if (!taggedNames.isEmpty()) { %>
                         <span class="fa-post-with">avec <strong><%= taggedNames %></strong></span>
                         <% } %>
@@ -1217,14 +1237,38 @@
                     var html = '';
                     html += '<div id="comm-' + c.id + '" class="fa-comment-item' + replyClass + '">';
                     html += '<div class="fa-comment-inner">';
-                    if (c.photo) {
+                    var profileUrl;
+                    if (c.idutilisateur === data.refuser) {
+                        // C'est mon commentaire, aller vers mon profil
+                        profileUrl = CTX + '/pages/module.jsp?but=profil/voir.jsp';
+                    } else {
+                        // C'est le commentaire d'un autre utilisateur
+                        profileUrl = (c.idprofil && c.idprofil !== '') 
+                            ? CTX + '/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp?idprofil=' + encodeURIComponent(c.idprofil)
+                            : '#';
+                    }
+                    if (profileUrl !== '#' && c.photo) {
+                        html += '<a href="' + profileUrl + '" style="text-decoration:none;cursor:pointer;">';
+                        html += '<div class="fa-avatar fa-avatar--xs" style="background:transparent;cursor:pointer;"><img src="' + CTX + '/' + escHtml(c.photo) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;cursor:pointer;"></div>';
+                        html += '</a>';
+                    } else if (c.photo) {
                         html += '<div class="fa-avatar fa-avatar--xs" style="background:transparent;"><img src="' + CTX + '/' + escHtml(c.photo) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>';
+                    } else if (profileUrl !== '#') {
+                        html += '<a href="' + profileUrl + '" style="text-decoration:none;cursor:pointer;">';
+                        html += '<div class="fa-avatar fa-avatar--xs" style="cursor:pointer;">' + escHtml(initials) + '</div>';
+                        html += '</a>';
                     } else {
                         html += '<div class="fa-avatar fa-avatar--xs">' + escHtml(initials) + '</div>';
                     }
                     html += '<div class="fa-comment-content">';
                     html += '<div class="fa-comment-bubble">';
-                    html += '<span class="fa-comment-author">' + escHtml(c.auteur) + '</span>';
+                    if (profileUrl !== '#') {
+                        html += '<a href="' + profileUrl + '" style="text-decoration:none;color:inherit;cursor:pointer;">';
+                        html += '<span class="fa-comment-author" style="cursor:pointer;">' + escHtml(c.auteur) + '</span>';
+                        html += '</a>';
+                    } else {
+                        html += '<span class="fa-comment-author">' + escHtml(c.auteur) + '</span>';
+                    }
                     html += '<span class="fa-comment-text">' + formatMentions(c.description) + '</span>';
                     html += '</div>';
 

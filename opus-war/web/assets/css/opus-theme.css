@@ -1,0 +1,618 @@
+/*
+ * ============================================================
+ *  OPUS — Charte graphique globale
+ *  Chargé EN DERNIER sur toutes les pages pour surcharger les
+ *  thèmes ITU, APJ-Design-System et AdminLTE existants.
+ *
+ *  Primaires : Bleu #283a97 · Bleu Nuit #1c1e29
+ *              Vert #b2d235 · Bleu Noir #1c1e21
+ *  Secondaires: Bleu Gris #d0dce7 · Rose #e46a91
+ *               Violet #536ae4 · Rouge #fd3022
+ * ============================================================
+ */
+
+/* ────────────────────────────────────────────────────────────
+   1.  REMPLACEMENTS DES VARIABLES CSS
+       Surcharge les deux systèmes de variables existants :
+         – alumni-theme.css / alumni-topnav.css / alumni-navbar-module.css  (--itu-*)
+         – apj-global-style.css  (--Primaire-*  --Onyx-*)
+   ──────────────────────────────────────────────────────────── */
+:root {
+
+    /* ── A. Variables ITU (alumni-theme, alumni-topnav, alumni-navbar-module) ── */
+
+    /* Fonds sombres */
+    --itu-dark:           #1c1e29;   /* Bleu Nuit  → sidebar, navbar bg */
+    --itu-dark-alt:       #1c1e21;   /* Bleu Noir  → logo, zone la plus sombre */
+
+    /* Accent vert */
+    --itu-lime:           #b2d235;   /* Vert       → CTA, éléments actifs */
+    --itu-lime-light:     #c9e057;   /* Vert clair → hover lime */
+
+    /* Bleu primaire */
+    --itu-blue:           #283a97;   /* Bleu       → liens, highlights */
+    --itu-blue-dark:      #1e2d78;   /* Bleu foncé → hover bleu */
+
+    /* Violet / secondaire */
+    --itu-violet:         #536ae4;   /* Violet     → badges, tags */
+    --itu-violet-dark:    #3f57d4;   /* Violet foncé → hover violet */
+
+    /* Aliases legacy */
+    --deep-purple:        #1c1e29;
+    --vibrant-violet:     #536ae4;
+    --bright-blue:        #283a97;
+    --neon-yellow:        #b2d235;
+
+    /* ── B. Palette Primaire bleue (apj-global-style) — échelle autour de #283a97 ── */
+
+    --Primaire-blue-main-color: #283a97;
+    --Primaire-blue-050: #eaecf8;
+    --Primaire-blue-100: #c4cbee;
+    --Primaire-blue-200: #9eaae4;
+    --Primaire-blue-300: #7889da;
+    --Primaire-blue-400: #5268d0;
+    --Primaire-blue-500: #283a97;   /* couleur principale */
+    --Primaire-blue-600: #202f7a;
+    --Primaire-blue-700: #17235c;
+    --Primaire-blue-800: #0e163d;
+    --Primaire-blue-900: #070a1f;
+
+    /* ── C. Palette Onyx (neutres → teinte bleutée cohérente avec #1c1e29) ── */
+
+    --Onyx-main-color:   #252838;
+    --Onyx-025:          #f7f8fb;
+    --Onyx-035:          #f0f2f7;
+    --Onyx-050:          #e6e9f3;
+    --Onyx-100:          #c0c4d8;
+    --Onyx-200:          #99a0bd;
+    --Onyx-300:          #737ba2;
+    --Onyx-400:          #4d5787;
+    --Onyx-500:          #363c5f;
+    --Onyx-600:          #282d4a;
+    --Onyx-700:          #1c1e29;   /* Bleu Nuit */
+    --Onyx-800:          #111420;
+    --Onyx-900:          #070817;
+
+    /* ── D. Couleurs sémantiques ── */
+
+    --Error-base:        #fd3022;   /* Rouge  */
+    --Error-dark:        #e02818;
+    --Error-light:       #fd5e4e;
+
+    /* Rose — accent UI (notifications, likes…) */
+    --opus-rose:         #e46a91;
+
+    /* Tokens sémantiques recalculés */
+    --Button-primary-main:    var(--Primaire-blue-main-color);
+    --Button-primary-hover:   var(--Primaire-blue-600);
+    --Button-primary-pressed: var(--Primaire-blue-700);
+    --Button-primary-focus:   var(--Primaire-blue-main-color);
+
+    --Text-primary:           var(--Onyx-700);
+    --Text-secondary:         var(--Onyx-300);
+    --Placeholder:            var(--Onyx-200);
+
+    --Border:                 #d0dce7;   /* Bleu Gris */
+    --Hover:                  var(--Onyx-025);
+    --Pressed:                var(--Onyx-035);
+
+    --Background-primaire:    #ffffff;
+    --Background-secondaire:  var(--Onyx-025);
+    --Background-tertiaire:   var(--Onyx-035);
+
+    /* Shadows élaborées pour le bleu nuit */
+    --shadow-xs: 0 1px 2px rgba(28, 30, 41, 0.06);
+    --shadow-sm: 0 2px 4px rgba(28, 30, 41, 0.10);
+    --shadow-md: 0 4px 12px rgba(28, 30, 41, 0.14);
+    --shadow-lg: 0 10px 30px rgba(28, 30, 41, 0.20);
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   2.  ADMINLTE — SURCHARGE DIRECTE (skin-blue)
+       Les fichiers AdminLTE sont compilés et ne lisent pas les
+       variables CSS, on surcharge donc par sélecteurs CSS.
+   ──────────────────────────────────────────────────────────── */
+
+/* ── 2a. Top navigation bar ── */
+.skin-blue .main-header .navbar,
+.skin-blue .main-header .navbar .nav > li > a {
+    background-color: #283a97;
+    color: #d0dce7;
+}
+.skin-blue .main-header .navbar .nav > li > a:hover,
+.skin-blue .main-header .navbar .nav > li > a:focus {
+    background-color: #1e2d78;
+    color: #b2d235;
+}
+.skin-blue .main-header .navbar .sidebar-toggle:hover {
+    background-color: #1e2d78;
+    color: #b2d235;
+}
+
+/* ── 2b. Logo ── */
+.skin-blue .main-header .logo,
+.skin-blue .main-header .logo:hover {
+    background-color: #1c1e21;
+    color: #b2d235;
+    border-right: 1px solid #252838;
+}
+
+/* ── 2c. Sidebar ── */
+.skin-blue .main-sidebar,
+.skin-blue .left-side {
+    background-color: #1c1e29;
+}
+
+/* Séparateur / header sidebar */
+.skin-blue .sidebar-menu > li.header {
+    color: #99a0bd;
+    background: #1c1e21;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+}
+
+/* Liens au repos */
+.skin-blue .sidebar-menu > li > a {
+    color: #c0c4d8;
+    border-left: 3px solid transparent;
+}
+.skin-blue .sidebar-menu > li > a:hover {
+    color: #b2d235;
+    background: #1c1e21;
+    border-left-color: #b2d235;
+}
+
+/* Élément actif */
+.skin-blue .sidebar-menu > li.active > a,
+.skin-blue .sidebar-menu > li.active > a:hover,
+.skin-blue .sidebar-menu > li.active > a:focus {
+    color: #b2d235;
+    background: #1c1e21;
+    border-left-color: #b2d235;
+}
+
+/* Sous-menu (treeview) */
+.skin-blue .treeview-menu {
+    background: #111420;
+}
+.skin-blue .treeview-menu > li > a {
+    color: #99a0bd;
+}
+.skin-blue .treeview-menu > li > a:hover,
+.skin-blue .treeview-menu > li.active > a {
+    color: #b2d235;
+    background: transparent;
+}
+
+/* ── 2d. User panel ── */
+.skin-blue .sidebar .user-panel > .info,
+.skin-blue .sidebar .user-panel > .info > a {
+    color: #d0dce7;
+}
+
+/* ── 2e. Content header (breadcrumb bar) ── */
+.content-header {
+    background: #eaecf8;
+    border-bottom: 1px solid #d0dce7;
+}
+.content-header h1 {
+    color: #1c1e29;
+}
+.breadcrumb > li a {
+    color: #283a97;
+}
+.breadcrumb-item.active,
+.breadcrumb > li.active {
+    color: #536ae4;
+}
+
+/* ── 2f. Navigation tabs & badge ── */
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+    color: #283a97;
+    border-bottom: 2px solid #283a97;
+}
+.badge,
+.label-primary,
+.label-info {
+    background-color: #283a97;
+}
+.label-success,
+.badge-success {
+    background-color: #b2d235;
+    color: #1c1e29;
+}
+.label-danger,
+.badge-danger {
+    background-color: #fd3022;
+}
+.label-warning,
+.badge-warning {
+    background-color: #536ae4;
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   3.  BOUTONS
+   ──────────────────────────────────────────────────────────── */
+
+/* Bouton primaire → Vert CTA sur fond Bleu Nuit */
+.btn-primary,
+.btn-primary:visited {
+    background-color: #b2d235 !important;
+    border-color:     #9bbf2a !important;
+    color:            #1c1e29 !important;
+    font-weight:      600;
+}
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active,
+.open > .dropdown-toggle.btn-primary {
+    background-color: #9bbf2a !important;
+    border-color:     #84a623 !important;
+    color:            #1c1e29 !important;
+}
+
+/* Bouton info → Bleu */
+.btn-info,
+.btn-info:visited {
+    background-color: #283a97 !important;
+    border-color:     #1e2d78 !important;
+    color:            #ffffff !important;
+}
+.btn-info:hover,
+.btn-info:focus {
+    background-color: #1e2d78 !important;
+    border-color:     #17235c !important;
+    color:            #ffffff !important;
+}
+
+/* Bouton default → Bleu Gris clair */
+.btn-default {
+    color:        #283a97;
+    border-color: #d0dce7;
+    background-color: #f7f8fb;
+}
+.btn-default:hover,
+.btn-default:focus {
+    background-color: #e6e9f3;
+    border-color:     #283a97;
+    color:            #283a97;
+}
+
+/* Bouton danger → Rouge */
+.btn-danger,
+.btn-danger:visited {
+    background-color: #fd3022 !important;
+    border-color:     #e02818 !important;
+    color:            #ffffff !important;
+}
+.btn-danger:hover,
+.btn-danger:focus {
+    background-color: #e02818 !important;
+    border-color:     #c42314 !important;
+    color:            #ffffff !important;
+}
+
+/* Bouton warning → Violet */
+.btn-warning,
+.btn-warning:visited {
+    background-color: #536ae4 !important;
+    border-color:     #3f57d4 !important;
+    color:            #ffffff !important;
+}
+.btn-warning:hover,
+.btn-warning:focus {
+    background-color: #3f57d4 !important;
+    border-color:     #2c44c4 !important;
+    color:            #ffffff !important;
+}
+
+/* Bouton success → Vert */
+.btn-success,
+.btn-success:visited {
+    background-color: #b2d235 !important;
+    border-color:     #9bbf2a !important;
+    color:            #1c1e29 !important;
+}
+.btn-success:hover,
+.btn-success:focus {
+    background-color: #9bbf2a !important;
+    border-color:     #84a623 !important;
+    color:            #1c1e29 !important;
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   4.  FORMULAIRES — inputs, labels, focus ring
+   ──────────────────────────────────────────────────────────── */
+.form-control:focus {
+    border-color: #283a97;
+    box-shadow: 0 0 0 3px rgba(40, 58, 151, 0.15);
+    outline: none;
+}
+.control-label,
+label {
+    color: #1c1e29;
+}
+.help-block {
+    color: #99a0bd;
+}
+.has-error .form-control:focus {
+    border-color: #fd3022;
+    box-shadow: 0 0 0 3px rgba(253, 48, 34, 0.15);
+}
+.has-success .form-control:focus {
+    border-color: #b2d235;
+    box-shadow: 0 0 0 3px rgba(178, 210, 53, 0.20);
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   5.  LIENS
+   ──────────────────────────────────────────────────────────── */
+a {
+    color: #283a97;
+}
+a:hover,
+a:focus {
+    color: #1e2d78;
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   6.  BOX / CARD ADMINLTE
+   ──────────────────────────────────────────────────────────── */
+.box {
+    border-top: 3px solid #283a97;
+}
+.box.box-primary {
+    border-top-color: #283a97;
+}
+.box.box-info {
+    border-top-color: #536ae4;
+}
+.box.box-warning {
+    border-top-color: #b2d235;
+}
+.box.box-danger {
+    border-top-color: #fd3022;
+}
+.box.box-success {
+    border-top-color: #b2d235;
+}
+.box-header {
+    background: #f7f8fb;
+    border-bottom: 1px solid #d0dce7;
+}
+.box-header .box-title {
+    color: #1c1e29;
+    font-weight: 600;
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   7.  TABLEAUX & DATATABLES
+   ──────────────────────────────────────────────────────────── */
+.table > thead > tr > th {
+    background-color: #1c1e29;
+    color: #d0dce7;
+    border-bottom: 2px solid #283a97;
+    font-weight: 600;
+}
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #f7f8fb;
+}
+.table-hover > tbody > tr:hover {
+    background-color: #eaecf8;
+}
+.table-bordered,
+.table-bordered > thead > tr > th,
+.table-bordered > tbody > tr > td {
+    border-color: #d0dce7;
+}
+/* Pagination */
+.pagination > li > a,
+.pagination > li > span {
+    color: #283a97;
+    border-color: #d0dce7;
+}
+.pagination > .active > a,
+.pagination > .active > span,
+.pagination > .active > a:hover,
+.pagination > .active > span:hover {
+    background-color: #283a97;
+    border-color: #283a97;
+    color: #ffffff;
+}
+.pagination > li > a:hover {
+    background-color: #eaecf8;
+    color: #283a97;
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   8.  ALERTES / NOTIFICATIONS
+   ──────────────────────────────────────────────────────────── */
+.alert-info {
+    background-color: #eaecf8;
+    border-color: #c4cbee;
+    color: #17235c;
+}
+.alert-success {
+    background-color: #f4fadc;
+    border-color: #c9e057;
+    color: #4a6010;
+}
+.alert-danger,
+.alert-error {
+    background-color: #fff1f0;
+    border-color: #fd5e4e;
+    color: #c42314;
+}
+.alert-warning {
+    background-color: #edeffe;
+    border-color: #a9b6f8;
+    color: #17235c;
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   9.  SELECT2
+   ──────────────────────────────────────────────────────────── */
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+    border-color: #d0dce7;
+}
+.select2-container--default.select2-container--focus
+    .select2-selection--single,
+.select2-container--default.select2-container--focus
+    .select2-selection--multiple {
+    border-color: #283a97;
+    box-shadow: 0 0 0 3px rgba(40, 58, 151, 0.15);
+}
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #283a97;
+    color: #ffffff;
+}
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: #eaecf8;
+    color: #283a97;
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   10. OVERRIDE STYLECUSTOM.CSS — quelques couleurs hardcodées
+   ──────────────────────────────────────────────────────────── */
+.currentMenu {
+    background: #283a97 !important;
+    color: #ffffff !important;
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   11. ALUMNI TOPNAV (surcharge composants spécifiques via class)
+   ──────────────────────────────────────────────────────────── */
+
+/* Barre de navigation principale */
+.alumni-topnav {
+    background-color: var(--itu-dark, #1c1e29) !important;
+    border-bottom: 2px solid var(--itu-blue, #283a97);
+}
+
+/* Logo dans la topnav */
+.alumni-topnav .topnav-logo,
+.alumni-topnav .topnav-brand {
+    color: var(--itu-lime, #b2d235) !important;
+}
+
+/* Liens de navigation */
+.alumni-topnav .topnav-link,
+.alumni-topnav .nav-link {
+    color: #d0dce7 !important;
+}
+.alumni-topnav .topnav-link:hover,
+.alumni-topnav .topnav-link.active,
+.alumni-topnav .nav-link:hover,
+.alumni-topnav .nav-link.active {
+    color: var(--itu-lime, #b2d235) !important;
+    background-color: rgba(178, 210, 53, 0.08) !important;
+}
+
+/* Bouton call-to-action dans la topnav */
+.alumni-topnav .btn-cta,
+.alumni-topnav .topnav-cta {
+    background-color: var(--itu-lime, #b2d235) !important;
+    color: var(--itu-dark, #1c1e29) !important;
+    border-color: var(--itu-lime, #b2d235) !important;
+}
+
+/* Icônes / notifications */
+.alumni-topnav .notification-badge,
+.alumni-topnav .badge-notif {
+    background-color: var(--opus-rose, #e46a91) !important;
+    color: #ffffff !important;
+}
+
+/* Dropdown menu */
+.alumni-topnav .dropdown-menu {
+    border: 1px solid #d0dce7;
+    box-shadow: var(--shadow-md, 0 4px 12px rgba(28, 30, 41, 0.14));
+}
+.alumni-topnav .dropdown-menu > li > a:hover {
+    background-color: #eaecf8;
+    color: #283a97;
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   12. ALUMNI NAVBAR MODULE
+   ──────────────────────────────────────────────────────────── */
+
+/* Fond de la navbar module */
+.alumni-navbar,
+[class*="alumni-navbar"] {
+    background-color: var(--itu-dark, #1c1e29) !important;
+}
+
+/* Liens actifs */
+.alumni-navbar .nav-item.active > .nav-link,
+.alumni-navbar .nav-link.active {
+    color: var(--itu-lime, #b2d235) !important;
+    border-bottom: 2px solid var(--itu-lime, #b2d235);
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   13. LOGIN PAGE (index.jsp / alumni-theme)
+   ──────────────────────────────────────────────────────────── */
+
+/* Panneau gauche de la page de login */
+.login-split .login-left,
+.login-left {
+    background: linear-gradient(160deg, #1c1e29 0%, #283a97 100%);
+}
+
+/* Accent décoratif login */
+.login-split .login-accent,
+.login-left .login-tagline strong,
+.login-left em {
+    color: #b2d235;
+}
+
+/* Formulaire de connexion */
+.login-box .btn-primary,
+.login-box-body .btn-primary {
+    background-color: #b2d235 !important;
+    border-color:     #9bbf2a !important;
+    color:            #1c1e29 !important;
+}
+.login-box .btn-primary:hover,
+.login-box-body .btn-primary:hover {
+    background-color: #9bbf2a !important;
+}
+.login-box-body {
+    border-top: 3px solid #283a97;
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   14. SCROLLBAR (Webkit) — cohérence visuelle
+   ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f0f2f7;
+}
+::-webkit-scrollbar-thumb {
+    background: #c0c4d8;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #283a97;
+}
