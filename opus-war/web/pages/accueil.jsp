@@ -1318,26 +1318,38 @@
                     html += '<span class="fa-comment-text">' + formatMentions(c.description) + '</span>';
                     html += '</div>';
 
-                    // Calcul total reactions + lib de ma reaction
+                    // Calcul total reactions + lib de ma reaction (c.reactions est maintenant un tableau trié)
                     var totalCReact = 0;
                     var myCommReactLib = '';
-                    for (var jr = 0; jr < rTypes.length; jr++) {
-                        totalCReact += (c.reactions[rTypes[jr].id] || 0);
-                        if (c.myReaction === rTypes[jr].id) myCommReactLib = rTypes[jr].libelle;
+                    for (var jr = 0; jr < c.reactions.length; jr++) {
+                        totalCReact += c.reactions[jr].count || 0;
+                        if (c.myReaction === c.reactions[jr].id) myCommReactLib = c.reactions[jr].libelle;
                     }
                     var hasCommReact = (c.myReaction && c.myReaction !== '');
 
                     // Barre d'actions
                     html += '<div class="fa-comment-actions">';
 
+                    // Afficher les reactions avec emojis (triées par count)
+                    if (c.reactions.length > 0) {
+                        html += '<div style="display:flex;gap:4px;align-items:center;margin-bottom:4px;flex-wrap:wrap;">';
+                        for (var jreact = 0; jreact < c.reactions.length; jreact++) {
+                            var reactItem = c.reactions[jreact];
+                            html += '<span class="fa-counter" title="' + escHtml(reactItem.libelle) + '">';
+                            html += reactItem.emoji + '&nbsp;' + reactItem.count;
+                            html += '</span>';
+                        }
+                        html += '</div>';
+                    }
+
                     // Reaction wrap (barre popup)
+
                     html += '<div class="fa-reaction-wrap" id="creact-wrap-' + c.id + '" style="display:inline-flex;position:relative;flex:none;">';
                     html += '<button class="fa-comment-react-btn' + (hasCommReact ? ' fa-comment-react-btn--active' : '') + '" ';
                     html += 'id="creact-btn-' + c.id + '" ';
                     html += 'onclick="toggleCommReactionBar(\'' + c.id + '\', event)">';
                     html += '<i class="bi bi-hand-thumbs-up' + (hasCommReact ? '-fill' : '') + '" style="font-size:11px;margin-right:3px;"></i>';
                     html += hasCommReact ? myCommReactLib : 'J&apos;aime';
-                    if (totalCReact > 0) html += ' <span style="font-weight:400;font-size:11px;">(' + totalCReact + ')</span>';
                     html += '</button>';
                     // Barre reaction popup
                     html += '<div class="fa-reaction-bar" id="creact-bar-' + c.id + '">';
