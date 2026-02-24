@@ -77,12 +77,15 @@
                 new ProfilLib(), null, null, conn, "");
         Map userNames  = new HashMap();
         Map userPhotos = new HashMap();
+        Map userProfils = new HashMap();
         if (allProfils != null) {
             for (int i = 0; i < allProfils.length; i++) {
                 Integer _key = new Integer(allProfils[i].getIdutilisateur());
                 userNames.put(_key, allProfils[i].getNom() + " " + allProfils[i].getPrenom());
                 if (allProfils[i].getPhotoProfil() != null && !allProfils[i].getPhotoProfil().trim().isEmpty())
                     userPhotos.put(_key, ctx + "/" + allProfils[i].getPhotoProfil().trim());
+                if (allProfils[i].getIdprofil() != null && !allProfils[i].getIdprofil().trim().isEmpty())
+                    userProfils.put(_key, allProfils[i].getIdprofil().trim());
             }
         }
 
@@ -270,13 +273,25 @@
                     break;
                 }
             }
+            // URL du profil auteur
+            String ffProfileUrl;
+            if (pub.getIdutilisateur() == refuserConnecte) {
+                ffProfileUrl = ctx + "/pages/module.jsp?but=profil/voir.jsp";
+            } else {
+                String ffIdprofil = (String) userProfils.get(new Integer(pub.getIdutilisateur()));
+                ffProfileUrl = (ffIdprofil != null && !ffIdprofil.isEmpty())
+                    ? ctx + "/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp?idprofil=" + ffIdprofil
+                    : "#";
+            }
 %>
 <!-- ====== CARD PUBLICATION (chargement progressif) ====== -->
 <div id="pub-<%= idpub %>" class="fa-post-card">
 
     <!-- EN-TETE -->
     <div class="fa-post-header">
-        <div class="fa-avatar fa-avatar--md"<%= _authorPhoto != null ? " style=\"background:transparent;\"" : "" %>><% if (_authorPhoto != null) { %><img src="<%= _authorPhoto %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initA %><% } %></div>
+        <a href="<%= ffProfileUrl %>" style="text-decoration:none;cursor:pointer;">
+            <div class="fa-avatar fa-avatar--md" style="<%= _authorPhoto != null ? "background:transparent;" : "" %>cursor:pointer;"><% if (_authorPhoto != null) { %><img src="<%= _authorPhoto %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initA %><% } %></div>
+        </a>
         <div class="fa-post-meta">
             <!-- Menu 3 points -->
             <div class="pub-menu">
@@ -291,7 +306,7 @@
                 </div>
             </div>
             <div class="fa-post-author">
-                <%= auteur %>
+                <a href="<%= ffProfileUrl %>" style="text-decoration:none;color:inherit;cursor:pointer;"><strong style="cursor:pointer;"><%= auteur %></strong></a>
                 <% if (!taggedNames.isEmpty()) { %>
                 <span class="fa-post-with">avec <strong><%= taggedNames %></strong></span>
                 <% } %>
@@ -323,7 +338,7 @@
     <!-- COMPTEURS -->
     <div class="fa-post-counters">
         <% if (totalReactions > 0) { %>
-        <span class="fa-counter"><i class="bi bi-hand-thumbs-up-fill" style="color:var(--itu-blue,#008BFF);"></i>&nbsp;<%= totalReactions %></span>
+        <span class="fa-counter" style="cursor:pointer;" title="Voir les r&eacute;actions" onclick="openReactionDetails('<%= idpub %>')"><i class="bi bi-hand-thumbs-up-fill" style="color:var(--itu-blue,#008BFF);"></i>&nbsp;<%= totalReactions %></span>
         <% } else { %><span></span><% } %>
         <span id="nb-comm-<%= idpub %>" class="fa-counter fa-counter--link"
               onclick="toggleCommentaires('<%= idpub %>')">
@@ -371,10 +386,12 @@
             <i class="bi bi-chat-left-text"></i>&nbsp;<span>Commenter</span>
         </button>
 
-        <!-- Identifier -->
+        <!-- Identifier (seulement pour l'auteur) -->
+        <% if (pub.getIdutilisateur() == refuserConnecte) { %>
         <button class="fa-action-btn" onclick="toggleIdentifier('<%= idpub %>')">
             <i class="bi bi-tag"></i>&nbsp;<span>Identifier</span>
         </button>
+        <% } %>
     </div>
 
     <!-- ZONE IDENTIFIER -->

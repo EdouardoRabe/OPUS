@@ -536,6 +536,25 @@
     .fa-hashtag-item { padding:8px 12px; cursor:pointer; font-size:13px; border-bottom:1px solid #f0f2f5; }
     .fa-hashtag-item:hover { background:#e7f3ff; }
     .fa-hashtag-item:last-child { border-bottom:none; }
+    /* ---- Modale detail reactions ---- */
+    #react-detail-modal { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.45); align-items:center; justify-content:center; }
+    .react-detail-box { background:#fff; border-radius:14px; width:min(420px,95vw); max-height:80vh; display:flex; flex-direction:column; box-shadow:0 10px 40px rgba(0,0,0,.25); overflow:hidden; }
+    .rdm-header { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--fa-border); }
+    .rdm-title { margin:0; font-size:16px; font-weight:700; color:var(--fa-text); }
+    .rdm-close { background:none; border:none; font-size:24px; cursor:pointer; color:var(--fa-text-secondary); line-height:1; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+    .rdm-close:hover { background:#f0f2f5; }
+    .rdm-tabs { display:flex; gap:2px; padding:6px 12px 0; border-bottom:1px solid var(--fa-border); flex-wrap:wrap; }
+    .rdm-tab { background:none; border:none; border-bottom:3px solid transparent; margin-bottom:-1px; padding:8px 14px; font-size:14px; cursor:pointer; color:var(--fa-text-secondary); font-weight:500; display:flex; align-items:center; gap:4px; border-radius:4px 4px 0 0; }
+    .rdm-tab:hover { background:#f0f2f5; }
+    .rdm-tab--active { color:var(--itu-blue,#008BFF); border-bottom-color:var(--itu-blue,#008BFF); }
+    .rdm-tab-count { font-size:12px; }
+    #react-detail-content { overflow-y:auto; flex:1; min-height:60px; }
+    .rdm-panel--hidden { display:none; }
+    .rdm-user-row { display:flex; align-items:center; gap:10px; padding:10px 16px; text-decoration:none; color:var(--fa-text); transition:background .15s; }
+    .rdm-user-row:hover { background:#f0f2f5; }
+    .rdm-avatar { width:40px; height:40px; border-radius:50%; background:var(--itu-blue,#008BFF); color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; flex-shrink:0; overflow:hidden; }
+    .rdm-user-name { flex:1; font-size:14px; font-weight:500; }
+    .rdm-reaction-emoji { font-size:20px; }
     .fa-composer-textarea {
         width: 100%; border: none; outline: none; resize: none;
         font-size: 16px; color: var(--fa-text); background: transparent;
@@ -774,6 +793,13 @@
     @keyframes feedSpin { to { transform:rotate(360deg); } }
     .fa-feed-end { text-align:center; padding:12px 0; color:var(--fa-text-secondary); font-size:13px; }
 </style>
+
+<!-- ==================== MODALE REACTIONS ==================== -->
+<div id="react-detail-modal">
+    <div class="react-detail-box">
+        <div id="react-detail-content"></div>
+    </div>
+</div>
 
 <!-- ==================== JAVASCRIPT ==================== -->
 <script>
@@ -1072,7 +1098,10 @@
             .then(function(body) {
                 try { var data = JSON.parse(body); } catch(e) { alert('Erreur serveur (reaction): ' + body.substring(0, 200)); return; }
                 if (data.success) {
-                    location.reload();
+                    // Recharger en scrollant sur la publication
+                    var url = new URL(window.location.href);
+                    url.searchParams.set('scrollTo', 'pub-' + idpub);
+                    window.location.href = url.toString();
                 } else {
                     alert('Erreur reaction: ' + (data.error || 'Inconnue'));
                 }
@@ -1127,7 +1156,7 @@
         }
     }
 
-    function chargerCommentaires(idpub) {
+    function chargerCommentaires(idpub, _callback) {
         var listeDiv = document.getElementById('liste-comm-' + idpub);
         listeDiv.innerHTML = '<em>Chargement...</em>';
 
@@ -1305,6 +1334,7 @@
                 }
 
                 listeDiv.innerHTML = html;
+                if (_callback) setTimeout(_callback, 60);
             })
             .catch(function(e) { listeDiv.innerHTML = '<span style="color:red;">Erreur: ' + e + '</span>'; });
     }
@@ -1352,7 +1382,11 @@
                     input.value = '';
                     state.mentionIds = [];
                     document.getElementById('comm-mentions-' + idpub).value = '';
-                    chargerCommentaires(idpub);
+                    chargerCommentaires(idpub, function() {
+                        var _liste = document.getElementById('liste-comm-' + idpub);
+                        if (_liste && _liste.lastElementChild)
+                            _liste.lastElementChild.scrollIntoView({behavior:'smooth', block:'nearest'});
+                    });
                     var nbSpan = document.getElementById('nb-comm-' + idpub);
                     nbSpan.textContent = parseInt(nbSpan.textContent) + 1;
                 } else {
@@ -1506,7 +1540,10 @@
                 if (data.success) {
                     input.value = '';
                     state.mentionIds = [];
-                    chargerCommentaires(idpub);
+                    chargerCommentaires(idpub, function() {
+                        var _el = document.getElementById('comm-' + idparent);
+                        if (_el) _el.scrollIntoView({behavior:'smooth', block:'nearest'});
+                    });
                     var nbSpan = document.getElementById('nb-comm-' + idpub);
                     nbSpan.textContent = parseInt(nbSpan.textContent) + 1;
                 } else {
@@ -1526,7 +1563,10 @@
             .then(function(body) {
                 try { var data = JSON.parse(body); } catch(e) { alert('Erreur serveur (reaction comm): ' + body.substring(0, 200)); return; }
                 if (data.success) {
-                    chargerCommentaires(idpub);
+                    chargerCommentaires(idpub, function() {
+                        var _el = document.getElementById('comm-' + idcomm);
+                        if (_el) _el.scrollIntoView({behavior:'smooth', block:'nearest'});
+                    });
                 } else {
                     alert('Erreur reaction commentaire: ' + (data.error || 'Inconnue'));
                 }
@@ -2045,5 +2085,92 @@
     document.addEventListener('DOMContentLoaded', function() {
         var ta = document.querySelector('.fa-composer-textarea');
         if (ta) setupHashtagAutocomplete(ta);
+    });
+
+    // ========== MODALE DETAIL REACTIONS ==========
+    function openReactionDetails(idpub) {
+        var modal   = document.getElementById('react-detail-modal');
+        var content = document.getElementById('react-detail-content');
+        modal.style.display = 'flex';
+        content.innerHTML = '<div style="text-align:center;padding:40px;"><div class="fa-feed-spinner"></div></div>';
+        fetch(CTX + '/pages/alumni/ajax/detail-reactions.jsp?idpublication=' + encodeURIComponent(idpub))
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (!data.success) { content.innerHTML = '<p style="color:red;padding:20px;">' + escHtml(data.error || 'Erreur') + '</p>'; return; }
+                if (!data.reactions || data.reactions.length === 0) {
+                    content.innerHTML = '<p style="text-align:center;color:#888;padding:30px;">Aucune r\u00e9action</p>';
+                    return;
+                }
+                var html = '<div class="rdm-header">';
+                html += '<h3 class="rdm-title">R\u00e9actions</h3>';
+                html += '<button class="rdm-close" onclick="closeReactionDetails()">&times;</button>';
+                html += '</div>';
+                // Tabs
+                html += '<div class="rdm-tabs">';
+                html += '<button class="rdm-tab rdm-tab--active" onclick="rdmShowTab(this,\'all\')">Tout&nbsp;<span class="rdm-tab-count">' + data.total + '</span></button>';
+                for (var i = 0; i < data.reactions.length; i++) {
+                    var rt = data.reactions[i];
+                    html += '<button class="rdm-tab" onclick="rdmShowTab(this,\'' + rt.id + '\')">'
+                          + rt.emoji + '&nbsp;<span class="rdm-tab-count">' + rt.count + '</span></button>';
+                }
+                html += '</div>';
+                // Panel "Tout"
+                html += '<div class="rdm-panel" id="rdm-panel-all">';
+                for (var i = 0; i < data.reactions.length; i++) {
+                    for (var j = 0; j < data.reactions[i].users.length; j++)
+                        html += rdmUserRow(data.reactions[i].users[j], data.reactions[i].emoji, data.myId);
+                }
+                html += '</div>';
+                // Panels par type
+                for (var i = 0; i < data.reactions.length; i++) {
+                    var rt = data.reactions[i];
+                    html += '<div class="rdm-panel rdm-panel--hidden" id="rdm-panel-' + rt.id + '">';
+                    for (var j = 0; j < rt.users.length; j++)
+                        html += rdmUserRow(rt.users[j], rt.emoji, data.myId);
+                    html += '</div>';
+                }
+                content.innerHTML = html;
+            })
+            .catch(function(e) { content.innerHTML = '<p style="color:red;padding:20px;">Erreur r\u00e9seau: ' + e + '</p>'; });
+    }
+    function rdmUserRow(u, emoji, myId) {
+        var profileUrl;
+        if (String(u.idutilisateur) === String(myId)) {
+            profileUrl = CTX + '/pages/module.jsp?but=profil/voir.jsp';
+        } else if (u.idprofil) {
+            profileUrl = CTX + '/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp?idprofil=' + encodeURIComponent(u.idprofil);
+        } else {
+            profileUrl = null;
+        }
+        var initials = getInitials(u.nom);
+        var wrap = profileUrl ? '<a href="' + profileUrl + '" class="rdm-user-row">' : '<div class="rdm-user-row">';
+        var wrapEnd = profileUrl ? '</a>' : '</div>';
+        var avatarInner = u.photo
+            ? '<img src="' + escHtml(u.photo) + '" alt="" style="width:100%;height:100%;object-fit:cover;">'
+            : escHtml(initials);
+        return wrap
+            + '<div class="rdm-avatar">' + avatarInner + '</div>'
+            + '<div class="rdm-user-name">' + escHtml(u.nom) + '</div>'
+            + '<span class="rdm-reaction-emoji">' + emoji + '</span>'
+            + wrapEnd;
+    }
+    function rdmShowTab(btn, panelId) {
+        var modal = document.getElementById('react-detail-modal');
+        modal.querySelectorAll('.rdm-tab').forEach(function(t) { t.classList.remove('rdm-tab--active'); });
+        btn.classList.add('rdm-tab--active');
+        modal.querySelectorAll('.rdm-panel').forEach(function(p) { p.classList.add('rdm-panel--hidden'); });
+        var panel = document.getElementById('rdm-panel-' + panelId);
+        if (panel) panel.classList.remove('rdm-panel--hidden');
+    }
+    function closeReactionDetails() {
+        document.getElementById('react-detail-modal').style.display = 'none';
+    }
+    // Fermer la modale en cliquant sur le fond
+    document.addEventListener('click', function(e) {
+        var modal = document.getElementById('react-detail-modal');
+        if (modal && e.target === modal) closeReactionDetails();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeReactionDetails();
     });
 </script>

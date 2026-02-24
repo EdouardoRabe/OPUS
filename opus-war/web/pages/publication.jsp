@@ -183,7 +183,7 @@
     <!-- EN-TETE -->
     <div class="fa-post-header">
         <a href="<%= profileUrl %>" style="text-decoration:none;cursor:pointer;">
-            <div class="fa-avatar fa-avatar--md" style="cursor:pointer;"<%= _authorPhoto != null ? " style=\"background:transparent;cursor:pointer;\"" : "style=\"cursor:pointer;\"" %>><% if (_authorPhoto != null) { %><img src="<%= _authorPhoto %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;cursor:pointer;"><% } else { %><%= initA %><% } %></div>
+            <div class="fa-avatar fa-avatar--md" style="<%= _authorPhoto != null ? "background:transparent;" : "" %>cursor:pointer;"><% if (_authorPhoto != null) { %><img src="<%= _authorPhoto %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initA %><% } %></div>
         </a>
         <div class="fa-post-meta">
             <!-- Menu 3 points -->
@@ -233,7 +233,7 @@
     <!-- COMPTEURS -->
     <div class="fa-post-counters">
         <% if (reactPairs.size() > 0) { %>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;cursor:pointer;" title="Voir les r&eacute;actions" onclick="openReactionDetails('<%= idpub %>')">
                 <% for (int rpi = 0; rpi < reactPairs.size(); rpi++) {
                     Object[] pair = (Object[]) reactPairs.get(rpi);
                     String rtId = (String) pair[0];
@@ -303,10 +303,12 @@
             <i class="bi bi-chat-left-text"></i>&nbsp;<span>Commenter</span>
         </button>
 
-        <!-- Identifier -->
+        <!-- Identifier (seulement pour l'auteur) -->
+        <% if (pub.getIdutilisateur() == _pubRefuser) { %>
         <button class="fa-action-btn" onclick="toggleIdentifier('<%= idpub %>')">
             <i class="bi bi-tag"></i>&nbsp;<span>Identifier</span>
         </button>
+        <% } %>
     </div>
 
     <!-- ZONE IDENTIFIER -->
