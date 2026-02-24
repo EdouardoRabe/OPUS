@@ -3,7 +3,7 @@ package alumni;
 public class ProfilLib extends Profil {
 
     private String promotionLib;
-    private int    promotionAnnee;
+    private int promotionAnnee;
     private String parcoursLib;
     private String photoProfil;
     private String photoCouverture;
@@ -14,6 +14,7 @@ public class ProfilLib extends Profil {
     private String idrole;
     private int refuser;
     private String loginuser;
+    private String genrelib;
 
     public ProfilLib() {
         setNomTable("profillib");
@@ -125,5 +126,14 @@ public class ProfilLib extends Profil {
 
     public void setEtatlib(String etatlib) {
         this.etatlib = etatlib;
+    }
+
+    /* ── genrelib ── */
+    public String getGenrelib() {
+        return genrelib;
+    }
+
+    public void setGenrelib(String genrelib) {
+        this.genrelib = genrelib;
     }
 }

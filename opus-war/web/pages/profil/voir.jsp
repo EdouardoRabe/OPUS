@@ -72,6 +72,8 @@
     String _photoCover  = profil != null && profil.getPhotoCouverture()!= null ? profil.getPhotoCouverture(): "";
     String _photoUrl      = _photo.isEmpty()      ? "" : request.getContextPath() + "/" + _photo;
     String _photoCoverUrl = _photoCover.isEmpty() ? "" : request.getContextPath() + "/" + _photoCover;
+    String _genrelib    = profil != null && profil.getGenrelib()       != null ? profil.getGenrelib()       : "";
+    String _idgenre     = profil != null && profil.getIdgenre()        != null ? profil.getIdgenre()        : "";
 %>
 <style>
 .pv-card {
@@ -261,7 +263,7 @@
   <div class="pv-top">
     <div style="display:flex;justify-content:space-between;align-items:flex-start">
       <div>
-        <div class="pv-name"     id="pvName">—</div>
+        <div class="pv-name" id="pvName" style="display:flex;align-items:center;gap:10px;"><span id="pvNameText">—</span><span id="pvGenreBadge" style="display:none;font-size:12px;font-weight:600;background:#f3e8ff;color:#7c3aed;border-radius:14px;padding:3px 12px;white-space:nowrap;"><i class="bi" id="pvGenreIcon"></i> <span id="pvGenreText"></span></span></div>
         <div class="pv-headline" id="pvHeadline">—</div>
         <div class="pv-meta">
           <span>📍 Antananarivo, Madagascar</span>
@@ -338,6 +340,7 @@
     <div class="pv-grid">
       <div class="pv-field"><label>Nom</label>              <span id="fi-nom">—</span></div>
       <div class="pv-field"><label>Prénom</label>           <span id="fi-prenom">—</span></div>
+      <div class="pv-field"><label>Genre</label>             <span id="fi-genre"><i class="bi" id="fi-genre-icon" style="color:#7c3aed;margin-right:4px;"></i><span id="fi-genre-text">—</span></span></div>
       <div class="pv-field"><label>Date de naissance</label><span id="fi-dtn">—</span></div>
       <div class="pv-field"><label>Téléphone</label>        <span id="fi-tel">—</span></div>
       <div class="pv-field"><label>Email</label>            <span id="fi-email">—</span></div>
@@ -402,7 +405,9 @@
     idparcours   : "<%= _idparcours %>",
     parcoursLib  : "<%= _parcourslib %>",
     photo        : "<%= _photoUrl %>",
-    photoCover   : "<%= _photoCoverUrl %>"
+    photoCover   : "<%= _photoCoverUrl %>",
+    genreLib     : "<%= _genrelib %>",
+    idgenre      : "<%= _idgenre %>"
   };
 
   /* Cover */
@@ -422,19 +427,26 @@
   }
 
   /* Identité */
-  document.getElementById("pvName").textContent     = p.prenom + " " + p.nom;
+  document.getElementById("pvNameText").textContent  = p.prenom + " " + p.nom;
   document.getElementById("pvHeadline").textContent = p.parcoursLib + "  ·  " + p.promotionLib;
   var em = document.getElementById("pvEmail");
   em.textContent = p.email; em.href = "mailto:" + p.email;
   document.getElementById("pvPhone").textContent    = "📞 " + p.telephone;
 
-  /* Tags */
+  /* Genre badge near name */
+  if (p.genreLib) {
+    document.getElementById("pvGenreText").textContent = p.genreLib;
+    document.getElementById("pvGenreIcon").className = "bi " + (p.idgenre === "GEN000001" ? "bi-gender-male" : "bi-gender-female");
+    document.getElementById("pvGenreBadge").style.display = "inline-flex";
+  }
   document.getElementById("pvPromoTag").textContent    = "🎓 " + p.promotionLib;
   document.getElementById("pvParcoursTag").textContent = "📚 " + p.parcoursLib;
 
   /* Grille */
   document.getElementById("fi-nom").textContent      = p.nom;
   document.getElementById("fi-prenom").textContent   = p.prenom;
+  document.getElementById("fi-genre-text").textContent = p.genreLib || "—";
+  if (p.idgenre) document.getElementById("fi-genre-icon").className = "bi " + (p.idgenre === "GEN000001" ? "bi-gender-male" : "bi-gender-female");
   document.getElementById("fi-dtn").textContent      = p.dtn ? p.dtn.split("-").reverse().join("/") : "";
   document.getElementById("fi-tel").textContent      = p.telephone;
   document.getElementById("fi-email").textContent    = p.email;

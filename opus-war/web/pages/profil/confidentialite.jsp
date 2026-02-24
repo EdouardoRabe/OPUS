@@ -23,6 +23,7 @@
     int visEmail = 1;
     int visParcours = 1;
     int visTelephone = 1;
+    int visGenre = 1;
     
     if (uEJB != null && uEJB.getUser() != null) {
         int refuser = uEJB.getUser().getRefuser();
@@ -51,6 +52,7 @@
                         else if ("email".equals(ch)) visEmail = st;
                         else if ("parcours".equals(ch)) visParcours = st;
                         else if ("telephone".equals(ch)) visTelephone = st;
+                        else if ("genre".equals(ch)) visGenre = st;
                     }
                 }
             }
@@ -227,6 +229,15 @@ alert("ERREUR: <%= erreur.replace("\"", "'").replace("\n", " ").replace("\r", ""
             <div><div class="cf-item-label">T&eacute;l&eacute;phone</div><div class="cf-item-desc">Votre num&eacute;ro de t&eacute;l&eacute;phone</div></div>
           </div>
           <label class="cf-toggle"><input type="checkbox" name="status_telephone" value="1" <%= visTelephone == 1 ? "checked" : "" %>><span class="slider"></span></label>
+        </div>
+
+        <!-- Genre -->
+        <div class="cf-item">
+          <div class="cf-item-left">
+            <div class="cf-item-icon purple"><i class="bi bi-gender-ambiguous"></i></div>
+            <div><div class="cf-item-label">Genre</div><div class="cf-item-desc">Votre genre (homme / femme)</div></div>
+          </div>
+          <label class="cf-toggle"><input type="checkbox" name="status_genre" value="1" <%= visGenre == 1 ? "checked" : "" %>><span class="slider"></span></label>
         </div>
 
         <!-- Promotion -->

@@ -11,6 +11,8 @@
 <%@ page import="alumni.Reactiontype" %>
 <%@ page import="alumni.Typepublication" %>
 <%@ page import="alumni.Profil" %>
+<%@ page import="alumni.ProfilLib" %>
+<%@ page import="alumni.Evenement" %>
 <%@ page import="alumni.Identification" %>
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.util.Map" %>
@@ -38,6 +40,27 @@
     Typepublication[] typesPub = (Typepublication[]) CGenUtil.rechercher(
             new Typepublication(), null, null, " order by idtypepublication");
     if (typesPub == null) typesPub = new Typepublication[0];
+
+    // Charger photo profil/couverture du connecte + 3 evenements a venir
+    String _connPhotoUrl = "";
+    String _connCoverUrl = "";
+    Evenement[] _upEvents = new Evenement[0];
+    {
+        Connection _c = null;
+        try {
+            _c = new UtilDB().GetConn();
+            ProfilLib[] _myProfils = (ProfilLib[]) CGenUtil.rechercher(new ProfilLib(), null, null, _c, " and refuser=" + refuserConnecte);
+            if (_myProfils != null && _myProfils.length > 0) {
+                if (_myProfils[0].getPhotoProfil() != null && !_myProfils[0].getPhotoProfil().trim().isEmpty())
+                    _connPhotoUrl = ctx + "/" + _myProfils[0].getPhotoProfil().trim();
+                if (_myProfils[0].getPhotoCouverture() != null && !_myProfils[0].getPhotoCouverture().trim().isEmpty())
+                    _connCoverUrl = ctx + "/" + _myProfils[0].getPhotoCouverture().trim();
+            }
+            _upEvents = (Evenement[]) CGenUtil.rechercher(new Evenement(), null, null, _c, " and datedebut >= CURRENT_DATE order by datedebut asc");
+            if (_upEvents == null) _upEvents = new Evenement[0];
+        } catch (Exception _e) { _e.printStackTrace(); }
+        finally { if (_c != null) try { _c.close(); } catch (Exception _x) {} }
+    }
 %>
 
 <div class="fa-layout">
@@ -45,15 +68,15 @@
     <!-- ===== COLONNE GAUCHE : Profil ===== -->
     <aside class="fa-sidebar-left">
         <div class="fa-profile-card">
-            <div class="fa-profile-cover"></div>
+            <div class="fa-profile-cover"<%= !_connCoverUrl.isEmpty() ? " style=\"background:none;\"" : "" %>><% if (!_connCoverUrl.isEmpty()) { %><img src="<%= _connCoverUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"><% } %></div>
             <div class="fa-profile-body">
                 <div class="fa-profile-avatar-wrap">
-                    <div class="fa-avatar fa-avatar--lg"><%= initialConnecte %></div>
+                    <div class="fa-avatar fa-avatar--lg"<%= !_connPhotoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>><% if (!_connPhotoUrl.isEmpty()) { %><img src="<%= _connPhotoUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initialConnecte %><% } %></div>
                 </div>
                 <div class="fa-profile-name"><%= nomConnecte %></div>
                 <hr class="fa-divider">
                 <nav class="fa-profile-nav">
-                    <a href="<%= ctx %>/module.jsp?but=profil/voir.jsp" class="fa-nav-link">
+                    <a href="<%= ctx %>/pages/module.jsp?but=profil/voir.jsp&currentMenu=MENDYN000009" class="fa-nav-link">
                         <i class="bi bi-person-fill"></i> Mon profil
                     </a>
                     <a href="#" class="fa-nav-link fa-nav-link--active">
@@ -81,7 +104,7 @@
         <!-- ===== COMPOSER ===== -->
         <div class="fa-composer-card" id="composer-card">
             <div class="fa-composer-trigger" id="composer-trigger" onclick="openComposer()">
-                <div class="fa-avatar fa-avatar--sm"><%= initialConnecte %></div>
+                <div class="fa-avatar fa-avatar--sm"<%= !_connPhotoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>><% if (!_connPhotoUrl.isEmpty()) { %><img src="<%= _connPhotoUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initialConnecte %><% } %></div>
                 <div class="fa-composer-placeholder">Quoi de neuf&nbsp;?</div>
             </div>
             <div class="fa-composer-quick-actions" id="composer-quick-actions">
@@ -99,7 +122,7 @@
                 <form method="POST" enctype="multipart/form-data" id="form-pub"
                       action="<%= ctx %>/pages/alumni/ajax/creer-publication.jsp">
                     <div class="fa-composer-header">
-                        <div class="fa-avatar fa-avatar--md"><%= initialConnecte %></div>
+                        <div class="fa-avatar fa-avatar--md"<%= !_connPhotoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>><% if (!_connPhotoUrl.isEmpty()) { %><img src="<%= _connPhotoUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initialConnecte %><% } %></div>
                         <div>
                             <strong><%= nomConnecte %></strong>
                             <select name="idtypepublication" class="fa-type-select">
@@ -154,13 +177,17 @@
                         new Reactiontype(), null, null, conn, " order by idreactiontype");
                 if (reactTypes == null) reactTypes = new Reactiontype[0];
 
-                // --- APJ: Charger tous les profils pour lookup nom ---
-                alumni.Profil[] allProfils = (alumni.Profil[]) CGenUtil.rechercher(
-                        new alumni.Profil(), null, null, conn, "");
+                // --- APJ: Charger tous les profils pour lookup nom + photo ---
+                ProfilLib[] allProfils = (ProfilLib[]) CGenUtil.rechercher(
+                        new ProfilLib(), null, null, conn, "");
                 Map userNames = new HashMap();
+                Map userPhotos = new HashMap();
                 if (allProfils != null) {
                     for (int i = 0; i < allProfils.length; i++) {
-                        userNames.put(new Integer(allProfils[i].getIdutilisateur()), allProfils[i].getNom() + " " + allProfils[i].getPrenom());
+                        Integer _key = new Integer(allProfils[i].getIdutilisateur());
+                        userNames.put(_key, allProfils[i].getNom() + " " + allProfils[i].getPrenom());
+                        if (allProfils[i].getPhotoProfil() != null && !allProfils[i].getPhotoProfil().trim().isEmpty())
+                            userPhotos.put(_key, ctx + "/" + allProfils[i].getPhotoProfil().trim());
                     }
                 }
 
@@ -188,6 +215,7 @@
                 String[] _partsA = auteur.trim().split("\\s+");
                 String initA = String.valueOf(Character.toUpperCase(_partsA[0].charAt(0)));
                 if (_partsA.length > 1) initA += Character.toUpperCase(_partsA[_partsA.length-1].charAt(0));
+                String _authorPhoto = (String) userPhotos.get(new Integer(pub.getIdutilisateur()));
 
                 // --- APJ: Medias ---
                 Media[] medias = (Media[]) CGenUtil.rechercher(
@@ -257,7 +285,7 @@
 
             <!-- EN-TETE -->
             <div class="fa-post-header">
-                <div class="fa-avatar fa-avatar--md"><%= initA %></div>
+                <div class="fa-avatar fa-avatar--md"<%= _authorPhoto != null ? " style=\"background:transparent;\"" : "" %>><% if (_authorPhoto != null) { %><img src="<%= _authorPhoto %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initA %><% } %></div>
                 <div class="fa-post-meta">
                 <!-- Menu 3 points -->
                 <div class="pub-menu">
@@ -372,7 +400,7 @@
             <div id="commentaires-<%= idpub %>" style="display:none;" class="fa-comments-zone">
                 <div id="liste-comm-<%= idpub %>"></div>
                 <div class="fa-comment-input-wrap">
-                    <div class="fa-avatar fa-avatar--sm"><%= initialConnecte %></div>
+                    <div class="fa-avatar fa-avatar--sm"<%= !_connPhotoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>><% if (!_connPhotoUrl.isEmpty()) { %><img src="<%= _connPhotoUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initialConnecte %><% } %></div>
                     <div class="fa-comment-input-box">
                         <input type="text" id="comm-text-<%= idpub %>"
                                placeholder="&Eacute;crire un commentaire... (@ pour mentionner)"
@@ -415,20 +443,40 @@
                 <span class="fa-widget-title">&Eacute;v&eacute;nements &agrave; venir</span>
             </div>
             <div class="fa-widget-body" id="evenements-list">
-                <!-- Les événements seront chargés ici -->
-                <div class="fa-event-item fa-event-item--placeholder">
+                <%
+                    String[] _moisCourt = {"jan","f\u00E9v","mar","avr","mai","jun","jul","ao\u00FB","sep","oct","nov","d\u00E9c"};
+                    int _evtMax = Math.min(_upEvents.length, 3);
+                    if (_evtMax == 0) {
+                %>
+                <div style="padding:16px;text-align:center;color:#999;font-size:13px;">Aucun &eacute;v&eacute;nement &agrave; venir</div>
+                <% } else {
+                    for (int _ei = 0; _ei < _evtMax; _ei++) {
+                        Evenement _ev = _upEvents[_ei];
+                        String _evDesc = _ev.getDescription() != null ? _ev.getDescription() : "\u00C9v\u00E9nement";
+                        String _evDescSafe = _evDesc.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;");
+                        if (_evDescSafe.length() > 40) _evDescSafe = _evDescSafe.substring(0, 40) + "...";
+                        String _evDay = "--"; String _evMon = "---";
+                        if (_ev.getDatedebut() != null) {
+                            java.util.Calendar _cal = java.util.Calendar.getInstance();
+                            _cal.setTime(_ev.getDatedebut());
+                            _evDay = String.valueOf(_cal.get(java.util.Calendar.DAY_OF_MONTH));
+                            _evMon = _moisCourt[_cal.get(java.util.Calendar.MONTH)];
+                        }
+                %>
+                <div class="fa-event-item">
                     <div class="fa-event-date-badge">
-                        <span class="fa-event-day">--</span>
-                        <span class="fa-event-month">---</span>
+                        <span class="fa-event-day"><%= _evDay %></span>
+                        <span class="fa-event-month"><%= _evMon %></span>
                     </div>
                     <div class="fa-event-info">
-                        <div class="fa-event-title">Chargement...</div>
-                        <div class="fa-event-meta"><i class="bi bi-geo-alt"></i> ---</div>
+                        <div class="fa-event-title"><%= _evDescSafe %></div>
+                        <div class="fa-event-meta"><i class="bi bi-calendar-event"></i>&nbsp;<%= _ev.getDatedebut() %></div>
                     </div>
                 </div>
+                <% } } %>
             </div>
             <div class="fa-widget-footer">
-                <a href="#" class="fa-widget-link">Voir tous les &eacute;v&eacute;nements &rarr;</a>
+                <a href="<%= ctx %>/pages/module.jsp?but=evenement/evenement-calendar.jsp" class="fa-widget-link">Voir tous les &eacute;v&eacute;nements &rarr;</a>
             </div>
         </div>
 
@@ -779,6 +827,7 @@
 <script>
     var CTX = '<%= ctx %>';
     var CURRENT_USER_ID = '<%= refuserConnecte %>';
+    var CONN_PHOTO = '<%= _connPhotoUrl %>';
 
     // ========== DONNEES TEMPORAIRES MENTIONS ==========
     var mentionData = {}; // { idpub: { suggestions: [], selectedIndex: 0, mentionIds: [], searchStart: -1 } }
@@ -1168,7 +1217,11 @@
                     var html = '';
                     html += '<div id="comm-' + c.id + '" class="fa-comment-item' + replyClass + '">';
                     html += '<div class="fa-comment-inner">';
-                    html += '<div class="fa-avatar fa-avatar--xs">' + escHtml(initials) + '</div>';
+                    if (c.photo) {
+                        html += '<div class="fa-avatar fa-avatar--xs" style="background:transparent;"><img src="' + CTX + '/' + escHtml(c.photo) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>';
+                    } else {
+                        html += '<div class="fa-avatar fa-avatar--xs">' + escHtml(initials) + '</div>';
+                    }
                     html += '<div class="fa-comment-content">';
                     html += '<div class="fa-comment-bubble">';
                     html += '<span class="fa-comment-author">' + escHtml(c.auteur) + '</span>';

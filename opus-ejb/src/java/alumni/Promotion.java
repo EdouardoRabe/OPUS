@@ -57,7 +57,7 @@ public class Promotion extends ClassMAPTable {
     public String getIdparcours() {
         return idparcours;
     }
-    
+
     public void setIdparcours(String idparcours) {
         this.idparcours = idparcours;
     }

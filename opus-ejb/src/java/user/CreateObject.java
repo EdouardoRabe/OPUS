@@ -70,27 +70,27 @@ import utilitaire.UtilitaireFormule;
 import utilitaire.UtilitaireMetier;
 
 public class CreateObject {
-    
-    public static Object createObject(ClassMAPTable o, Connection c, UserEJBBean u)throws Exception
-    {
-        return createObject(o,c,u.getUser(),u, u.getListeConfiguration());
-    }
-          
-    public static Object createObject(ClassMAPTable o, Connection c, MapUtilisateur u, UserEJBBean user, Configuration[] listeConfig) throws Exception {
-	try {
-	    o.setMode("modif");
-        System.out.println("------------"+o.getClassName());
-	    if (o instanceof bean.ClassEtat) {
-        //o.setValChamp("etat", Integer.valueOf(1));
-		o.setValChamp("iduser", u.getTuppleID());
-	    }
-	    if (o instanceof bean.ClassUser) {
-		o.setValChamp("iduser", u.getTuppleID());
-	    } 
-	    return o.createObject(u.getTuppleID(), c);
-	} catch (Exception e) {
-            e.printStackTrace();
-	    throw e;
+
+	public static Object createObject(ClassMAPTable o, Connection c, UserEJBBean u) throws Exception {
+		return createObject(o, c, u.getUser(), u, u.getListeConfiguration());
 	}
-    }
+
+	public static Object createObject(ClassMAPTable o, Connection c, MapUtilisateur u, UserEJBBean user,
+			Configuration[] listeConfig) throws Exception {
+		try {
+			o.setMode("modif");
+			System.out.println("------------" + o.getClassName());
+			if (o instanceof bean.ClassEtat) {
+				// o.setValChamp("etat", Integer.valueOf(1));
+				o.setValChamp("iduser", u.getTuppleID());
+			}
+			if (o instanceof bean.ClassUser) {
+				o.setValChamp("iduser", u.getTuppleID());
+			}
+			return o.createObject(u.getTuppleID(), c);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+	}
 }
