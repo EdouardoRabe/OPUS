@@ -256,6 +256,38 @@
                         .replace(">", "&gt;").replace("\n", "<br>");
             }
 
+            // ---- Partage: charger la pub originale si idpuborigine est defini ----
+            boolean ffIsShared = pub.getIdpuborigine() != null && !pub.getIdpuborigine().trim().isEmpty();
+            String ffOrigDesc = "", ffOrigAuteur = "", ffOrigDate = "", ffOrigMediaUrl = "", ffOrigTypePubLib = "";
+            String ffOrigId = ffIsShared ? pub.getIdpuborigine().trim() : "";
+            if (ffIsShared) {
+                Publication[] ffOrigPubs = (Publication[]) CGenUtil.rechercher(
+                    new Publication(), null, null, conn, " and idpublication = '" + ffOrigId + "'");
+                if (ffOrigPubs != null && ffOrigPubs.length > 0) {
+                    Publication ffOrig = ffOrigPubs[0];
+                    String ffod = ffOrig.getDescritpion();
+                    ffOrigDesc = ffod != null ? ffod.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;").replace("\n","<br>") : "";
+                    ffOrigDate = (ffOrig.getDaty() != null ? ffOrig.getDaty().toString() : "") + " \u00e0 " + (ffOrig.getHeure() != null ? ffOrig.getHeure() : "");
+                    String ffOrigTypePubId = ffOrig.getIdtypepublication() != null ? ffOrig.getIdtypepublication() : "";
+                    ffOrigTypePubLib = ffOrigTypePubId;
+                    for (int t2 = 0; t2 < typesPub.length; t2++) {
+                        if (typesPub[t2].getIdtypepublication().equals(ffOrigTypePubId)) { ffOrigTypePubLib = typesPub[t2].getLibelle(); break; }
+                    }
+                    String ffOA = (String) userNames.get(new Integer(ffOrig.getIdutilisateur()));
+                    if (ffOA == null) {
+                        ProfilLib[] ffOP = (ProfilLib[]) CGenUtil.rechercher(
+                            new ProfilLib(), null, null, conn, " and refuser = " + ffOrig.getIdutilisateur());
+                        if (ffOP != null && ffOP.length > 0) { ffOA = (ffOP[0].getNom() != null ? ffOP[0].getNom() : "") + (ffOP[0].getPrenom() != null ? " " + ffOP[0].getPrenom() : ""); }
+                    }
+                    ffOrigAuteur = ffOA != null ? ffOA.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;") : "Utilisateur";
+                    Media[] ffOM = (Media[]) CGenUtil.rechercher(new Media(), null, null, conn, " and idpublication = '" + ffOrigId + "'");
+                    if (ffOM != null && ffOM.length > 0 && ffOM[0].getMediaurl() != null) {
+                        String omu = ffOM[0].getMediaurl();
+                        ffOrigMediaUrl = omu.startsWith("http") ? omu : ctx + "/UploadDownloadFileServlet?fileName=" + java.net.URLEncoder.encode(omu, "UTF-8");
+                    }
+                } else { ffIsShared = false; }
+            }
+
             // Libelle type publication
             String typePubLib = pub.getIdtypepublication() != null ? pub.getIdtypepublication() : "";
             for (int t = 0; t < typesPub.length; t++) {
@@ -333,6 +365,18 @@
             <img src="<%= mUrl %>" class="fa-post-img" alt="media" onclick="openMediaZoom(this.src)">
         </div>
         <% } %>
+
+        <% if (ffIsShared) { %>
+        <div class="fa-shared-embed">
+            <div class="fa-shared-embed-header">
+                <span class="fa-shared-embed-author"><%= ffOrigAuteur %></span>
+                <span class="fa-shared-embed-date">&nbsp;&middot;&nbsp;<%= ffOrigDate %></span>
+                <% if (!ffOrigTypePubLib.isEmpty()) { %><span class="fa-type-badge"><%= ffOrigTypePubLib %></span><% } %>
+            </div>
+            <% if (!ffOrigDesc.isEmpty()) { %><div class="fa-shared-embed-text"><%= ffOrigDesc %></div><% } %>
+            <% if (!ffOrigMediaUrl.isEmpty()) { %><img src="<%= ffOrigMediaUrl %>" alt="" onclick="openMediaZoom(this.src)" style="width:100%;border-radius:8px;margin-top:6px;max-height:200px;object-fit:cover;cursor:pointer;"><% } %>
+        </div>
+        <% } %>
     </div>
 
     <!-- COMPTEURS -->
@@ -390,6 +434,15 @@
         <% if (pub.getIdutilisateur() == refuserConnecte) { %>
         <button class="fa-action-btn" onclick="toggleIdentifier('<%= idpub %>')">
             <i class="bi bi-tag"></i>&nbsp;<span>Identifier</span>
+        </button>
+        <% } %>
+
+        <!-- Partager (non auteur, non partage) -->
+        <% if (pub.getIdutilisateur() != refuserConnecte && !ffIsShared) { %>
+        <%  String _ffShareAuteurEsc = auteur.replace("'","\\'").replace("\"","\\\"");
+            String _ffShareTexteEsc  = descSafe.isEmpty() ? "" : descSafe.replace("<br>"," ").replace("'","\\'").replace("\"","\\\""); %>
+        <button class="fa-action-btn" onclick="openShareModal('<%= idpub %>','<%= _ffShareAuteurEsc %>','<%= pub.getDaty() %>&nbsp;&agrave;&nbsp;<%= pub.getHeure() != null ? pub.getHeure() : "" %>','<%= _ffShareTexteEsc %>')">
+            <i class="bi bi-share"></i>&nbsp;<span>Partager</span>
         </button>
         <% } %>
     </div>

@@ -792,12 +792,59 @@
     .fa-feed-spinner { display:inline-block; width:32px; height:32px; border:3px solid #e4e6eb; border-top-color:var(--itu-blue,#008BFF); border-radius:50%; animation:feedSpin .7s linear infinite; }
     @keyframes feedSpin { to { transform:rotate(360deg); } }
     .fa-feed-end { text-align:center; padding:12px 0; color:var(--fa-text-secondary); font-size:13px; }
+    /* ---- Publication partagee : bloc original embedded ---- */
+    .fa-shared-embed { border:1.5px solid var(--fa-border); border-radius:10px; margin:10px 0 4px; padding:12px 14px; background:#f8f9fb; cursor:default; }
+    .fa-shared-embed-header { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:6px; font-size:13px; }
+    .fa-shared-embed-author { font-weight:700; }
+    .fa-shared-embed-date { color:#888; font-size:12px; }
+    .fa-shared-embed-text { font-size:13px; color:var(--fa-text); word-break:break-word; line-height:1.5; max-height:160px; overflow:hidden; }
+    .fa-shared-embed img { max-width:100%; border-radius:8px; margin-top:8px; max-height:200px; object-fit:cover; cursor:pointer; pointer-events:auto; width:100%; }
+    /* ---- Modale partage ---- */
+    #share-modal { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.45); align-items:center; justify-content:center; }
+    .share-box { background:#fff; border-radius:14px; width:min(500px,96vw); max-height:90vh; display:flex; flex-direction:column; box-shadow:0 10px 40px rgba(0,0,0,.25); overflow:hidden; }
+    .share-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--fa-border); }
+    .share-title { margin:0; font-size:16px; font-weight:700; }
+    .share-body { padding:16px 18px; overflow-y:auto; flex:1; }
+    .share-textarea { width:100%; min-height:80px; border:1.5px solid #dde3ec; border-radius:10px; padding:10px 12px; font-size:14px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; }
+    .share-textarea:focus { border-color:var(--itu-blue,#008BFF); }
+    .share-original { border:1.5px solid #dde3ec; border-radius:10px; padding:12px 14px; margin-top:12px; background:#f8f9fb; max-height:220px; overflow:hidden; pointer-events:none; }
+    .share-orig-author { font-weight:700; font-size:13px; margin-bottom:4px; }
+    .share-orig-date { font-size:11px; color:#888; margin-bottom:8px; }
+    .share-orig-text { font-size:13px; color:var(--fa-text); white-space:pre-wrap; word-break:break-word; max-height:120px; overflow:hidden; }
+    .share-footer { display:flex; justify-content:flex-end; gap:10px; padding:12px 18px; border-top:1px solid var(--fa-border); }
+    .share-cancel-btn { background:transparent; border:1.5px solid var(--fa-border); border-radius:20px; padding:7px 18px; font-size:14px; font-weight:600; cursor:pointer; }
+    .share-cancel-btn:hover { background:#f0f2f5; }
+    .share-submit-btn { background:var(--itu-blue,#008BFF); color:#fff; border:none; border-radius:20px; padding:7px 18px; font-size:14px; font-weight:700; cursor:pointer; }
+    .share-submit-btn:hover { opacity:.88; }
+    .share-submit-btn:disabled { opacity:.5; cursor:default; }
 </style>
 
 <!-- ==================== MODALE REACTIONS ==================== -->
 <div id="react-detail-modal">
     <div class="react-detail-box">
         <div id="react-detail-content"></div>
+    </div>
+</div>
+
+<!-- ==================== MODALE PARTAGE ==================== -->
+<div id="share-modal">
+    <div class="share-box">
+        <div class="share-header">
+            <h3 class="share-title">Partager la publication</h3>
+            <button class="rdm-close" onclick="closeShareModal()">&times;</button>
+        </div>
+        <div class="share-body">
+            <textarea id="share-description" class="share-textarea" placeholder="Dites quelque chose... (optionnel)"></textarea>
+            <div class="share-original" id="share-original-preview">
+                <div class="share-orig-author" id="share-orig-author"></div>
+                <div class="share-orig-date" id="share-orig-date"></div>
+                <div class="share-orig-text" id="share-orig-text"></div>
+            </div>
+        </div>
+        <div class="share-footer">
+            <button class="share-cancel-btn" onclick="closeShareModal()">Annuler</button>
+            <button class="share-submit-btn" id="share-submit-btn" onclick="submitShare()"><i class="bi bi-send-fill"></i>&nbsp;Partager</button>
+        </div>
     </div>
 </div>
 
@@ -1686,17 +1733,27 @@
                 if (attempts > 20) clearInterval(scrollInterval); // max 10 secondes
             }, 500);
         } else if (scrollTo.startsWith('pub-')) {
-            // Notification de type publication
-            setTimeout(function() {
+            // Publication ciblée (like, notification...) — on tente en boucle
+            // pour couvrir le cas où la publication est chargée en lazy
+            var _pubAttempts = 0;
+            var _pubInterval = setInterval(function() {
+                _pubAttempts++;
                 var el = document.getElementById(scrollTo);
                 if (el) {
+                    clearInterval(_pubInterval);
                     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    el.style.background = '#fff9c4';
+                    el.style.background = '#fffde7';
                     el.style.borderLeft = '4px solid #f9a825';
-                    el.style.transition = 'background 2s';
+                    el.style.transition = 'background 0.3s';
                     setTimeout(function() { el.style.background = ''; el.style.borderLeft = ''; }, 4000);
                 }
-            }, 300);
+                // Après 5 tentatives (~2.5s), déclencher le chargement suivant
+                if (_pubAttempts === 5) {
+                    var sentinel = document.getElementById('feed-sentinel');
+                    if (sentinel) sentinel.scrollIntoView();
+                }
+                if (_pubAttempts > 20) clearInterval(_pubInterval);
+            }, 500);
         }
     });
 
@@ -2171,6 +2228,53 @@
         if (modal && e.target === modal) closeReactionDetails();
     });
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closeReactionDetails();
+        if (e.key === 'Escape') { closeReactionDetails(); closeShareModal(); }
+    });
+
+    // ========== PARTAGE PUBLICATION ==========
+    var _shareIdPub = null;
+    function openShareModal(idpub, auteur, datepub, texte) {
+        _shareIdPub = idpub;
+        document.getElementById('share-description').value = '';
+        document.getElementById('share-orig-author').textContent = auteur || '';
+        document.getElementById('share-orig-date').textContent = datepub || '';
+        document.getElementById('share-orig-text').textContent = texte || '';
+        document.getElementById('share-submit-btn').disabled = false;
+        document.getElementById('share-modal').style.display = 'flex';
+        document.getElementById('share-description').focus();
+    }
+    function closeShareModal() {
+        document.getElementById('share-modal').style.display = 'none';
+        _shareIdPub = null;
+    }
+    function submitShare() {
+        if (!_shareIdPub) return;
+        var btn = document.getElementById('share-submit-btn');
+        var desc = document.getElementById('share-description').value.trim();
+        btn.disabled = true;
+        fetch(CTX + '/pages/alumni/ajax/partager-publication.jsp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'idpublication=' + encodeURIComponent(_shareIdPub)
+                + '&description=' + encodeURIComponent(desc)
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                closeShareModal();
+                var url = new URL(window.location.href);
+                url.searchParams.set('scrollTo', 'pub-' + data.idpublication);
+                window.location.href = url.toString();
+            } else {
+                btn.disabled = false;
+                alert('Erreur lors du partage: ' + (data.error || 'Inconnue'));
+            }
+        })
+        .catch(function(e) { btn.disabled = false; alert('Erreur réseau: ' + e); });
+    }
+    // Fermer modale partage en cliquant le fond
+    document.addEventListener('click', function(e) {
+        var sm = document.getElementById('share-modal');
+        if (sm && e.target === sm) closeShareModal();
     });
 </script>

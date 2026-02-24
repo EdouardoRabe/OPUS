@@ -14,6 +14,7 @@ public class Publication extends ClassMAPTable {
     private String heure;
     private String idtypepublication;
     private int idutilisateur;
+    private String idpuborigine;
 
     public Publication() {
         setNomTable("publication");
@@ -97,5 +98,13 @@ public class Publication extends ClassMAPTable {
 
     public void setIdutilisateur(int idutilisateur) {
         this.idutilisateur = idutilisateur;
+    }
+
+    public String getIdpuborigine() {
+        return idpuborigine;
+    }
+
+    public void setIdpuborigine(String idpuborigine) {
+        this.idpuborigine = idpuborigine;
     }
 }

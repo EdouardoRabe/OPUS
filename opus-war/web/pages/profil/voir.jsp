@@ -234,6 +234,26 @@
   color: #999; font-size: 14px; padding: 0 2px; transition: color .15s; line-height: 1;
 }
 .pv-spec-item button:hover { color: #c62828; }
+
+/* ---- Publications du profil ---- */
+.ppub-card { background:#fff; border:1px solid #dde3ec; border-radius:12px; padding:16px; margin-bottom:14px; cursor:pointer; transition:box-shadow .15s; }
+.ppub-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.10); }
+.ppub-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.ppub-avatar { width:38px; height:38px; border-radius:50%; background:#0a66c2; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex-shrink:0; overflow:hidden; }
+.ppub-meta { flex:1; min-width:0; }
+.ppub-author { font-weight:700; font-size:14px; color:inherit; text-decoration:none; display:block; }
+.ppub-author:hover { text-decoration:underline; color:#0a66c2; }
+.ppub-date { font-size:12px; color:#888; margin-top:2px; }
+.ppub-badge { font-size:11px; background:#eef3fb; color:#0a66c2; padding:2px 8px; border-radius:10px; font-weight:600; margin-left:4px; }
+.ppub-text { font-size:14px; line-height:1.5; color:#1c1e21; margin-bottom:8px; max-height:96px; overflow:hidden; text-overflow:ellipsis; word-break:break-word; }
+.ppub-media-wrap { margin:6px 0; border-radius:8px; overflow:hidden; max-height:220px; }
+.ppub-media-img { width:100%; max-height:220px; object-fit:cover; display:block; }
+.ppub-counters { display:flex; align-items:center; gap:14px; font-size:13px; color:#888; margin-top:8px; padding-top:8px; border-top:1px solid #f0f2f5; }
+.ppub-counter { display:flex; align-items:center; gap:4px; }
+.ppub-view-link { margin-left:auto; font-size:12px; color:#0a66c2; font-weight:600; }
+.ppub-load-more-wrap { text-align:center; margin:8px 0 16px; }
+.ppub-load-more-btn { background:transparent; border:1.5px solid #0a66c2; color:#0a66c2; border-radius:20px; padding:7px 22px; font-size:13px; font-weight:700; cursor:pointer; }
+.ppub-load-more-btn:hover { background:#0a66c2; color:#fff; }
 </style>
 
 <div class="pv-card">
@@ -382,6 +402,14 @@
         </div>
       <% } } %>
     </div>
+  </div>
+
+  <!-- ── Publications ── -->
+  <div class="pv-section" id="pvPubSection">
+    <div class="pv-section-header">
+      <h2><i class="bi bi-newspaper"></i> Publications</h2>
+    </div>
+    <div id="pvPublications"><em style="color:#aaa;font-size:13px;">Chargement...</em></div>
   </div>
 
 </div>
@@ -586,6 +614,73 @@ function pvUploadPhoto(inputId, typeVal, apresOk) {
   })
   .catch(function(e){ alert("Erreur réseau : " + e); });
 }
+
+// ========== PUBLICATIONS DU PROFIL ==========
+function pvLoadPubs(idutilisateur, idprofil, cursorId) {
+    var container = document.getElementById('pvPublications');
+    var loadBtn = event && event.target && event.target.classList.contains('ppub-load-more-btn') ? event.target : null;
+    if (cursorId === '') {
+        container.innerHTML = '<em style="color:#aaa;font-size:13px;">Chargement...</em>';
+    }
+    var url = ctx + '/pages/alumni/ajax/publications-profil.jsp?'
+        + 'idutilisateur=' + encodeURIComponent(idutilisateur)
+        + '&idprofil=' + encodeURIComponent(idprofil)
+        + (cursorId ? '&cursor_id=' + encodeURIComponent(cursorId) : '');
+    fetch(url)
+        .then(function(r) { return r.text(); })
+        .then(function(html) {
+            if (cursorId === '') {
+                container.innerHTML = html;
+            } else {
+                // Supprimer le bouton "voir plus" existant
+                var existing = container.querySelector('.ppub-load-more-wrap');
+                if (existing) existing.remove();
+                var tmp = document.createElement('div');
+                tmp.innerHTML = html;
+                while (tmp.firstChild) container.appendChild(tmp.firstChild);
+            }
+        })
+        .catch(function(e) { container.innerHTML = '<p style="color:red;font-size:13px;">Erreur: ' + e + '</p>'; });
+}
+function ppubLoadMore(btn, iduser, idprofil, cursorId) {
+    btn.disabled = true; btn.textContent = 'Chargement...';
+    var container = document.getElementById('pvPublications');
+    var url = ctx + '/pages/alumni/ajax/publications-profil.jsp?'
+        + 'idutilisateur=' + encodeURIComponent(iduser)
+        + '&idprofil=' + encodeURIComponent(idprofil)
+        + '&cursor_id=' + encodeURIComponent(cursorId);
+    fetch(url)
+        .then(function(r) { return r.text(); })
+        .then(function(html) {
+            var wrap = btn.closest('.ppub-load-more-wrap');
+            if (wrap) wrap.remove();
+            var tmp = document.createElement('div'); tmp.innerHTML = html;
+            while (tmp.firstChild) container.appendChild(tmp.firstChild);
+        })
+        .catch(function(e) { btn.disabled = false; btn.textContent = 'Voir plus'; alert('Erreur: ' + e); });
+}
+// Zoom media simple (si pas disponible ailleurs)
+function openMediaZoom(src) {
+    var ov = document.getElementById('pvMediaZoom');
+    if (!ov) {
+        ov = document.createElement('div');
+        ov.id = 'pvMediaZoom';
+        ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:10000;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
+        ov.onclick = function() { ov.remove(); };
+        var img = document.createElement('img');
+        img.style.cssText = 'max-width:95vw;max-height:92vh;border-radius:6px;object-fit:contain;';
+        img.src = src;
+        ov.appendChild(img);
+        document.body.appendChild(ov);
+    } else {
+        ov.querySelector('img').src = src;
+        ov.style.display = 'flex';
+    }
+}
+// Charger les publications au chargement
+document.addEventListener('DOMContentLoaded', function() {
+    pvLoadPubs('<%= uEJB.getUser().getRefuser() %>', '<%= _idprofil %>', '');
+});
 </script>
 
 <!-- ═══════════════ MODALS ═══════════════ -->

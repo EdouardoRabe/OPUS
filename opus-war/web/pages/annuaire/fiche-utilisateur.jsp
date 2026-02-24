@@ -255,6 +255,24 @@
 .fu-btn-primary:hover{background:#004182;color:#fff;text-decoration:none}
 .fu-btn-outline{background:transparent;color:#0a66c2;border:1.5px solid #0a66c2}
 .fu-btn-outline:hover{background:#eef3fb;color:#0a66c2;text-decoration:none}
+/* ---- Publications du profil ---- */
+.ppub-card { background:#fff; border:1px solid #dde3ec; border-radius:12px; padding:14px; margin-bottom:12px; cursor:pointer; transition:box-shadow .15s; }
+.ppub-card:hover { box-shadow:0 4px 14px rgba(0,0,0,.10); }
+.ppub-header { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.ppub-avatar { width:36px; height:36px; border-radius:50%; background:#0a66c2; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex-shrink:0; overflow:hidden; }
+.ppub-meta { flex:1; min-width:0; }
+.ppub-author { font-weight:700; font-size:13px; color:inherit; text-decoration:none; display:block; }
+.ppub-date { font-size:12px; color:#888; margin-top:2px; }
+.ppub-badge { font-size:11px; background:#eef3fb; color:#0a66c2; padding:2px 8px; border-radius:10px; font-weight:600; margin-left:4px; }
+.ppub-text { font-size:13px; line-height:1.5; color:#1c1e21; margin-bottom:6px; max-height:96px; overflow:hidden; word-break:break-word; }
+.ppub-media-wrap { margin:4px 0; border-radius:8px; overflow:hidden; max-height:200px; }
+.ppub-media-img { width:100%; max-height:200px; object-fit:cover; display:block; }
+.ppub-counters { display:flex; align-items:center; gap:12px; font-size:12px; color:#888; margin-top:6px; padding-top:6px; border-top:1px solid #f0f2f5; }
+.ppub-counter { display:flex; align-items:center; gap:4px; }
+.ppub-view-link { margin-left:auto; font-size:12px; color:#0a66c2; font-weight:600; }
+.ppub-load-more-wrap { text-align:center; margin:6px 0 12px; }
+.ppub-load-more-btn { background:transparent; border:1.5px solid #0a66c2; color:#0a66c2; border-radius:20px; padding:6px 20px; font-size:13px; font-weight:700; cursor:pointer; }
+.ppub-load-more-btn:hover { background:#0a66c2; color:#fff; }
 </style>
 
 <div class="fu-wrap">
@@ -395,6 +413,61 @@
             <% } } %>
         </div>
 
+        <!-- Publications -->
+        <div class="fu-section" id="fuPubSection" style="border-top:1px solid #dce0e4;margin-top:6px;">
+            <h2><i class="bi bi-newspaper"></i> Publications</h2>
+            <div id="fuPublications"><em style="color:#aaa;font-size:13px;">Chargement...</em></div>
+        </div>
+
     </div><!-- .fu-card -->
 
 </div>
+
+<script>
+(function() {
+    var ctx = '<%= request.getContextPath() %>';
+    var fuIdprofil = '<%= h(idprofil) %>';
+    var fuIduser   = '<%= profil != null ? profil.getRefuser() : -1 %>';
+
+    function fuLoadPubs(iduser, idprofil, cursorId) {
+        var container = document.getElementById('fuPublications');
+        if (!cursorId) container.innerHTML = '<em style="color:#aaa;font-size:13px;">Chargement...</em>';
+        var url = ctx + '/pages/alumni/ajax/publications-profil.jsp?idutilisateur=' + encodeURIComponent(iduser)
+            + '&idprofil=' + encodeURIComponent(idprofil)
+            + (cursorId ? '&cursor_id=' + encodeURIComponent(cursorId) : '');
+        fetch(url)
+            .then(function(r) { return r.text(); })
+            .then(function(html) {
+                if (!cursorId) { container.innerHTML = html; }
+                else {
+                    var ex = container.querySelector('.ppub-load-more-wrap');
+                    if (ex) ex.remove();
+                    var tmp = document.createElement('div'); tmp.innerHTML = html;
+                    while (tmp.firstChild) container.appendChild(tmp.firstChild);
+                }
+            })
+            .catch(function(e) { container.innerHTML = '<p style="color:red;font-size:13px;">Erreur: ' + e + '</p>'; });
+    }
+
+    window.ppubLoadMore = function(btn, iduser, idprofil, cursorId) {
+        btn.disabled = true; btn.textContent = 'Chargement...';
+        fuLoadPubs(iduser, idprofil, cursorId);
+    };
+
+    window.openMediaZoom = window.openMediaZoom || function(src) {
+        var ov = document.getElementById('fuMediaZoom');
+        if (!ov) {
+            ov = document.createElement('div'); ov.id = 'fuMediaZoom';
+            ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:10000;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
+            ov.onclick = function() { ov.remove(); };
+            var img = document.createElement('img');
+            img.style.cssText = 'max-width:95vw;max-height:92vh;border-radius:6px;object-fit:contain;';
+            img.src = src; ov.appendChild(img); document.body.appendChild(ov);
+        } else { ov.querySelector('img').src = src; ov.style.display = 'flex'; }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        fuLoadPubs(fuIduser, fuIdprofil, '');
+    });
+})();
+</script>
