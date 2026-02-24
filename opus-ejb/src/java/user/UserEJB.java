@@ -83,6 +83,8 @@ public interface UserEJB {
 
     public int desactiveUtilisateur(String ref) throws Exception;
 
+    public int desactiveUtilisateur(String ref, String description) throws Exception;
+
     public int activeUtilisateur(String ref) throws Exception;
 
     public void testLogin(String user, String pass) throws Exception;
