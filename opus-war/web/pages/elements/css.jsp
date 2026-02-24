@@ -41,7 +41,7 @@ folder instead of downloading all of them to reduce the load. -->
 <!--        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>-->
 <![endif]-->
 <!-- fichier style a customiser !-->
-<link href="${pageContext.request.contextPath}/dist/css/stylecustom.css?6" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/dist/css/stylecustom.css?8" rel="stylesheet" type="text/css" />
 <link href="${pageContext.request.contextPath}/assets/css/apj-global-style.css" rel="stylesheet" type="text/css" />
 <!-- OPUS Global Theme -->
 <link href="${pageContext.request.contextPath}/assets/css/opus-theme.css" rel="stylesheet" type="text/css" />

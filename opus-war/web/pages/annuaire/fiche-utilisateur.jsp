@@ -8,6 +8,8 @@
 <%@ page import="alumni.Visibilite" %>
 <%@ page import="alumni.Specialite" %>
 <%@ page import="alumni.Specialiteprofil" %>
+<%@ page import="alumni.ReseauSocial" %>
+<%@ page import="alumni.ProfilSocialMedia" %>
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
@@ -51,6 +53,8 @@
 
     ProfilLib profil = null;
     ExperienceLib[] experiences = null;
+    ReseauSocial[] allReseaux = null;
+    ProfilSocialMedia[] socialMedias = null;
     Map champVis = new HashMap(); // champ -> status
     List specLabels = new ArrayList(); // specialite libelles
     String _erreur = null;
@@ -108,6 +112,14 @@
                     }
                 }
             }
+
+            // charger réseaux sociaux si public
+            if (isPublic(champVis, "socialmedia")) {
+                allReseaux = (ReseauSocial[]) CGenUtil.rechercher(new ReseauSocial(), null, null, conn, " and actif=1 order by priorite desc");
+                ProfilSocialMedia smf = new ProfilSocialMedia();
+                smf.setIdprofil(idprofil);
+                socialMedias = (ProfilSocialMedia[]) CGenUtil.rechercher(smf, null, null, conn, "");
+            }
         }
     } catch (Exception e) {
         _erreur = e.getMessage();
@@ -115,6 +127,9 @@
     } finally {
         if (conn != null) try { conn.close(); } catch (Exception ignore) {}
     }
+
+    if (allReseaux == null) allReseaux = new ReseauSocial[0];
+    if (socialMedias == null) socialMedias = new ProfilSocialMedia[0];
 
     if (profil == null) {
 %>
@@ -138,6 +153,7 @@
     boolean vExp       = isPublic(champVis, "experience");
     boolean vTel       = isPublic(champVis, "telephone");
     boolean vGenre     = isPublic(champVis, "genre");
+    boolean vSocial    = isPublic(champVis, "socialmedia");
 
     String nom       = (vNom && profil.getNom() != null)            ? profil.getNom()            : "";
     String prenom    = (vPrenom && profil.getPrenom() != null)       ? profil.getPrenom()         : "";
@@ -152,6 +168,7 @@
 
     int refuser = profil.getRefuser();
     String loginuser = profil.getLoginuser() != null ? profil.getLoginuser() : "";
+    int contribution = profil.getContribution();
 
     // Display name
     String displayName;
@@ -191,7 +208,7 @@
 /* ═══════════════════════════════════════
    FICHE UTILISATEUR  •  LinkedIn-style
    ═══════════════════════════════════════ */
-.fu-wrap{max-width:760px;margin:0 auto 40px;padding:0 16px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#191919;-webkit-font-smoothing:antialiased}
+.fu-wrap{max-width:1200px;margin:0 auto 40px;padding:0 16px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#191919;-webkit-font-smoothing:antialiased}
 
 /* Back link */
 .fu-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#0a66c2;text-decoration:none;margin-bottom:14px;padding:5px 0;transition:color .15s}
@@ -201,27 +218,27 @@
 .fu-card{background:#fff;border:1px solid #dce0e4;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 
 /* Cover */
-.fu-cover{height:148px;background:linear-gradient(135deg,#003366 0%,#0a66c2 60%,#378fe9 100%);position:relative;overflow:hidden}
+.fu-cover{height:200px;background:linear-gradient(135deg,#003366 0%,#0a66c2 60%,#378fe9 100%);position:relative;overflow:hidden}
 .fu-cover img{width:100%;height:100%;object-fit:cover;display:block}
 .fu-refuser-badge{position:absolute;top:12px;right:16px;background:rgba(0,0,0,.4);color:#fff;padding:4px 14px;border-radius:12px;font-size:11px;font-weight:700;letter-spacing:.5px;backdrop-filter:blur(4px)}
 
 /* Avatar */
-.fu-avatar-wrap{display:inline-block;margin-top:-48px;margin-left:24px;position:relative;z-index:1}
-.fu-avatar{width:96px;height:96px;border-radius:50%;border:3.5px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.18);background:#0a66c2;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#fff;overflow:hidden;line-height:1}
+.fu-avatar-wrap{display:inline-block;margin-top:-60px;margin-left:32px;position:relative;z-index:1}
+.fu-avatar{width:120px;height:120px;border-radius:50%;border:4px solid #fff;box-shadow:0 2px 12px rgba(0,0,0,.25);background:#0a66c2;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;color:#fff;overflow:hidden;line-height:1}
 .fu-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 
 /* Top */
-.fu-top{padding:10px 24px 18px;border-bottom:1px solid #eee}
-.fu-name{font-size:21px;font-weight:700;line-height:1.25}
-.fu-headline{font-size:14px;color:#555;margin-top:3px}
-.fu-meta{display:flex;flex-wrap:wrap;gap:16px;margin-top:8px;font-size:13px;color:#666}
+.fu-top{padding:16px 32px 24px;border-bottom:1px solid #eee}
+.fu-name{font-size:26px;font-weight:700;line-height:1.25}
+.fu-headline{font-size:15px;color:#555;margin-top:6px}
+.fu-meta{display:flex;flex-wrap:wrap;gap:20px;margin-top:10px;font-size:14px;color:#666}
 .fu-meta a{color:#0a66c2;text-decoration:none;font-weight:500}
 .fu-meta a:hover{text-decoration:underline}
 
 /* Section */
-.fu-section{padding:18px 24px;border-bottom:1px solid #eee}
+.fu-section{padding:24px 32px;border-bottom:1px solid #eee}
 .fu-section:last-child{border-bottom:none}
-.fu-section h2{font-size:15px;font-weight:700;margin:0 0 14px;display:flex;align-items:center;gap:8px}
+.fu-section h2{font-size:16px;font-weight:700;margin:0 0 16px;display:flex;align-items:center;gap:8px}
 .fu-section h2 i{font-size:16px;color:#0a66c2}
 
 /* Tags */
@@ -231,10 +248,11 @@
 .fu-tag.green{background:#e8f5e9;color:#2e7d32}
 
 /* Grid */
-.fu-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 28px}
+.fu-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px 32px}
+@media(max-width:900px){.fu-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.fu-grid{grid-template-columns:1fr}}
-.fu-field label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#888;display:block;margin-bottom:3px}
-.fu-field span{font-size:14px}
+.fu-field label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#888;display:block;margin-bottom:5px}
+.fu-field span{font-size:15px}
 
 /* Experience */
 .fu-exp-item{border-left:3px solid #0a66c2;padding:10px 0 10px 16px;margin-bottom:16px}
@@ -299,7 +317,11 @@
 
         <!-- Top -->
         <div class="fu-top">
-            <div class="fu-name" style="display:flex;align-items:center;gap:10px;"><%= h(displayName) %><% if (!genreLib.isEmpty()) { %><span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;background:#f3e8ff;color:#7c3aed;border-radius:14px;padding:3px 12px;white-space:nowrap;"><i class="bi <%= "GEN000001".equals(genreId) ? "bi-gender-male" : "bi-gender-female" %>"></i>&nbsp;<%= h(genreLib) %></span><% } %></div>
+            <div class="fu-name" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <%= h(displayName) %>
+                <% if (!genreLib.isEmpty()) { %><span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;background:#f3e8ff;color:#7c3aed;border-radius:14px;padding:3px 12px;white-space:nowrap;"><i class="bi <%= "GEN000001".equals(genreId) ? "bi-gender-male" : "bi-gender-female" %>"></i>&nbsp;<%= h(genreLib) %></span><% } %>
+                <span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;background:#fff8e1;color:#f57f17;border-radius:14px;padding:3px 12px;white-space:nowrap;" title="Contribution (publications)"><i class="bi bi-award-fill"></i>&nbsp;<%= contribution %></span>
+            </div>
             <div class="fu-headline"><%= h(headline) %></div>
             <div class="fu-meta">
                 <% if (!email.isEmpty()) { %><a href="mailto:<%= h(email) %>"><i class="bi bi-envelope-fill"></i>&nbsp;<%= h(email) %></a><% } %>
@@ -330,6 +352,31 @@
                 <% for (int i = 0; i < specLabels.size(); i++) { %>
                 <span class="fu-tag green"><%= h((String) specLabels.get(i)) %></span>
                 <% } %>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Reseaux Sociaux -->
+        <% if (vSocial) { %>
+        <div class="fu-section">
+            <h2><i class="bi bi-globe2"></i> R&eacute;seaux sociaux</h2>
+            <div class="fu-tags">
+                <% if (socialMedias == null || socialMedias.length == 0) { %>
+                    <span style="color:#aaa;font-size:13px">Aucun r&eacute;seau social renseign&eacute;.</span>
+                <% } else {
+                    for (int ii = 0; ii < socialMedias.length; ii++) {
+                        ProfilSocialMedia sm = socialMedias[ii];
+                        String lib = "";
+                        for (int ri = 0; ri < allReseaux.length; ri++) {
+                            if (allReseaux[ri].getIdReseauSocial() != null &&
+                                allReseaux[ri].getIdReseauSocial().equals(sm.getIdReseauSocial())) {
+                                lib = allReseaux[ri].getLibelle() != null ? allReseaux[ri].getLibelle() : "";
+                                break;
+                            }
+                        }
+                %>
+                    <span class="fu-tag grey"><%= h(lib + ": " + (sm.getValeur()!=null?sm.getValeur():"")) %></span>
+                <% } } %>
             </div>
         </div>
         <% } %>

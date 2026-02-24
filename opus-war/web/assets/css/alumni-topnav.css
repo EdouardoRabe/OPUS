@@ -240,6 +240,8 @@
   top: calc(100% + 10px);
   left: 0;
   min-width: 300px;
+  max-height: 80vh;
+  overflow-y: auto;
   background: var(--white);
   border: 1px solid #e8ecf1;
   border-radius: var(--radius-lg);
@@ -271,6 +273,15 @@
   transform: rotate(-45deg);
   z-index: 1;
   border-radius: 2px;
+}
+.topnav-submenu.topnav-submenu-right {
+  left: auto;
+  right: 0;
+  transform-origin: top right;
+}
+.topnav-submenu.topnav-submenu-right::before {
+  left: auto;
+  right: 18px;
 }
 .topnav-link-group.is-open .topnav-submenu { display: block; }
 

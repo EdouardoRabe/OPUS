@@ -55,6 +55,27 @@
       }
     }
 
+    // Adjust submenu position if it overflows to the right
+    function adjustSubmenuPosition(submenu) {
+      if (!submenu) return;
+
+      // Reset position first
+      submenu.classList.remove('topnav-submenu-right');
+      submenu.style.right = '';
+      submenu.style.left = '';
+
+      // Small delay to allow rendering
+      setTimeout(function () {
+        var rect = submenu.getBoundingClientRect();
+        var viewportWidth = window.innerWidth;
+
+        // If submenu overflows to the right, reposition to the left
+        if (rect.right > viewportWidth - 10) {
+          submenu.classList.add('topnav-submenu-right');
+        }
+      }, 10);
+    }
+
     function openOverflowMenu() {
       if (overflowMenu.children.length === 0) {
         return;
@@ -132,6 +153,9 @@
       if (willOpen) {
         group.classList.add('is-open');
         trigger.setAttribute('aria-expanded', 'true');
+        // Adjust submenu position for overflow
+        var submenu = group.querySelector('.topnav-submenu');
+        adjustSubmenuPosition(submenu);
       } else {
         group.classList.remove('is-open');
         trigger.setAttribute('aria-expanded', 'false');
@@ -166,6 +190,9 @@
         if (willOpen) {
           group.classList.add('is-open');
           trigger.setAttribute('aria-expanded', 'true');
+          // Adjust submenu position for overflow on mobile
+          var submenu = group.querySelector('.topnav-submenu');
+          adjustSubmenuPosition(submenu);
         } else {
           group.classList.remove('is-open');
           trigger.setAttribute('aria-expanded', 'false');
@@ -225,7 +252,15 @@
       }
     });
 
-    window.addEventListener('resize', recomputeOverflow);
+    window.addEventListener('resize', function () {
+      recomputeOverflow();
+      // Re-adjust all open submenus on resize
+      var openGroups = nav.querySelectorAll('.topnav-link-group.is-open');
+      openGroups.forEach(function (group) {
+        var submenu = group.querySelector('.topnav-submenu');
+        adjustSubmenuPosition(submenu);
+      });
+    });
     recomputeOverflow();
   }
 
