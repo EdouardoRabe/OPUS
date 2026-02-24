@@ -16,7 +16,7 @@ INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALU
 ('MENDYN000001', 'Accueil',        'bi-house-door-fill', 'module.jsp?but=accueil.jsp', 1,  0, NULL),
 ('MENDYN000002', 'Reseau',         'bi-people-fill',     '#',                           2,  0, NULL),
 ('MENDYN000003', 'Carriere',       'bi-briefcase-fill',  '#',                           3,  0, NULL),
-('MENDYN000004', 'Mon Profil',     'bi-person-circle',   '#',                           4,  0, NULL),
+('MENDYN000004', 'Mon Profil',     'bi-person-circle',   '#',                           5,  0, NULL),
 ('MENDYN000999', 'Administration', 'bi-gear-fill',       '#',                           99, 0, NULL);
 
 -- ETAPE 3: INSERER LES SOUS-MENUS (NIVEAU 1)
@@ -78,7 +78,7 @@ INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
 
 -- Sous-menu Notifications sous Publications (Niveau 1)
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
-('MENDYN000014', 'Notifications', 'bi-bell-fill', '#', 5, 0, NULL);
+('MENDYN000014', 'Notifications', 'bi-bell-fill', '#', 6, 0, NULL);
 
 -- Droits role etu
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
@@ -91,7 +91,7 @@ INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
 -- ETAPE 6: MENU CALENDRIER
 -- menu Calendrier (Niveau 0)
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
-('MENDYN000015', 'Evenements', 'bi-calendar-event-fill', '#', 6, 0, NULL),
+('MENDYN000015', 'Evenements', 'bi-calendar-event-fill', '#', 4, 0, NULL),
 ('MENDYN000016', 'Saisie', 'bi-plus-circle-fill', 'module.jsp?but=evenement/evenement-saisie.jsp', 1, 1, 'MENDYN000015'),
 ('MENDYN000017', 'Liste', 'bi-list-ul', 'module.jsp?but=evenement/evenement-list.jsp', 2, 1, 'MENDYN000015'),
 ('MENDYN000018', 'Calendrier', 'bi-calendar-heart-fill', 'module.jsp?but=evenement/evenement-calendar.jsp', 3, 1, 'MENDYN000015');

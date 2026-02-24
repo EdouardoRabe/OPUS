@@ -53,7 +53,7 @@
                 <div class="fa-profile-name"><%= nomConnecte %></div>
                 <hr class="fa-divider">
                 <nav class="fa-profile-nav">
-                    <a href="<%= ctx %>module.jsp?but=profil/voir.jsp" class="fa-nav-link">
+                    <a href="<%= ctx %>/module.jsp?but=profil/voir.jsp" class="fa-nav-link">
                         <i class="bi bi-person-fill"></i> Mon profil
                     </a>
                     <a href="#" class="fa-nav-link fa-nav-link--active">
@@ -393,9 +393,33 @@
 
     </main><!-- /fa-feed-center -->
 
-    <!-- ===== COLONNE DROITE (a implementer) ===== -->
+    <!-- ===== COLONNE DROITE : Événements à venir ===== -->
     <aside class="fa-sidebar-right">
-        <!-- widgets futurs -->
+
+        <!-- Widget : Événements à venir -->
+        <div class="fa-widget-card" id="widget-evenements">
+            <div class="fa-widget-header">
+                <i class="bi bi-calendar-event-fill fa-widget-icon"></i>
+                <span class="fa-widget-title">&Eacute;v&eacute;nements &agrave; venir</span>
+            </div>
+            <div class="fa-widget-body" id="evenements-list">
+                <!-- Les événements seront chargés ici -->
+                <div class="fa-event-item fa-event-item--placeholder">
+                    <div class="fa-event-date-badge">
+                        <span class="fa-event-day">--</span>
+                        <span class="fa-event-month">---</span>
+                    </div>
+                    <div class="fa-event-info">
+                        <div class="fa-event-title">Chargement...</div>
+                        <div class="fa-event-meta"><i class="bi bi-geo-alt"></i> ---</div>
+                    </div>
+                </div>
+            </div>
+            <div class="fa-widget-footer">
+                <a href="#" class="fa-widget-link">Voir tous les &eacute;v&eacute;nements &rarr;</a>
+            </div>
+        </div>
+
     </aside>
 
 </div><!-- /fa-layout -->
@@ -428,6 +452,38 @@
     }
     .fa-sidebar-left, .fa-sidebar-right { position: sticky; top: 80px; }
     .fa-feed-center { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+    /* ---- Widget sidebar droite ---- */
+    .fa-widget-card {
+        background: var(--fa-card-bg); border-radius: 12px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.12); overflow: hidden;
+    }
+    .fa-widget-header {
+        display: flex; align-items: center; gap: 8px;
+        padding: 14px 16px 10px; border-bottom: 1px solid var(--fa-border);
+    }
+    .fa-widget-icon { font-size: 16px; color: var(--itu-blue,#008BFF); }
+    .fa-widget-title { font-weight: 700; font-size: 15px; color: var(--fa-text); }
+    .fa-widget-body { padding: 8px 0; }
+    .fa-widget-footer { padding: 8px 16px 12px; border-top: 1px solid var(--fa-border); }
+    .fa-widget-link { font-size: 13px; color: var(--itu-blue,#008BFF); text-decoration: none; font-weight: 600; }
+    .fa-widget-link:hover { text-decoration: underline; }
+    /* ---- Événement item ---- */
+    .fa-event-item {
+        display: flex; align-items: flex-start; gap: 10px;
+        padding: 8px 16px; transition: background .15s; cursor: pointer;
+    }
+    .fa-event-item:hover { background: #f0f2f5; }
+    .fa-event-item--placeholder { opacity: .5; cursor: default; pointer-events: none; }
+    .fa-event-date-badge {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        min-width: 40px; background: #e7f3ff; border-radius: 8px;
+        padding: 4px 6px; flex-shrink: 0;
+    }
+    .fa-event-day { font-weight: 700; font-size: 16px; color: var(--itu-blue,#008BFF); line-height: 1.1; }
+    .fa-event-month { font-size: 10px; color: var(--itu-blue,#008BFF); text-transform: uppercase; font-weight: 600; }
+    .fa-event-info { flex: 1; min-width: 0; }
+    .fa-event-title { font-size: 13px; font-weight: 600; color: var(--fa-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fa-event-meta { font-size: 11px; color: var(--fa-text-secondary); margin-top: 2px; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     /* ---- Avatar ---- */
     .fa-avatar {
         display: inline-flex; align-items: center; justify-content: center;
