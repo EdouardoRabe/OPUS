@@ -167,7 +167,60 @@
         </div>
 
         <!-- ===== PUBLICATIONS (composant réutilisable) ===== -->
+        <%
+            Connection _pubConn = null;
+            try {
+                _pubConn = new UtilDB().GetConn();
+
+                // Charger types de réactions
+                Reactiontype[] _reactTypes = (Reactiontype[]) CGenUtil.rechercher(
+                        new Reactiontype(), null, null, _pubConn, " order by idreactiontype");
+                if (_reactTypes == null) _reactTypes = new Reactiontype[0];
+
+                // Charger tous les profils pour lookup nom + photo
+                alumni.ProfilLib[] _allProfils = (alumni.ProfilLib[]) CGenUtil.rechercher(
+                        new alumni.ProfilLib(), null, null, _pubConn, "");
+                Map _userNames = new HashMap();
+                Map _userPhotos = new HashMap();
+                if (_allProfils != null) {
+                    for (int i = 0; i < _allProfils.length; i++) {
+                        Integer _key = new Integer(_allProfils[i].getIdutilisateur());
+                        _userNames.put(_key, _allProfils[i].getNom() + " " + _allProfils[i].getPrenom());
+                        if (_allProfils[i].getPhotoProfil() != null && !_allProfils[i].getPhotoProfil().trim().isEmpty())
+                            _userPhotos.put(_key, ctx + "/" + _allProfils[i].getPhotoProfil().trim());
+                    }
+                }
+
+                // Charger les publications actives
+                Publication[] _pubs = (Publication[]) CGenUtil.rechercher(
+                        new Publication(), null, null, _pubConn, " and etat = 1 order by daty desc, heure desc");
+                if (_pubs == null) _pubs = new Publication[0];
+
+                // Passer les données au composant via request attributes
+                request.setAttribute("_pub_pubs", _pubs);
+                request.setAttribute("_pub_userNames", _userNames);
+                request.setAttribute("_pub_userPhotos", _userPhotos);
+                request.setAttribute("_pub_reactTypes", _reactTypes);
+                request.setAttribute("_pub_typesPub", typesPub);
+                request.setAttribute("_pub_refuser", new Integer(refuserConnecte));
+                request.setAttribute("_pub_initialConnecte", initialConnecte);
+                request.setAttribute("_pub_connPhotoUrl", _connPhotoUrl);
+                request.setAttribute("_pub_ctx", ctx);
+                request.setAttribute("_pub_conn", _pubConn);
+        %>
         <jsp:include page="publication.jsp" />
+        <%
+            } catch (Exception _pubEx) {
+                _pubEx.printStackTrace();
+        %>
+        <div class="fa-error-box">
+            <i class="bi bi-exclamation-triangle-fill"></i>&nbsp;Erreur publications&nbsp;: <%= _pubEx.getMessage() %>
+        </div>
+        <%
+            } finally {
+                if (_pubConn != null) try { _pubConn.close(); } catch (Exception _x) {}
+            }
+        %>
 
     </main><!-- /fa-feed-center -->
 

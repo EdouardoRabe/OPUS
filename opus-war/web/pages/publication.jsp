@@ -1,16 +1,12 @@
 <%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
-<%@ page import="user.UserEJB" %>
-<%@ page import="historique.MapUtilisateur" %>
-<%@ page import="bean.CGenUtil" %>
-<%@ page import="utilitaire.UtilDB" %>
 <%@ page import="alumni.Publication" %>
 <%@ page import="alumni.Media" %>
 <%@ page import="alumni.Publicationreaction" %>
 <%@ page import="alumni.Publicationcommentaire" %>
 <%@ page import="alumni.Reactiontype" %>
 <%@ page import="alumni.Typepublication" %>
-<%@ page import="alumni.ProfilLib" %>
 <%@ page import="alumni.Identification" %>
+<%@ page import="bean.CGenUtil" %>
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
@@ -18,64 +14,48 @@
     /* ============================================================
        COMPOSANT PUBLICATION  –  publication.jsp
        Composant réutilisable pour afficher le fil de publications.
-       Inclusion :  <jsp:include page="publication.jsp" />
+
+       La page appelante DOIT définir ces request attributes :
+         _pub_pubs           → Publication[]    (publications à afficher)
+         _pub_userNames      → Map              (Integer idutilisateur → String nom)
+         _pub_userPhotos     → Map              (Integer idutilisateur → String photoUrl)
+         _pub_reactTypes     → Reactiontype[]   (types de réactions)
+         _pub_typesPub       → Typepublication[] (types de publication)
+         _pub_refuser        → Integer          (refuser du connecté)
+         _pub_initialConnecte→ String           (initiales du connecté)
+         _pub_connPhotoUrl   → String           (photo profil du connecté)
+         _pub_ctx            → String           (context path)
+         _pub_conn           → Connection       (connexion DB – pas fermée ici)
+
+       Exemple :
+         request.setAttribute("_pub_pubs", pubs);
+         ...
+         <jsp:include page="publication.jsp" />
        ============================================================ */
 
-    // --- Récupérer le user connecté depuis la session ---
-    UserEJB _pubU = (UserEJB) session.getAttribute("u");
-    MapUtilisateur _pubMap = _pubU.getUser();
-    int _pubRefuser = _pubMap.getRefuser();
-    String _pubNomConnecte = _pubMap.getNomuser() != null ? _pubMap.getNomuser() : "";
-    String _pubCtx = request.getContextPath();
+    // --- Récupérer les données passées par la page appelante ---
+    Publication[] _pubPubs   = (Publication[]) request.getAttribute("_pub_pubs");
+    Map _pubUserNames        = (Map) request.getAttribute("_pub_userNames");
+    Map _pubUserPhotos       = (Map) request.getAttribute("_pub_userPhotos");
+    Reactiontype[] _pubReactTypes = (Reactiontype[]) request.getAttribute("_pub_reactTypes");
+    Typepublication[] _pubTypesPub = (Typepublication[]) request.getAttribute("_pub_typesPub");
+    int _pubRefuser          = ((Integer) request.getAttribute("_pub_refuser")).intValue();
+    String _pubInitialConnecte = (String) request.getAttribute("_pub_initialConnecte");
+    String _pubConnPhotoUrl  = (String) request.getAttribute("_pub_connPhotoUrl");
+    String _pubCtx           = (String) request.getAttribute("_pub_ctx");
+    Connection _pubConn      = (Connection) request.getAttribute("_pub_conn");
 
-    // Initiales du user connecté
-    String[] _pubPartsConn = _pubNomConnecte.trim().split("\\s+");
-    String _pubInitialConnecte = (_pubPartsConn.length > 0 && _pubPartsConn[0].length() > 0)
-            ? String.valueOf(Character.toUpperCase(_pubPartsConn[0].charAt(0))) : "U";
-    if (_pubPartsConn.length > 1 && _pubPartsConn[_pubPartsConn.length - 1].length() > 0)
-        _pubInitialConnecte += Character.toUpperCase(_pubPartsConn[_pubPartsConn.length - 1].charAt(0));
+    // Sécurité : valeurs par défaut si null
+    if (_pubPubs == null) _pubPubs = new Publication[0];
+    if (_pubUserNames == null) _pubUserNames = new HashMap();
+    if (_pubUserPhotos == null) _pubUserPhotos = new HashMap();
+    if (_pubReactTypes == null) _pubReactTypes = new Reactiontype[0];
+    if (_pubTypesPub == null) _pubTypesPub = new Typepublication[0];
+    if (_pubInitialConnecte == null) _pubInitialConnecte = "U";
+    if (_pubConnPhotoUrl == null) _pubConnPhotoUrl = "";
+    if (_pubCtx == null) _pubCtx = request.getContextPath();
 
-    Connection _pubConn = null;
     try {
-        _pubConn = new UtilDB().GetConn();
-
-        // --- Photo profil du connecté ---
-        String _pubConnPhotoUrl = "";
-        ProfilLib[] _pubMyProfils = (ProfilLib[]) CGenUtil.rechercher(
-                new ProfilLib(), null, null, _pubConn, " and refuser=" + _pubRefuser);
-        if (_pubMyProfils != null && _pubMyProfils.length > 0) {
-            if (_pubMyProfils[0].getPhotoProfil() != null && !_pubMyProfils[0].getPhotoProfil().trim().isEmpty())
-                _pubConnPhotoUrl = _pubCtx + "/" + _pubMyProfils[0].getPhotoProfil().trim();
-        }
-
-        // --- Types de réactions ---
-        Reactiontype[] _pubReactTypes = (Reactiontype[]) CGenUtil.rechercher(
-                new Reactiontype(), null, null, _pubConn, " order by idreactiontype");
-        if (_pubReactTypes == null) _pubReactTypes = new Reactiontype[0];
-
-        // --- Types de publication ---
-        Typepublication[] _pubTypesPub = (Typepublication[]) CGenUtil.rechercher(
-                new Typepublication(), null, null, _pubConn, " order by idtypepublication");
-        if (_pubTypesPub == null) _pubTypesPub = new Typepublication[0];
-
-        // --- Lookup nom + photo pour tous les profils ---
-        ProfilLib[] _pubAllProfils = (ProfilLib[]) CGenUtil.rechercher(
-                new ProfilLib(), null, null, _pubConn, "");
-        Map _pubUserNames = new HashMap();
-        Map _pubUserPhotos = new HashMap();
-        if (_pubAllProfils != null) {
-            for (int i = 0; i < _pubAllProfils.length; i++) {
-                Integer _key = new Integer(_pubAllProfils[i].getIdutilisateur());
-                _pubUserNames.put(_key, _pubAllProfils[i].getNom() + " " + _pubAllProfils[i].getPrenom());
-                if (_pubAllProfils[i].getPhotoProfil() != null && !_pubAllProfils[i].getPhotoProfil().trim().isEmpty())
-                    _pubUserPhotos.put(_key, _pubCtx + "/" + _pubAllProfils[i].getPhotoProfil().trim());
-            }
-        }
-
-        // --- Publications actives ---
-        Publication[] _pubPubs = (Publication[]) CGenUtil.rechercher(
-                new Publication(), null, null, _pubConn, " and etat = 1 order by daty desc, heure desc");
-        if (_pubPubs == null) _pubPubs = new Publication[0];
 
         if (_pubPubs.length == 0) {
 %>
@@ -307,7 +287,5 @@
     <i class="bi bi-exclamation-triangle-fill"></i>&nbsp;Erreur lors du chargement&nbsp;: <%= e.getMessage() %>
 </div>
 <%
-    } finally {
-        if (_pubConn != null) try { _pubConn.close(); } catch (Exception ex) {}
     }
 %>
