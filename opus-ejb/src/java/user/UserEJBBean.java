@@ -44,6 +44,7 @@ import utilisateur.ConstanteUtilisateur;
 import utilisateur.HomePageURL;
 import utilisateurAcade.UtilisateurAcade;
 import constanteAcade.ConstanteEtatAcade;
+import constanteAcade.ConstantEtatUser;
 import utilitaire.ConstanteUser;
 import utilitaire.UtilDB;
 import utilitaire.Utilitaire;
@@ -316,6 +317,14 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
                 profil.createObject(refUser, c);
             }
 
+            // 9. Inserer historiqueActif avec etat = creer
+            UtilisateurAcade uaNew = new UtilisateurAcade();
+            uaNew.setRefuser(newUser.getTuppleID());
+            uaNew.setEstActif(ConstantEtatUser.etatUtilisateurCreer);
+            HistoriqueActifLib histCreer = uaNew.genererHistoriqueActif();
+            histCreer.setDescription("Creation de l'utilisateur");
+            histCreer.createObject(refUser, c);
+
             c.commit();
             System.out.println("Utilisateur cree avec ref : " + newUser.getTuppleID());
             return newUser.getTuppleID();
@@ -524,27 +533,43 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         return retour1 + retour2;
     }
 
-    public int desactiveUtilisateur(String ref, String refUser) throws Exception {
+    public int desactiveUtilisateur(String ref, String refUser, String description) throws Exception {
+        Connection c = null;
         try {
-            historique.AnnulationUtilisateur au = new historique.AnnulationUtilisateur(ref);
-            historique.MapHistorique h = new historique.MapHistorique("Utilisateurs", "annule", refUser, ref);
-            h.setObjet("historique.AnnulationUtilisateur");
-            au.insertToTable(h);
+            c = new UtilDB().GetConn();
+            c.setAutoCommit(false);
+            UtilisateurAcade ua = new UtilisateurAcade();
+            UtilisateurAcade[] found = (UtilisateurAcade[]) CGenUtil.rechercher(ua, null, null, c,
+                    " and refuser = " + ref);
+            if (found == null || found.length == 0) {
+                throw new Exception("Utilisateur introuvable (ref=" + ref + ").");
+            }
+            ua = found[0];
+            if (ua.getEstActif() == ConstantEtatUser.etatUtilisateurBanis) {
+                throw new Exception("Utilisateur deja banni.");
+            }
+            ua.changerActifVers(ConstantEtatUser.etatUtilisateurBanis, refUser, c, description);
+            c.commit();
             return 1;
-        } catch (ErreurDAO ex) {
-            throw new bean.ErreurDAO(ex.getMessage());
+        } catch (Exception ex) {
+            if (c != null) { try { c.rollback(); } catch (Exception ignored) {} }
+            throw new Exception(ex.getMessage());
+        } finally {
+            if (c != null) { try { c.close(); } catch (Exception ignored) {} }
         }
     }
 
     @Override
     public int desactiveUtilisateur(String ref) throws Exception {
+        return desactiveUtilisateur(ref, (String) null);
+    }
 
+    @Override
+    public int desactiveUtilisateur(String ref, String description) throws Exception {
         try {
-            if (u.getIdrole().compareTo("admin") == 0 || u.getIdrole().compareTo("dg") == 0
+            if (u.getIdrole().compareTo("md") == 0 || u.getIdrole().compareTo("dg") == 0
                     || u.getIdrole().compareTo("adminFacture") == 0) {
-
-                int i = desactiveUtilisateur(ref, u.getTuppleID());
-                return i;
+                return desactiveUtilisateur(ref, u.getTuppleID(), description);
             } else {
                 throw new Exception("Erreur de droit");
             }
@@ -554,17 +579,42 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     }
 
     public int activeUtilisateur(String ref, String refUser) throws bean.ErreurDAO {
+        Connection c = null;
         try {
-            historique.AnnulationUtilisateur[] au = (historique.AnnulationUtilisateur[]) new historique.AnnulationUtilisateurUtil()
-                    .rechercher(2, ref);
-            historique.MapHistorique h = new historique.MapHistorique("Utilisateurs", "active", refUser, ref);
-            h.setObjet("historique.AnnulationUtilisateur");
-            for (int i = 0; i < au.length; i++) {
-                au[i].deleteToTable(h);
+            c = new UtilDB().GetConn();
+            c.setAutoCommit(false);
+            UtilisateurAcade ua = new UtilisateurAcade();
+            UtilisateurAcade[] found = (UtilisateurAcade[]) CGenUtil.rechercher(ua, null, null, c,
+                    " and refuser = " + ref);
+            if (found == null || found.length == 0) {
+                throw new bean.ErreurDAO("Utilisateur introuvable (ref=" + ref + ").");
             }
+            ua = found[0];
+            int etatActuel = ua.getEstActif();
+
+            if (etatActuel == ConstantEtatUser.etatUtilisateurCreer) {
+                // Utilisateur vient d'etre cree -> on le valide
+                ua.changerActifVers(ConstantEtatUser.etatUtilisateurValider, refUser, c, "Validation utilisateur");
+            } else if (etatActuel == ConstantEtatUser.etatUtilisateurBanis) {
+                // Utilisateur banni -> on le reactive
+                ua.changerActifVers(ConstantEtatUser.etatUtilisateurActiver, refUser, c, "Reactivation utilisateur");
+            } else if (etatActuel == ConstantEtatUser.etatUtilisateurValider 
+                    || etatActuel == ConstantEtatUser.etatUtilisateurActiver) {
+                throw new bean.ErreurDAO("Utilisateur deja actif.");
+            } else {
+                // Autres cas : on active
+                ua.changerActifVers(ConstantEtatUser.etatUtilisateurActiver, refUser, c, "Activation utilisateur");
+            }
+            c.commit();
             return 1;
         } catch (ErreurDAO ex) {
+            if (c != null) { try { c.rollback(); } catch (Exception ignored) {} }
             throw new bean.ErreurDAO(ex.getMessage());
+        } catch (Exception ex) {
+            if (c != null) { try { c.rollback(); } catch (Exception ignored) {} }
+            throw new bean.ErreurDAO(ex.getMessage());
+        } finally {
+            if (c != null) { try { c.close(); } catch (Exception ignored) {} }
         }
     }
 
@@ -572,7 +622,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
     public int activeUtilisateur(String ref) throws Exception {
 
         try {
-            if (u.getIdrole().compareTo("admin") == 0 || u.getIdrole().compareTo("dg") == 0
+            if (u.getIdrole().compareTo("md") == 0 || u.getIdrole().compareTo("dg") == 0
                     || u.getIdrole().compareTo("adminFacture") == 0) {
 
                 int i = activeUtilisateur(ref, u.getTuppleID());

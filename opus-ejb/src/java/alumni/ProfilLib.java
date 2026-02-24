@@ -8,6 +8,8 @@ public class ProfilLib extends Profil {
     private String photoProfil;
     private String photoCouverture;
     private int estactif;
+    private int etatdetail;
+    private String etatlib;
     private String profile;
     private String idrole;
     private int refuser;
@@ -105,5 +107,23 @@ public class ProfilLib extends Profil {
 
     public void setLoginuser(String loginuser) {
         this.loginuser = loginuser;
+    }
+
+    /* ── etatdetail ── */
+    public int getEtatdetail() {
+        return etatdetail;
+    }
+
+    public void setEtatdetail(int etatdetail) {
+        this.etatdetail = etatdetail;
+    }
+
+    /* ── etatlib ── */
+    public String getEtatlib() {
+        return etatlib;
+    }
+
+    public void setEtatlib(String etatlib) {
+        this.etatlib = etatlib;
     }
 }

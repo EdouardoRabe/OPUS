@@ -10,6 +10,7 @@ public class HistoriqueActifLib  extends ClassMAPTable {
     private int estactif;
     private Date daty;
     private String estactiflib;
+    private String description;
 
     public String getId() {
         return id;
@@ -72,5 +73,13 @@ public class HistoriqueActifLib  extends ClassMAPTable {
     public String getAttributIDName() {
         return "id";
     }
+
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
 }
 

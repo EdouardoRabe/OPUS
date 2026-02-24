@@ -6,6 +6,8 @@
 package utilisateurAcade;
 
 import bean.CGenUtil;
+import constanteAcade.ConstantEtatUser;
+import user.HistoriqueActifLib;
 import bean.ClassMAPTable;
 import user.HistoriqueActifLib;
 import utilisateur.Role;
@@ -152,6 +154,10 @@ public class UtilisateurAcade extends Utilisateur{
     }
 
     public void changerActif(String u,Connection c) throws Exception{
+        changerActif(u, c, null);
+    }
+
+    public void changerActif(String u, Connection c, String description) throws Exception{
         boolean canClose=false;
         try {
             if (c == null) {
@@ -164,8 +170,12 @@ public class UtilisateurAcade extends Utilisateur{
             } else {
                 this.setEstActif(1);
             }
-            genererHistoriqueActif().createObject(u,c);
-            String req="update utilisateur set estActif="+getEstActif()+" where id='"+getId()+"'";
+            HistoriqueActifLib hist = genererHistoriqueActif();
+            if (description != null && !description.trim().isEmpty()) {
+                hist.setDescription(description);
+            }
+            hist.createObject(u,c);
+            String req="update utilisateur set estActif="+getEstActif()+" where refuser='"+getRefuser()+"'";
             this.updateToTableDirecte(req, c);
             if (canClose) {
                 c.commit();
@@ -182,6 +192,43 @@ public class UtilisateurAcade extends Utilisateur{
         }
     }
 
+    /**
+     * Change l'etat actif vers une valeur specifique (utilise les constantes ConstantEtatUser)
+     */
+    public void changerActifVers(int nouvelEtat, String u, Connection c, String description) throws Exception {
+        boolean canClose = false;
+        try {
+            if (c == null) {
+                c = new UtilDB().GetConn();
+                c.setAutoCommit(false);
+                canClose = true;
+            }
+            this.setEstActif(nouvelEtat);
+            HistoriqueActifLib hist = genererHistoriqueActif();
+            if (description != null && !description.trim().isEmpty()) {
+                hist.setDescription(description);
+            }
+            hist.createObject(u, c);
+
+            // estactif dans utilisateur : 1 si valider ou activer, 0 sinon
+            int estActifTable = (nouvelEtat == ConstantEtatUser.etatUtilisateurValider 
+                              || nouvelEtat == ConstantEtatUser.etatUtilisateurActiver) ? 1 : 0;
+            String req = "update utilisateur set estActif=" + estActifTable + " where refuser='" + getRefuser() + "'";
+            this.updateToTableDirecte(req, c);
+            if (canClose) {
+                c.commit();
+            }
+        } catch (Exception e) {
+            if (c != null) c.rollback();
+            e.printStackTrace();
+            throw e;
+        } finally {
+            if (canClose && c != null) {
+                c.close();
+            }
+        }
+    }
+
     public static UtilisateurAcade[] findUsersActif(Connection c) throws Exception {
         UtilisateurAcade a = new UtilisateurAcade();
         a.setEstActif(1);
@@ -193,8 +240,7 @@ public class UtilisateurAcade extends Utilisateur{
         historiqueActifLib.setNomTable("historiqueActif");
         historiqueActifLib.setEstactif (this.getEstActif());
         historiqueActifLib.setDaty (Utilitaire.dateDuJourSql());
-        historiqueActifLib.setIdutilisateur(this.getId());
-
+        historiqueActifLib.setIdutilisateur(this.getRefuser());
         return historiqueActifLib;
     }
 
