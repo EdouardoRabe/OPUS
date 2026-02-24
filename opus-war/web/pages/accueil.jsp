@@ -23,6 +23,12 @@
     int refuserConnecte = mapFil.getRefuser();
     String nomConnecte = mapFil.getNomuser() != null ? mapFil.getNomuser() : "";
     String ctx = request.getContextPath();
+    // --- Feed seed (variation d'ordre a chaque nouvelle session de navigation) ---
+    Integer feedSeed = (Integer) session.getAttribute("feedSeed");
+    if (feedSeed == null) {
+        feedSeed = new java.util.Random().nextInt(10000);
+        session.setAttribute("feedSeed", feedSeed);
+    }
     // Initiales du user connecte
     String[] _partsConn = nomConnecte.trim().split("\\s+");
     String initialConnecte = (_partsConn.length > 0 && _partsConn[0].length() > 0)
@@ -191,10 +197,15 @@
                     }
                 }
 
-                // --- APJ: Charger les publications actives ---
+                // --- APJ: Charger les 10 premieres publications (cursor-based, OFFSET varie au refresh) ---
+                int _feedOffset = feedSeed % 6;
                 Publication[] pubs = (Publication[]) CGenUtil.rechercher(
-                        new Publication(), null, null, conn, " and etat = 1 order by daty desc, heure desc");
+                        new Publication(), null, null, conn,
+                        " and etat = 1 order by daty desc, heure desc, idpublication desc limit 10 offset " + _feedOffset);
                 if (pubs == null) pubs = new Publication[0];
+
+                // Variables curseur (mises a jour a chaque iteration)
+                String _lastDaty = "", _lastHeure = "", _lastId = "";
 
                 if (pubs.length == 0) {
         %>
@@ -207,6 +218,10 @@
 
             for (int p = 0; p < pubs.length; p++) {
                 Publication pub = pubs[p];
+                // Mise a jour curseur (pointe toujours vers la derniere pub affichee)
+                _lastDaty  = pub.getDaty()  != null ? pub.getDaty().toString() : _lastDaty;
+                _lastHeure = pub.getHeure() != null ? pub.getHeure()           : _lastHeure;
+                _lastId    = pub.getIdpublication() != null ? pub.getIdpublication() : _lastId;
                 String idpub = pub.getIdpublication();
                 String auteur = (String) userNames.get(new Integer(pub.getIdutilisateur()));
                 if (auteur == null) auteur = "Utilisateur";
@@ -419,6 +434,19 @@
         </div><!-- /fa-post-card -->
         <%
             } // fin for publications
+            // --- Infinite scroll : curseur + sentinel ---
+            boolean _hasMore = (pubs.length == 10);
+        %>
+        <span id="feed-cursor" style="display:none"
+              data-daty="<%= _lastDaty %>"
+              data-heure="<%= _lastHeure %>"
+              data-id="<%= _lastId %>"
+              data-has-more="<%= _hasMore %>"></span>
+        <div id="feed-sentinel" style="height:4px;margin:4px 0;"></div>
+        <div id="feed-loader" style="display:none;text-align:center;padding:20px;">
+            <div class="fa-feed-spinner"></div>
+        </div>
+        <%
         } catch (Exception e) {
             e.printStackTrace();
         %>
@@ -821,6 +849,10 @@
     .mention-badge { color: var(--itu-blue,#008BFF); font-weight: 600; background: #e7f3ff; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
     /* ---- Highlight scroll (notifications) ---- */
     .fa-highlight { background: #fffde7 !important; border-left: 4px solid #f9a825 !important; transition: background 2s !important; }
+    /* ---- Infinite scroll loader ---- */
+    .fa-feed-spinner { display:inline-block; width:32px; height:32px; border:3px solid #e4e6eb; border-top-color:var(--itu-blue,#008BFF); border-radius:50%; animation:feedSpin .7s linear infinite; }
+    @keyframes feedSpin { to { transform:rotate(360deg); } }
+    .fa-feed-end { text-align:center; padding:12px 0; color:var(--fa-text-secondary); font-size:13px; }
 </style>
 
 <!-- ==================== JAVASCRIPT ==================== -->
@@ -1729,4 +1761,84 @@
         document.addEventListener('keydown', function esc(e){ if(e.key==='Escape'){ document.body.removeChild(overlay); document.removeEventListener('keydown',esc); } });
         document.body.appendChild(overlay);
     }
+
+    // ========== INFINITE SCROLL (cursor-based pagination) ==========
+    (function() {
+        var loading   = false;
+        var cursor    = document.getElementById('feed-cursor');
+        var sentinel  = document.getElementById('feed-sentinel');
+        var loader    = document.getElementById('feed-loader');
+        var feed      = document.querySelector('.fa-feed-center');
+        if (!cursor || !sentinel || !feed) return;
+
+        var observer = new IntersectionObserver(function(entries) {
+            if (!entries[0].isIntersecting) return;
+            if (loading) return;
+            if (cursor.getAttribute('data-has-more') !== 'true') {
+                observer.disconnect();
+                return;
+            }
+
+            var daty  = cursor.getAttribute('data-daty');
+            var heure = cursor.getAttribute('data-heure');
+            var id    = cursor.getAttribute('data-id');
+            if (!id) return;
+
+            loading = true;
+            loader.style.display = 'block';
+
+            var url = CTX + '/pages/alumni/ajax/charger-feed.jsp'
+                + '?cursor_daty='  + encodeURIComponent(daty)
+                + '&cursor_heure=' + encodeURIComponent(heure)
+                + '&cursor_id='    + encodeURIComponent(id);
+
+            fetch(url)
+                .then(function(r) { return r.text(); })
+                .then(function(html) {
+                    loader.style.display = 'none';
+                    loading = false;
+
+                    var tmp = document.createElement('div');
+                    tmp.innerHTML = html;
+
+                    // Lire le meta (curseur suivant)
+                    var meta = tmp.querySelector('#feed-meta-new');
+                    if (meta) {
+                        cursor.setAttribute('data-daty',     meta.getAttribute('data-daty')     || '');
+                        cursor.setAttribute('data-heure',    meta.getAttribute('data-heure')    || '');
+                        cursor.setAttribute('data-id',       meta.getAttribute('data-id')       || '');
+                        cursor.setAttribute('data-has-more', meta.getAttribute('data-has-more') || 'false');
+                        meta.parentNode.removeChild(meta);
+                    } else {
+                        cursor.setAttribute('data-has-more', 'false');
+                    }
+
+                    // Injecter les nouvelles cartes avant le sentinel
+                    var cards = tmp.querySelectorAll('.fa-post-card');
+                    if (cards.length === 0) {
+                        cursor.setAttribute('data-has-more', 'false');
+                    }
+                    cards.forEach(function(card) {
+                        feed.insertBefore(card, sentinel);
+                    });
+
+                    // Plus rien a charger
+                    if (cursor.getAttribute('data-has-more') !== 'true') {
+                        observer.disconnect();
+                        sentinel.style.display = 'none';
+                        var endMsg = document.createElement('div');
+                        endMsg.className = 'fa-feed-end';
+                        endMsg.textContent = '\u2014 Vous avez tout vu \u2014';
+                        feed.insertBefore(endMsg, loader);
+                    }
+                })
+                .catch(function(e) {
+                    loader.style.display = 'none';
+                    loading = false;
+                    console.error('Feed load error:', e);
+                });
+        }, { rootMargin: '300px' });
+
+        observer.observe(sentinel);
+    })();
 </script>
