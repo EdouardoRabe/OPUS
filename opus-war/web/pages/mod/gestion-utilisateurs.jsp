@@ -31,7 +31,7 @@
     }
 
     ProfilLib t = new ProfilLib();
-    String listeCrt[] = {"nom", "loginuser"};
+    String listeCrt[] = {"nom", "loginuser", "email", "promotionlib", "parcourslib", "idrole"};
     String listeInt[] = {};
     String libEntete[] = {"idprofil", "nom", "prenom", "email", "telephone", "loginuser", "idrole", "promotionlib", "parcourslib", "photoprofil", "estactif", "refuser"};
     PageRecherche pr = new PageRecherche(t, request, listeCrt, listeInt, 3, libEntete, libEntete.length);
@@ -40,7 +40,11 @@
     pr.setLien((String) session.getValue("lien"));
     pr.setApres("mod/gestion-utilisateurs.jsp");
     pr.getFormu().getChamp("nom").setLibelle("Nom");
-    pr.getFormu().getChamp("loginuser").setLibelle("ETU");
+    pr.getFormu().getChamp("loginuser").setLibelle("ETU / Login");
+    pr.getFormu().getChamp("email").setLibelle("Email");
+    pr.getFormu().getChamp("promotionlib").setLibelle("Promotion");
+    pr.getFormu().getChamp("parcourslib").setLibelle("Parcours");
+    pr.getFormu().getChamp("idrole").setLibelle("R&ocirc;le");
     pr.setNpp(50);
     String[] colSomme = {};
     pr.creerObjetPage(libEntete, colSomme);
@@ -116,26 +120,10 @@
     </div>
 </div>
 
-<!-- ═══ SEARCH & FILTER ═══ -->
+<!-- ═══ SEARCH & FILTER (APJ Standard) ═══ -->
 <div class="custom-card no-hover" style="margin-bottom:20px;padding:1.25rem 1.5rem;">
-    <form action="<%= pr.getLien() %>?but=<%= pr.getApres() %>" method="post">
-        <div class="specialite-search-row">
-            <input class="form-control-custom"
-                   type="text"
-                   name="nom"
-                   value="<%= pr.getFormu().getChamp("nom").getValeur() != null ? pr.getFormu().getChamp("nom").getValeur() : "" %>"
-                   placeholder="Rechercher par nom..."
-                   style="flex:1;">
-            <input class="form-control-custom"
-                   type="text"
-                   name="loginuser"
-                   value="<%= pr.getFormu().getChamp("loginuser").getValeur() != null ? pr.getFormu().getChamp("loginuser").getValeur() : "" %>"
-                   placeholder="Rechercher par login..."
-                   style="flex:1;">
-            <button class="btn btn-primary" type="submit" style="padding-left:1.5rem;padding-right:1.5rem;">
-                <i class="fa fa-search" style="margin-right:6px;"></i>Chercher
-            </button>
-        </div>
+    <form action="<%= pr.getLien() %>?but=<%= pr.getApres() %>" method="post" name="recherche" id="recherche">
+        <%= pr.getFormu().getHtmlEnsemble() %>
     </form>
 </div>
 
@@ -216,6 +204,12 @@
 .usr-badge-cree { background:#fff3cd; color:#856404; }
 .usr-badge-banni { background:#f8d7da; color:#721c24; }
 .usr-badge-role { background:#d1ecf1; color:#0c5460; }
+
+/* publication menu */
+.pub-menu-btn { background:transparent;border:none;font-size:1.2rem;cursor:pointer;color:#6b7280;}
+.pub-menu-btn:hover { color:var(--itu-blue,#008BFF); }
+.pub-menu-dropdown .pub-menu-item { display:flex; align-items:center; gap:6px; }
+.pub-menu-dropdown .pub-menu-item i { width:14px; }
 </style>
 
 <!-- ═══ USERS GRID ═══ -->

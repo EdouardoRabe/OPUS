@@ -256,7 +256,7 @@
         <div id="pub-<%= idpub %>" class="fa-post-card">
 
             <!-- EN-TETE -->
-            <div class="fa-post-header">
+            <div class="fa-post-header" style="position:relative;">
                 <div class="fa-avatar fa-avatar--md"><%= initA %></div>
                 <div class="fa-post-meta">
                     <div class="fa-post-author">
@@ -268,6 +268,18 @@
                     <div class="fa-post-date">
                         <%= pub.getDaty() %>&nbsp;&agrave;&nbsp;<%= pub.getHeure() != null ? pub.getHeure() : "" %>
                         <span class="fa-type-badge"><%= typePubLib %></span>
+                    </div>
+                </div>
+                <!-- three dots menu -->
+                <div class="pub-menu" style="position:absolute;top:12px;right:12px;">
+                    <button class="pub-menu-btn" onclick="togglePubMenu(this,event)" title="Plus d'options"><i class="bi bi-three-dots-vertical"></i></button>
+                    <div class="pub-menu-dropdown" style="display:none;position:absolute;right:0;top:100%;background:#fff;border:1px solid #dde3ec;border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.12);min-width:120px;z-index:100;">
+                        <button class="pub-menu-item" onclick="savePublication('<%= idpub %>')" style="width:100%;padding:8px;text-align:left;border:none;background:transparent;cursor:pointer;">
+                            <i class="fa fa-bookmark"></i> Sauvegarder
+                        </button>
+                        <button class="pub-menu-item" onclick="reportPublication('<%= idpub %>')" style="width:100%;padding:8px;text-align:left;border:none;background:transparent;cursor:pointer;"> 
+                            <i class="fa fa-flag"></i> Signaler
+                        </button>  
                     </div>
                 </div>
             </div>
@@ -507,6 +519,13 @@
 /* ---- Post card ---- */
 .fa-post-card { background: var(--fa-card-bg); border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.12); overflow: hidden; }
 .fa-post-header { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px 8px; }
+
+/* three-dots menu button */
+.pub-menu { position:absolute; top:10px; right:10px; z-index:10; }
+.pub-menu-btn { background:none; border:none; font-size:18px; line-height:1; padding:4px 6px; cursor:pointer; color:#65676b; border-radius:50%; transition:background .15s,color .15s; }
+.pub-menu-btn:hover { background:#f0f2f5; color:var(--itu-blue,#008BFF); }
+.pub-menu-dropdown { display:none; position:absolute; right:0; top:100%; background:#fff; border:1px solid #dde3ec; border-radius:6px; box-shadow:0 6px 20px rgba(0,0,0,.12); min-width:140px; z-index:100; overflow:hidden; }
+.pub-menu-item:hover { background:#f0f2f5; }
 .fa-post-meta { flex: 1; min-width: 0; }
 .fa-post-author { font-weight: 700; font-size: 15px; color: var(--fa-text); }
 .fa-post-with { font-weight: 400; font-size: 14px; color: var(--fa-text-secondary); }
@@ -1531,5 +1550,27 @@ function openMediaZoom(src) {
     overlay.addEventListener('click', function(){ document.body.removeChild(overlay); });
     document.addEventListener('keydown', function esc(e){ if(e.key==='Escape'){ document.body.removeChild(overlay); document.removeEventListener('keydown',esc); } });
     document.body.appendChild(overlay);
+}
+
+// ===== publication menu =====
+function togglePubMenu(btn, e) {
+    e.stopPropagation();
+    var dd = btn.nextElementSibling;
+    var open = dd.style.display === 'block';
+    document.querySelectorAll('.pub-menu-dropdown').forEach(function(el){ el.style.display='none'; });
+    if (!open) dd.style.display='block';
+}
+document.addEventListener('click', function(){
+    document.querySelectorAll('.pub-menu-dropdown').forEach(function(el){ el.style.display='none'; });
+});
+
+function savePublication(idpub) {
+    // placeholder: send request to save
+    fetch(CTX + '/pages/alumni/ajax/save-publication.jsp?idpublication=' + encodeURIComponent(idpub))
+    .then(r=>r.json()).then(d=>{ if(d.success) Swal.fire({toast:true,position:'top-end',icon:'success',title:'Sauvegardée',timer:1500,showConfirmButton:false}); else alert('Erreur sauvegarde'); });
+}
+
+function reportPublication(idpub) {
+    window.location.href = CTX + '/pages/module.jsp?but=alumni/signaler-publication.jsp&idpublication=' + encodeURIComponent(idpub);
 }
 </script>
