@@ -1,5 +1,10 @@
 <%@page import="affichage.PageRecherche"%>
 <%@ page import="alumni.SpecialiteCpl" %>
+<%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.PreparedStatement" %>
+<%@ page import="java.sql.ResultSet" %>
+<%@ page import="java.util.*" %>
+<%@ page import="utilitaire.UtilDB" %>
 
 <% try {
     SpecialiteCpl t = new SpecialiteCpl();
@@ -17,6 +22,43 @@
     pr.setNpp(50);
     String[] colSomme = {};
     pr.creerObjetPage(libEntete, colSomme);
+
+    // ═══ COMPTAGE ALUMNI PAR SPÉCIALITÉ ═══
+    Map<String, Integer> alumniCount = new HashMap<String, Integer>();
+    Connection conn = null;
+    try {
+        conn = new UtilDB().GetConn();
+        String sqlCount = "SELECT s.idspecialite, COUNT(DISTINCT sp.idprofil) as nb_alumni " +
+                         "FROM specialite s " +
+                         "LEFT JOIN specialiteprofil sp ON s.idspecialite = sp.idspecialite " +
+                         "LEFT JOIN profil p ON sp.idprofil = p.idprofil " +
+                         "WHERE p.etat = 1 OR p.etat IS NULL " +
+                         "GROUP BY s.idspecialite";
+        PreparedStatement psCount = conn.prepareStatement(sqlCount);
+        ResultSet rsCount = psCount.executeQuery();
+        while (rsCount.next()) {
+            alumniCount.put(rsCount.getString("idspecialite"), rsCount.getInt("nb_alumni"));
+        }
+        rsCount.close();
+        psCount.close();
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        if (conn != null) conn.close();
+    }
+
+    // ═══ TRI PAR NOMBRE D'ALUMNI (DÉCROISSANT) ═══
+    alumni.SpecialiteCpl[] listeOriginale = (alumni.SpecialiteCpl[]) pr.getListe();
+    List<alumni.SpecialiteCpl> listeTriee = Arrays.asList(listeOriginale);
+    Collections.sort(listeTriee, new Comparator<alumni.SpecialiteCpl>() {
+        public int compare(alumni.SpecialiteCpl s1, alumni.SpecialiteCpl s2) {
+            Integer count1 = alumniCount.get(s1.getIdspecialite());
+            Integer count2 = alumniCount.get(s2.getIdspecialite());
+            if (count1 == null) count1 = 0;
+            if (count2 == null) count2 = 0;
+            return count2.compareTo(count1); // Ordre décroissant
+        }
+    });
 
     String lienBase = (String) session.getValue("lien");
     String lienTableau[] = {lienBase + "?but=specialite/specialite-fiche.jsp"};
@@ -76,6 +118,27 @@
     <form action="<%= pr.getLien() %>?but=<%= pr.getApres() %>" method="post" name="recherche" id="recherche">
         <%= pr.getFormu().getHtmlEnsemble() %>
     </form>
+</div>
+
+<!-- ═══ TRI & STATS ═══ -->
+<div class="custom-card no-hover" style="margin-bottom:20px;padding:1rem 1.5rem;background:linear-gradient(135deg,#f8fafc,#f1f5f9);border:1px solid #e2e8f0;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+        <div style="display:flex;align-items:center;gap:1rem;">
+            <span style="font-size:0.9rem;color:#64748b;">
+                <i class="fa fa-sort-amount-desc" style="margin-right:6px;color:#008BFF;"></i>
+                Tri&eacute; par nombre d'alumni (+ populaires en premier)
+            </span>
+        </div>
+        <div style="font-size:0.85rem;color:#475569;">
+            <% 
+                int totalAlumni = 0;
+                for (Integer count : alumniCount.values()) {
+                    totalAlumni += count;
+                }
+            %>
+            <strong style="color:#1e293b;"><%= totalAlumni %></strong> alumni au total
+        </div>
+    </div>
 </div>
 
 <!-- ═══ STYLES MENU KEBAB ═══ -->
@@ -142,15 +205,18 @@
 <!-- ═══ SPECIALITES GRID ═══ -->
 <div class="specialities-grid">
 <%
-    alumni.SpecialiteCpl[] liste = (alumni.SpecialiteCpl[]) pr.getListe();
+    // Utiliser la liste triée
+    alumni.SpecialiteCpl[] liste = listeTriee.toArray(new alumni.SpecialiteCpl[0]);
     for (int i = 0; i < liste.length; i++) {
         alumni.SpecialiteCpl spe = liste[i];
+        Integer nbAlumni = alumniCount.get(spe.getIdspecialite());
+        if (nbAlumni == null) nbAlumni = 0;
         int idx = i % 8;
         String photoHtml = spe.getPhotohtml();
         if (photoHtml != null) photoHtml = photoHtml.replace("__CTX__", request.getContextPath());
         boolean hasPhoto = (photoHtml != null && !photoHtml.trim().isEmpty());
 %>
-    <div class="speciality-card" style="position:relative;">
+    <div class="custom-card no-hover speciality-card" style="position:relative;">
 
         <!-- Menu 3 points -->
         <div class="spe-card-menu">
@@ -188,8 +254,15 @@
 
         <!-- Meta (alumni count + level) -->
         <div class="speciality-meta">
-            <span class="speciality-count"><strong>&mdash;</strong> alumni</span>
-            <span class="speciality-level">Tous niveaux</span>
+            <span class="speciality-count">
+                <strong style="color:#008BFF;"><%= nbAlumni %></strong> 
+                <%= nbAlumni <= 1 ? "alumni" : "alumni" %>
+            </span>
+            <% if (nbAlumni > 0) { %>
+                <span class="speciality-level" style="background:linear-gradient(135deg,#10b981,#059669);color:white;">Actif</span>
+            <% } else { %>
+                <span class="speciality-level" style="background:#f1f5f9;color:#64748b;">Nouveau</span>
+            <% } %>
         </div>
 
         <!-- Bouton Voir profils -->

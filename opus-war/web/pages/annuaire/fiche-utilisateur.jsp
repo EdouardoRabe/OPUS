@@ -43,7 +43,7 @@
 <div style="text-align:center;padding:60px 20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#888">
     <h3 style="color:#444">Profil introuvable</h3>
     <p>Aucun identifiant de profil fourni.</p>
-    <a href="<%= _lien %>?but=annuaire/annuaire.jsp" style="color:#0a66c2">← Retour &agrave; l'annuaire</a>
+    <a href="javascript:void(0)" onclick="window.history.back()" style="color:#0a66c2;cursor:pointer;">← Retour</a>
 </div>
 <% return; } %>
 <%
@@ -121,7 +121,7 @@
 <div style="text-align:center;padding:60px 20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#888">
     <h3 style="color:#444">Profil introuvable</h3>
     <p>Ce profil n'existe pas ou a &eacute;t&eacute; supprim&eacute;.</p>
-    <a href="<%= _lien %>?but=annuaire/annuaire.jsp" style="color:#0a66c2">&larr; Retour &agrave; l'annuaire</a>
+    <a href="javascript:void(0)" onclick="window.history.back()" style="color:#0a66c2;cursor:pointer;">&larr; Retour</a>
 </div>
 <% return; } %>
 <%
@@ -260,8 +260,8 @@
 <div class="fu-wrap">
 
     <!-- Back link -->
-    <a class="fu-back" href="<%= _lien %>?but=annuaire/annuaire.jsp">
-        <i class="bi bi-arrow-left"></i> Retour &agrave; l'annuaire
+    <a class="fu-back" href="javascript:void(0)" onclick="window.history.back()">
+        <i class="bi bi-arrow-left"></i> Retour
     </a>
 
     <div class="fu-card">

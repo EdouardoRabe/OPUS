@@ -21,6 +21,8 @@
 
     <!-- OPUS CUSTOM THEME (local, utilisant les fonts du projet) -->
     <link href="${pageContext.request.contextPath}/assets/css/alumni-theme.css" rel="stylesheet" type="text/css" />
+    <!-- OPUS Global Theme -->
+    <link href="${pageContext.request.contextPath}/assets/css/opus-theme.css" rel="stylesheet" type="text/css" />
 
     <!-- SweetAlert (du projet) -->
     <script src="${pageContext.request.contextPath}/dist/js/swal.js"></script>
