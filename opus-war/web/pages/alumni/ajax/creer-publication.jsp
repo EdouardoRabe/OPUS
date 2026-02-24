@@ -18,7 +18,7 @@
     // Utilise ClassMAPTable.construirePK + insertToTableWithHisto (100% APJ)
 
     String ctx = request.getContextPath();
-    String redirectUrl = ctx + "/pages/module.jsp?but=alumni/fil-actualite.jsp";
+    String redirectUrl = ctx + "/pages/module.jsp?but=accueil.jsp";
 
     try {
         UserEJB u = (UserEJB) session.getAttribute("u");
@@ -117,7 +117,7 @@
             // --- Identification: taguer des personnes dans la publication ---
             if (identifications != null && !identifications.trim().isEmpty()) {
                 String nomSource = Notification.getNomUtilisateur(conn, map.getRefuser());
-                String lienPub = "module.jsp?but=alumni/fil-actualite.jsp&scrollTo=pub-" + pub.getIdpublication();
+                String lienPub = "module.jsp?but=accueil.jsp&scrollTo=pub-" + pub.getIdpublication();
                 String[] tagIds = identifications.split(",");
                 for (int t = 0; t < tagIds.length; t++) {
                     String tid = tagIds[t].trim();
@@ -155,6 +155,6 @@
     } catch (Exception e) {
         e.printStackTrace();
         session.setAttribute("pubErreur", "Erreur: " + e.getMessage());
-        response.sendRedirect(request.getContextPath() + "/pages/module.jsp?but=alumni/fil-actualite.jsp");
+        response.sendRedirect(request.getContextPath() + "/pages/module.jsp?but=accueil.jsp");
     }
 %>

@@ -53,9 +53,7 @@
     /* ==============================
        PARAMETRES DE RECHERCHE
        ============================== */
-    String qNom        = request.getParameter("nom");
-    String qPrenom     = request.getParameter("prenom");
-    String qRefuser    = request.getParameter("refuser");
+    String qSearch     = request.getParameter("q");
     String qPromotion  = request.getParameter("promotion");
     String qParcours   = request.getParameter("parcours");
     String qEntreprise = request.getParameter("entreprise");
@@ -72,9 +70,7 @@
     try { if (pageParam != null) pageNum = Integer.parseInt(pageParam); } catch (Exception e) {}
     if (pageNum < 1) pageNum = 1;
 
-    boolean hasNom        = qNom != null && !qNom.trim().isEmpty();
-    boolean hasPrenom     = qPrenom != null && !qPrenom.trim().isEmpty();
-    boolean hasRefuser    = qRefuser != null && !qRefuser.trim().isEmpty();
+    boolean hasSearch    = qSearch != null && !qSearch.trim().isEmpty();
     boolean hasPromotion  = qPromotion != null && !qPromotion.trim().isEmpty();
     boolean hasParcours   = qParcours != null && !qParcours.trim().isEmpty();
     boolean hasEntreprise = qEntreprise != null && !qEntreprise.trim().isEmpty();
@@ -82,7 +78,7 @@
     boolean hasAnnee      = qAnnee != null && !qAnnee.trim().isEmpty();
     boolean hasGenre      = qGenre != null && !qGenre.trim().isEmpty();
     boolean hasSpecialite = qSpecialites != null && qSpecialites.length > 0 && !(qSpecialites.length == 1 && qSpecialites[0].isEmpty());
-    boolean hasAdvanced   = hasPromotion || hasParcours || hasSpecialite || hasAnnee || hasEntreprise || hasPoste || hasPrenom || hasRefuser || hasGenre;
+    boolean hasAdvanced   = hasPromotion || hasParcours || hasSpecialite || hasAnnee || hasEntreprise || hasPoste || hasGenre;
 
     // Set des specialites selectionnees (pour le multi-select)
     Set selectedSpecs = new HashSet();
@@ -134,17 +130,16 @@
         StringBuilder where = new StringBuilder();
         where.append(" and nom IS NOT NULL");
 
-        if (hasNom) {
-            String safe = qNom.trim().replace("'", "''").toLowerCase();
-            where.append(" and LOWER(nom) LIKE '%").append(safe).append("%'");
-        }
-        if (hasPrenom) {
-            String safe = qPrenom.trim().replace("'", "''").toLowerCase();
-            where.append(" and LOWER(prenom) LIKE '%").append(safe).append("%'");
-        }
-        if (hasRefuser) {
-            String safe = qRefuser.trim().replace("'", "''").toLowerCase();
-            where.append(" and LOWER(loginuser) LIKE '%").append(safe).append("%'");
+        if (hasSearch) {
+            // Recherche multi-mots : chaque mot est recherche dans nom, prenom ou loginuser (OR)
+            // Plusieurs mots sont combines en AND pour affiner
+            String[] words = qSearch.trim().toLowerCase().split("\\s+");
+            for (int w = 0; w < words.length; w++) {
+                String safe = words[w].replace("'", "''");
+                where.append(" and (LOWER(nom) LIKE '%").append(safe).append("%'")
+                     .append(" or LOWER(prenom) LIKE '%").append(safe).append("%'")
+                     .append(" or LOWER(loginuser) LIKE '%").append(safe).append("%')");
+            }
         }
         if (hasPromotion) {
             where.append(" and idpromotion='").append(qPromotion.trim().replace("'","''")).append("'");
@@ -289,9 +284,7 @@
        URL BUILDER POUR PAGINATION
        ============================== */
     StringBuilder baseUrl = new StringBuilder("module.jsp?but=annuaire/annuaire.jsp");
-    if (hasNom)        baseUrl.append("&nom=").append(ue(qNom.trim()));
-    if (hasPrenom)     baseUrl.append("&prenom=").append(ue(qPrenom.trim()));
-    if (hasRefuser)    baseUrl.append("&refuser=").append(ue(qRefuser.trim()));
+    if (hasSearch)     baseUrl.append("&q=").append(ue(qSearch.trim()));
     if (hasPromotion)  baseUrl.append("&promotion=").append(ue(qPromotion.trim()));
     if (hasParcours)   baseUrl.append("&parcours=").append(ue(qParcours.trim()));
     if (hasAnnee)      baseUrl.append("&annee=").append(ue(qAnnee.trim()));
@@ -428,9 +421,9 @@
                 <p>Retrouvez et connectez-vous avec les anciens de votre promotion</p>
 
                 <div class="an-form-row">
-                    <input type="text" name="nom" class="an-search-input"
-                           placeholder="Rechercher par nom..."
-                           value="<%= h(hasNom ? qNom.trim() : "") %>">
+                    <input type="text" name="q" class="an-search-input"
+                           placeholder="Rechercher par nom, pr&eacute;nom ou login..."
+                           value="<%= h(hasSearch ? qSearch.trim() : "") %>">
                     <button type="submit" class="an-btn-search">
                         <i class="bi bi-search"></i>&nbsp; Rechercher
                     </button>
@@ -445,16 +438,6 @@
 
                 <div class="an-filters-panel<%= hasAdvanced ? " show" : "" %>" id="anFiltersPanel">
                     <div class="an-filters-grid">
-                        <div class="an-filter-group">
-                            <label>Pr&eacute;nom</label>
-                            <input type="text" name="prenom" placeholder="Prenom..."
-                                   value="<%= h(hasPrenom ? qPrenom.trim() : "") %>">
-                        </div>
-                        <div class="an-filter-group">
-                            <label>Login utilisateur</label>
-                            <input type="text" name="refuser" placeholder="Ex: ETU001"
-                                   value="<%= h(hasRefuser ? qRefuser.trim() : "") %>">
-                        </div>
                         <div class="an-filter-group">
                             <label>Promotion</label>
                             <select name="promotion">
@@ -552,9 +535,7 @@
             <strong><%= total %></strong> alumni trouv&eacute;<%= (total > 1 ? "s" : "") %>
         </div>
         <div class="an-active-filters">
-            <% if (hasNom) { %><span class="an-filter-badge">Nom : <%= h(qNom.trim()) %></span><% } %>
-            <% if (hasPrenom) { %><span class="an-filter-badge">Pr&eacute;nom : <%= h(qPrenom.trim()) %></span><% } %>
-            <% if (hasRefuser) { %><span class="an-filter-badge">Login : <%= h(qRefuser.trim()) %></span><% } %>
+            <% if (hasSearch) { %><span class="an-filter-badge"><i class="bi bi-search"></i> <%= h(qSearch.trim()) %></span><% } %>
             <% if (hasPromotion) {
                 String promoLabel = qPromotion.trim();
                 for (int i = 0; i < promotions.length; i++) {
@@ -582,7 +563,7 @@
             <% if (hasAnnee) { %><span class="an-filter-badge">Ann&eacute;e : <%= h(qAnnee.trim()) %></span><% } %>
             <% if (hasEntreprise) { %><span class="an-filter-badge">Entreprise : <%= h(qEntreprise.trim()) %></span><% } %>
             <% if (hasPoste) { %><span class="an-filter-badge">Poste : <%= h(qPoste.trim()) %></span><% } %>
-            <% if (hasNom || hasAdvanced) { %><a class="an-btn-clear" href="module.jsp?but=annuaire/annuaire.jsp">Effacer tout</a><% } %>
+            <% if (hasSearch || hasAdvanced) { %><a class="an-btn-clear" href="module.jsp?but=annuaire/annuaire.jsp">Effacer tout</a><% } %>
         </div>
     </div>
 

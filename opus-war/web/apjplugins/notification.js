@@ -47,7 +47,7 @@ function renderNotifList() {
     if (!listDiv) return;
 
     if (mesnotifs.length === 0) {
-        listDiv.innerHTML = '<div style="text-align:center;padding:30px;color:#999;"><i class="bi bi-bell-slash" style="font-size:28px;display:block;margin-bottom:8px;"></i>Aucune notification</div>';
+        listDiv.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#aaa;"><i class="bi bi-bell-slash" style="font-size:36px;display:block;margin-bottom:10px;color:#ccc;"></i><span style="font-size:14px;">Aucune notification</span></div>';
         return;
     }
 
@@ -55,21 +55,33 @@ function renderNotifList() {
     var limit = Math.min(mesnotifs.length, 20);
     for (var i = 0; i < limit; i++) {
         var n = mesnotifs[i];
-        var bgColor = (n.etat === 0 || n.etat === '0') ? '#e8f4fd' : '#fff';
-        var dotHtml = (n.etat === 0 || n.etat === '0') ? '<span style="width:8px;height:8px;background:#1a73e8;border-radius:50%;display:inline-block;margin-left:6px;"></span>' : '';
-        var lienClick = n.lien ? ' onclick="ouvrirNotif(\'' + escHtmlAttr(n.id) + '\',\'' + escHtmlAttr(n.lien) + '\')" style="cursor:pointer;"' : '';
+        var isUnread = (n.etat === 0 || n.etat === '0');
+        var bgColor = isUnread ? '#eef4ff' : '#fff';
+        var hoverBg = isUnread ? '#e3ecf8' : '#f5f7fa';
+        var dotHtml = isUnread ? '<span style="width:8px;height:8px;background:#1a73e8;border-radius:50%;display:inline-block;margin-left:6px;flex-shrink:0;"></span>' : '';
+        var lienClick = n.lien ? ' onclick="ouvrirNotif(\'' + escHtmlAttr(n.id) + '\',\'' + escHtmlAttr(n.lien) + '\')"' : '';
+        var fontWeight = isUnread ? 'font-weight:600;' : 'font-weight:400;';
 
-        html += '<div class="notif-item" ' + lienClick + ' style="display:flex;align-items:flex-start;gap:10px;padding:10px 15px;background:' + bgColor + ';border-bottom:1px solid #f0f0f0;transition:background 0.2s;" onmouseover="this.style.background=\'#f5f5f5\'" onmouseout="this.style.background=\'' + bgColor + '\'">';
+        // Couleur d'icone par type
+        var iconColor = '#1a73e8';
+        var iconBg = '#e8f0fe';
+        if (n.type === 'PUB_REACTION' || n.type === 'COMM_REACTION') { iconColor = '#e8453c'; iconBg = '#fce8e6'; }
+        else if (n.type === 'COMMENT' || n.type === 'REPLY') { iconColor = '#188038'; iconBg = '#e6f4ea'; }
+        else if (n.type === 'MENTION' || n.type === 'IDENTIFICATION') { iconColor = '#a142f4'; iconBg = '#f3e8fd'; }
+
+        html += '<div class="notif-item"' + lienClick + ' style="display:flex;align-items:flex-start;gap:12px;padding:12px 18px;background:' + bgColor + ';cursor:pointer;transition:background 0.15s;border-bottom:1px solid #f0f0f0;' + fontWeight + '" onmouseover="this.style.background=\'' + hoverBg + '\'" onmouseout="this.style.background=\'' + bgColor + '\'">';
 
         // Icone
-        html += '<div style="flex-shrink:0;width:36px;height:36px;background:#e8f0fe;border-radius:50%;display:flex;align-items:center;justify-content:center;">';
-        html += '<i class="bi ' + getNotifIcon(n.type) + '" style="font-size:16px;color:#1a73e8;"></i>';
+        html += '<div style="flex-shrink:0;width:40px;height:40px;background:' + iconBg + ';border-radius:50%;display:flex;align-items:center;justify-content:center;">';
+        html += '<i class="bi ' + getNotifIcon(n.type) + '" style="font-size:17px;color:' + iconColor + ';"></i>';
         html += '</div>';
 
         // Contenu
         html += '<div style="flex:1;min-width:0;">';
-        html += '<div style="font-size:13px;line-height:1.4;color:#333;">' + escNotifHtml(n.objet) + dotHtml + '</div>';
-        html += '<div style="font-size:11px;color:#999;margin-top:2px;">' + escNotifHtml(n.ecart || n.daty || '') + '</div>';
+        html += '<div style="font-size:13px;line-height:1.45;color:#1d1d1f;display:flex;align-items:center;">';
+        html += '<span style="flex:1;">' + escNotifHtml(n.objet) + '</span>' + dotHtml;
+        html += '</div>';
+        html += '<div style="font-size:11px;color:#8e8e93;margin-top:3px;"><i class="bi bi-clock" style="margin-right:3px;"></i>' + escNotifHtml(n.ecart || n.daty || '') + '</div>';
         html += '</div>';
 
         html += '</div>';

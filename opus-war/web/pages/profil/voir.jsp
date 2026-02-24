@@ -263,7 +263,7 @@
   <div class="pv-top">
     <div style="display:flex;justify-content:space-between;align-items:flex-start">
       <div>
-        <div class="pv-name"     id="pvName">—</div>
+        <div class="pv-name" id="pvName" style="display:flex;align-items:center;gap:10px;"><span id="pvNameText">—</span><span id="pvGenreBadge" style="display:none;font-size:12px;font-weight:600;background:#f3e8ff;color:#7c3aed;border-radius:14px;padding:3px 12px;white-space:nowrap;"><i class="bi" id="pvGenreIcon"></i> <span id="pvGenreText"></span></span></div>
         <div class="pv-headline" id="pvHeadline">—</div>
         <div class="pv-meta">
           <span>📍 Antananarivo, Madagascar</span>
@@ -288,7 +288,6 @@
   <div class="pv-section">
     <h2>Promotion & Parcours</h2>
     <div class="pv-tags">
-      <span class="pv-tag" style="background:#f3e8ff;color:#7c3aed;" id="pvGenreTag"><i class="bi" id="pvGenreIcon"></i> <span id="pvGenreText">—</span></span>
       <span class="pv-tag"      id="pvPromoTag">—</span>
       <span class="pv-tag grey" id="pvParcoursTag">—</span>
     </div>
@@ -428,18 +427,17 @@
   }
 
   /* Identité */
-  document.getElementById("pvName").textContent     = p.prenom + " " + p.nom;
+  document.getElementById("pvNameText").textContent  = p.prenom + " " + p.nom;
   document.getElementById("pvHeadline").textContent = p.parcoursLib + "  ·  " + p.promotionLib;
   var em = document.getElementById("pvEmail");
   em.textContent = p.email; em.href = "mailto:" + p.email;
   document.getElementById("pvPhone").textContent    = "📞 " + p.telephone;
 
-  /* Tags */
+  /* Genre badge near name */
   if (p.genreLib) {
     document.getElementById("pvGenreText").textContent = p.genreLib;
     document.getElementById("pvGenreIcon").className = "bi " + (p.idgenre === "GEN000001" ? "bi-gender-male" : "bi-gender-female");
-  } else {
-    document.getElementById("pvGenreTag").style.display = "none";
+    document.getElementById("pvGenreBadge").style.display = "inline-flex";
   }
   document.getElementById("pvPromoTag").textContent    = "🎓 " + p.promotionLib;
   document.getElementById("pvParcoursTag").textContent = "📚 " + p.parcoursLib;

@@ -7,6 +7,7 @@
 <%@ page import="alumni.Commentairereaction" %>
 <%@ page import="alumni.Reactiontype" %>
 <%@ page import="alumni.Profil" %>
+<%@ page import="alumni.ProfilLib" %>
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
@@ -52,13 +53,17 @@
             }
             sbRT.append("]");
 
-            // --- APJ: Tous les profils pour lookup noms ---
-            alumni.Profil[] allProfils = (alumni.Profil[]) CGenUtil.rechercher(
-                new alumni.Profil(), null, null, conn, "");
+            // --- APJ: Tous les profils pour lookup noms + photos ---
+            alumni.ProfilLib[] allProfils = (alumni.ProfilLib[]) CGenUtil.rechercher(
+                new alumni.ProfilLib(), null, null, conn, "");
             Map userNames = new HashMap();
+            Map userPhotos = new HashMap();
             if (allProfils != null) {
                 for (int i = 0; i < allProfils.length; i++) {
-                    userNames.put(new Integer(allProfils[i].getIdutilisateur()), allProfils[i].getNom() + " " + allProfils[i].getPrenom());
+                    Integer _key = new Integer(allProfils[i].getIdutilisateur());
+                    userNames.put(_key, allProfils[i].getNom() + " " + allProfils[i].getPrenom());
+                    if (allProfils[i].getPhotoProfil() != null && !allProfils[i].getPhotoProfil().trim().isEmpty())
+                        userPhotos.put(_key, allProfils[i].getPhotoProfil().trim());
                 }
             }
 
@@ -113,6 +118,8 @@
                 sbComm.append(",\"description\":\"").append(ej(c.getDescription())).append("\"");
                 sbComm.append(",\"auteur\":\"").append(ej(auteur)).append("\"");
                 sbComm.append(",\"idutilisateur\":").append(c.getIdutilisateur());
+                String _photoPath = (String) userPhotos.get(new Integer(c.getIdutilisateur()));
+                sbComm.append(",\"photo\":\"").append(_photoPath != null ? ej(_photoPath) : "").append("\"");
                 String parent = c.getIdpublicationcommentaire_1();
                 sbComm.append(",\"idparent\":\"").append(parent != null ? ej(parent) : "").append("\"");
                 sbComm.append(",\"reactions\":").append(sbReact.toString());

@@ -281,7 +281,7 @@
 
         <!-- Top -->
         <div class="fu-top">
-            <div class="fu-name"><%= h(displayName) %></div>
+            <div class="fu-name" style="display:flex;align-items:center;gap:10px;"><%= h(displayName) %><% if (!genreLib.isEmpty()) { %><span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;background:#f3e8ff;color:#7c3aed;border-radius:14px;padding:3px 12px;white-space:nowrap;"><i class="bi <%= "GEN000001".equals(genreId) ? "bi-gender-male" : "bi-gender-female" %>"></i>&nbsp;<%= h(genreLib) %></span><% } %></div>
             <div class="fu-headline"><%= h(headline) %></div>
             <div class="fu-meta">
                 <% if (!email.isEmpty()) { %><a href="mailto:<%= h(email) %>"><i class="bi bi-envelope-fill"></i>&nbsp;<%= h(email) %></a><% } %>
@@ -298,7 +298,6 @@
         <div class="fu-section">
             <h2><i class="bi bi-mortarboard-fill"></i> Promotion & Parcours</h2>
             <div class="fu-tags">
-                <% if (!genreLib.isEmpty()) { %><span class="fu-tag" style="background:#f3e8ff;color:#7c3aed;"><i class="bi <%= "GEN000001".equals(genreId) ? "bi-gender-male" : "bi-gender-female" %>"></i>&nbsp;<%= h(genreLib) %></span><% } %>
                 <% if (!promoLib.isEmpty()) { %><span class="fu-tag">🎓&nbsp;<%= h(promoLib) %><%= promoAnnee > 0 ? " (" + promoAnnee + ")" : "" %></span><% } %>
                 <% if (!parcLib.isEmpty()) { %><span class="fu-tag grey">📚&nbsp;<%= h(parcLib) %></span><% } %>
             </div>

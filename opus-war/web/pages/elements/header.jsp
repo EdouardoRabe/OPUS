@@ -195,7 +195,7 @@
         <input value="recherche-global.jsp" name="but" type="hidden">
         <div class="topnav-search-container">
           <i class="bi bi-search"></i>
-          <input class="topnav-search" type="text" name="remarque" placeholder="Rechercher...">
+          <input class="topnav-search" type="text" name="q" placeholder="Rechercher...">
         </div>
       </form>
     </div>
@@ -258,14 +258,14 @@
             <span class="topnav-link-label"><%= libelle %></span>
             <span id="notif-badge" class="badge" style="display:none;position:absolute;top:0;right:0;background:#e00;color:#fff;font-size:10px;padding:2px 5px;border-radius:10px;direction:ltr;unicode-bidi:bidi-override;min-width:16px;text-align:center;">0</span>
           </button>
-          <div id="notif-dropdown-panel" class="topnav-submenu" style="min-width:380px;right:0;left:auto;">
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-bottom:1px solid #eee;">
-              <h4 style="margin:0;font-size:16px;font-weight:600;">Notifications</h4>
-              <a href="javascript:void(0)" onclick="marquerToutLu()" style="font-size:12px;color:#1a73e8;">Tout marquer comme lu</a>
+          <div id="notif-dropdown-panel" class="topnav-submenu" style="min-width:400px;max-width:420px;right:0;left:auto;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.18);border:1px solid #e0e0e0;overflow:hidden;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:#fafbfc;border-bottom:1px solid #eee;">
+              <h4 style="margin:0;font-size:17px;font-weight:700;color:#1d1d1f;">Notifications</h4>
+              <a href="javascript:void(0)" onclick="marquerToutLu()" style="font-size:12px;color:#1a73e8;font-weight:500;text-decoration:none;">Tout marquer comme lu</a>
             </div>
-            <div id="notif-list" style="max-height:380px;overflow-y:auto;padding:5px 0;"><div style="text-align:center;padding:20px;color:#999;">Chargement...</div></div>
-            <div style="text-align:center;padding:8px;border-top:1px solid #eee;">
-              <a href="<%=lien%>?but=alumni/notifications.jsp" style="font-size:13px;color:#1a73e8;">Voir toutes les notifications</a>
+            <div id="notif-list" style="max-height:400px;overflow-y:auto;padding:0;"><div style="text-align:center;padding:28px;color:#999;"><i class="bi bi-arrow-repeat" style="font-size:20px;display:block;margin-bottom:6px;"></i>Chargement...</div></div>
+            <div style="text-align:center;padding:10px 18px;border-top:1px solid #eee;background:#fafbfc;">
+              <a href="<%=lien%>?but=alumni/notifications.jsp" style="font-size:13px;color:#1a73e8;font-weight:600;text-decoration:none;">Voir toutes les notifications</a>
             </div>
           </div>
         </div>
