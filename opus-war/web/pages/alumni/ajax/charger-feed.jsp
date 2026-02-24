@@ -22,7 +22,7 @@
     //   cursor_heure = derniere heure vue (HH:MM:SS)
     //   cursor_id    = dernier idpublication vu
     // Retourne du HTML :
-    //   1. <div id="feed-meta-new"> avec attributs data-* du prochain curseur
+    //   1. <div id="feed-meta-new"> avec data-daty, data-heure, data-id, data-has-more
     //   2. Les cartes .fa-post-card suivantes
     // =========================================================
 
@@ -47,11 +47,9 @@
     String cursorId    = request.getParameter("cursor_id");
 
     if (cursorDaty == null || cursorId == null || cursorId.trim().isEmpty()) {
-        // Aucun curseur fourni : ne rien retourner
         return;
     }
 
-    // Sanitize : on n'accepte que des caracteres autorises pour eviter SQL injection
     cursorDaty  = cursorDaty.replaceAll("[^0-9\\-]", "");
     cursorHeure = (cursorHeure != null ? cursorHeure.replaceAll("[^0-9:]", "") : "23:59:59");
     if (cursorHeure.isEmpty()) cursorHeure = "23:59:59";
@@ -94,9 +92,7 @@
                 _connPhotoUrl = ctx + "/" + _myProfils[0].getPhotoProfil().trim();
         }
 
-        // --- Requete cursor-based ---
-        // On charge les publications dont (daty, heure, idpublication) est STRICTEMENT
-        // inferieur au curseur transmis (ordre DESC => on va vers le passe).
+        // --- Requete cursor-based (simple, tri par date) ---
         String whereClause = " and etat = 1"
                 + " and (daty < '" + cursorDaty + "'"
                 + " OR (daty = '" + cursorDaty + "' AND heure < '" + cursorHeure + "')"
@@ -107,12 +103,11 @@
                 new Publication(), null, null, conn, whereClause);
         if (pubs == null) pubs = new Publication[0];
 
-        // --- Calcul du prochain curseur ---
+        // --- Curseur suivant ---
         String nextDaty  = "";
         String nextHeure = "";
         String nextId    = "";
         boolean hasMore  = (pubs.length == 10);
-
         if (pubs.length > 0) {
             Publication lastPub = pubs[pubs.length - 1];
             nextDaty  = lastPub.getDaty()  != null ? lastPub.getDaty().toString() : "";

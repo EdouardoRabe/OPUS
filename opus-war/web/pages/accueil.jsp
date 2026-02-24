@@ -23,6 +23,12 @@
     int refuserConnecte = mapFil.getRefuser();
     String nomConnecte = mapFil.getNomuser() != null ? mapFil.getNomuser() : "";
     String ctx = request.getContextPath();
+    // --- Feed seed (variation d'ordre a chaque nouvelle session de navigation) ---
+    Integer feedSeed = (Integer) session.getAttribute("feedSeed");
+    if (feedSeed == null) {
+        feedSeed = new java.util.Random().nextInt(10000);
+        session.setAttribute("feedSeed", feedSeed);
+    }
     // Initiales du user connecte
     String[] _partsConn = nomConnecte.trim().split("\\s+");
     String initialConnecte = (_partsConn.length > 0 && _partsConn[0].length() > 0)
@@ -191,12 +197,14 @@
                     }
                 }
 
-                // --- APJ: Charger les 10 premieres publications (cursor-based scroll) ---
+                // --- APJ: Charger les 10 premieres publications (cursor-based, OFFSET varie au refresh) ---
+                int _feedOffset = feedSeed % 6;
                 Publication[] pubs = (Publication[]) CGenUtil.rechercher(
-                        new Publication(), null, null, conn, " and etat = 1 order by daty desc, heure desc, idpublication desc limit 10");
+                        new Publication(), null, null, conn,
+                        " and etat = 1 order by daty desc, heure desc, idpublication desc limit 10 offset " + _feedOffset);
                 if (pubs == null) pubs = new Publication[0];
 
-                // Variables curseur (mises a jour a chaque iteration, pointent vers la derniere pub affichee)
+                // Variables curseur (mises a jour a chaque iteration)
                 String _lastDaty = "", _lastHeure = "", _lastId = "";
 
                 if (pubs.length == 0) {
@@ -213,7 +221,7 @@
                 // Mise a jour curseur (pointe toujours vers la derniere pub affichee)
                 _lastDaty  = pub.getDaty()  != null ? pub.getDaty().toString() : _lastDaty;
                 _lastHeure = pub.getHeure() != null ? pub.getHeure()           : _lastHeure;
-                _lastId    = pub.getIdpublication();
+                _lastId    = pub.getIdpublication() != null ? pub.getIdpublication() : _lastId;
                 String idpub = pub.getIdpublication();
                 String auteur = (String) userNames.get(new Integer(pub.getIdutilisateur()));
                 if (auteur == null) auteur = "Utilisateur";
