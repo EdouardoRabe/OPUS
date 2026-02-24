@@ -8,6 +8,8 @@
 <%@ page import="alumni.Visibilite" %>
 <%@ page import="alumni.Specialite" %>
 <%@ page import="alumni.Specialiteprofil" %>
+<%@ page import="alumni.ReseauSocial" %>
+<%@ page import="alumni.ProfilSocialMedia" %>
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
@@ -126,6 +128,9 @@
         if (conn != null) try { conn.close(); } catch (Exception ignore) {}
     }
 
+    if (allReseaux == null) allReseaux = new ReseauSocial[0];
+    if (socialMedias == null) socialMedias = new ProfilSocialMedia[0];
+
     if (profil == null) {
 %>
 <div style="text-align:center;padding:60px 20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#888">
@@ -163,6 +168,7 @@
 
     int refuser = profil.getRefuser();
     String loginuser = profil.getLoginuser() != null ? profil.getLoginuser() : "";
+    int contribution = profil.getContribution();
 
     // Display name
     String displayName;
@@ -293,7 +299,11 @@
 
         <!-- Top -->
         <div class="fu-top">
-            <div class="fu-name" style="display:flex;align-items:center;gap:10px;"><%= h(displayName) %><% if (!genreLib.isEmpty()) { %><span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;background:#f3e8ff;color:#7c3aed;border-radius:14px;padding:3px 12px;white-space:nowrap;"><i class="bi <%= "GEN000001".equals(genreId) ? "bi-gender-male" : "bi-gender-female" %>"></i>&nbsp;<%= h(genreLib) %></span><% } %></div>
+            <div class="fu-name" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <%= h(displayName) %>
+                <% if (!genreLib.isEmpty()) { %><span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;background:#f3e8ff;color:#7c3aed;border-radius:14px;padding:3px 12px;white-space:nowrap;"><i class="bi <%= "GEN000001".equals(genreId) ? "bi-gender-male" : "bi-gender-female" %>"></i>&nbsp;<%= h(genreLib) %></span><% } %>
+                <span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;background:#fff8e1;color:#f57f17;border-radius:14px;padding:3px 12px;white-space:nowrap;" title="Contribution (publications)"><i class="bi bi-award-fill"></i>&nbsp;<%= contribution %></span>
+            </div>
             <div class="fu-headline"><%= h(headline) %></div>
             <div class="fu-meta">
                 <% if (!email.isEmpty()) { %><a href="mailto:<%= h(email) %>"><i class="bi bi-envelope-fill"></i>&nbsp;<%= h(email) %></a><% } %>
@@ -315,12 +325,26 @@
             </div>
         </div>
         <% } %>
+
+        <!-- Specialites -->
+        <% if (vSpec && !specLabels.isEmpty()) { %>
+        <div class="fu-section">
+            <h2><i class="bi bi-star-fill"></i> Sp&eacute;cialit&eacute;s</h2>
+            <div class="fu-tags">
+                <% for (int i = 0; i < specLabels.size(); i++) { %>
+                <span class="fu-tag green"><%= h((String) specLabels.get(i)) %></span>
+                <% } %>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Reseaux Sociaux -->
         <% if (vSocial) { %>
         <div class="fu-section">
-            <h2><i class="bi bi-globe2"></i> Réseaux sociaux</h2>
+            <h2><i class="bi bi-globe2"></i> R&eacute;seaux sociaux</h2>
             <div class="fu-tags">
                 <% if (socialMedias == null || socialMedias.length == 0) { %>
-                    <span style="color:#aaa;font-size:13px">Aucun réseau social renseigné.</span>
+                    <span style="color:#aaa;font-size:13px">Aucun r&eacute;seau social renseign&eacute;.</span>
                 <% } else {
                     for (int ii = 0; ii < socialMedias.length; ii++) {
                         ProfilSocialMedia sm = socialMedias[ii];
@@ -335,9 +359,6 @@
                 %>
                     <span class="fu-tag grey"><%= h(lib + ": " + (sm.getValeur()!=null?sm.getValeur():"")) %></span>
                 <% } } %>
-            </div>
-        </div>
-        <% } %>
             </div>
         </div>
         <% } %>

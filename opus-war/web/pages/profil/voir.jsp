@@ -91,6 +91,7 @@
     String _photoCoverUrl = _photoCover.isEmpty() ? "" : request.getContextPath() + "/" + _photoCover;
     String _genrelib    = profil != null && profil.getGenrelib()       != null ? profil.getGenrelib()       : "";
     String _idgenre     = profil != null && profil.getIdgenre()        != null ? profil.getIdgenre()        : "";
+    int _contribution   = profil != null ? profil.getContribution() : 0;
 %>
 <style>
 .pv-card {
@@ -323,7 +324,11 @@
   <div class="pv-top">
     <div style="display:flex;justify-content:space-between;align-items:flex-start">
       <div>
-        <div class="pv-name" id="pvName" style="display:flex;align-items:center;gap:10px;"><span id="pvNameText">—</span><span id="pvGenreBadge" style="display:none;font-size:12px;font-weight:600;background:#f3e8ff;color:#7c3aed;border-radius:14px;padding:3px 12px;white-space:nowrap;"><i class="bi" id="pvGenreIcon"></i> <span id="pvGenreText"></span></span></div>
+        <div class="pv-name" id="pvName" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span id="pvNameText">—</span>
+          <span id="pvGenreBadge" style="display:none;font-size:12px;font-weight:600;background:#f3e8ff;color:#7c3aed;border-radius:14px;padding:3px 12px;white-space:nowrap;"><i class="bi" id="pvGenreIcon"></i> <span id="pvGenreText"></span></span>
+          <span id="pvContributionBadge" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;background:#fff8e1;color:#f57f17;border-radius:14px;padding:3px 12px;white-space:nowrap;" title="Contribution (publications)"><i class="bi bi-award-fill"></i> <span id="pvContributionText">0</span></span>
+        </div>
         <div class="pv-headline" id="pvHeadline">—</div>
         <div class="pv-meta">
           <span>📍 Antananarivo, Madagascar</span>
@@ -515,7 +520,8 @@
     photo        : "<%= _photoUrl %>",
     photoCover   : "<%= _photoCoverUrl %>",
     genreLib     : "<%= _genrelib %>",
-    idgenre      : "<%= _idgenre %>"
+    idgenre      : "<%= _idgenre %>",
+    contribution : <%= _contribution %>
   };
 
   /* Cover */
@@ -547,6 +553,7 @@
     document.getElementById("pvGenreIcon").className = "bi " + (p.idgenre === "GEN000001" ? "bi-gender-male" : "bi-gender-female");
     document.getElementById("pvGenreBadge").style.display = "inline-flex";
   }
+  document.getElementById("pvContributionText").textContent = p.contribution;
   document.getElementById("pvPromoTag").textContent    = "🎓 " + p.promotionLib;
   document.getElementById("pvParcoursTag").textContent = "📚 " + p.parcoursLib;
 
