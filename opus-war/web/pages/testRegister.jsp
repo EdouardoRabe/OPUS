@@ -51,8 +51,8 @@
         UserEJB u = UserEJBClient.lookupUserEJBBeanLocal();
         String ret = u.createUtilisateurs(loginuser, pwduser, nomuser, adruser, teluser, idrole, profil);
 
-        // redirect back to login with success flag
-        response.sendRedirect(request.getContextPath() + "/index.jsp?inscription=success");
+        // redirect to attente validation
+        response.sendRedirect("attenteValidation.jsp");
         return;
 
     } catch (Exception e) {

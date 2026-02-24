@@ -46,80 +46,40 @@
 
         <div class="login-card" style="position: relative; z-index: 1;">
           <h2 style="font-family: var(--font-serif); font-size: 2rem; color: var(--itu-dark); margin-bottom: 0.4rem; font-weight: 700;">Bienvenue</h2>
-          <p style="color: var(--gray-500); font-size: 0.95rem; margin-bottom: 1.75rem;">Accédez à votre espace privilégié OPUS</p>
+          <p style="color: var(--gray-500); font-size: 0.95rem; margin-bottom: 1.5rem;">Accédez à votre espace privilégié OPUS</p>
 
-          <!-- TABS -->
-          <div class="login-tabs">
-            <button class="login-tab active" onclick="switchTab('login', event)">Connexion</button>
-            <button class="login-tab" onclick="switchTab('register', event)">Inscription</button>
-          </div>
+          <div class="section-divider-label">Connexion</div>
 
           <!-- LOGIN FORM -->
           <div id="login-form">
-            <form action="<%=but%>" method="post">
+            <form action="<%=but%>" method="post" autocomplete="off">
               <div class="form-group">
-                <label>Identifiant</label>
-                <div class="input-position-relative">
-                  <input type="text" name="identifiant" class="form-control-custom" placeholder="Numéro ETU" style="padding-right:90px;" required />
-                  <span id="login-id-badge" style="background:var(--gray-200); color:var(--gray-500);">ETU</span>
+                <label class="field-label">Identifiant</label>
+                <div class="input-icon-wrap">
+                  <span class="glyphicon glyphicon-user input-icon"></span>
+                  <input type="text" name="identifiant" class="form-control-custom with-icon" placeholder="Numéro ETU ou e-mail" required />
                 </div>
                 <div class="info-badge">
-                  <i class="fa fa-info-circle"></i> Utilisez votre <em>e-mail</em> ou <em>identifiant</em> (ex: <strong>ETU003356</strong>)
+                  <i class="fa fa-info-circle"></i> Ex&nbsp;: <strong>ETU003356</strong> ou votre adresse e-mail
                 </div>
               </div>
-              <div class="form-group">
-                <label>Mot de passe</label>
-                <input type="password" name="passe" class="form-control-custom" placeholder="••••••••" required />
+              <div class="form-group" style="margin-bottom: 2rem;">
+                <label class="field-label">Mot de passe</label>
+                <div class="input-icon-wrap">
+                  <span class="glyphicon glyphicon-lock input-icon"></span>
+                  <input type="password" name="passe" class="form-control-custom with-icon" placeholder="••••••••" required />
+                </div>
               </div>
-              <div class="forgot">Mot de passe oublié ?</div>
-              <button type="submit" class="btn btn-primary btn-block" id="login-btn" style="padding: 0.85rem; font-size: 1rem; font-weight: 700;">
-                <span id="login-btn-text">Se connecter</span> <i class="fa fa-arrow-right" style="margin-left: 8px;"></i>
+              <button type="submit" class="btn-login" id="login-btn">
+                Se connecter <i class="fa fa-arrow-right"></i>
               </button>
             </form>
-            <div class="text-center" style="margin-top:1rem;">
-              <em>Pas encore de compte ? <a href="${pageContext.request.contextPath}/pages/inscription.jsp">Inscrivez-vous</a></em>
-            </div>
-          </div>
-
-          <!-- REGISTER FORM -->
-          <div id="register-form" style="display: none;">
-            <form action="#" method="post" onsubmit="return false;">
-              <div class="row">
-                <div class="col-xs-6 form-group">
-                  <label>Prénom</label>
-                  <input type="text" class="form-control-custom" placeholder="Jean" required />
-                </div>
-                <div class="col-xs-6 form-group">
-                  <label>Nom</label>
-                  <input type="text" class="form-control-custom" placeholder="Dupont" required />
-                </div>
-              </div>
-              <div class="form-group">
-                <label>E-mail universitaire</label>
-                <input type="email" class="form-control-custom" placeholder="jean.dupont@opus.edu" required />
-              </div>
-              <div class="form-group">
-                <label>Numéro ETU</label>
-                <div class="input-position-relative">
-                  <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:0.76rem;font-weight:700;letter-spacing:0.08em;color:var(--itu-blue);pointer-events:none;">ETU</span>
-                  <input type="text" class="form-control-custom" placeholder="Ex: 003356" style="padding-left:52px;" required />
-                </div>
-              </div>
-              <div class="form-group">
-                <label>Promotion (année)</label>
-                <input type="text" class="form-control-custom" placeholder="Ex: 2022" required />
-              </div>
-              <div class="form-group">
-                <label>Mot de passe</label>
-                <input type="password" class="form-control-custom" placeholder="Min. 8 caractères" required />
-              </div>
-              <button type="button" class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1rem; font-weight: 700;" onclick="alert('L\'inscription sera intégrée ultérieurement')">
-                Créer mon compte <i class="fa fa-arrow-right" style="margin-left: 8px;"></i>
-              </button>
-              <p style="font-size: 0.78rem; color: var(--gray-500); margin-top: 1rem; text-align: center;">
-                <em>L'inscription sera disponible très prochainement</em>
-              </p>
-            </form>
+            <p style="text-align:center; margin-top:1.25rem; font-size:0.88rem; color:var(--gray-500);">
+              Pas encore de compte ?
+              <a href="${pageContext.request.contextPath}/pages/inscription.jsp" style="color:var(--itu-blue); font-weight:600; text-decoration:none;">
+                Créer un compte
+              </a>
+            </p>
           </div>
         </div>
       </div>
@@ -131,62 +91,17 @@
     <script src="${pageContext.request.contextPath}/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
 
     <script>
-      // show success message if redirected after registration
-      (function(){
-        var params = new URLSearchParams(window.location.search);
-        if(params.get('inscription') === 'success'){
-          Swal.fire({
-            title: 'Inscription réussie',
-            text: 'Vous pouvez maintenant vous connecter.',
-            icon: 'success',
-            confirmButtonText: 'OK'
+      // Effet focus sur le bouton de connexion
+      (function () {
+        var btn = document.getElementById('login-btn');
+        var form = btn ? btn.closest('form') : null;
+        if (form) {
+          form.addEventListener('submit', function () {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Connexion…';
           });
-          // remove param from URL without reloading
-          params.delete('inscription');
-          var newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
-          window.history.replaceState({}, '', newUrl);
         }
       })();
-
-      // Fonction pour basculer entre les onglets
-      function switchTab(tab, event) {
-        if (event) {
-          event.preventDefault();
-        }
-
-        // Masquer les deux formulaires
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('register-form').style.display = 'none';
-
-        // Désactiver tous les onglets
-        document.querySelectorAll('.login-tab').forEach(function (t) {
-          t.classList.remove('active');
-        });
-
-        // Afficher le formulaire sélectionné
-        if (tab === 'login') {
-          document.getElementById('login-form').style.display = 'block';
-        } else if (tab === 'register') {
-          document.getElementById('register-form').style.display = 'block';
-        }
-
-        // Activer l'onglet cliqué
-        event.target.classList.add('active');
-      }
-
-      // Badge de type identifiant
-      const loginInput = document.querySelector('input[name="identifiant"]');
-      const loginBadge = document.getElementById('login-id-badge');
-
-      if (loginInput) {
-        loginInput.addEventListener('input', function () {
-          const val = this.value.trim();
-          const isETU = /^ETU/i.test(val) || (/^\d/.test(val) && val.length <= 10);
-          loginBadge.textContent = isETU ? 'ETU' : 'EMAIL';
-          loginBadge.style.background = isETU ? 'rgba(91,35,255,0.12)' : 'var(--gray-200)';
-          loginBadge.style.color = isETU ? 'var(--itu-blue)' : 'var(--gray-500)';
-        });
-      }
     </script>
 
     <%
@@ -199,19 +114,6 @@
             title: "Oups !",
             text: "<%= loginError.replace("\"", "\\\"") %>",
             icon: "error",
-            confirmButtonText: "OK"
-        });
-    </script>
-    <%
-        }
-        String insc = request.getParameter("inscription");
-        if("success".equals(insc)){
-    %>
-    <script>
-        Swal.fire({
-            title: "Bravo !",
-            text: "Inscription réussie, vous pouvez maintenant vous connecter.",
-            icon: "success",
             confirmButtonText: "OK"
         });
     </script>
