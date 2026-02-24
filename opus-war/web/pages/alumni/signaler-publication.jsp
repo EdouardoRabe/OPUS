@@ -293,7 +293,7 @@
         .then(function(d) {
             if (d.success) {
                 alert("Merci pour votre signalement. Nous utilisons vos retours pour améliorer la plateforme et détecter les contenus inappropriés.");
-                window.location.href = '<%= ctx %>/'; // Redirige vers l'accueil
+                window.location.href = '<%= ctx %>/page/acceuil.jsp'; // Redirige vers l'accueil
             } else {
                 alert(d.error || 'Erreur inconnue');
                 btn.disabled = false;
