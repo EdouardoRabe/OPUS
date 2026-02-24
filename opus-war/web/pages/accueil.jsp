@@ -15,6 +15,10 @@
 <%@ page import="alumni.Evenement" %>
 <%@ page import="alumni.Identification" %>
 <%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.Statement" %>
+<%@ page import="java.sql.ResultSet" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
 <%
@@ -23,12 +27,6 @@
     int refuserConnecte = mapFil.getRefuser();
     String nomConnecte = mapFil.getNomuser() != null ? mapFil.getNomuser() : "";
     String ctx = request.getContextPath();
-    // --- Feed seed (variation d'ordre a chaque nouvelle session de navigation) ---
-    Integer feedSeed = (Integer) session.getAttribute("feedSeed");
-    if (feedSeed == null) {
-        feedSeed = new java.util.Random().nextInt(10000);
-        session.setAttribute("feedSeed", feedSeed);
-    }
     // Initiales du user connecte
     String[] _partsConn = nomConnecte.trim().split("\\s+");
     String initialConnecte = (_partsConn.length > 0 && _partsConn[0].length() > 0)
@@ -200,14 +198,32 @@
                     }
                 }
 
-                // Charger les 10 premieres publications (cursor-based)
-                int _feedOffset = feedSeed % 6;
-                Publication[] pubs = (Publication[]) CGenUtil.rechercher(
-                        new Publication(), null, null, conn,
-                        " and etat = 1 order by daty desc, heure desc, idpublication desc limit 10 offset " + _feedOffset);
-                if (pubs == null) pubs = new Publication[0];
+                // --- Score feed : interactions + recence - vues (1 requete JDBC, leger) ---
+                // Score = reactions*2 + commentaires*3 - vues_user*4 + bonus_recence
+                String _sE =
+                    "COALESCE((SELECT COUNT(*) FROM publicationreaction pr WHERE pr.idpublication=p.idpublication),0)*2"
+                    + "+COALESCE((SELECT COUNT(*) FROM publicationcommentaire pc WHERE pc.idpublication=p.idpublication AND pc.etat=1),0)*3"
+                    + "-COALESCE((SELECT pv.nbvue FROM publicationvue pv WHERE pv.idpublication=p.idpublication AND pv.idutilisateur=" + refuserConnecte + "),0)*4"
+                    + "+CASE WHEN p.daty::date=CURRENT_DATE THEN 15 WHEN p.daty::date>=CURRENT_DATE-7 THEN 8 WHEN p.daty::date>=CURRENT_DATE-30 THEN 3 ELSE 0 END";
+                String _initSql = "SELECT p.idpublication,(" + _sE + ") AS score FROM publication p WHERE p.etat=1 ORDER BY score DESC,p.idpublication DESC LIMIT 10";
+                List _pids = new ArrayList(); List _pscores = new ArrayList();
+                Statement _st = null; ResultSet _rs = null;
+                try {
+                    _st = conn.createStatement(); _rs = _st.executeQuery(_initSql);
+                    while (_rs.next()) { _pids.add(_rs.getString("idpublication")); _pscores.add(new Integer(_rs.getInt("score"))); }
+                } finally {
+                    if (_rs != null) try { _rs.close(); } catch (Exception _x) {}
+                    if (_st != null) try { _st.close(); } catch (Exception _x) {}
+                }
+                Publication[] pubs = new Publication[_pids.size()];
+                for (int _i = 0; _i < _pids.size(); _i++) {
+                    Publication[] _pa = (Publication[]) CGenUtil.rechercher(new Publication(), null, null, conn, " and idpublication='" + _pids.get(_i) + "'");
+                    pubs[_i] = (_pa != null && _pa.length > 0) ? _pa[0] : new Publication();
+                }
+                String _lastScore = _pscores.isEmpty() ? "0" : _pscores.get(_pscores.size()-1).toString();
 
                 // Passer les données au composant via request attributes
+                request.setAttribute("_pub_lastScore", _lastScore);
                 request.setAttribute("_pub_pubs", pubs);
                 request.setAttribute("_pub_userNames", userNames);
                 request.setAttribute("_pub_userPhotos", userPhotos);
@@ -1590,8 +1606,7 @@
                 return;
             }
 
-            var daty  = cursor.getAttribute('data-daty');
-            var heure = cursor.getAttribute('data-heure');
+            var score = cursor.getAttribute('data-score');
             var id    = cursor.getAttribute('data-id');
             if (!id) return;
 
@@ -1599,8 +1614,7 @@
             loader.style.display = 'block';
 
             var url = CTX + '/pages/alumni/ajax/charger-feed.jsp'
-                + '?cursor_daty='  + encodeURIComponent(daty)
-                + '&cursor_heure=' + encodeURIComponent(heure)
+                + '?cursor_score=' + encodeURIComponent(score)
                 + '&cursor_id='    + encodeURIComponent(id);
 
             fetch(url)
@@ -1615,8 +1629,7 @@
                     // Lire le meta (curseur suivant)
                     var meta = tmp.querySelector('#feed-meta-new');
                     if (meta) {
-                        cursor.setAttribute('data-daty',     meta.getAttribute('data-daty')     || '');
-                        cursor.setAttribute('data-heure',    meta.getAttribute('data-heure')    || '');
+                        cursor.setAttribute('data-score',    meta.getAttribute('data-score')    || '0');
                         cursor.setAttribute('data-id',       meta.getAttribute('data-id')       || '');
                         cursor.setAttribute('data-has-more', meta.getAttribute('data-has-more') || 'false');
                         meta.parentNode.removeChild(meta);
@@ -1632,6 +1645,7 @@
                     cards.forEach(function(card) {
                         feed.insertBefore(card, sentinel);
                     });
+                    observeViewCards(feed);
 
                     // Plus rien a charger
                     if (cursor.getAttribute('data-has-more') !== 'true') {
@@ -1651,5 +1665,29 @@
         }, { rootMargin: '300px' });
 
         observer.observe(sentinel);
+
+        // --- Suivi des vues (tire le score vers le bas apres lecture) ---
+        var vued = {};
+        function observeViewCards(container) {
+            var vueObs = new IntersectionObserver(function(entries) {
+                entries.forEach(function(e) {
+                    if (!e.isIntersecting) return;
+                    var pid = e.target.id ? e.target.id.replace('pub-', '') : null;
+                    if (!pid || vued[pid]) return;
+                    vued[pid] = true;
+                    vueObs.unobserve(e.target);
+                    fetch(CTX + '/pages/alumni/ajax/marquer-vue.jsp', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: 'idpublication=' + encodeURIComponent(pid)
+                    });
+                });
+            }, {threshold: 0.5});
+            (container || document).querySelectorAll('.fa-post-card:not([data-vue-ok])').forEach(function(c) {
+                c.setAttribute('data-vue-ok', '1');
+                vueObs.observe(c);
+            });
+        }
+        observeViewCards();
     })();
 </script>

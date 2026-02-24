@@ -16,14 +16,10 @@
 <%@ page import="java.util.HashMap" %>
 <%
     // =========================================================
-    // AJAX : Chargement progressif du fil d'actualite (cursor-based)
+    // AJAX : Chargement progressif du fil d'actualite (score-based)
     // Parametres GET :
-    //   cursor_daty  = derniere date vue (YYYY-MM-DD)
-    //   cursor_heure = derniere heure vue (HH:MM:SS)
-    //   cursor_id    = dernier idpublication vu
-    // Retourne du HTML :
-    //   1. <div id="feed-meta-new"> avec data-daty, data-heure, data-id, data-has-more
-    //   2. Les cartes .fa-post-card suivantes
+    //   cursor_score = score de la derniere publication affichee
+    //   cursor_id    = idpublication de la derniere publication affichee
     // =========================================================
 
     UserEJB uFeed = (UserEJB) session.getAttribute("u");
@@ -42,18 +38,14 @@
         initialConnecte += Character.toUpperCase(_partsConn[_partsConn.length - 1].charAt(0));
 
     // --- Lecture et sanitisation des parametres curseur ---
-    String cursorDaty  = request.getParameter("cursor_daty");
-    String cursorHeure = request.getParameter("cursor_heure");
-    String cursorId    = request.getParameter("cursor_id");
+    String cursorScoreStr = request.getParameter("cursor_score");
+    String cursorId       = request.getParameter("cursor_id");
 
-    if (cursorDaty == null || cursorId == null || cursorId.trim().isEmpty()) {
-        return;
-    }
+    if (cursorId == null || cursorId.trim().isEmpty()) { return; }
 
-    cursorDaty  = cursorDaty.replaceAll("[^0-9\\-]", "");
-    cursorHeure = (cursorHeure != null ? cursorHeure.replaceAll("[^0-9:]", "") : "23:59:59");
-    if (cursorHeure.isEmpty()) cursorHeure = "23:59:59";
-    cursorId    = cursorId.replaceAll("[^A-Za-z0-9]", "");
+    cursorId = cursorId.replaceAll("[^A-Za-z0-9]", "");
+    int cursorScore = 0;
+    try { cursorScore = Integer.parseInt(cursorScoreStr != null ? cursorScoreStr.replaceAll("[^0-9\\-]", "") : "0"); } catch (NumberFormatException _nfe) {}
 
     Connection conn = null;
     try {
@@ -92,33 +84,45 @@
                 _connPhotoUrl = ctx + "/" + _myProfils[0].getPhotoProfil().trim();
         }
 
-        // --- Requete cursor-based (simple, tri par date) ---
-        String whereClause = " and etat = 1"
-                + " and (daty < '" + cursorDaty + "'"
-                + " OR (daty = '" + cursorDaty + "' AND heure < '" + cursorHeure + "')"
-                + " OR (daty = '" + cursorDaty + "' AND heure = '" + cursorHeure + "' AND idpublication < '" + cursorId + "'))"
-                + " order by daty desc, heure desc, idpublication desc limit 10";
-
-        Publication[] pubs = (Publication[]) CGenUtil.rechercher(
-                new Publication(), null, null, conn, whereClause);
-        if (pubs == null) pubs = new Publication[0];
-
+        // --- Requete score-based avec curseur ---
+        String _sC =
+            "COALESCE((SELECT COUNT(*) FROM publicationreaction pr WHERE pr.idpublication=p.idpublication),0)*2"
+            + "+COALESCE((SELECT COUNT(*) FROM publicationcommentaire pc WHERE pc.idpublication=p.idpublication AND pc.etat=1),0)*3"
+            + "-COALESCE((SELECT pv.nbvue FROM publicationvue pv WHERE pv.idpublication=p.idpublication AND pv.idutilisateur=" + refuserConnecte + "),0)*4"
+            + "+CASE WHEN p.daty::date=CURRENT_DATE THEN 15 WHEN p.daty::date>=CURRENT_DATE-7 THEN 8 WHEN p.daty::date>=CURRENT_DATE-30 THEN 3 ELSE 0 END";
+        String _pSql =
+            "SELECT sub.idpublication, sub.score FROM ("
+            + "  SELECT p.idpublication,(" + _sC + ") AS score FROM publication p WHERE p.etat=1"
+            + ") sub WHERE sub.score < " + cursorScore
+            + " OR (sub.score = " + cursorScore + " AND sub.idpublication < '" + cursorId + "')"
+            + " ORDER BY sub.score DESC, sub.idpublication DESC LIMIT 10";
+        java.util.List _pids = new java.util.ArrayList();
+        java.util.List _pscores = new java.util.ArrayList();
+        java.sql.Statement _st = null; java.sql.ResultSet _rs = null;
+        try {
+            _st = conn.createStatement(); _rs = _st.executeQuery(_pSql);
+            while (_rs.next()) { _pids.add(_rs.getString("idpublication")); _pscores.add(new Integer(_rs.getInt("score"))); }
+        } finally {
+            if (_rs != null) try { _rs.close(); } catch (Exception _x) {}
+            if (_st != null) try { _st.close(); } catch (Exception _x) {}
+        }
+        Publication[] pubs = new Publication[_pids.size()];
+        for (int _i = 0; _i < _pids.size(); _i++) {
+            Publication[] _pa = (Publication[]) CGenUtil.rechercher(new Publication(), null, null, conn, " and idpublication='" + _pids.get(_i) + "'");
+            pubs[_i] = (_pa != null && _pa.length > 0) ? _pa[0] : new Publication();
+        }
         // --- Curseur suivant ---
-        String nextDaty  = "";
-        String nextHeure = "";
         String nextId    = "";
-        boolean hasMore  = (pubs.length == 10);
-        if (pubs.length > 0) {
-            Publication lastPub = pubs[pubs.length - 1];
-            nextDaty  = lastPub.getDaty()  != null ? lastPub.getDaty().toString() : "";
-            nextHeure = lastPub.getHeure() != null ? lastPub.getHeure()           : "";
-            nextId    = lastPub.getIdpublication();
+        int    nextScore = 0;
+        boolean hasMore  = (_pids.size() == 10);
+        if (!_pids.isEmpty()) {
+            nextId    = (String) _pids.get(_pids.size()-1);
+            nextScore = ((Integer) _pscores.get(_pscores.size()-1)).intValue();
         }
 %>
 <%-- Element meta : contient le prochain curseur, lu par le JS avant injection --%>
 <div id="feed-meta-new" style="display:none"
-     data-daty="<%= nextDaty %>"
-     data-heure="<%= nextHeure %>"
+     data-score="<%= nextScore %>"
      data-id="<%= nextId %>"
      data-has-more="<%= hasMore %>"></div>
 <%
