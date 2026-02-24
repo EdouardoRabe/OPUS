@@ -53,7 +53,10 @@
     if (_pubCtx == null) _pubCtx = request.getContextPath();
 
     // Variables curseur pour infinite scroll
-    String _lastDaty = "", _lastHeure = "", _lastId = "";
+    String _lastId = "";
+    String _pubLastScore = "0";
+    Object _lsAttr = request.getAttribute("_pub_lastScore");
+    if (_lsAttr != null) _pubLastScore = _lsAttr.toString();
 
     if (_pubPubs.length == 0) {
 %>
@@ -67,9 +70,7 @@
     for (int p = 0; p < _pubPubs.length; p++) {
         Publication pub = _pubPubs[p];
         // Mise a jour curseur
-        _lastDaty  = pub.getDaty()  != null ? pub.getDaty().toString() : _lastDaty;
-        _lastHeure = pub.getHeure() != null ? pub.getHeure()           : _lastHeure;
-        _lastId    = pub.getIdpublication() != null ? pub.getIdpublication() : _lastId;
+        _lastId = pub.getIdpublication() != null ? pub.getIdpublication() : _lastId;
         String idpub = pub.getIdpublication();
         String auteur = (String) _pubUserNames.get(new Integer(pub.getIdutilisateur()));
         if (auteur == null) auteur = "Utilisateur";
@@ -346,8 +347,7 @@
     boolean _hasMore = (_pubPubs.length == 10);
 %>
 <span id="feed-cursor" style="display:none"
-      data-daty="<%= _lastDaty %>"
-      data-heure="<%= _lastHeure %>"
+      data-score="<%= _pubLastScore %>"
       data-id="<%= _lastId %>"
       data-has-more="<%= _hasMore %>"></span>
 <div id="feed-sentinel" style="height:4px;margin:4px 0;"></div>
