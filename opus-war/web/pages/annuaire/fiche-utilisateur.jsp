@@ -137,6 +137,7 @@
     boolean vSpec      = isPublic(champVis, "specialite");
     boolean vExp       = isPublic(champVis, "experience");
     boolean vTel       = isPublic(champVis, "telephone");
+    boolean vGenre     = isPublic(champVis, "genre");
 
     String nom       = (vNom && profil.getNom() != null)            ? profil.getNom()            : "";
     String prenom    = (vPrenom && profil.getPrenom() != null)       ? profil.getPrenom()         : "";
@@ -146,6 +147,8 @@
     String promoLib  = (vPromo && profil.getPromotionLib() != null)  ? profil.getPromotionLib()   : "";
     int promoAnnee   = vPromo                                        ? profil.getPromotionAnnee() : 0;
     String parcLib   = (vParcours && profil.getParcoursLib() != null)? profil.getParcoursLib()    : "";
+    String genreLib  = (vGenre && profil.getGenrelib() != null) ? profil.getGenrelib() : "";
+    String genreId   = (vGenre && profil.getIdgenre()  != null) ? profil.getIdgenre()  : "";
 
     int refuser = profil.getRefuser();
     String loginuser = profil.getLoginuser() != null ? profil.getLoginuser() : "";
@@ -295,6 +298,7 @@
         <div class="fu-section">
             <h2><i class="bi bi-mortarboard-fill"></i> Promotion & Parcours</h2>
             <div class="fu-tags">
+                <% if (!genreLib.isEmpty()) { %><span class="fu-tag" style="background:#f3e8ff;color:#7c3aed;"><i class="bi <%= "GEN000001".equals(genreId) ? "bi-gender-male" : "bi-gender-female" %>"></i>&nbsp;<%= h(genreLib) %></span><% } %>
                 <% if (!promoLib.isEmpty()) { %><span class="fu-tag">🎓&nbsp;<%= h(promoLib) %><%= promoAnnee > 0 ? " (" + promoAnnee + ")" : "" %></span><% } %>
                 <% if (!parcLib.isEmpty()) { %><span class="fu-tag grey">📚&nbsp;<%= h(parcLib) %></span><% } %>
             </div>
@@ -337,6 +341,9 @@
                 <% } %>
                 <% if (vTel && !telephone.isEmpty()) { %>
                 <div class="fu-field"><label>T&eacute;l&eacute;phone</label><span><%= h(telephone) %></span></div>
+                <% } %>
+                <% if (!genreLib.isEmpty()) { %>
+                <div class="fu-field"><label>Genre</label><span><i class="bi <%= "GEN000001".equals(genreId) ? "bi-gender-male" : "bi-gender-female" %>" style="color:#7c3aed;margin-right:4px;"></i><%= h(genreLib) %></span></div>
                 <% } %>
                 <% if (vPromo && !promoLib.isEmpty()) { %>
                 <div class="fu-field"><label>Promotion</label><span><%= h(promoLib) %><%= promoAnnee > 0 ? " (" + promoAnnee + ")" : "" %></span></div>

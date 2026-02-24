@@ -72,6 +72,8 @@
     String _photoCover  = profil != null && profil.getPhotoCouverture()!= null ? profil.getPhotoCouverture(): "";
     String _photoUrl      = _photo.isEmpty()      ? "" : request.getContextPath() + "/" + _photo;
     String _photoCoverUrl = _photoCover.isEmpty() ? "" : request.getContextPath() + "/" + _photoCover;
+    String _genrelib    = profil != null && profil.getGenrelib()       != null ? profil.getGenrelib()       : "";
+    String _idgenre     = profil != null && profil.getIdgenre()        != null ? profil.getIdgenre()        : "";
 %>
 <style>
 .pv-card {
@@ -286,6 +288,7 @@
   <div class="pv-section">
     <h2>Promotion & Parcours</h2>
     <div class="pv-tags">
+      <span class="pv-tag" style="background:#f3e8ff;color:#7c3aed;" id="pvGenreTag"><i class="bi" id="pvGenreIcon"></i> <span id="pvGenreText">—</span></span>
       <span class="pv-tag"      id="pvPromoTag">—</span>
       <span class="pv-tag grey" id="pvParcoursTag">—</span>
     </div>
@@ -338,6 +341,7 @@
     <div class="pv-grid">
       <div class="pv-field"><label>Nom</label>              <span id="fi-nom">—</span></div>
       <div class="pv-field"><label>Prénom</label>           <span id="fi-prenom">—</span></div>
+      <div class="pv-field"><label>Genre</label>             <span id="fi-genre"><i class="bi" id="fi-genre-icon" style="color:#7c3aed;margin-right:4px;"></i><span id="fi-genre-text">—</span></span></div>
       <div class="pv-field"><label>Date de naissance</label><span id="fi-dtn">—</span></div>
       <div class="pv-field"><label>Téléphone</label>        <span id="fi-tel">—</span></div>
       <div class="pv-field"><label>Email</label>            <span id="fi-email">—</span></div>
@@ -402,7 +406,9 @@
     idparcours   : "<%= _idparcours %>",
     parcoursLib  : "<%= _parcourslib %>",
     photo        : "<%= _photoUrl %>",
-    photoCover   : "<%= _photoCoverUrl %>"
+    photoCover   : "<%= _photoCoverUrl %>",
+    genreLib     : "<%= _genrelib %>",
+    idgenre      : "<%= _idgenre %>"
   };
 
   /* Cover */
@@ -429,12 +435,20 @@
   document.getElementById("pvPhone").textContent    = "📞 " + p.telephone;
 
   /* Tags */
+  if (p.genreLib) {
+    document.getElementById("pvGenreText").textContent = p.genreLib;
+    document.getElementById("pvGenreIcon").className = "bi " + (p.idgenre === "GEN000001" ? "bi-gender-male" : "bi-gender-female");
+  } else {
+    document.getElementById("pvGenreTag").style.display = "none";
+  }
   document.getElementById("pvPromoTag").textContent    = "🎓 " + p.promotionLib;
   document.getElementById("pvParcoursTag").textContent = "📚 " + p.parcoursLib;
 
   /* Grille */
   document.getElementById("fi-nom").textContent      = p.nom;
   document.getElementById("fi-prenom").textContent   = p.prenom;
+  document.getElementById("fi-genre-text").textContent = p.genreLib || "—";
+  if (p.idgenre) document.getElementById("fi-genre-icon").className = "bi " + (p.idgenre === "GEN000001" ? "bi-gender-male" : "bi-gender-female");
   document.getElementById("fi-dtn").textContent      = p.dtn ? p.dtn.split("-").reverse().join("/") : "";
   document.getElementById("fi-tel").textContent      = p.telephone;
   document.getElementById("fi-email").textContent    = p.email;

@@ -61,6 +61,7 @@
     String qEntreprise = request.getParameter("entreprise");
     String qPoste      = request.getParameter("poste");
     String qAnnee      = request.getParameter("annee");
+    String qGenre      = request.getParameter("genre");
     String pageParam   = request.getParameter("page");
 
     // Specialites = multi-select → plusieurs valeurs
@@ -79,8 +80,9 @@
     boolean hasEntreprise = qEntreprise != null && !qEntreprise.trim().isEmpty();
     boolean hasPoste      = qPoste != null && !qPoste.trim().isEmpty();
     boolean hasAnnee      = qAnnee != null && !qAnnee.trim().isEmpty();
+    boolean hasGenre      = qGenre != null && !qGenre.trim().isEmpty();
     boolean hasSpecialite = qSpecialites != null && qSpecialites.length > 0 && !(qSpecialites.length == 1 && qSpecialites[0].isEmpty());
-    boolean hasAdvanced   = hasPromotion || hasParcours || hasSpecialite || hasAnnee || hasEntreprise || hasPoste || hasPrenom || hasRefuser;
+    boolean hasAdvanced   = hasPromotion || hasParcours || hasSpecialite || hasAnnee || hasEntreprise || hasPoste || hasPrenom || hasRefuser || hasGenre;
 
     // Set des specialites selectionnees (pour le multi-select)
     Set selectedSpecs = new HashSet();
@@ -155,6 +157,9 @@
                 int annee = Integer.parseInt(qAnnee.trim());
                 where.append(" and promotionannee=").append(annee);
             } catch (Exception ignored) {}
+        }
+        if (hasGenre) {
+            where.append(" and idgenre='").append(qGenre.trim().replace("'","''")).append("'");
         }
         where.append(" order by nom, prenom");
 
@@ -292,6 +297,7 @@
     if (hasAnnee)      baseUrl.append("&annee=").append(ue(qAnnee.trim()));
     if (hasEntreprise) baseUrl.append("&entreprise=").append(ue(qEntreprise.trim()));
     if (hasPoste)      baseUrl.append("&poste=").append(ue(qPoste.trim()));
+    if (hasGenre)      baseUrl.append("&genre=").append(ue(qGenre.trim()));
     if (hasSpecialite) {
         java.util.Iterator specIt = selectedSpecs.iterator();
         while (specIt.hasNext()) baseUrl.append("&specialite=").append(ue((String) specIt.next()));
@@ -488,6 +494,14 @@
                             </select>
                         </div>
                         <div class="an-filter-group">
+                            <label>Genre</label>
+                            <select name="genre">
+                                <option value="">Tous</option>
+                                <option value="GEN000001"<%= (hasGenre && "GEN000001".equals(qGenre.trim())) ? " selected" : "" %>>Homme</option>
+                                <option value="GEN000002"<%= (hasGenre && "GEN000002".equals(qGenre.trim())) ? " selected" : "" %>>Femme</option>
+                            </select>
+                        </div>
+                        <div class="an-filter-group">
                             <label>Ann&eacute;e</label>
                             <input type="number" name="annee" placeholder="Ex: 2024" min="1990" max="2030"
                                    value="<%= h(hasAnnee ? qAnnee.trim() : "") %>">
@@ -564,6 +578,7 @@
             %><span class="an-filter-badge"><%= h(sLabel) %></span><%
                 }
             } %>
+            <% if (hasGenre) { %><span class="an-filter-badge"><i class="bi <%= "GEN000001".equals(qGenre.trim()) ? "bi-gender-male" : "bi-gender-female" %>"></i> <%= "GEN000001".equals(qGenre.trim()) ? "Homme" : "Femme" %></span><% } %>
             <% if (hasAnnee) { %><span class="an-filter-badge">Ann&eacute;e : <%= h(qAnnee.trim()) %></span><% } %>
             <% if (hasEntreprise) { %><span class="an-filter-badge">Entreprise : <%= h(qEntreprise.trim()) %></span><% } %>
             <% if (hasPoste) { %><span class="an-filter-badge">Poste : <%= h(qPoste.trim()) %></span><% } %>
@@ -597,6 +612,7 @@
             boolean vSpec      = isSelf || isPublic(visMap, pid, "specialite");
             boolean vExp       = isSelf || isPublic(visMap, pid, "experience");
             boolean vTel       = isSelf || isPublic(visMap, pid, "telephone");
+            boolean vGenre     = isSelf || isPublic(visMap, pid, "genre");
 
             String nom       = (vNom && p.getNom() != null) ? p.getNom() : "";
             String prenom    = (vPrenom && p.getPrenom() != null) ? p.getPrenom() : "";
@@ -605,6 +621,8 @@
             String promoLib  = (vPromo && p.getPromotionLib() != null) ? p.getPromotionLib() : "";
             int    promoAn   = vPromo ? p.getPromotionAnnee() : 0;
             String parcLib   = (vParcours && p.getParcoursLib() != null) ? p.getParcoursLib() : "";
+            String genreLib  = (vGenre && p.getGenrelib() != null) ? p.getGenrelib() : "";
+            String genreId   = (vGenre && p.getIdgenre() != null)  ? p.getIdgenre()  : "";
 
             // Si nom cache -> afficher loginuser
             String displayName;
@@ -662,6 +680,7 @@
                     <div class="an-card-name"><a href="<%= h(profilLink) %>"><%= h(displayName) %></a></div>
                     <div class="an-card-headline"><%= h(headline) %></div>
                     <div class="an-card-meta">
+                        <% if (!genreLib.isEmpty()) { %><span class="an-card-tag" style="background:#f3e8ff;color:#7c3aed;"><i class="bi <%= "GEN000001".equals(genreId) ? "bi-gender-male" : "bi-gender-female" %>"></i> <%= h(genreLib) %></span><% } %>
                         <% if (!promoLib.isEmpty()) { %><span class="an-card-tag promo"><%= h(promoLib) %><%= promoAn > 0 ? " " + promoAn : "" %></span><% } %>
                         <% if (!parcLib.isEmpty()) { %><span class="an-card-tag"><%= h(parcLib) %></span><% } %>
                         <% for (int s = 0; s < specsArr.length && s < 2; s++) { %><span class="an-card-tag spec"><%= h(specsArr[s]) %></span><% } %>

@@ -14,6 +14,7 @@
     String idpromotion   = "";
     String idparcours    = "";
     String idutilisateur = "";
+    String idgenre       = "";
 
     try {
         Profil t = new Profil();
@@ -31,6 +32,7 @@
         pu.getFormu().getChamp("idpromotion").setVisible(false);
         pu.getFormu().getChamp("idparcours").setVisible(false);
         pu.getFormu().getChamp("idutilisateur").setVisible(false);
+        pu.getFormu().getChamp("idgenre").setVisible(false);
 
         pu.preparerDataFormu();
         id           = pu.getBase().getTuppleID();
@@ -38,6 +40,7 @@
         idpromotion   = base.getIdpromotion()   != null ? base.getIdpromotion()   : "";
         idparcours    = base.getIdparcours()    != null ? base.getIdparcours()    : "";
         idutilisateur = String.valueOf(base.getIdutilisateur());
+        idgenre       = base.getIdgenre()       != null ? base.getIdgenre()       : "";
         htmlForm = pu.getFormu().getHtmlInsert();
     } catch (Exception e) {
         e.printStackTrace();
@@ -68,6 +71,7 @@
                         <input type="hidden" name="idpromotion"   value="<%= idpromotion %>">
                         <input type="hidden" name="idparcours"    value="<%= idparcours %>">
                         <input type="hidden" name="idutilisateur" value="<%= idutilisateur %>">
+                        <input type="hidden" name="idgenre"       value="<%= idgenre %>">
 
                         <div class="row">
                             <div class="col-md-11">
