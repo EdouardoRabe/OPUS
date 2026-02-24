@@ -55,39 +55,104 @@
           <p style="color: var(--gray-500); font-size: 0.95rem; margin-bottom: 1.75rem;">Rejoignez la communauté OPUS en quelques clics. <br>
           Toute inscription est soumise à validation par les modérateurs.</p>
 
+          <div class="steps-track">
+            <div class="step-item active">
+              <div class="step-circle"><span class="glyphicon glyphicon-lock"></span></div>
+              <span class="step-name">Identifiants</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item inactive">
+              <div class="step-circle"></div>
+              <span class="step-name">Profil</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item inactive">
+              <div class="step-circle"></div>
+              <span class="step-name">Validation</span>
+            </div>
+          </div>
+
           <!-- REGISTER FORM - STEP 1 -->
-          <div id="register-form" style="display:block;">
-            <form action="detailsInscription.jsp" method="post">
+          <div id="register-form">
+            <form action="detailsInscription.jsp" method="post" autocomplete="off">
               <div class="form-group">
-                <label>Numéro ETU <span style="color:red">*</span></label>
-                <div class="input-position-relative">
-                  <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:0.76rem;font-weight:700;letter-spacing:0.08em;color:var(--itu-blue);pointer-events:none;">ETU</span>
-                  <input type="text" name="etu" class="form-control-custom" placeholder="Ex: 003356" style="padding-left:52px;" required />
+                <label class="field-label">Numéro ETU <span style="color:red">*</span></label>
+                <div class="input-icon-wrap">
+                  <span class="glyphicon glyphicon-education input-icon"></span>
+                  <input type="text" name="etu" class="form-control-custom with-icon" placeholder="Ex: ETU003356" required />
                 </div>
               </div>
-              <div class="form-group">
-                <label>Mot de passe <span style="color:red">*</span></label>
-                <input type="password" name="password" class="form-control-custom" placeholder="Min. 8 caractères" required />
+              <div class="form-group" style="margin-bottom: 0.75rem;">
+                <label class="field-label">Mot de passe <span style="color:red">*</span></label>
+                <div class="input-icon-wrap">
+                  <span class="glyphicon glyphicon-lock input-icon"></span>
+                  <input type="password" id="pwd" name="password" class="form-control-custom with-icon" placeholder="Min. 8 caractères" required />
+                </div>
+                <div class="info-badge"><i class="fa fa-info-circle"></i> Minimum 8 caractères</div>
               </div>
-              <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1rem; font-weight: 700;">
-                Continuer <i class="fa fa-arrow-right" style="margin-left: 8px;"></i>
+              <div class="form-group" style="margin-bottom: 2rem;">
+                <label class="field-label">Confirmer le mot de passe <span style="color:red">*</span></label>
+                <div class="input-icon-wrap">
+                  <span class="glyphicon glyphicon-lock input-icon"></span>
+                  <input type="password" id="pwd-confirm" class="form-control-custom with-icon" placeholder="Répétez votre mot de passe" required />
+                </div>
+                <div id="pwd-feedback"></div>
+              </div>
+              <button type="submit" class="btn-login">
+                Continuer <i class="fa fa-arrow-right"></i>
               </button>
-              <p style="font-size: 0.78rem; color: var(--gray-500); margin-top: 1rem; text-align: center;">
-                <em>Vous serez redirigé pour compléter votre profil</em>
-              </p>
             </form>
-            <p class="text-center" style="margin-top:1rem;">
-              <a href="${pageContext.request.contextPath}/index.jsp">Retour à la connexion</a>
+            <p style="text-align:center; margin-top:1.25rem; font-size:0.88rem; color:var(--gray-500);">
+              Déjà un compte ?
+              <a href="${pageContext.request.contextPath}/index.jsp" style="color:var(--itu-blue); font-weight:600; text-decoration:none;">Se connecter</a>
             </p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- jQuery 2.1.4 -->
     <script src="${pageContext.request.contextPath}/plugins/jQuery/jQuery-2.1.4.min.js" type="text/javascript"></script>
     <!-- Bootstrap 3.3.2 JS -->
     <script src="${pageContext.request.contextPath}/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+
+    <script>
+      (function () {
+        var pwd     = document.getElementById('pwd');
+        var confirm = document.getElementById('pwd-confirm');
+        var feedback = document.getElementById('pwd-feedback');
+        var btn     = document.querySelector('.btn-login');
+        var form    = document.querySelector('#register-form form');
+
+        function check() {
+          var p = pwd.value;
+          var c = confirm.value;
+          if (!c) { feedback.innerHTML = ''; return; }
+          if (p === c) {
+            feedback.innerHTML = '<span class="pwd-match-badge match"><span class="glyphicon glyphicon-ok"></span> Les mots de passe correspondent</span>';
+            confirm.style.borderColor = '#16a34a';
+          } else {
+            feedback.innerHTML = '<span class="pwd-match-badge nomatch"><span class="glyphicon glyphicon-remove"></span> Les mots de passe ne correspondent pas</span>';
+            confirm.style.borderColor = '#dc2626';
+          }
+        }
+
+        if (pwd)     pwd.addEventListener('input', check);
+        if (confirm) confirm.addEventListener('input', check);
+
+        if (form) {
+          form.addEventListener('submit', function (e) {
+            if (pwd.value !== confirm.value) {
+              e.preventDefault();
+              confirm.focus();
+              check();
+            } else {
+              btn.disabled = true;
+              btn.innerHTML = '<span class="glyphicon glyphicon-refresh" style="animation:spin .8s linear infinite"></span> Chargement…';
+            }
+          });
+        }
+      })();
+    </script>
 
     <script src="${pageContext.request.contextPath}/assets/js/timer-flottant.js"></script>
   </body>

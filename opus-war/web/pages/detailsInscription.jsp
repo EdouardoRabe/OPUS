@@ -66,73 +66,124 @@
         <div style="position: absolute; bottom: 2rem; right: 2rem; font-family: var(--font-serif); font-size: 8rem; font-weight: 900; color: rgba(0,0,0,0.03); line-height: 1; pointer-events: none; z-index: 0;">OPUS</div>
         <div class="login-card" style="position: relative; z-index: 1;">
           <h2 style="font-family: var(--font-serif); font-size: 2rem; color: var(--itu-dark); margin-bottom: 0.4rem; font-weight: 700;">Finaliser l'inscription</h2>
-          <p style="color: var(--gray-500); font-size: 0.95rem; margin-bottom: 1.75rem;">Complétez les champs ci-dessous.</p>
+          <p style="color: var(--gray-500); font-size: 0.95rem; margin-bottom: 1.5rem;">Complétez les champs ci-dessous.</p>
+
+          <div class="steps-track">
+            <div class="step-item completed">
+              <div class="step-circle"><span class="glyphicon glyphicon-ok"></span></div>
+              <span class="step-name">Identifiants</span>
+            </div>
+            <div class="step-line completed"></div>
+            <div class="step-item active">
+              <div class="step-circle"><span class="glyphicon glyphicon-user"></span></div>
+              <span class="step-name">Profil</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item inactive">
+              <div class="step-circle"></div>
+              <span class="step-name">Validation</span>
+            </div>
+          </div>
 
           <div id="details-form">
             <form id="detailsForm" action="testRegister.jsp" method="post">
               <input type="hidden" name="etu" value="<%= etu %>" />
               <input type="hidden" name="password" value="<%= password %>" />
 
-              <div class="form-group">
-                <label>Parcours <span style="color:red">*</span></label>  
-                <select name="idparcours" class="form-control-custom" onchange="reloadWithParcours(this.value)" required>
-                    <option value="">-- choisissez --</option>
-                    <% for(alumni.Parcours pp : parcoursList){ %>
+              <!-- Parcours + Promotion sur une ligne -->
+              <div class="row">
+                <div class="col-xs-7 form-group">
+                  <label class="field-label">Parcours <span style="color:red">*</span></label>
+                  <div class="input-icon-wrap">
+                    <span class="glyphicon glyphicon-book input-icon"></span>
+                    <select name="idparcours" class="form-control-custom with-icon" onchange="reloadWithParcours(this.value)" required>
+                      <option value="">-- choisissez --</option>
+                      <% for(alumni.Parcours pp : parcoursList){ %>
                         <option value="<%=pp.getIdparcours()%>" <%= pp.getIdparcours().equals(selectedParcours) ? "selected" : "" %>><%=pp.getLibelle()%></option>
-                    <% } %>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label>Promotion <span style="color:red">*</span></label>
-                <select name="idpromotion" class="form-control-custom" required <%= (promoList == null || promoList.length==0) ? "disabled" : "" %> >
-                    <option value="">-- choisissez un parcours d'abord --</option>
-                    <% if(promoList != null && promoList.length > 0) { 
-                        for(alumni.Promotion promo : promoList){ %>
+                      <% } %>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-xs-5 form-group">
+                  <label class="field-label">Promotion <span style="color:red">*</span></label>
+                  <div class="input-icon-wrap">
+                    <span class="glyphicon glyphicon-calendar input-icon"></span>
+                    <select name="idpromotion" class="form-control-custom with-icon" required <%= (promoList == null || promoList.length==0) ? "disabled" : "" %>>
+                      <option value="">-- d'abord --</option>
+                      <% if(promoList != null && promoList.length > 0) {
+                          for(alumni.Promotion promo : promoList){ %>
                         <option value="<%=promo.getIdpromotion()%>"><%=promo.getLibelle()%></option>
-                    <% } } %>
-                </select>
+                      <% } } %>
+                    </select>
+                  </div>
+                </div>
               </div>
 
-              <div class="form-group">
-                <label>Genre <span style="color:red">*</span></label>
-                <select name="idgenre" class="form-control-custom" required>
-                    <option value="">-- choisissez --</option>
-                    <% for(alumni.Genre g : genreList){ %>
-                        <option value="<%=g.getIdgenre()%>" <%= (selectedGenre != null && selectedGenre.equals(g.getIdgenre())) ? "selected" : "" %>><%=g.getLibelle()%></option>
-                    <% } %>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label>E-mail <span style="color:red">*</span></label>
-                <input type="email" name="email" class="form-control-custom" placeholder="jean.dupont@opus.edu" required />
-              </div>
+              <!-- Prénom + Nom -->
               <div class="row">
                 <div class="col-xs-6 form-group">
-                  <label>Prénom <span style="color:red">*</span></label>
-                  <input type="text" name="prenom" class="form-control-custom" placeholder="Jean" required />
+                  <label class="field-label">Prénom <span style="color:red">*</span></label>
+                  <div class="input-icon-wrap">
+                    <span class="glyphicon glyphicon-user input-icon"></span>
+                    <input type="text" name="prenom" class="form-control-custom with-icon" placeholder="Jean" required />
+                  </div>
                 </div>
                 <div class="col-xs-6 form-group">
-                  <label>Nom <span style="color:red">*</span></label>
-                  <input type="text" name="nom" class="form-control-custom" placeholder="Dupont" required />
+                  <label class="field-label">Nom <span style="color:red">*</span></label>
+                  <div class="input-icon-wrap">
+                    <span class="glyphicon glyphicon-user input-icon"></span>
+                    <input type="text" name="nom" class="form-control-custom with-icon" placeholder="Dupont" required />
+                  </div>
                 </div>
               </div>
+
+              <!-- E-mail -->
               <div class="form-group">
-                <label>Date de naissance <span style="color:red">*</span></label>
-                <input type="date" name="dtn" class="form-control-custom" required />
-              </div>
-              <div class="form-group">
-                <label>Téléphone <span style="color:red">*</span></label>
-                <input type="tel" name="telephone" class="form-control-custom" placeholder="06 12 34 56 78" required />
+                <label class="field-label">E-mail <span style="color:red">*</span></label>
+                <div class="input-icon-wrap">
+                  <span class="glyphicon glyphicon-envelope input-icon"></span>
+                  <input type="email" name="email" class="form-control-custom with-icon" placeholder="jean.dupont@opus.edu" required />
+                </div>
               </div>
 
-              <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1rem; font-weight: 700;">
-                Valider l'inscription <i class="fa fa-arrow-right" style="margin-left: 8px;"></i>
+              <!-- Date de naissance + Genre sur une ligne -->
+              <div class="row">
+                <div class="col-xs-7 form-group">
+                  <label class="field-label">Date de naissance <span style="color:red">*</span></label>
+                  <div class="input-icon-wrap">
+                    <span class="glyphicon glyphicon-gift input-icon"></span>
+                    <input type="date" name="dtn" class="form-control-custom with-icon" required />
+                  </div>
+                </div>
+                <div class="col-xs-5 form-group">
+                  <label class="field-label">Genre <span style="color:red">*</span></label>
+                  <div class="input-icon-wrap">
+                    <span class="glyphicon glyphicon-asterisk input-icon"></span>
+                    <select name="idgenre" class="form-control-custom with-icon" required>
+                      <option value="">--</option>
+                      <% for(alumni.Genre g : genreList){ %>
+                        <option value="<%=g.getIdgenre()%>" <%= (selectedGenre != null && selectedGenre.equals(g.getIdgenre())) ? "selected" : "" %>><%=g.getLibelle()%></option>
+                      <% } %>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Téléphone -->
+              <div class="form-group" style="margin-bottom: 2rem;">
+                <label class="field-label">Téléphone <span style="color:red">*</span></label>
+                <div class="input-icon-wrap">
+                  <span class="glyphicon glyphicon-phone input-icon"></span>
+                  <input type="tel" name="telephone" class="form-control-custom with-icon" placeholder="06 12 34 56 78" required />
+                </div>
+              </div>
+
+              <button type="submit" class="btn-login">
+                Valider l'inscription <i class="fa fa-arrow-right"></i>
               </button>
             </form>
-            <p class="text-center" style="margin-top:1rem;">
-              <a href="${pageContext.request.contextPath}/index.jsp">Annuler </a>
+            <p style="text-align:center; margin-top:1.25rem; font-size:0.88rem; color:var(--gray-500);">
+              <a href="${pageContext.request.contextPath}/index.jsp" style="color:var(--gray-500); text-decoration:none;">Annuler et retourner à la connexion</a>
             </p>
           </div>
         </div>
