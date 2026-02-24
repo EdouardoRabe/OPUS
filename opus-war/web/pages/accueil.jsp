@@ -517,11 +517,11 @@
             e.printStackTrace();
         %>
         <div class="fa-error-box">
-            <i class="bi bi-exclamation-triangle-fill"></i>&nbsp;Erreur lors du chargement&nbsp;: <%= e.getMessage() %>
+            <i class="bi bi-exclamation-triangle-fill"></i>&nbsp;Erreur publications&nbsp;: <%= e.getMessage() %>
         </div>
         <%
             } finally {
-                if (conn != null) try { conn.close(); } catch (Exception ex) {}
+                if (conn != null) try { conn.close(); } catch (Exception _x) {}
             }
         %>
 

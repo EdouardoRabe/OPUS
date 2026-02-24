@@ -6,7 +6,9 @@ SELECT
     s.idsignalementpublication AS idsignalement,
     s.idpublication,
     s.idutilisateur AS idsignalant,
+    COALESCE(prsignalant.prenom || ' ' || prsignalant.nom, 'Utilisateur #' || s.idutilisateur) AS nomsignalant,
     pub.idutilisateur AS idsignale,
+    COALESCE(prsignale.prenom || ' ' || prsignale.nom, 'Utilisateur #' || pub.idutilisateur) AS nomsignale,
     s.typesignalement,
     s.daty,
     s.heure,
@@ -17,5 +19,7 @@ FROM signalementpublication s
     JOIN typesignalement sp ON sp.idtypesignalement = s.typesignalement
     LEFT JOIN profil prsignalant ON prsignalant.idutilisateur = s.idutilisateur
     LEFT JOIN profil prsignale ON prsignale.idutilisateur = pub.idutilisateur;
+
+drop view if exists signalementpublicationlib;
 
 select * from signalementpublicationlib;
