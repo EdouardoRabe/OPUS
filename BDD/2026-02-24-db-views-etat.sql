@@ -1,4 +1,4 @@
--- Mise à jour de la vue historiqueactiflib pour les états détaillés
+-- Mise a jour de la vue historiqueactiflib pour les etats detailles
 CREATE OR REPLACE VIEW public.historiqueactiflib AS
  SELECT id,
     idutilisateur,
@@ -6,15 +6,15 @@ CREATE OR REPLACE VIEW public.historiqueactiflib AS
     daty,
         CASE
             WHEN (estactif = 0) THEN 'Banni'::text
-            WHEN (estactif = 1) THEN 'Créé'::text
-            WHEN (estactif = 11) THEN 'Validé'::text
+            WHEN (estactif = 1) THEN 'Cree'::text
+            WHEN (estactif = 11) THEN 'Valide'::text
             WHEN (estactif = 100) THEN 'Actif'::text
             ELSE 'Inconnu'::text
         END AS estactiflib,
     description
    FROM public.historiqueactif ha;
 
--- Mise à jour de la vue profillib pour inclure le dernier état détaillé
+-- Mise ajour de la vue profillib pour inclure le dernier etat detaille
 CREATE OR REPLACE VIEW profillib AS
 SELECT
     pr.idprofil,
@@ -29,7 +29,7 @@ SELECT
     p.annee AS promotionannee,
     parc.idparcours,
     parc.libelle AS parcourslib,
-    -- Dernière photo de profil (type=1)
+    -- Derniere photo de profil (type=1)
     (
         SELECT image
         FROM photo
@@ -38,7 +38,7 @@ SELECT
         ORDER BY daty DESC, heure DESC
         LIMIT 1
     ) AS photoprofil,
-    -- Dernière photo de couverture (type=0)
+    -- Derniere photo de couverture (type=0)
     (
         SELECT image
         FROM photo
@@ -52,7 +52,7 @@ SELECT
     u.idrole,
     u.refuser,
     u.loginuser,
-    -- Dernier état détaillé depuis historiqueactif
+    -- Dernier etat detaille depuis historiqueactif
     COALESCE(
         (SELECT ha.estactif FROM historiqueactif ha
          WHERE ha.idutilisateur = CAST(u.refuser AS varchar)
@@ -64,8 +64,8 @@ SELECT
         (SELECT
             CASE
                 WHEN ha.estactif = 0 THEN 'Banni'
-                WHEN ha.estactif = 1 THEN 'Créé'
-                WHEN ha.estactif = 11 THEN 'Validé'
+                WHEN ha.estactif = 1 THEN 'Cree'
+                WHEN ha.estactif = 11 THEN 'Valide'
                 WHEN ha.estactif = 100 THEN 'Actif'
                 ELSE 'Inconnu'
             END
@@ -73,7 +73,7 @@ SELECT
          WHERE ha.idutilisateur = CAST(u.refuser AS varchar)
          ORDER BY ha.daty DESC, ha.id DESC
          LIMIT 1),
-        CASE WHEN u.estactif = 1 THEN 'Validé' ELSE 'Banni' END
+        CASE WHEN u.estactif = 1 THEN 'Valide' ELSE 'Banni' END
     ) AS etatlib
 FROM utilisateur u
     LEFT JOIN profil pr   ON pr.idutilisateur = u.refuser

@@ -1,4 +1,4 @@
--- création de la vue profillib
+-- creation de la vue profillib
 CREATE OR REPLACE VIEW profillib AS
 SELECT
     pr.idprofil,
@@ -13,7 +13,7 @@ SELECT
     p.annee AS promotionannee,
     parc.idparcours,
     parc.libelle AS parcourslib,
-    -- Dernière photo de profil (type=1)
+    -- Derniere photo de profil (type=1)
     (
         SELECT image
         FROM photo
@@ -22,7 +22,7 @@ SELECT
         ORDER BY daty DESC, heure DESC
         LIMIT 1
     ) AS photoprofil,
-    -- Dernière photo de couverture (type=0)
+    -- Derniere photo de couverture (type=0)
     (
         SELECT image
         FROM photo
