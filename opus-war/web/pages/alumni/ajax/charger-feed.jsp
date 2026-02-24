@@ -16,14 +16,10 @@
 <%@ page import="java.util.HashMap" %>
 <%
     // =========================================================
-    // AJAX : Chargement progressif du fil d'actualite (cursor-based)
+    // AJAX : Chargement progressif du fil d'actualite (score-based)
     // Parametres GET :
-    //   cursor_daty  = derniere date vue (YYYY-MM-DD)
-    //   cursor_heure = derniere heure vue (HH:MM:SS)
-    //   cursor_id    = dernier idpublication vu
-    // Retourne du HTML :
-    //   1. <div id="feed-meta-new"> avec data-daty, data-heure, data-id, data-has-more
-    //   2. Les cartes .fa-post-card suivantes
+    //   cursor_score = score de la derniere publication affichee
+    //   cursor_id    = idpublication de la derniere publication affichee
     // =========================================================
 
     UserEJB uFeed = (UserEJB) session.getAttribute("u");
@@ -42,18 +38,25 @@
         initialConnecte += Character.toUpperCase(_partsConn[_partsConn.length - 1].charAt(0));
 
     // --- Lecture et sanitisation des parametres curseur ---
-    String cursorDaty  = request.getParameter("cursor_daty");
-    String cursorHeure = request.getParameter("cursor_heure");
-    String cursorId    = request.getParameter("cursor_id");
+    String cursorScoreStr = request.getParameter("cursor_score");
+    String cursorId       = request.getParameter("cursor_id");
 
-    if (cursorDaty == null || cursorId == null || cursorId.trim().isEmpty()) {
-        return;
-    }
+    if (cursorId == null || cursorId.trim().isEmpty()) { return; }
 
-    cursorDaty  = cursorDaty.replaceAll("[^0-9\\-]", "");
-    cursorHeure = (cursorHeure != null ? cursorHeure.replaceAll("[^0-9:]", "") : "23:59:59");
-    if (cursorHeure.isEmpty()) cursorHeure = "23:59:59";
-    cursorId    = cursorId.replaceAll("[^A-Za-z0-9]", "");
+    cursorId = cursorId.replaceAll("[^A-Za-z0-9]", "");
+    int cursorScore = 0;
+    try { cursorScore = Integer.parseInt(cursorScoreStr != null ? cursorScoreStr.replaceAll("[^0-9\\-]", "") : "0"); } catch (NumberFormatException _nfe) {}
+
+    // --- Filtres hashtag ---
+    String filterSpec    = request.getParameter("filter_spec");    if (filterSpec == null) filterSpec = "";
+    String filterParc    = request.getParameter("filter_parc");    if (filterParc == null) filterParc = "";
+    String filterPromo   = request.getParameter("filter_promo");   if (filterPromo == null) filterPromo = "";
+    String filterTypepub = request.getParameter("filter_typepub"); if (filterTypepub == null) filterTypepub = "";
+    String filterLier    = request.getParameter("filter_lier");    if (filterLier == null) filterLier = "";
+    filterSpec    = filterSpec.replaceAll("[^A-Za-z0-9]","");
+    filterParc    = filterParc.replaceAll("[^A-Za-z0-9]","");
+    filterPromo   = filterPromo.replaceAll("[^0-9+\\-]",""); // format: yyyy+ ou yyyy-
+    filterTypepub = filterTypepub.replaceAll("[^A-Za-z0-9]","");
 
     Connection conn = null;
     try {
@@ -92,35 +95,97 @@
                 _connPhotoUrl = ctx + "/" + _myProfils[0].getPhotoProfil().trim();
         }
 
-        // --- Requete cursor-based (simple, tri par date) ---
-        String whereClause = " and etat = 1"
-                + " and (daty < '" + cursorDaty + "'"
-                + " OR (daty = '" + cursorDaty + "' AND heure < '" + cursorHeure + "')"
-                + " OR (daty = '" + cursorDaty + "' AND heure = '" + cursorHeure + "' AND idpublication < '" + cursorId + "'))"
-                + " order by daty desc, heure desc, idpublication desc limit 10";
-
-        Publication[] pubs = (Publication[]) CGenUtil.rechercher(
-                new Publication(), null, null, conn, whereClause);
-        if (pubs == null) pubs = new Publication[0];
-
+        // --- Requete score-based avec curseur + visibilite + filtre ---
+        // Filtre visibilite (avec PARCOURS + anneedirection)
+        String _vsSpec2     = "(SELECT sp.idspecialite FROM specialiteprofil sp JOIN profil _pr ON sp.idprofil=_pr.idprofil WHERE _pr.idutilisateur=" + refuserConnecte + ")";
+        String _vsParc2     = "(SELECT _pr.idparcours FROM profil _pr WHERE _pr.idutilisateur=" + refuserConnecte + " LIMIT 1)";
+        String _vsUserAnnee2= "(SELECT _pt.annee FROM promotion _pt JOIN profil _pr ON _pt.idpromotion=_pr.idpromotion WHERE _pr.idutilisateur=" + refuserConnecte + " LIMIT 1)";
+        String _vsPromoCond2= "(_pv.typecible='PROMOTION' AND ((_pv.anneedirection='+' AND " + _vsUserAnnee2 + ">=_pv.anneeref) OR (_pv.anneedirection='-' AND " + _vsUserAnnee2 + "<=_pv.anneeref)))";
+        String _vsSpecExist2 = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE' AND _pv.idref IN " + _vsSpec2 + ")";
+        String _vsPromoExist2= "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND " + _vsPromoCond2 + ")";
+        String _vsParcExist2 = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PARCOURS' AND _pv.idref=" + _vsParc2 + ")";
+        String _visW2 =
+            " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication)"
+            + " OR (COALESCE(p.logique_visibilite,'OR')='OR' AND ("
+            + _vsSpecExist2 + " OR " + _vsPromoExist2 + " OR " + _vsParcExist2
+            + "))"
+            + " OR (p.logique_visibilite='AND'"
+            + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE') OR " + _vsSpecExist2 + ")"
+            + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PROMOTION') OR " + _vsPromoExist2 + ")"
+            + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PARCOURS') OR " + _vsParcExist2 + ")))";
+        // Filtre hashtag — typepub suit le flag lier comme les autres
+        java.util.List _fConds = new java.util.ArrayList();
+        if (!filterSpec.isEmpty())
+            _fConds.add("EXISTS (SELECT 1 FROM publicationhashtag _ph WHERE _ph.idpublication=p.idpublication AND _ph.typetag='SPECIALITE' AND _ph.idref='" + filterSpec + "')");
+        if (!filterParc.isEmpty())
+            _fConds.add("EXISTS (SELECT 1 FROM publicationhashtag _ph WHERE _ph.idpublication=p.idpublication AND _ph.typetag='PARCOURS' AND _ph.idref='" + filterParc + "')");
+        if (!filterPromo.isEmpty() && filterPromo.matches("\\d{4}[+-]")) {
+            int _fpAnnee = Integer.parseInt(filterPromo.substring(0,4));
+            char _fpDir  = filterPromo.charAt(4);
+            String _fpUserAnnee = "(SELECT _pt.annee FROM promotion _pt JOIN profil _pr ON _pt.idpromotion=_pr.idpromotion WHERE _pr.idutilisateur=" + refuserConnecte + " LIMIT 1)";
+            String _fpCmp = (_fpDir == '+') ? ">=" : "<=";
+            _fConds.add("EXISTS (SELECT 1 FROM publicationhashtag _ph WHERE _ph.idpublication=p.idpublication AND _ph.typetag='PROMOTION' AND (SELECT _pt2.annee FROM promotion _pt2 WHERE _pt2.idpromotion=_ph.idref LIMIT 1)" + _fpCmp + _fpAnnee + ")");
+        }
+        if (!filterTypepub.isEmpty())
+            _fConds.add("p.idtypepublication='" + filterTypepub + "'");
+        String _hashW = "";
+        if (_fConds.size() == 1) {
+            _hashW = " AND " + _fConds.get(0);
+        } else if (_fConds.size() > 1) {
+            String _join = "1".equals(filterLier) ? " AND " : " OR ";
+            StringBuilder _sb = new StringBuilder(" AND (");
+            for (int _ci = 0; _ci < _fConds.size(); _ci++) {
+                if (_ci > 0) _sb.append(_join);
+                _sb.append(_fConds.get(_ci));
+            }
+            _sb.append(")");
+            _hashW = _sb.toString();
+        }
+        String _sC =
+            "COALESCE((SELECT COUNT(*) FROM publicationreaction pr WHERE pr.idpublication=p.idpublication),0)*2"
+            + "+COALESCE((SELECT COUNT(*) FROM publicationcommentaire pc WHERE pc.idpublication=p.idpublication AND pc.etat=1),0)*3"
+            + "-COALESCE((SELECT pv.nbvue FROM publicationvue pv WHERE pv.idpublication=p.idpublication AND pv.idutilisateur=" + refuserConnecte + "),0)*4"
+            + "+CASE WHEN p.daty::date=CURRENT_DATE THEN 15 WHEN p.daty::date>=CURRENT_DATE-7 THEN 8 WHEN p.daty::date>=CURRENT_DATE-30 THEN 3 ELSE 0 END";
+        String _pSql =
+            "SELECT sub.idpublication, sub.score FROM ("
+            + "  SELECT p.idpublication,(" + _sC + ") AS score FROM publication p WHERE p.etat=1" + _visW2 + _hashW
+            + ") sub WHERE sub.score < " + cursorScore
+            + " OR (sub.score = " + cursorScore + " AND sub.idpublication < '" + cursorId + "')"
+            + " ORDER BY sub.score DESC, sub.idpublication DESC LIMIT 10";
+        java.util.List _pids = new java.util.ArrayList();
+        java.util.List _pscores = new java.util.ArrayList();
+        java.sql.Statement _st = null; java.sql.ResultSet _rs = null;
+        try {
+            _st = conn.createStatement(); _rs = _st.executeQuery(_pSql);
+            while (_rs.next()) { _pids.add(_rs.getString("idpublication")); _pscores.add(new Integer(_rs.getInt("score"))); }
+        } finally {
+            if (_rs != null) try { _rs.close(); } catch (Exception _x) {}
+            if (_st != null) try { _st.close(); } catch (Exception _x) {}
+        }
+        Publication[] pubs = new Publication[_pids.size()];
+        for (int _i = 0; _i < _pids.size(); _i++) {
+            Publication[] _pa = (Publication[]) CGenUtil.rechercher(new Publication(), null, null, conn, " and idpublication='" + _pids.get(_i) + "'");
+            pubs[_i] = (_pa != null && _pa.length > 0) ? _pa[0] : new Publication();
+        }
         // --- Curseur suivant ---
-        String nextDaty  = "";
-        String nextHeure = "";
         String nextId    = "";
-        boolean hasMore  = (pubs.length == 10);
-        if (pubs.length > 0) {
-            Publication lastPub = pubs[pubs.length - 1];
-            nextDaty  = lastPub.getDaty()  != null ? lastPub.getDaty().toString() : "";
-            nextHeure = lastPub.getHeure() != null ? lastPub.getHeure()           : "";
-            nextId    = lastPub.getIdpublication();
+        int    nextScore = 0;
+        boolean hasMore  = (_pids.size() == 10);
+        if (!_pids.isEmpty()) {
+            nextId    = (String) _pids.get(_pids.size()-1);
+            nextScore = ((Integer) _pscores.get(_pscores.size()-1)).intValue();
         }
 %>
 <%-- Element meta : contient le prochain curseur, lu par le JS avant injection --%>
 <div id="feed-meta-new" style="display:none"
-     data-daty="<%= nextDaty %>"
-     data-heure="<%= nextHeure %>"
+     data-score="<%= nextScore %>"
      data-id="<%= nextId %>"
-     data-has-more="<%= hasMore %>"></div>
+     data-has-more="<%= hasMore %>"
+     data-filter-spec="<%= filterSpec %>"
+     data-filter-parc="<%= filterParc %>"
+     data-filter-promo="<%= filterPromo %>"
+     data-filter-typepub="<%= filterTypepub %>"
+     data-filter-lier="<%= filterLier %>"></div>
 <%
         // --- Rendu de chaque carte publication ---
         for (int p = 0; p < pubs.length; p++) {
