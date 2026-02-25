@@ -1110,11 +1110,11 @@ INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALU
 
 -- Droits role etu
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
-    ('USRM000035', 'MENDYN000019', '*', 0, 'etu');
+    ('USRM000045', 'MENDYN000019', '*', 0, 'etu');
 
 -- Droits role md
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
-    ('USRM000036', 'MENDYN000019', '*', 0, 'md');
+    ('USRM000046', 'MENDYN000019', '*', 0, 'md');
 -- ╔═══════════════════════════════════════════════════════════════════════════════╗
 -- ║ SECTION 16: MISE A JOUR DES SEQUENCES                                         ║
 -- ╚═══════════════════════════════════════════════════════════════════════════════╝
