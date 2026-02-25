@@ -40,6 +40,10 @@ public class ProfilTypeStatut extends ClassMAPTable {
         return libelle;
     }
 
+    public void setLibelle(String libelle) {
+        this.libelle = libelle;
+    }
+
 
     @Override
     public String getTuppleID() {
