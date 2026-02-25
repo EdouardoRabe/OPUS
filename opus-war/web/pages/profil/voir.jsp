@@ -597,6 +597,10 @@
            style="padding:6px 16px;background:#fff;color:#0a66c2;border:1px solid #0a66c2;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block">
           <i class="fa fa-lock"></i> Confidentialité
         </a>
+        <button onclick="pvCopyProfileLink()"
+           style="padding:6px 16px;background:#fff;color:#0a66c2;border:1px solid #0a66c2;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;">
+          <i class="bi bi-link-45deg"></i> Copier le lien
+        </button>
         <button onclick="pvOpenModal('modalCV')"
            style="padding:6px 16px;background:#fff;color:#0a66c2;border:1px solid #0a66c2;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;">
           <i class="bi bi-file-earmark-text"></i> CV
@@ -747,14 +751,10 @@
       %>
         <a class="pv-social-item" id="social-<%= smIdStr %>"
            href="<%= smUrl %>" target="_blank" rel="noopener noreferrer"
-           title="<%= smLibelle %>: <%= smValeur %>">
-          <div class="pv-social-icon" style="background:<%= smCouleur %>">
-            <i class="<%= smIcone %>"></i>
-          </div>
-          <div class="pv-social-info">
-            <span class="pv-social-name"><%= smLibelle %></span>
-            <span class="pv-social-val"><%= smValeur %></span>
-          </div>
+           title="<%= smLibelle %>: <%= smValeur %>"
+           style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+          <i class="<%= smIcone %>" style="color:<%= smCouleur %>;font-size:18px;"></i>
+          <span><%= smLibelle %>: <%= smValeur %></span>
           <button class="pv-social-del" type="button" title="Supprimer"
                   onclick="event.preventDefault();event.stopPropagation();pvDeleteSocial('<%= smIdStr %>')">×</button>
         </a>
@@ -835,12 +835,17 @@
     </div>
 </div>
 <div id="pub-detail-modal">
-    <div class="pub-detail-box">
-        <div class="pub-detail-header">
-            <h3 class="pub-detail-title">Publication</h3>
-            <button class="rdm-close" onclick="closePublicationDetail()">&times;</button>
+    <div class="pub-fb-box" id="pub-fb-box">
+        <button class="pub-fb-close" onclick="closePublicationDetail()">&times;</button>
+        <div class="pub-fb-media" id="pub-fb-media">
+            <div class="pub-fb-media-content" id="pub-fb-media-content"></div>
+            <button class="pub-fb-nav pub-fb-nav-prev" id="pub-fb-prev" onclick="pubFbNavPrev()"><i class="bi bi-chevron-left"></i></button>
+            <button class="pub-fb-nav pub-fb-nav-next" id="pub-fb-next" onclick="pubFbNavNext()"><i class="bi bi-chevron-right"></i></button>
+            <div class="pub-fb-media-counter" id="pub-fb-counter"></div>
         </div>
-        <div class="pub-detail-body" id="pub-detail-content"></div>
+        <div class="pub-fb-details" id="pub-fb-details">
+            <div style="text-align:center;padding:40px;"><div class="fa-feed-spinner"></div></div>
+        </div>
     </div>
 </div>
 
@@ -1024,6 +1029,24 @@ function pvDeleteSpec(spId) {
 var _statutUrl = "<%= request.getContextPath() %>/pages/profil/ajax/traitement-profilstatut.jsp";
 var _idprofil = "<%= _idprofil %>";
 var _idutilisateur = "<%= uEJB.getUser().getRefuser() %>";
+
+/* ── Copier le lien du profil ── */
+function pvCopyProfileLink() {
+    var url = window.location.origin + "<%= request.getContextPath() %>/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp?idprofil=" + encodeURIComponent(_idprofil);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function() {
+            if (typeof Swal !== 'undefined') Swal.fire({toast:true,position:'top-end',icon:'success',title:'Lien du profil copi\u00e9 !',timer:2000,showConfirmButton:false});
+            else alert('Lien copi\u00e9 !');
+        }).catch(function() { _pvFallbackCopy(url); });
+    } else { _pvFallbackCopy(url); }
+}
+function _pvFallbackCopy(txt) {
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); alert('Lien du profil copi\u00e9 !'); } catch(e) { alert('Impossible de copier le lien'); }
+    document.body.removeChild(ta);
+}
 
 function pvShowStatutForm() {
   document.getElementById("statutSelect").value = "";
