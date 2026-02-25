@@ -37,8 +37,8 @@
             Profil[] profils = (Profil[]) CGenUtil.rechercher(
                 new Profil(), null, null, conn,
                 " and idutilisateur != " + refuser 
-                + " and (lower(nom) like '%" + query.replace("'", "''") + "%'"
-                + " or lower(prenom) like '%" + query.replace("'", "''") + "%')");
+                + " and (lower(coalesce(nom,'') || ' ' || coalesce(prenom,'')) like '%" + query.replace("'", "''") + "%'"
+                + " or lower(coalesce(prenom,'') || ' ' || coalesce(nom,'')) like '%" + query.replace("'", "''") + "%')");
             if (profils == null) profils = new Profil[0];
 
             StringBuilder sb = new StringBuilder("[");

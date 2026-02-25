@@ -10,7 +10,7 @@
     Connection conn = null;
     try {
         conn = new UtilDB().GetConn();
-        alumniList = (VProfilLocalisation[]) CGenUtil.rechercher(new VProfilLocalisation(), null, null, conn, "");
+        alumniList = (VProfilLocalisation[]) CGenUtil.rechercher(new VProfilLocalisation(), null, null, conn, " and estactif = 1");
     } catch (Exception e) {
         e.printStackTrace();
     } finally {

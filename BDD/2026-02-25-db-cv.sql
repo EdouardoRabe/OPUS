@@ -1,0 +1,1 @@
+alter table profil add column cv VARCHAR(150);
