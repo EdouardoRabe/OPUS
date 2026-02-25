@@ -12,6 +12,7 @@
 <%@ page import="alumni.Poste" %>
 <%@ page import="alumni.ReseauSocial" %>
 <%@ page import="alumni.ProfilSocialMedia" %>
+<%@ page import="alumni.Profilemplacement" %>
 <%@ page import="java.sql.Connection" %>
 <%
     UserEJB    uEJB  = (UserEJB) session.getAttribute("u");
@@ -24,6 +25,7 @@
     ReseauSocial[] allReseaux = null;
     ProfilSocialMedia[] socialMedias = null;
     ProfilTypeStatut[] allStatutTypes = null;
+    Profilemplacement emplacement = null;
     String     _erreur = null;
     if (uEJB != null && uEJB.getUser() != null) {
         MapUtilisateur mu = uEJB.getUser();
@@ -63,6 +65,13 @@
                     new ProfilSocialMedia(), null, null, conn,
                     " and idprofil='" + profil.getIdprofil() + "'"
                 );
+                
+                // Chargement de l'emplacement
+                Profilemplacement[] empRes = (Profilemplacement[]) CGenUtil.rechercher(
+                    new Profilemplacement(), null, null, conn,
+                    " and idprofil='" + profil.getIdprofil() + "'"
+                );
+                if (empRes != null && empRes.length > 0) emplacement = empRes[0];
             }
 
         } catch (Exception e) {
@@ -97,6 +106,11 @@
     String _genrelib    = profil != null && profil.getGenrelib()       != null ? profil.getGenrelib()       : "";
     String _idgenre     = profil != null && profil.getIdgenre()        != null ? profil.getIdgenre()        : "";
     int _contribution   = profil != null ? profil.getContribution() : 0;
+    
+    // Emplacement vars
+    String _empId = emplacement != null ? emplacement.getId() : "";
+    double _empLng = emplacement != null ? emplacement.getLongitude() : 0;
+    double _empLat = emplacement != null ? emplacement.getLatitude() : 0;
     
     // Chargement du statut du profil
     String _statutColor = "#0a66c2"; // couleur par défaut
@@ -467,6 +481,13 @@
 .fab { font-family: "Font Awesome 6 Brands" !important; }
 .fas, .fa { font-family: "Font Awesome 6 Free" !important; font-weight: 900 !important; }
 </style>
+<link rel="stylesheet" href="<%= request.getContextPath() %>/pages/elements/libs/leaflet.css">
+<style>
+  #locMap { height: 300px; border-radius: 12px; margin-top: 10px; border: 1px solid #ddd; }
+  .pvl-loc-box { margin-top: 15px; padding: 12px; background: #f0f7ff; border-radius: 10px; border-left: 4px solid #008BFF; }
+  .pvl-loc-title { font-size: 11px; font-weight: 700; color: #008BFF; text-transform: uppercase; margin-bottom: 4px; }
+  .pvl-loc-val { font-size: 13px; color: #333; display: flex; align-items: center; gap: 5px; }
+</style>
 <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/publication-cards.css">
 
 <%
@@ -505,6 +526,17 @@
             <i class="bi bi-bell-fill"></i> Notifications
           </a>
         </nav>
+        
+        <div class="pvl-loc-box">
+          <div class="pvl-loc-title">Localisation</div>
+          <div class="pvl-loc-val">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span id="sidebarLocText"><%= _empId.isEmpty() ? "Non définie" : String.format("%.4f, %.4f", _empLat, _empLng) %></span>
+          </div>
+          <button onclick="pvOpenLocModal()" style="margin-top:8px; width:100%; padding:6px; background:#fff; border:1px solid #008BFF; color:#008BFF; border-radius:15px; font-size:11px; font-weight:700; cursor:pointer;">
+            <i class="bi bi-pencil"></i> Modifier ma position
+          </button>
+        </div>
       </div>
     </div>
   </aside>
@@ -1258,7 +1290,70 @@ function ppubLoadMore(btn, iduser, idprofil, cursorId) {
 document.addEventListener('DOMContentLoaded', function() {
     pvLoadPubs('<%= uEJB.getUser().getRefuser() %>', '<%= _idprofil %>', '');
 });
+
+/* ════════════════════════════════════════
+   LOCALISATION CRUD
+   ════════════════════════════════════════ */
+var _locUrl = "<%= request.getContextPath() %>/pages/profil/ajax/traitement-localisation.jsp";
+var locMap = null;
+var locMarker = null;
+var _currentLat = <%= _empLat != 0 ? _empLat : -18.8792 %>;
+var _currentLng = <%= _empLng != 0 ? _empLng : 47.5079 %>;
+
+function pvOpenLocModal() {
+  pvOpenModal("modalLoc");
+  setTimeout(initLocMap, 300);
+}
+
+function initLocMap() {
+  if (locMap) return;
+  locMap = L.map('locMap').setView([_currentLat, _currentLng], 12);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(locMap);
+
+  locMarker = L.marker([_currentLat, _currentLng], {draggable: true}).addTo(locMap);
+  
+  locMarker.on('dragend', function(e) {
+    var pos = locMarker.getLatLng();
+    updateLocInputs(pos.lat, pos.lng);
+  });
+
+  locMap.on('click', function(e) {
+    locMarker.setLatLng(e.latlng);
+    updateLocInputs(e.latlng.lat, e.latlng.lng);
+  });
+}
+
+function updateLocInputs(lat, lng) {
+  document.getElementById("locLat").value = lat.toFixed(6);
+  document.getElementById("locLng").value = lng.toFixed(6);
+}
+
+function pvSaveLoc() {
+  var lat = document.getElementById("locLat").value;
+  var lng = document.getElementById("locLng").value;
+  if (!lat || !lng) { alert("Coordonnées invalides"); return; }
+
+  var data = new URLSearchParams();
+  data.append("action", "<%= _empId.isEmpty() ? "create" : "update" %>");
+  <% if (!_empId.isEmpty()) { %>data.append("id", "<%= _empId %>");<% } %>
+  data.append("idprofil", "<%= _idprofil %>");
+  data.append("latitude", lat);
+  data.append("longitude", lng);
+
+  fetch(_locUrl, { method: "POST", body: data,
+    headers: {"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","X-Requested-With":"XMLHttpRequest"}
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.success) { pvCloseModal("modalLoc"); location.reload(); }
+    else alert("Erreur : " + d.error);
+  })
+  .catch(function(e) { alert("Erreur réseau : " + e); });
+}
 </script>
+<script src="<%= request.getContextPath() %>/pages/elements/libs/leaflet-src.js"></script>
 <script src="<%= request.getContextPath() %>/assets/js/publication-cards.js"></script>
 
 <!-- Modal : Changer le Profil Statut -->
@@ -1477,6 +1572,34 @@ document.addEventListener('DOMContentLoaded', function() {
           cover.insertBefore(i, cover.firstChild);
         }
       })">Enregistrer</button>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+
+<!-- Modal : Localisation (Carte) -->
+<div class="pv-modal-overlay" id="modalLoc">
+  <div class="pv-modal" style="max-width:600px;">
+    <h3>Ma position géographique</h3>
+    <p style="font-size:12px; color:#666; margin-bottom:15px;">Cliquez sur la carte ou déplacez le marqueur pour définir votre position.</p>
+    
+    <div id="locMap"></div>
+    
+    <div class="pv-form-row" style="margin-top:15px; grid-template-columns: 1fr 1fr;">
+      <div>
+        <label>Latitude</label>
+        <input type="text" id="locLat" value="<%= _empLat != 0 ? String.format("%.6f", _empLat).replace(",", ".") : "" %>" readonly>
+      </div>
+      <div>
+        <label>Longitude</label>
+        <input type="text" id="locLng" value="<%= _empLng != 0 ? String.format("%.6f", _empLng).replace(",", ".") : "" %>" readonly>
+      </div>
+    </div>
+    
+    <div class="pv-modal-footer">
+      <button class="pv-btn-cancel" onclick="pvCloseModal('modalLoc')">Annuler</button>
+      <button class="pv-btn-save" onclick="pvSaveLoc()">Enregistrer ma position</button>
     </div>
   </div>
 </div>

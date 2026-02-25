@@ -59,7 +59,6 @@ public class ProfilTypeStatut extends ClassMAPTable {
         this.setIdprofiltypestatut(makePK(c));
     }
 
-    
     @Override
     public String toString() {
 
