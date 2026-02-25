@@ -4,6 +4,8 @@
 <%@ page import="bean.CGenUtil" %>
 <%@ page import="utilitaire.UtilDB" %>
 <%@ page import="alumni.ProfilLib" %>
+<%@ page import="alumni.ProfilStatut" %>
+<%@ page import="alumni.ProfilTypeStatut" %>
 <%@ page import="alumni.ExperienceLib" %>
 <%@ page import="alumni.Specialite" %>
 <%@ page import="alumni.Specialiteprofil" %>
@@ -92,7 +94,39 @@
     String _genrelib    = profil != null && profil.getGenrelib()       != null ? profil.getGenrelib()       : "";
     String _idgenre     = profil != null && profil.getIdgenre()        != null ? profil.getIdgenre()        : "";
     int _contribution   = profil != null ? profil.getContribution() : 0;
+    
+    // Chargement du statut du profil
+    String _statutColor = "#0a66c2"; // couleur par défaut
+    String _statutLibelle = "";
+    try {
+        if (profil != null && profil.getIdprofil() != null) {
+            ProfilStatut psFiltre = new ProfilStatut();
+            psFiltre.setIdprofil(profil.getIdprofil());
+            Object[] psRes = CGenUtil.rechercher(psFiltre, null, null, " order by daty desc limit 1");
+            if (psRes != null && psRes.length > 0) {
+                ProfilStatut ps = (ProfilStatut) psRes[0];
+                if (ps.getIdprofiltypestatut() != null) {
+                    ProfilTypeStatut ptsFiltre = new ProfilTypeStatut();
+                    ptsFiltre.setIdprofiltypestatut(ps.getIdprofiltypestatut());
+                    Object[] ptsRes = CGenUtil.rechercher(ptsFiltre, null, null, "");
+                    if (ptsRes != null && ptsRes.length > 0) {
+                        ProfilTypeStatut pts = (ProfilTypeStatut) ptsRes[0];
+                        if (pts.getCouleur() != null && !pts.getCouleur().isEmpty()) {
+                            _statutColor = pts.getCouleur();
+                        }
+                        if (pts.getLibelle() != null) {
+                            _statutLibelle = pts.getLibelle();
+                        }
+                    }
+                }
+            }
+        }
+    } catch (Exception e) {
+        System.err.println("voir.jsp - erreur chargement statut: " + e.getMessage());
+    }
 %>
+<!-- Font Awesome 6 (all icons: fab, fas, etc.) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVJkEZSbVkFvwj6GWGcsA3UbVDA46NmCcc9syThH05yu85Z+I6QILv3GVpnwnbaIPN1zcEvGWxQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <style>
 .pv-card {
   max-width: 1200px;
@@ -158,6 +192,9 @@
   display: flex; align-items: center; justify-content: center;
   font-size: 40px; font-weight: 700; color: #fff;
   overflow: hidden;
+}
+.pv-avatar--with-status {
+  box-shadow: 0 0 0 3px var(--pv-status-color, #0a66c2), 0 2px 12px rgba(0,0,0,.25);
 }
 .pv-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
 
@@ -314,9 +351,163 @@
 }
 .pv-social-item:hover .pv-social-del { opacity: 1; }
 .pv-social-del:hover { background: #ffebee; border-color: #ef5350; color: #c62828; }
+/* ── Fix icône réseau social ── */
+.pv-social-icon i {
+  font-size: 18px !important;
+  line-height: 1;
+  display: block;
+  text-align: center;
+}
+/* ════════════════════════════════
+   LAYOUT 2 COLONNES
+   ════════════════════════════════ */
+:root {
+  --itu-blue: #008BFF;
+  --itu-dark: #362F4F;
+  --itu-violet: #5B23FF;
+  --pvl-border: #e2e6ea;
+  --pvl-card-bg: #fff;
+  --pvl-text: #1c1e21;
+  --pvl-text-sec: #65676b;
+}
+.pv-profile-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 18px;
+  max-width: 1240px;
+  margin: 20px auto 40px;
+  padding: 0 12px;
+  align-items: start;
+}
+@media(max-width: 900px) { .pv-profile-layout { grid-template-columns: 1fr; } }
+.pvl-sidebar { position: sticky; top: 80px; }
+.pvl-main { min-width: 0; }
+/* Annuler max-width du pv-card (il est maintenant à l'intérieur de pvl-main) */
+.pvl-main .pv-card { max-width: unset; margin: 0; }
+/* ── Sidebar card ── */
+.pvl-profile-card {
+  background: var(--pvl-card-bg);
+  border-radius: 14px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.12);
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.pvl-cover {
+  height: 72px;
+  background: linear-gradient(135deg, var(--itu-dark,#362F4F) 0%, var(--itu-violet,#5B23FF) 100%);
+}
+.pvl-cover-img { width:100%; height:100%; object-fit:cover; display:block; }
+.pvl-body { padding: 0 16px 16px; }
+.pvl-avatar-wrap { margin-top: -36px; margin-bottom: 8px; }
+.pvl-avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.20);
+  background: var(--itu-blue,#008BFF);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; font-weight: 700; color: #fff;
+  overflow: hidden;
+  font-family: inherit;
+}
+.pvl-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+.pvl-name { font-weight: 700; font-size: 15px; color: var(--pvl-text); margin-bottom: 4px; line-height: 1.3; }
+.pvl-title { font-size: 12px; color: var(--pvl-text-sec); margin-bottom: 12px; line-height: 1.3; }
+.pvl-divider { border: none; border-top: 1px solid var(--pvl-border); margin: 8px 0; }
+.pvl-nav { display: flex; flex-direction: column; gap: 2px; }
+.pvl-nav-link {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 14px; font-weight: 500;
+  color: var(--pvl-text);
+  text-decoration: none;
+  transition: background .15s, color .15s;
+}
+.pvl-nav-link:hover  { background: #f0f2f5; color: var(--itu-blue,#008BFF); }
+.pvl-nav-link--active { background: #e7f3ff; color: var(--itu-blue,#008BFF); font-weight: 700; }
+.pvl-nav-link i { font-size: 16px; }
+/* ── Design améliorations sections ── */
+.pv-section { border-bottom: 1px solid #f0f2f5; }
+.pv-section:last-child { border-bottom: none; }
+.pv-section-header h2 { font-size: 15px; }
+.pv-about-text {
+  font-size: 14px; color: #444; line-height: 1.65;
+  background: #f8f9fb; border-radius: 10px; padding: 12px 16px;
+  border-left: 4px solid var(--itu-blue,#008BFF);
+}
+.pv-info-icon { color: var(--itu-blue,#008BFF); margin-right: 6px; }
+/* Social media bigger */
+.pv-social-item { padding: 10px 14px 10px 12px; }
+.pv-social-icon { 
+  width: 38px; height: 38px; 
+  border-radius: 10px; 
+  font-size: 20px; 
+  flex-shrink: 0; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+}
+.pv-social-icon i,
+.pv-social-icon .fa,
+.pv-social-icon .fab,
+.pv-social-icon .fas { 
+  display: inline-block !important; 
+  font-size: 20px !important;
+  line-height: 1; 
+  color: #fff !important;
+  text-align: center;
+}
+</style>
+<!-- ensure brand/free icons render with FA6 even if FA4 also loaded -->
+<style>
+.fab { font-family: "Font Awesome 6 Brands" !important; }
+.fas, .fa { font-family: "Font Awesome 6 Free" !important; font-weight: 900 !important; }
 </style>
 <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/publication-cards.css">
 
+<%
+  String _fullName = (_prenom + " " + _nom).trim();
+  String[] _pvParts = _fullName.split("\\s+");
+  String _pvInitials = "";
+  if (_pvParts.length > 0 && _pvParts[0].length() > 0) _pvInitials += Character.toUpperCase(_pvParts[0].charAt(0));
+  if (_pvParts.length > 1 && _pvParts[_pvParts.length-1].length() > 0) _pvInitials += Character.toUpperCase(_pvParts[_pvParts.length-1].charAt(0));
+  if (_pvInitials.isEmpty()) _pvInitials = "U";
+%>
+
+<div class="pv-profile-layout">
+
+  <!-- ═══════ SIDEBAR GAUCHE ═══════ -->
+  <aside class="pvl-sidebar">
+    <div class="pvl-profile-card">
+      <div class="pvl-cover" id="pvlCover">
+        <% if (!_photoCoverUrl.isEmpty()) { %><img class="pvl-cover-img" src="<%= _photoCoverUrl %>" alt=""><% } %>
+      </div>
+      <div class="pvl-body">
+        <div class="pvl-avatar-wrap">
+          <div class="pvl-avatar" id="pvlAvatar">
+            <% if (!_photoUrl.isEmpty()) { %><img src="<%= _photoUrl %>" alt=""><% } else { %><%= _pvInitials %><% } %>
+          </div>
+        </div>
+        <div class="pvl-name"><%= _fullName.isEmpty() ? "—" : _fullName %></div>
+        <hr class="pvl-divider">
+        <nav class="pvl-nav">
+          <a href="<%= _lien %>?but=profil/voir.jsp" class="pvl-nav-link pvl-nav-link--active">
+            <i class="bi bi-person-fill"></i> Mon profil
+          </a>
+          <a href="<%= _lien %>?but=accueil.jsp" class="pvl-nav-link">
+            <i class="bi bi-newspaper"></i> Fil d'actualité
+          </a>
+          <a href="<%= _lien %>?but=alumni/notifications.jsp" class="pvl-nav-link">
+            <i class="bi bi-bell-fill"></i> Notifications
+          </a>
+        </nav>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════ CONTENU PRINCIPAL ═══════ -->
+  <main class="pvl-main">
 <div class="pv-card">
 
   <!-- ── Cover ── -->
@@ -330,8 +521,8 @@
   </div>
 
   <!-- ── Avatar ── -->
-  <div class="pv-avatar-wrap">
-    <div class="pv-avatar" id="pvAvatar"></div>
+  <div class="pv-avatar-wrap" style="--pv-status-color: <%= _statutColor %>;">
+    <div class="pv-avatar pv-avatar--with-status" id="pvAvatar" title="<%= _statutLibelle %>"></div>
     <button class="pv-edit-btn" title="Modifier la photo de profil" onclick="pvOpenModal('modalPDP')">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0a66c2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
@@ -351,7 +542,7 @@
         </div>
         <div class="pv-headline" id="pvHeadline">—</div>
         <div class="pv-meta">
-          <span>📍 Antananarivo, Madagascar</span>
+          <span><i class="bi bi-geo-alt-fill" style="color:#008BFF;margin-right:3px;"></i>Antananarivo, Madagascar</span>
           <a id="pvEmail" href="#">—</a>
           <span id="pvPhone">—</span>
         </div>
@@ -371,7 +562,9 @@
 
   <!-- ── Promotion & Parcours ── -->
   <div class="pv-section">
-    <h2>Promotion & Parcours</h2>
+    <div class="pv-section-header">
+      <h2><i class="bi bi-mortarboard-fill"></i> Promotion &amp; Parcours</h2>
+    </div>
     <div class="pv-tags">
       <span class="pv-tag"      id="pvPromoTag">—</span>
       <span class="pv-tag grey" id="pvParcoursTag">—</span>
@@ -419,19 +612,54 @@
     </div>
   </div>
 
-  <!-- ── Informations ── -->
+  <!-- ── À propos / Informations ── -->
   <div class="pv-section">
-    <h2>Informations</h2>
+    <div class="pv-section-header">
+      <h2><i class="bi bi-person-lines-fill"></i> À propos</h2>
+    </div>
     <div class="pv-grid">
-      <div class="pv-field"><label>Nom</label>              <span id="fi-nom">—</span></div>
-      <div class="pv-field"><label>Prénom</label>           <span id="fi-prenom">—</span></div>
-      <div class="pv-field"><label>Genre</label>             <span id="fi-genre"><i class="bi" id="fi-genre-icon" style="color:#7c3aed;margin-right:4px;"></i><span id="fi-genre-text">—</span></span></div>
-      <div class="pv-field"><label>Date de naissance</label><span id="fi-dtn">—</span></div>
-      <div class="pv-field"><label>Téléphone</label>        <span id="fi-tel">—</span></div>
-      <div class="pv-field"><label>Email</label>            <span id="fi-email">—</span></div>
-      <div class="pv-field"><label>ID Profil</label>        <span id="fi-id">—</span></div>
-      <div class="pv-field"><label>Promotion</label>        <span id="fi-promo">—</span></div>
-      <div class="pv-field"><label>Parcours</label>         <span id="fi-parcours">—</span></div>
+      <div class="pv-field">
+        <label><i class="bi bi-person-fill pv-info-icon"></i>Nom complet</label>
+        <span id="fi-nom">—</span> <span id="fi-prenom"></span>
+      </div>
+      <div class="pv-field">
+        <label><i class="bi bi-gender-ambiguous pv-info-icon"></i>Genre</label>
+        <span id="fi-genre" style="display:flex;align-items:center;gap:4px;">
+          <i class="bi" id="fi-genre-icon" style="color:#7c3aed;"></i>
+          <span id="fi-genre-text">—</span>
+        </span>
+      </div>
+      <div class="pv-field">
+        <label><i class="bi bi-calendar-heart pv-info-icon"></i>Date de naissance</label>
+        <span id="fi-dtn">—</span>
+      </div>
+      <div class="pv-field">
+        <label><i class="bi bi-telephone-fill pv-info-icon"></i>Téléphone</label>
+        <span id="fi-tel">—</span>
+      </div>
+      <div class="pv-field">
+        <label><i class="bi bi-envelope-fill pv-info-icon"></i>Email</label>
+        <span id="fi-email">—</span>
+      </div>
+      <div class="pv-field">
+        <label><i class="bi bi-mortarboard-fill pv-info-icon"></i>Promotion</label>
+        <span id="fi-promo">—</span>
+      </div>
+      <div class="pv-field">
+        <label><i class="bi bi-book-fill pv-info-icon"></i>Parcours</label>
+        <span id="fi-parcours">—</span>
+      </div>
+      <div class="pv-field">
+        <label><i class="bi bi-award-fill pv-info-icon"></i>Contributions</label>
+        <span style="display:inline-flex;align-items:center;gap:5px;">
+          <span id="fi-contribution" style="font-weight:700;color:#f57f17;">0</span>
+          <span style="font-size:12px;color:#888;">publications</span>
+        </span>
+      </div>
+      <div class="pv-field">
+        <label><i class="bi bi-fingerprint pv-info-icon"></i>ID Profil</label>
+        <span id="fi-id" style="font-family:monospace;font-size:12px;color:#888;">—</span>
+      </div>
     </div>
   </div>
 
@@ -525,7 +753,9 @@
     <div id="pvPublications"><em style="color:#aaa;font-size:13px;">Chargement...</em></div>
   </div>
 
-</div>
+</div><!-- /pv-card -->
+  </main>
+</div><!-- /pv-profile-layout -->
 
 <!-- ==================== MODALES PUBLICATIONS ==================== -->
 <div id="react-detail-modal">
@@ -611,7 +841,7 @@ var CURRENT_USER_ID = '<%= uEJB.getUser().getRefuser() %>';
   document.getElementById("pvHeadline").textContent = p.parcoursLib + "  ·  " + p.promotionLib;
   var em = document.getElementById("pvEmail");
   em.textContent = p.email; em.href = "mailto:" + p.email;
-  document.getElementById("pvPhone").textContent    = "📞 " + p.telephone;
+  document.getElementById("pvPhone").innerHTML = '<i class="bi bi-telephone-fill" style="color:#008BFF;margin-right:4px;"></i>' + (p.telephone || '—');
 
   /* Genre badge near name */
   if (p.genreLib) {
@@ -620,20 +850,22 @@ var CURRENT_USER_ID = '<%= uEJB.getUser().getRefuser() %>';
     document.getElementById("pvGenreBadge").style.display = "inline-flex";
   }
   document.getElementById("pvContributionText").textContent = p.contribution;
-  document.getElementById("pvPromoTag").textContent    = "🎓 " + p.promotionLib;
-  document.getElementById("pvParcoursTag").textContent = "📚 " + p.parcoursLib;
+  document.getElementById("pvPromoTag").innerHTML  = '<i class="bi bi-mortarboard-fill" style="margin-right:5px;"></i>' + (p.promotionLib || '—');
+  document.getElementById("pvParcoursTag").innerHTML = '<i class="bi bi-book-fill" style="margin-right:5px;"></i>' + (p.parcoursLib || '—');
 
-  /* Grille */
-  document.getElementById("fi-nom").textContent      = p.nom;
-  document.getElementById("fi-prenom").textContent   = p.prenom;
+  /* À propos / Grille */
+  document.getElementById("fi-nom").textContent       = (p.prenom + " " + p.nom).trim() || "—";
+  document.getElementById("fi-prenom").textContent    = "";   /* fusionné dans fi-nom */
   document.getElementById("fi-genre-text").textContent = p.genreLib || "—";
   if (p.idgenre) document.getElementById("fi-genre-icon").className = "bi " + (p.idgenre === "GEN000001" ? "bi-gender-male" : "bi-gender-female");
-  document.getElementById("fi-dtn").textContent      = p.dtn ? p.dtn.split("-").reverse().join("/") : "";
-  document.getElementById("fi-tel").textContent      = p.telephone;
-  document.getElementById("fi-email").textContent    = p.email;
-  document.getElementById("fi-id").textContent       = p.idprofil;
-  document.getElementById("fi-promo").textContent    = p.promotionLib + " (" + p.idpromotion + ")";
-  document.getElementById("fi-parcours").textContent = p.parcoursLib  + " (" + p.idparcours  + ")";
+  document.getElementById("fi-dtn").textContent       = p.dtn ? p.dtn.split("-").reverse().join("/") : "—";
+  document.getElementById("fi-tel").textContent       = p.telephone || "—";
+  document.getElementById("fi-email").textContent     = p.email || "—";
+  document.getElementById("fi-id").textContent        = p.idprofil || "—";
+  document.getElementById("fi-promo").textContent     = p.promotionLib ? p.promotionLib + (p.idpromotion ? " (" + p.idpromotion + ")" : "") : "—";
+  document.getElementById("fi-parcours").textContent  = p.parcoursLib  ? p.parcoursLib  + (p.idparcours  ? " (" + p.idparcours  + ")" : "") : "—";
+  var fiContrib = document.getElementById("fi-contribution");
+  if (fiContrib) fiContrib.textContent = p.contribution;
 
 })();
 

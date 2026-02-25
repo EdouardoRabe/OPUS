@@ -23,13 +23,39 @@ public class Profil extends ClassMAPTable {
         setNomTable("profil");
     }
 
+    public ProfilStatutLib getProfilStatut() throws Exception {
+        ProfilStatutLib result = null;
+        Connection c = null;
+        try {
+            c = new utilitaire.UtilDB().GetConn();
+            ProfilStatutLib filtre = new ProfilStatutLib();
+            filtre.setIdprofil(this.idprofil);
+            Object[] res = CGenUtil.rechercher(filtre, null, null, c, "");
+            if (res != null && res.length > 0) {
+                result = (ProfilStatutLib) res[0];
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (Exception e) {
+                    throw e;
+                }
+            }
+        }
+        return result;
+    }
+
     public int getContribution() throws Exception {
         int count = 0;
         Connection c = null;
         try {
             c = new utilitaire.UtilDB().GetConn();
             Publication filtre = new Publication();
-            // System.out.println("ID utilisateur pour contribution: " + this.idutilisateur);
+            // System.out.println("ID utilisateur pour contribution: " +
+            // this.idutilisateur);
             // filtre.setIdutilisateur(this.idutilisateur);
             filtre.setIdtypepublication("TPB000001");
             Object[] res = CGenUtil.rechercher(filtre, null, null, c, " and idutilisateur = " + this.idutilisateur);
