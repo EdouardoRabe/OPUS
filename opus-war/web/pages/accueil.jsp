@@ -78,328 +78,6 @@
     }
 %>
 
-<div class="fa-layout">
-
-    <!-- ===== COLONNE GAUCHE : Profil ===== -->
-    <aside class="fa-sidebar-left">
-        <div class="fa-profile-card">
-            <div class="fa-profile-cover"<%= !_connCoverUrl.isEmpty() ? " style=\"background:none;\"" : "" %>><% if (!_connCoverUrl.isEmpty()) { %><img src="<%= _connCoverUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"><% } %></div>
-            <div class="fa-profile-body">
-                <div class="fa-profile-avatar-wrap">
-                    <div class="fa-avatar fa-avatar--lg"<%= !_connPhotoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>><% if (!_connPhotoUrl.isEmpty()) { %><img src="<%= _connPhotoUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initialConnecte %><% } %></div>
-                </div>
-                <div class="fa-profile-name"><%= nomConnecte %></div>
-                <hr class="fa-divider">
-                <nav class="fa-profile-nav">
-                    <a href="<%= ctx %>/pages/module.jsp?but=profil/voir.jsp&currentMenu=MENDYN000009" class="fa-nav-link">
-                        <i class="bi bi-person-fill"></i> Mon profil
-                    </a>
-                    <a href="#" class="fa-nav-link fa-nav-link--active">
-                        <i class="bi bi-newspaper"></i> Fil d&apos;actualit&eacute;
-                    </a>
-                    <a href="<%= ctx %>/pages/module.jsp?but=alumni/notifications.jsp" class="fa-nav-link">
-                        <i class="bi bi-bell-fill"></i> Notifications
-                    </a>
-                </nav>
-            </div>
-        </div>
-    </aside>
-
-    <!-- ===== COLONNE CENTRALE : Fil ===== -->
-    <main class="fa-feed-center">
-
-        <!-- Flash messages via Swal -->
-        <% if (msgSucces != null) { %>
-        <script>document.addEventListener('DOMContentLoaded',function(){Swal.fire({toast:true,position:'top-end',icon:'success',title:'<%= msgSucces.replace("'","\\'").replace("<","&lt;") %>',timer:3000,showConfirmButton:false});});</script>
-        <% } %>
-        <% if (msgErreur != null) { %>
-        <script>document.addEventListener('DOMContentLoaded',function(){Swal.fire({icon:'error',title:'Erreur',text:'<%= msgErreur.replace("'","\\'").replace("<","&lt;") %>',confirmButtonColor:'var(--itu-blue)'});});</script>
-        <% } %>
-
-        <!-- ===== FILTRE DU FIL ===== -->
-        <!-- Datalists pour le filtre -->
-        <datalist id="dl-f-spec"><% for (int _fi=0;_fi<allSpecialites.length;_fi++){%><option value="<%= allSpecialites[_fi].getLibelle() %>"><% } %></datalist>
-        <datalist id="dl-f-parc"><% for (int _fi=0;_fi<allParcours.length;_fi++){%><option value="<%= allParcours[_fi].getLibelle() %>"><% } %></datalist>
-        <datalist id="dl-f-typepub"><% for (int _fi=0;_fi<typesPub.length;_fi++){%><option value="<%= typesPub[_fi].getLibelle() %>"><% } %></datalist>
-        <div class="fa-filter-bar" id="feed-filter-bar">
-            <input list="dl-f-spec" id="filter-spec-input" class="fa-filter-input" placeholder="Sp&eacute;cialit&eacute;..." autocomplete="off">
-            <input list="dl-f-parc" id="filter-parc-input" class="fa-filter-input" placeholder="Parcours..." autocomplete="off">
-            <input id="filter-promo-input" class="fa-filter-input" placeholder="Ann&eacute;e ex: 2023+" maxlength="6" autocomplete="off">
-            <input list="dl-f-typepub" id="filter-typepub-input" class="fa-filter-input" placeholder="Type de publication..." autocomplete="off">
-            <label class="fa-filter-lier-label" title="Relier les crit&egrave;res (ET)">
-                <input type="checkbox" id="filter-lier">&nbsp;Lier
-            </label>
-            <button type="button" class="fa-filter-apply" onclick="appliquerFiltre()"><i class="bi bi-sliders"></i>&nbsp;Filtrer</button>
-            <button type="button" class="fa-filter-reset" onclick="reinitialiserFiltre()" id="filter-reset-btn" style="display:none"><i class="bi bi-x-lg"></i></button>
-        </div>
-
-        <!-- ===== COMPOSER ===== -->
-        <div class="fa-composer-card" id="composer-card">
-            <div class="fa-composer-trigger" id="composer-trigger" onclick="openComposer()">
-                <div class="fa-avatar fa-avatar--sm"<%= !_connPhotoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>><% if (!_connPhotoUrl.isEmpty()) { %><img src="<%= _connPhotoUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initialConnecte %><% } %></div>
-                <div class="fa-composer-placeholder">Quoi de neuf&nbsp;?</div>
-            </div>
-            <div class="fa-composer-quick-actions" id="composer-quick-actions">
-                <button class="fa-quick-action-btn" type="button"
-                        onclick="openComposer();setTimeout(function(){document.getElementById('composer-img-input').click();},120)">
-                    <i class="bi bi-image-fill" style="color:#45bd62;"></i>&nbsp;Photo
-                </button>
-                <button class="fa-quick-action-btn" type="button"
-                        onclick="openComposer();setTimeout(function(){togglePubTag();},120)">
-                    <i class="bi bi-tag-fill" style="color:#f7b928;"></i>&nbsp;Identifier
-                </button>
-            </div>
-            <!-- Formulaire complet (masqué par défaut) -->
-            <div class="fa-composer-full" id="composer-full" style="display:none;">
-                <form method="POST" enctype="multipart/form-data" id="form-pub"
-                      action="<%= ctx %>/pages/alumni/ajax/creer-publication.jsp">
-                    <div class="fa-composer-header">
-                        <div class="fa-avatar fa-avatar--md"<%= !_connPhotoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>><% if (!_connPhotoUrl.isEmpty()) { %><img src="<%= _connPhotoUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initialConnecte %><% } %></div>
-                        <div>
-                            <strong><%= nomConnecte %></strong>
-                            <select name="idtypepublication" class="fa-type-select">
-                                <% for (int t = 0; t < typesPub.length; t++) { %>
-                                <option value="<%= typesPub[t].getIdtypepublication() %>"><%= typesPub[t].getLibelle() %></option>
-                                <% } %>
-                            </select>
-                        </div>
-                    </div>
-                    <textarea name="description" class="fa-composer-textarea" rows="4"
-                              placeholder="Quoi de neuf, <%= nomConnecte %> ?"></textarea>
-                    <div id="composer-img-preview" style="display:none;" class="fa-img-preview-wrap">
-                        <img id="composer-img-previewImg" src="" class="fa-img-preview" alt="apercu">
-                        <button type="button" class="fa-img-remove-btn" onclick="removeComposerImg()"><i class="bi bi-x-lg"></i></button>
-                    </div>
-                    <!-- Zone identification -->
-                    <div class="fa-composer-tags-area">
-                        <a href="javascript:void(0)" onclick="togglePubTag()" class="fa-tag-toggle">
-                            <i class="bi bi-tag-fill"></i> Identifier des personnes
-                        </a>
-                        <div id="pub-tag-zone" style="display:none;margin-top:8px;">
-                            <input type="text" id="pub-tag-search" placeholder="Rechercher un utilisateur..."
-                                   oninput="rechercherPourPubTag()" autocomplete="off" class="fa-input">
-                            <div id="pub-tag-suggestions" class="fa-suggestions-list"></div>
-                            <div id="pub-tag-selected" class="fa-chips-row"></div>
-                        </div>
-                        <input type="hidden" name="identifications" id="pub-identifications" value="">
-                    </div>
-                    <!-- Zone visibilite -->
-                    <div class="fa-vis-section" id="vis-section">
-                        <div class="fa-vis-header" onclick="toggleVisSection()">
-                            <i class="bi bi-globe2" id="vis-icon"></i>
-                            <span id="vis-summary">Visible par tous</span>
-                            <i class="bi bi-chevron-down" id="vis-chevron" style="margin-left:auto;font-size:12px;"></i>
-                        </div>
-                        <!-- Datalists visibilite -->
-                        <datalist id="dl-vis-spec"><% for(int _vi=0;_vi<allSpecialites.length;_vi++){%><option value="<%= allSpecialites[_vi].getLibelle() %>"><% } %></datalist>
-                        <datalist id="dl-vis-parc"><% for(int _vi=0;_vi<allParcours.length;_vi++){%><option value="<%= allParcours[_vi].getLibelle() %>"><% } %></datalist>
-                        <div class="fa-vis-body" id="vis-body" style="display:none;">
-                            <div class="fa-vis-group">
-                                <div class="fa-vis-label">Sp&eacute;cialit&eacute;s</div>
-                                <div class="fa-vis-tag-row">
-                                    <input list="dl-vis-spec" id="vis-spec-input" class="fa-vis-tag-input" placeholder="Ajouter une sp&eacute;cialit&eacute;..." autocomplete="off" oninput="" onkeydown="onVisTagKey(event,'spec')">
-                                    <button type="button" class="fa-vis-tag-add" onclick="addVisTagFromInput('spec')"><i class="bi bi-plus"></i></button>
-                                </div>
-                                <div class="fa-vis-chips" id="vis-spec-chips"></div>
-                            </div>
-                            <div class="fa-vis-group">
-                                <div class="fa-vis-label">Parcours</div>
-                                <div class="fa-vis-tag-row">
-                                    <input list="dl-vis-parc" id="vis-parc-input" class="fa-vis-tag-input" placeholder="Ajouter un parcours..." autocomplete="off" onkeydown="onVisTagKey(event,'parc')">
-                                    <button type="button" class="fa-vis-tag-add" onclick="addVisTagFromInput('parc')"><i class="bi bi-plus"></i></button>
-                                </div>
-                                <div class="fa-vis-chips" id="vis-parc-chips"></div>
-                            </div>
-                            <div class="fa-vis-group">
-                                <div class="fa-vis-label">Promotion (ann&eacute;e)</div>
-                                <div class="fa-vis-tag-row" style="position:relative;">
-                                    <input id="vis-promo-input" class="fa-vis-tag-input" placeholder="ex: 2023 &rarr; 2023+ ou 2023-" maxlength="5" autocomplete="off"
-                                           oninput="onVisPromoInput()" onkeydown="onVisPromoKey(event)">
-                                    <button type="button" class="fa-vis-tag-add" onclick="addVisPromoFromInput()"><i class="bi bi-plus"></i></button>
-                                    <div class="fa-vis-promo-dd" id="vis-promo-dd" style="display:none;"></div>
-                                </div>
-                                <div class="fa-vis-chips" id="vis-promo-chips"></div>
-                            </div>
-                            <div class="fa-vis-group" id="vis-lier-group">
-                                <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;">
-                                    <input type="checkbox" id="vis-lier-check" onchange="updateVisHidden()">
-                                    Lier les crit&egrave;res (ET : toutes les conditions requises)
-                                </label>
-                            </div>
-                            <input type="hidden" name="vis_spec" id="vis-spec-hidden" value="">
-                            <input type="hidden" name="vis_parc" id="vis-parc-hidden" value="">
-                            <input type="hidden" name="vis_promo_annee" id="vis-promo-annee-hidden" value="">
-                            <input type="hidden" name="vis_lier" id="vis-lier-hidden" value="OR">
-                        </div>
-                    </div>
-                    <div class="fa-composer-footer">
-                        <label class="fa-attach-btn">
-                            <i class="bi bi-image"></i>&nbsp;Photo/Vid&eacute;o
-                            <input type="file" id="composer-img-input" name="image" accept="image/*" style="display:none;"
-                                   onchange="previewComposerImg(this)">
-                        </label>
-                        <div class="fa-composer-submit-group">
-                            <button type="button" class="fa-btn-cancel" onclick="closeComposer()">Annuler</button>
-                            <button type="submit" class="fa-btn-publish">Publier</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- ===== PUBLICATIONS (composant réutilisable) ===== -->
-        <%
-            Connection conn = null;
-            try {
-                conn = new UtilDB().GetConn();
-
-                // Charger types de reactions
-                Reactiontype[] reactTypes = (Reactiontype[]) CGenUtil.rechercher(
-                        new Reactiontype(), null, null, conn, " order by idreactiontype");
-                if (reactTypes == null) reactTypes = new Reactiontype[0];
-
-                // Charger tous les profils pour lookup nom + photo
-                ProfilLib[] allProfils = (ProfilLib[]) CGenUtil.rechercher(
-                        new ProfilLib(), null, null, conn, "");
-                Map userNames = new HashMap();
-                Map userPhotos = new HashMap();
-                Map userProfils = new HashMap();
-                if (allProfils != null) {
-                    for (int i = 0; i < allProfils.length; i++) {
-                        Integer _key = new Integer(allProfils[i].getIdutilisateur());
-                        userNames.put(_key, allProfils[i].getNom() + " " + allProfils[i].getPrenom());
-                        if (allProfils[i].getPhotoProfil() != null && !allProfils[i].getPhotoProfil().trim().isEmpty())
-                            userPhotos.put(_key, ctx + "/" + allProfils[i].getPhotoProfil().trim());
-                        if (allProfils[i].getIdprofil() != null)
-                            userProfils.put(_key, allProfils[i].getIdprofil());
-                    }
-                }
-
-                // --- Score feed : interactions + recence - vues (1 requete JDBC, leger) ---
-                // Score = reactions*2 + commentaires*3 - vues_user*4 + bonus_recence
-                String _sE =
-                    "COALESCE((SELECT COUNT(*) FROM publicationreaction pr WHERE pr.idpublication=p.idpublication),0)*2"
-                    + "+COALESCE((SELECT COUNT(*) FROM publicationcommentaire pc WHERE pc.idpublication=p.idpublication AND pc.etat=1),0)*3"
-                    + "-COALESCE((SELECT pv.nbvue FROM publicationvue pv WHERE pv.idpublication=p.idpublication AND pv.idutilisateur=" + refuserConnecte + "),0)*4"
-                    + "+CASE WHEN p.daty::date=CURRENT_DATE THEN 15 WHEN p.daty::date>=CURRENT_DATE-7 THEN 8 WHEN p.daty::date>=CURRENT_DATE-30 THEN 3 ELSE 0 END";
-                // ---- Visibilite : construire sous-requetes ----
-                String _vsSpecSub = "(SELECT sp.idspecialite FROM specialiteprofil sp JOIN profil _pr ON sp.idprofil=_pr.idprofil WHERE _pr.idutilisateur=" + refuserConnecte + ")";
-                String _vsParcSub = "(SELECT _pr.idparcours FROM profil _pr WHERE _pr.idutilisateur=" + refuserConnecte + " LIMIT 1)";
-                String _vsUserAnnee = "(SELECT _pt.annee FROM promotion _pt JOIN profil _pr ON _pt.idpromotion=_pr.idpromotion WHERE _pr.idutilisateur=" + refuserConnecte + " LIMIT 1)";
-                // Condition promo : direction + ou -
-                String _vsPromoCond = "(_pv.typecible='PROMOTION' AND ((_pv.anneedirection='+' AND " + _vsUserAnnee + ">=_pv.anneeref) OR (_pv.anneedirection='-' AND " + _vsUserAnnee + "<=_pv.anneeref)))";
-                String _vsSpecExist  = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE' AND _pv.idref IN " + _vsSpecSub + ")";
-                String _vsPromoExist = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND " + _vsPromoCond + ")";
-                String _vsParcExist  = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PARCOURS' AND _pv.idref=" + _vsParcSub + ")";
-                String _visW =
-                    " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication)"
-                    // OR mode: satisfaire au moins UNE restriction
-                    + " OR (COALESCE(p.logique_visibilite,'OR')='OR' AND ("
-                    + _vsSpecExist + " OR " + _vsPromoExist + " OR " + _vsParcExist
-                    + "))"
-                    // AND mode: satisfaire CHAQUE type de restriction present
-                    + " OR (p.logique_visibilite='AND'"
-                    + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE') OR " + _vsSpecExist + ")"
-                    + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PROMOTION') OR " + _vsPromoExist + ")"
-                    + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PARCOURS') OR " + _vsParcExist + ")))"; 
-                String _initSql = "SELECT p.idpublication,(" + _sE + ") AS score FROM publication p WHERE p.etat=1" + _visW + " ORDER BY score DESC,p.idpublication DESC LIMIT 10";
-                List _pids = new ArrayList(); List _pscores = new ArrayList();
-                Statement _st = null; ResultSet _rs = null;
-                try {
-                    _st = conn.createStatement(); _rs = _st.executeQuery(_initSql);
-                    while (_rs.next()) { _pids.add(_rs.getString("idpublication")); _pscores.add(new Integer(_rs.getInt("score"))); }
-                } finally {
-                    if (_rs != null) try { _rs.close(); } catch (Exception _x) {}
-                    if (_st != null) try { _st.close(); } catch (Exception _x) {}
-                }
-                Publication[] pubs = new Publication[_pids.size()];
-                for (int _i = 0; _i < _pids.size(); _i++) {
-                    Publication[] _pa = (Publication[]) CGenUtil.rechercher(new Publication(), null, null, conn, " and idpublication='" + _pids.get(_i) + "'");
-                    pubs[_i] = (_pa != null && _pa.length > 0) ? _pa[0] : new Publication();
-                }
-                String _lastScore = _pscores.isEmpty() ? "0" : _pscores.get(_pscores.size()-1).toString();
-
-                // Passer les données au composant via request attributes
-                request.setAttribute("_pub_lastScore", _lastScore);
-                request.setAttribute("_pub_pubs", pubs);
-                request.setAttribute("_pub_userNames", userNames);
-                request.setAttribute("_pub_userPhotos", userPhotos);
-                request.setAttribute("_pub_userProfils", userProfils);
-                request.setAttribute("_pub_reactTypes", reactTypes);
-                request.setAttribute("_pub_typesPub", typesPub);
-                request.setAttribute("_pub_refuser", new Integer(refuserConnecte));
-                request.setAttribute("_pub_initialConnecte", initialConnecte);
-                request.setAttribute("_pub_connPhotoUrl", _connPhotoUrl);
-                request.setAttribute("_pub_ctx", ctx);
-                request.setAttribute("_pub_conn", conn);
-        %>
-        <jsp:include page="publication.jsp" />
-        <%
-        } catch (Exception e) {
-            e.printStackTrace();
-        %>
-        <div class="fa-error-box">
-            <i class="bi bi-exclamation-triangle-fill"></i>&nbsp;Erreur publications&nbsp;: <%= e.getMessage() %>
-        </div>
-        <%
-            } finally {
-                if (conn != null) try { conn.close(); } catch (Exception _x) {}
-            }
-        %>
-
-    </main><!-- /fa-feed-center -->
-
-    <!-- ===== COLONNE DROITE : Événements à venir ===== -->
-    <aside class="fa-sidebar-right">
-
-        <!-- Widget : Événements à venir -->
-        <div class="fa-widget-card" id="widget-evenements">
-            <div class="fa-widget-header">
-                <i class="bi bi-calendar-event-fill fa-widget-icon"></i>
-                <span class="fa-widget-title">&Eacute;v&eacute;nements &agrave; venir</span>
-            </div>
-            <div class="fa-widget-body" id="evenements-list">
-                <%
-                    String[] _moisCourt = {"jan","f\u00E9v","mar","avr","mai","jun","jul","ao\u00FB","sep","oct","nov","d\u00E9c"};
-                    int _evtMax = Math.min(_upEvents.length, 3);
-                    if (_evtMax == 0) {
-                %>
-                <div style="padding:16px;text-align:center;color:#999;font-size:13px;">Aucun &eacute;v&eacute;nement &agrave; venir</div>
-                <% } else {
-                    for (int _ei = 0; _ei < _evtMax; _ei++) {
-                        Evenement _ev = _upEvents[_ei];
-                        String _evDesc = _ev.getDescription() != null ? _ev.getDescription() : "\u00C9v\u00E9nement";
-                        String _evDescSafe = _evDesc.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;");
-                        if (_evDescSafe.length() > 40) _evDescSafe = _evDescSafe.substring(0, 40) + "...";
-                        String _evDay = "--"; String _evMon = "---";
-                        if (_ev.getDatedebut() != null) {
-                            java.util.Calendar _cal = java.util.Calendar.getInstance();
-                            _cal.setTime(_ev.getDatedebut());
-                            _evDay = String.valueOf(_cal.get(java.util.Calendar.DAY_OF_MONTH));
-                            _evMon = _moisCourt[_cal.get(java.util.Calendar.MONTH)];
-                        }
-                %>
-                <div class="fa-event-item">
-                    <div class="fa-event-date-badge">
-                        <span class="fa-event-day"><%= _evDay %></span>
-                        <span class="fa-event-month"><%= _evMon %></span>
-                    </div>
-                    <div class="fa-event-info">
-                        <div class="fa-event-title"><%= _evDescSafe %></div>
-                        <div class="fa-event-meta"><i class="bi bi-calendar-event"></i>&nbsp;<%= _ev.getDatedebut() %></div>
-                    </div>
-                </div>
-                <% } } %>
-            </div>
-            <div class="fa-widget-footer">
-                <a href="<%= ctx %>/pages/module.jsp?but=evenement/evenement-calendar.jsp" class="fa-widget-link">Voir tous les &eacute;v&eacute;nements &rarr;</a>
-            </div>
-        </div>
-
-    </aside>
-
-</div><!-- /fa-layout -->
-
 <!-- ==================== STYLES FIL D'ACTUALITE ==================== -->
 <style>
     /* ---- Variables locales ---- */
@@ -818,6 +496,328 @@
     .share-submit-btn:hover { opacity:.88; }
     .share-submit-btn:disabled { opacity:.5; cursor:default; }
 </style>
+
+<div class="fa-layout">
+
+    <!-- ===== COLONNE GAUCHE : Profil ===== -->
+    <aside class="fa-sidebar-left">
+        <div class="fa-profile-card">
+            <div class="fa-profile-cover"<%= !_connCoverUrl.isEmpty() ? " style=\"background:none;\"" : "" %>><% if (!_connCoverUrl.isEmpty()) { %><img src="<%= _connCoverUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"><% } %></div>
+            <div class="fa-profile-body">
+                <div class="fa-profile-avatar-wrap">
+                    <div class="fa-avatar fa-avatar--lg"<%= !_connPhotoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>><% if (!_connPhotoUrl.isEmpty()) { %><img src="<%= _connPhotoUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initialConnecte %><% } %></div>
+                </div>
+                <div class="fa-profile-name"><%= nomConnecte %></div>
+                <hr class="fa-divider">
+                <nav class="fa-profile-nav">
+                    <a href="<%= ctx %>/pages/module.jsp?but=profil/voir.jsp&currentMenu=MENDYN000009" class="fa-nav-link">
+                        <i class="bi bi-person-fill"></i> Mon profil
+                    </a>
+                    <a href="#" class="fa-nav-link fa-nav-link--active">
+                        <i class="bi bi-newspaper"></i> Fil d&apos;actualit&eacute;
+                    </a>
+                    <a href="<%= ctx %>/pages/module.jsp?but=alumni/notifications.jsp" class="fa-nav-link">
+                        <i class="bi bi-bell-fill"></i> Notifications
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ===== COLONNE CENTRALE : Fil ===== -->
+    <main class="fa-feed-center">
+
+        <!-- Flash messages via Swal -->
+        <% if (msgSucces != null) { %>
+        <script>document.addEventListener('DOMContentLoaded',function(){Swal.fire({toast:true,position:'top-end',icon:'success',title:'<%= msgSucces.replace("'","\\'").replace("<","&lt;") %>',timer:3000,showConfirmButton:false});});</script>
+        <% } %>
+        <% if (msgErreur != null) { %>
+        <script>document.addEventListener('DOMContentLoaded',function(){Swal.fire({icon:'error',title:'Erreur',text:'<%= msgErreur.replace("'","\\'").replace("<","&lt;") %>',confirmButtonColor:'var(--itu-blue)'});});</script>
+        <% } %>
+
+        <!-- ===== FILTRE DU FIL ===== -->
+        <!-- Datalists pour le filtre -->
+        <datalist id="dl-f-spec"><% for (int _fi=0;_fi<allSpecialites.length;_fi++){%><option value="<%= allSpecialites[_fi].getLibelle() %>"><% } %></datalist>
+        <datalist id="dl-f-parc"><% for (int _fi=0;_fi<allParcours.length;_fi++){%><option value="<%= allParcours[_fi].getLibelle() %>"><% } %></datalist>
+        <datalist id="dl-f-typepub"><% for (int _fi=0;_fi<typesPub.length;_fi++){%><option value="<%= typesPub[_fi].getLibelle() %>"><% } %></datalist>
+        <div class="fa-filter-bar" id="feed-filter-bar">
+            <input list="dl-f-spec" id="filter-spec-input" class="fa-filter-input" placeholder="Sp&eacute;cialit&eacute;..." autocomplete="off">
+            <input list="dl-f-parc" id="filter-parc-input" class="fa-filter-input" placeholder="Parcours..." autocomplete="off">
+            <input id="filter-promo-input" class="fa-filter-input" placeholder="Ann&eacute;e ex: 2023+" maxlength="6" autocomplete="off">
+            <input list="dl-f-typepub" id="filter-typepub-input" class="fa-filter-input" placeholder="Type de publication..." autocomplete="off">
+            <label class="fa-filter-lier-label" title="Relier les crit&egrave;res (ET)">
+                <input type="checkbox" id="filter-lier">&nbsp;Lier
+            </label>
+            <button type="button" class="fa-filter-apply" onclick="appliquerFiltre()"><i class="bi bi-sliders"></i>&nbsp;Filtrer</button>
+            <button type="button" class="fa-filter-reset" onclick="reinitialiserFiltre()" id="filter-reset-btn" style="display:none"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <!-- ===== COMPOSER ===== -->
+        <div class="fa-composer-card" id="composer-card">
+            <div class="fa-composer-trigger" id="composer-trigger" onclick="openComposer()">
+                <div class="fa-avatar fa-avatar--sm"<%= !_connPhotoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>><% if (!_connPhotoUrl.isEmpty()) { %><img src="<%= _connPhotoUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initialConnecte %><% } %></div>
+                <div class="fa-composer-placeholder">Quoi de neuf&nbsp;?</div>
+            </div>
+            <div class="fa-composer-quick-actions" id="composer-quick-actions">
+                <button class="fa-quick-action-btn" type="button"
+                        onclick="openComposer();setTimeout(function(){document.getElementById('composer-img-input').click();},120)">
+                    <i class="bi bi-image-fill" style="color:#45bd62;"></i>&nbsp;Photo
+                </button>
+                <button class="fa-quick-action-btn" type="button"
+                        onclick="openComposer();setTimeout(function(){togglePubTag();},120)">
+                    <i class="bi bi-tag-fill" style="color:#f7b928;"></i>&nbsp;Identifier
+                </button>
+            </div>
+            <!-- Formulaire complet (masqué par défaut) -->
+            <div class="fa-composer-full" id="composer-full" style="display:none;">
+                <form method="POST" enctype="multipart/form-data" id="form-pub"
+                      action="<%= ctx %>/pages/alumni/ajax/creer-publication.jsp">
+                    <div class="fa-composer-header">
+                        <div class="fa-avatar fa-avatar--md"<%= !_connPhotoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>><% if (!_connPhotoUrl.isEmpty()) { %><img src="<%= _connPhotoUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initialConnecte %><% } %></div>
+                        <div>
+                            <strong><%= nomConnecte %></strong>
+                            <select name="idtypepublication" class="fa-type-select">
+                                <% for (int t = 0; t < typesPub.length; t++) { %>
+                                <option value="<%= typesPub[t].getIdtypepublication() %>"><%= typesPub[t].getLibelle() %></option>
+                                <% } %>
+                            </select>
+                        </div>
+                    </div>
+                    <textarea name="description" class="fa-composer-textarea" rows="4"
+                              placeholder="Quoi de neuf, <%= nomConnecte %> ?"></textarea>
+                    <div id="composer-img-preview" style="display:none;" class="fa-img-preview-wrap">
+                        <img id="composer-img-previewImg" src="" class="fa-img-preview" alt="apercu">
+                        <button type="button" class="fa-img-remove-btn" onclick="removeComposerImg()"><i class="bi bi-x-lg"></i></button>
+                    </div>
+                    <!-- Zone identification -->
+                    <div class="fa-composer-tags-area">
+                        <a href="javascript:void(0)" onclick="togglePubTag()" class="fa-tag-toggle">
+                            <i class="bi bi-tag-fill"></i> Identifier des personnes
+                        </a>
+                        <div id="pub-tag-zone" style="display:none;margin-top:8px;">
+                            <input type="text" id="pub-tag-search" placeholder="Rechercher un utilisateur..."
+                                   oninput="rechercherPourPubTag()" autocomplete="off" class="fa-input">
+                            <div id="pub-tag-suggestions" class="fa-suggestions-list"></div>
+                            <div id="pub-tag-selected" class="fa-chips-row"></div>
+                        </div>
+                        <input type="hidden" name="identifications" id="pub-identifications" value="">
+                    </div>
+                    <!-- Zone visibilite -->
+                    <div class="fa-vis-section" id="vis-section">
+                        <div class="fa-vis-header" onclick="toggleVisSection()">
+                            <i class="bi bi-globe2" id="vis-icon"></i>
+                            <span id="vis-summary">Visible par tous</span>
+                            <i class="bi bi-chevron-down" id="vis-chevron" style="margin-left:auto;font-size:12px;"></i>
+                        </div>
+                        <!-- Datalists visibilite -->
+                        <datalist id="dl-vis-spec"><% for(int _vi=0;_vi<allSpecialites.length;_vi++){%><option value="<%= allSpecialites[_vi].getLibelle() %>"><% } %></datalist>
+                        <datalist id="dl-vis-parc"><% for(int _vi=0;_vi<allParcours.length;_vi++){%><option value="<%= allParcours[_vi].getLibelle() %>"><% } %></datalist>
+                        <div class="fa-vis-body" id="vis-body" style="display:none;">
+                            <div class="fa-vis-group">
+                                <div class="fa-vis-label">Sp&eacute;cialit&eacute;s</div>
+                                <div class="fa-vis-tag-row">
+                                    <input list="dl-vis-spec" id="vis-spec-input" class="fa-vis-tag-input" placeholder="Ajouter une sp&eacute;cialit&eacute;..." autocomplete="off" oninput="" onkeydown="onVisTagKey(event,'spec')">
+                                    <button type="button" class="fa-vis-tag-add" onclick="addVisTagFromInput('spec')"><i class="bi bi-plus"></i></button>
+                                </div>
+                                <div class="fa-vis-chips" id="vis-spec-chips"></div>
+                            </div>
+                            <div class="fa-vis-group">
+                                <div class="fa-vis-label">Parcours</div>
+                                <div class="fa-vis-tag-row">
+                                    <input list="dl-vis-parc" id="vis-parc-input" class="fa-vis-tag-input" placeholder="Ajouter un parcours..." autocomplete="off" onkeydown="onVisTagKey(event,'parc')">
+                                    <button type="button" class="fa-vis-tag-add" onclick="addVisTagFromInput('parc')"><i class="bi bi-plus"></i></button>
+                                </div>
+                                <div class="fa-vis-chips" id="vis-parc-chips"></div>
+                            </div>
+                            <div class="fa-vis-group">
+                                <div class="fa-vis-label">Promotion (ann&eacute;e)</div>
+                                <div class="fa-vis-tag-row" style="position:relative;">
+                                    <input id="vis-promo-input" class="fa-vis-tag-input" placeholder="ex: 2023 &rarr; 2023+ ou 2023-" maxlength="5" autocomplete="off"
+                                           oninput="onVisPromoInput()" onkeydown="onVisPromoKey(event)">
+                                    <button type="button" class="fa-vis-tag-add" onclick="addVisPromoFromInput()"><i class="bi bi-plus"></i></button>
+                                    <div class="fa-vis-promo-dd" id="vis-promo-dd" style="display:none;"></div>
+                                </div>
+                                <div class="fa-vis-chips" id="vis-promo-chips"></div>
+                            </div>
+                            <div class="fa-vis-group" id="vis-lier-group">
+                                <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                                    <input type="checkbox" id="vis-lier-check" onchange="updateVisHidden()">
+                                    Lier les crit&egrave;res (ET : toutes les conditions requises)
+                                </label>
+                            </div>
+                            <input type="hidden" name="vis_spec" id="vis-spec-hidden" value="">
+                            <input type="hidden" name="vis_parc" id="vis-parc-hidden" value="">
+                            <input type="hidden" name="vis_promo_annee" id="vis-promo-annee-hidden" value="">
+                            <input type="hidden" name="vis_lier" id="vis-lier-hidden" value="OR">
+                        </div>
+                    </div>
+                    <div class="fa-composer-footer">
+                        <label class="fa-attach-btn">
+                            <i class="bi bi-image"></i>&nbsp;Photo/Vid&eacute;o
+                            <input type="file" id="composer-img-input" name="image" accept="image/*" style="display:none;"
+                                   onchange="previewComposerImg(this)">
+                        </label>
+                        <div class="fa-composer-submit-group">
+                            <button type="button" class="fa-btn-cancel" onclick="closeComposer()">Annuler</button>
+                            <button type="submit" class="fa-btn-publish">Publier</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===== PUBLICATIONS (composant réutilisable) ===== -->
+        <%
+            Connection conn = null;
+            try {
+                conn = new UtilDB().GetConn();
+
+                // Charger types de reactions
+                Reactiontype[] reactTypes = (Reactiontype[]) CGenUtil.rechercher(
+                        new Reactiontype(), null, null, conn, " order by idreactiontype");
+                if (reactTypes == null) reactTypes = new Reactiontype[0];
+
+                // Charger tous les profils pour lookup nom + photo
+                ProfilLib[] allProfils = (ProfilLib[]) CGenUtil.rechercher(
+                        new ProfilLib(), null, null, conn, "");
+                Map userNames = new HashMap();
+                Map userPhotos = new HashMap();
+                Map userProfils = new HashMap();
+                if (allProfils != null) {
+                    for (int i = 0; i < allProfils.length; i++) {
+                        Integer _key = new Integer(allProfils[i].getIdutilisateur());
+                        userNames.put(_key, allProfils[i].getNom() + " " + allProfils[i].getPrenom());
+                        if (allProfils[i].getPhotoProfil() != null && !allProfils[i].getPhotoProfil().trim().isEmpty())
+                            userPhotos.put(_key, ctx + "/" + allProfils[i].getPhotoProfil().trim());
+                        if (allProfils[i].getIdprofil() != null)
+                            userProfils.put(_key, allProfils[i].getIdprofil());
+                    }
+                }
+
+                // --- Score feed : interactions + recence - vues (1 requete JDBC, leger) ---
+                // Score = reactions*2 + commentaires*3 - vues_user*4 + bonus_recence
+                String _sE =
+                    "COALESCE((SELECT COUNT(*) FROM publicationreaction pr WHERE pr.idpublication=p.idpublication),0)*2"
+                    + "+COALESCE((SELECT COUNT(*) FROM publicationcommentaire pc WHERE pc.idpublication=p.idpublication AND pc.etat=1),0)*3"
+                    + "-COALESCE((SELECT pv.nbvue FROM publicationvue pv WHERE pv.idpublication=p.idpublication AND pv.idutilisateur=" + refuserConnecte + "),0)*4"
+                    + "+CASE WHEN p.daty::date=CURRENT_DATE THEN 15 WHEN p.daty::date>=CURRENT_DATE-7 THEN 8 WHEN p.daty::date>=CURRENT_DATE-30 THEN 3 ELSE 0 END";
+                // ---- Visibilite : construire sous-requetes ----
+                String _vsSpecSub = "(SELECT sp.idspecialite FROM specialiteprofil sp JOIN profil _pr ON sp.idprofil=_pr.idprofil WHERE _pr.idutilisateur=" + refuserConnecte + ")";
+                String _vsParcSub = "(SELECT _pr.idparcours FROM profil _pr WHERE _pr.idutilisateur=" + refuserConnecte + " LIMIT 1)";
+                String _vsUserAnnee = "(SELECT _pt.annee FROM promotion _pt JOIN profil _pr ON _pt.idpromotion=_pr.idpromotion WHERE _pr.idutilisateur=" + refuserConnecte + " LIMIT 1)";
+                // Condition promo : direction + ou -
+                String _vsPromoCond = "(_pv.typecible='PROMOTION' AND ((_pv.anneedirection='+' AND " + _vsUserAnnee + ">=_pv.anneeref) OR (_pv.anneedirection='-' AND " + _vsUserAnnee + "<=_pv.anneeref)))";
+                String _vsSpecExist  = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE' AND _pv.idref IN " + _vsSpecSub + ")";
+                String _vsPromoExist = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND " + _vsPromoCond + ")";
+                String _vsParcExist  = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PARCOURS' AND _pv.idref=" + _vsParcSub + ")";
+                String _visW =
+                    " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication)"
+                    // OR mode: satisfaire au moins UNE restriction
+                    + " OR (COALESCE(p.logique_visibilite,'OR')='OR' AND ("
+                    + _vsSpecExist + " OR " + _vsPromoExist + " OR " + _vsParcExist
+                    + "))"
+                    // AND mode: satisfaire CHAQUE type de restriction present
+                    + " OR (p.logique_visibilite='AND'"
+                    + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE') OR " + _vsSpecExist + ")"
+                    + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PROMOTION') OR " + _vsPromoExist + ")"
+                    + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PARCOURS') OR " + _vsParcExist + ")))"; 
+                String _initSql = "SELECT p.idpublication,(" + _sE + ") AS score FROM publication p WHERE p.etat=1" + _visW + " ORDER BY score DESC,p.idpublication DESC LIMIT 10";
+                List _pids = new ArrayList(); List _pscores = new ArrayList();
+                Statement _st = null; ResultSet _rs = null;
+                try {
+                    _st = conn.createStatement(); _rs = _st.executeQuery(_initSql);
+                    while (_rs.next()) { _pids.add(_rs.getString("idpublication")); _pscores.add(new Integer(_rs.getInt("score"))); }
+                } finally {
+                    if (_rs != null) try { _rs.close(); } catch (Exception _x) {}
+                    if (_st != null) try { _st.close(); } catch (Exception _x) {}
+                }
+                Publication[] pubs = new Publication[_pids.size()];
+                for (int _i = 0; _i < _pids.size(); _i++) {
+                    Publication[] _pa = (Publication[]) CGenUtil.rechercher(new Publication(), null, null, conn, " and idpublication='" + _pids.get(_i) + "'");
+                    pubs[_i] = (_pa != null && _pa.length > 0) ? _pa[0] : new Publication();
+                }
+                String _lastScore = _pscores.isEmpty() ? "0" : _pscores.get(_pscores.size()-1).toString();
+
+                // Passer les données au composant via request attributes
+                request.setAttribute("_pub_lastScore", _lastScore);
+                request.setAttribute("_pub_pubs", pubs);
+                request.setAttribute("_pub_userNames", userNames);
+                request.setAttribute("_pub_userPhotos", userPhotos);
+                request.setAttribute("_pub_userProfils", userProfils);
+                request.setAttribute("_pub_reactTypes", reactTypes);
+                request.setAttribute("_pub_typesPub", typesPub);
+                request.setAttribute("_pub_refuser", new Integer(refuserConnecte));
+                request.setAttribute("_pub_initialConnecte", initialConnecte);
+                request.setAttribute("_pub_connPhotoUrl", _connPhotoUrl);
+                request.setAttribute("_pub_ctx", ctx);
+                request.setAttribute("_pub_conn", conn);
+        %>
+        <jsp:include page="publication.jsp" />
+        <%
+        } catch (Exception e) {
+            e.printStackTrace();
+        %>
+        <div class="fa-error-box">
+            <i class="bi bi-exclamation-triangle-fill"></i>&nbsp;Erreur publications&nbsp;: <%= e.getMessage() %>
+        </div>
+        <%
+            } finally {
+                if (conn != null) try { conn.close(); } catch (Exception _x) {}
+            }
+        %>
+
+    </main><!-- /fa-feed-center -->
+
+    <!-- ===== COLONNE DROITE : Événements à venir ===== -->
+    <aside class="fa-sidebar-right">
+
+        <!-- Widget : Événements à venir -->
+        <div class="fa-widget-card" id="widget-evenements">
+            <div class="fa-widget-header">
+                <i class="bi bi-calendar-event-fill fa-widget-icon"></i>
+                <span class="fa-widget-title">&Eacute;v&eacute;nements &agrave; venir</span>
+            </div>
+            <div class="fa-widget-body" id="evenements-list">
+                <%
+                    String[] _moisCourt = {"jan","f\u00E9v","mar","avr","mai","jun","jul","ao\u00FB","sep","oct","nov","d\u00E9c"};
+                    int _evtMax = Math.min(_upEvents.length, 3);
+                    if (_evtMax == 0) {
+                %>
+                <div style="padding:16px;text-align:center;color:#999;font-size:13px;">Aucun &eacute;v&eacute;nement &agrave; venir</div>
+                <% } else {
+                    for (int _ei = 0; _ei < _evtMax; _ei++) {
+                        Evenement _ev = _upEvents[_ei];
+                        String _evDesc = _ev.getDescription() != null ? _ev.getDescription() : "\u00C9v\u00E9nement";
+                        String _evDescSafe = _evDesc.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;");
+                        if (_evDescSafe.length() > 40) _evDescSafe = _evDescSafe.substring(0, 40) + "...";
+                        String _evDay = "--"; String _evMon = "---";
+                        if (_ev.getDatedebut() != null) {
+                            java.util.Calendar _cal = java.util.Calendar.getInstance();
+                            _cal.setTime(_ev.getDatedebut());
+                            _evDay = String.valueOf(_cal.get(java.util.Calendar.DAY_OF_MONTH));
+                            _evMon = _moisCourt[_cal.get(java.util.Calendar.MONTH)];
+                        }
+                %>
+                <div class="fa-event-item">
+                    <div class="fa-event-date-badge">
+                        <span class="fa-event-day"><%= _evDay %></span>
+                        <span class="fa-event-month"><%= _evMon %></span>
+                    </div>
+                    <div class="fa-event-info">
+                        <div class="fa-event-title"><%= _evDescSafe %></div>
+                        <div class="fa-event-meta"><i class="bi bi-calendar-event"></i>&nbsp;<%= _ev.getDatedebut() %></div>
+                    </div>
+                </div>
+                <% } } %>
+            </div>
+            <div class="fa-widget-footer">
+                <a href="<%= ctx %>/pages/module.jsp?but=evenement/evenement-calendar.jsp" class="fa-widget-link">Voir tous les &eacute;v&eacute;nements &rarr;</a>
+            </div>
+        </div>
+
+    </aside>
+
+</div><!-- /fa-layout -->
 
 <!-- ==================== MODALE REACTIONS ==================== -->
 <div id="react-detail-modal">
