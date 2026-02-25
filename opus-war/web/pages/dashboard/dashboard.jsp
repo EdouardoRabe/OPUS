@@ -8,6 +8,8 @@
 <%@ page import="alumni.ProfilLib" %>
 <%@ page import="alumni.Publication" %>
 <%@ page import="alumni.Historique" %>
+<%@ page import="alumni.Specialite" %>
+<%@ page import="alumni.Specialiteprofil" %>
 
 <%
     UserEJB uEJB = (UserEJB) session.getAttribute("u");
@@ -61,7 +63,38 @@
             }
         }
 
-        // 4. (Removed Recent Actions)
+        // 4. Specialities Distribution
+        List<Map<String, Object>> topSpecialities = new ArrayList<Map<String, Object>>();
+        Specialiteprofil[] specProfs = (Specialiteprofil[]) CGenUtil.rechercher(new Specialiteprofil(), null, null, conn, "");
+        if (specProfs != null) {
+            Map<String, Integer> specCounts = new HashMap<String, Integer>();
+            for (Specialiteprofil sp : specProfs) {
+                specCounts.put(sp.getIdspecialite(), specCounts.getOrDefault(sp.getIdspecialite(), 0) + 1);
+            }
+            
+            // Sort by count
+            List<Map.Entry<String, Integer>> list = new ArrayList<Map.Entry<String, Integer>>(specCounts.entrySet());
+            Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+                public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+                    return o2.getValue().compareTo(o1.getValue());
+                }
+            });
+            
+            // Take top 5
+            Specialite sTmp = new Specialite();
+            int i = 0;
+            for (Map.Entry<String, Integer> entry : list) {
+                if (i++ >= 5) break;
+                Specialite[] sArr = (Specialite[]) CGenUtil.rechercher(sTmp, null, null, conn, " and idspecialite = '" + entry.getKey() + "'");
+                if (sArr != null && sArr.length > 0) {
+                    Map<String, Object> m = new HashMap<String, Object>();
+                    m.put("libelle", sArr[0].getLibelle());
+                    m.put("count", entry.getValue());
+                    topSpecialities.add(m);
+                }
+            }
+        }
+        request.setAttribute("topSpecs", topSpecialities);
 
     } catch (Exception e) {
         e.printStackTrace();
@@ -158,8 +191,14 @@
 
     .dash-main-grid {
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns: 2fr 1fr;
         gap: 24px;
+    }
+
+    @media (max-width: 1024px) {
+        .dash-main-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
     .dash-card {
@@ -228,6 +267,12 @@
             <h2 class="dash-card-title"><i class="bi bi-activity"></i>Fr&eacute;quentation (Connexions/Jour)</h2>
             <div class="chart-wrapper">
                 <canvas id="loginChart"></canvas>
+            </div>
+        </div>
+        <div class="dash-card">
+            <h2 class="dash-card-title"><i class="bi bi-pie-chart-fill"></i>R&eacute;partition des Sp&eacute;cialit&eacute;s</h2>
+            <div class="chart-wrapper">
+                <canvas id="specChart"></canvas>
             </div>
         </div>
     </div>
@@ -300,6 +345,64 @@ $(function() {
                         display: false
                     }
                 }]
+            },
+            tooltips: {
+                backgroundColor: '#1e293b',
+                titleFontFamily: 'Plus Jakarta Sans',
+                bodyFontFamily: 'Plus Jakarta Sans',
+                cornerRadius: 8,
+                padding: 12
+            }
+        }
+    });
+
+    // Specialities Chart
+    <%
+        List<Map<String, Object>> tSpecs = (List<Map<String, Object>>) request.getAttribute("topSpecs");
+        StringBuilder sLabels = new StringBuilder();
+        StringBuilder sData = new StringBuilder();
+        if (tSpecs != null) {
+            for (int j = 0; j < tSpecs.size(); j++) {
+                Map m = tSpecs.get(j);
+                sLabels.append("'").append(((String)m.get("libelle")).replace("'", "\\'")).append("'");
+                sData.append(m.get("count"));
+                if (j < tSpecs.size() - 1) {
+                    sLabels.append(",");
+                    sData.append(",");
+                }
+            }
+        }
+    %>
+    var ctxSpec = document.getElementById('specChart').getContext('2d');
+    var specChart = new Chart(ctxSpec, {
+        type: 'doughnut',
+        data: {
+            labels: [<%= sLabels.toString() %>],
+            datasets: [{
+                data: [<%= sData.toString() %>],
+                backgroundColor: [
+                    '#008BFF',
+                    '#5B23FF',
+                    '#10b981',
+                    '#f59e0b',
+                    '#ef4444',
+                    '#8b5cf6'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutoutPercentage: 75,
+            legend: {
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    padding: 20,
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontColor: '#64748b'
+                }
             },
             tooltips: {
                 backgroundColor: '#1e293b',
