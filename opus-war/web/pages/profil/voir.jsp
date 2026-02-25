@@ -365,13 +365,17 @@
    LAYOUT 2 COLONNES
    ════════════════════════════════ */
 :root {
-  --itu-blue: #008BFF;
-  --itu-dark: #362F4F;
+  --itu-blue: #283a97;
+  --itu-dark: #1c1e29;
   --itu-violet: #5B23FF;
   --pvl-border: #e2e6ea;
   --pvl-card-bg: #fff;
   --pvl-text: #1c1e21;
   --pvl-text-sec: #65676b;
+  --fa-text: #1c1e29;
+  --fa-text-secondary: #8a95a3;
+  --fa-border: #d0dce7;
+  --fa-card-bg: #fff;
 }
 .pv-profile-layout {
   display: grid;
@@ -419,16 +423,19 @@
 .pvl-divider { border: none; border-top: 1px solid var(--pvl-border); margin: 8px 0; }
 .pvl-nav { display: flex; flex-direction: column; gap: 2px; }
 .pvl-nav-link {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
   border-radius: 8px;
-  font-size: 14px; font-weight: 500;
-  color: var(--pvl-text);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--fa-text);
   text-decoration: none;
   transition: background .15s, color .15s;
 }
-.pvl-nav-link:hover  { background: #f0f2f5; color: var(--itu-blue,#008BFF); }
-.pvl-nav-link--active { background: #e7f3ff; color: var(--itu-blue,#008BFF); font-weight: 700; }
+.pvl-nav-link:hover { background: #f0f2f5; color: var(--itu-blue,#008BFF); }
+.pvl-nav-link--active { background: #e7f3ff; color: var(--itu-blue,#008BFF); font-weight: 600; }
 .pvl-nav-link i { font-size: 16px; }
 /* ── Design améliorations sections ── */
 .pv-section { border-bottom: 1px solid #f0f2f5; }
