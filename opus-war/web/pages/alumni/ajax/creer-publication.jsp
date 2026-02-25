@@ -18,6 +18,7 @@
 <%@ page import="org.apache.commons.fileupload.FileItem" %>
 <%@ page import="org.apache.commons.fileupload.disk.DiskFileItemFactory" %>
 <%@ page import="org.apache.commons.fileupload.servlet.ServletFileUpload" %>
+<%@ page import="org.apache.commons.fileupload.FileUploadBase" %>
 <%
     // POST multipart: Creer publication + upload image dans table media
     // Utilise Commons FileUpload (meme lib que UploadDownloadFileServlet)
@@ -46,7 +47,24 @@
             DiskFileItemFactory factory = new DiskFileItemFactory();
             ServletFileUpload upload = new ServletFileUpload(factory);
             upload.setSizeMax(50 * 1024 * 1024); // 50 Mo max (videos)
-            List items = upload.parseRequest(request);
+            upload.setFileSizeMax(50 * 1024 * 1024); // 50 Mo max par fichier
+            List items = null;
+            try {
+                items = upload.parseRequest(request);
+            } catch (FileUploadBase.SizeLimitExceededException sle) {
+                long actualMB = sle.getActualSize() / (1024 * 1024);
+                long maxMB = sle.getPermittedSize() / (1024 * 1024);
+                session.setAttribute("pubErreur",
+                    "Le fichier est trop volumineux (" + actualMB + " Mo). La taille maximale autorisee est de " + maxMB + " Mo.");
+                response.sendRedirect(redirectUrl);
+                return;
+            } catch (FileUploadBase.FileSizeLimitExceededException fsle) {
+                long maxMB = fsle.getPermittedSize() / (1024 * 1024);
+                session.setAttribute("pubErreur",
+                    "Un des fichiers depasse la taille maximale autorisee de " + maxMB + " Mo.");
+                response.sendRedirect(redirectUrl);
+                return;
+            }
             for (int i = 0; i < items.size(); i++) {
                 FileItem item = (FileItem) items.get(i);
                 if (item.isFormField()) {
@@ -344,9 +362,20 @@
         session.setAttribute("pubSucces", "Publication creee avec succes !");
         response.sendRedirect(redirectUrl);
 
+    } catch (org.apache.commons.fileupload.FileUploadException fue) {
+        // Erreur liee au telechargement du fichier (taille, format, etc.)
+        String fueMsg = fue.getMessage();
+        if (fueMsg != null && fueMsg.contains("size")) {
+            session.setAttribute("pubErreur", "Le fichier est trop volumineux. La taille maximale autorisee est de 50 Mo.");
+        } else {
+            session.setAttribute("pubErreur", "Erreur lors du telechargement du fichier. Veuillez reessayer.");
+        }
+        response.sendRedirect(request.getContextPath() + "/pages/module.jsp?but=accueil.jsp");
     } catch (Exception e) {
         e.printStackTrace();
-        session.setAttribute("pubErreur", "Erreur: " + e.getMessage());
+        String errMsg = e.getMessage();
+        if (errMsg != null && errMsg.length() > 200) errMsg = errMsg.substring(0, 200);
+        session.setAttribute("pubErreur", "Erreur lors de la creation de la publication. Veuillez reessayer.");
         response.sendRedirect(request.getContextPath() + "/pages/module.jsp?but=accueil.jsp");
     }
 %>
