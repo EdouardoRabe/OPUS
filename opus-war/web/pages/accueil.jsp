@@ -464,6 +464,12 @@
     .tag-chip .remove-tag:hover { color: #e00; }
     /* ---- Mention badge ---- */
     .mention-badge { color: var(--itu-blue,#008BFF); font-weight: 600; background: #e7f3ff; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+    /* ---- Liens cliquables dans les publications ---- */
+    .pub-link { color: #0a66c2; text-decoration: none; word-break: break-all; }
+    .pub-link:hover { text-decoration: underline; color: #004182; }
+    /* ---- Hashtags ---- */
+    .pub-hashtag { color: #0a66c2; font-weight: 600; cursor: default; }
+    .pub-hashtag:hover { text-decoration: underline; }
     /* ---- Highlight scroll (notifications) ---- */
     .fa-highlight { background: #fffde7 !important; border-left: 4px solid #f9a825 !important; transition: background 2s !important; }
     /* ---- Infinite scroll loader ---- */

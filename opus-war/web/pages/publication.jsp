@@ -10,6 +10,44 @@
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.regex.Pattern" %>
+<%@ page import="java.util.regex.Matcher" %>
+<%!
+    /**
+     * Echappe HTML puis transforme URLs, #hashtags et @mentions en liens cliquables.
+     * - URLs (http/https/www) -> <a> bleu ouvrant dans un nouvel onglet
+     * - #hashtag -> <span class="pub-hashtag">#tag</span>
+     * - @Mention -> <span class="mention-badge">@Nom</span>
+     */
+    private static String linkifyDesc(String raw) {
+        if (raw == null || raw.trim().isEmpty()) return "";
+        // 1. Echapper HTML
+        String s = raw.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+        // 2. Newlines
+        s = s.replace("\n", "<br>");
+        // 3. URLs -> liens cliquables (avant hashtag/mention pour ne pas casser les <a>)
+        s = s.replaceAll(
+            "(https?://[A-Za-z0-9._~:/?#\\[\\]@!$&'()*+,;=%-]+)",
+            "<a href=\"$1\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"pub-link\">$1</a>"
+        );
+        // www sans http
+        s = s.replaceAll(
+            "(?<!href=\\\"|/)(www\\.[A-Za-z0-9._~:/?#\\[\\]@!$&'()*+,;=%-]+)",
+            "<a href=\"http://$1\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"pub-link\">$1</a>"
+        );
+        // 4. #hashtags
+        s = s.replaceAll(
+            "#([A-Za-z0-9_]+)",
+            "<span class=\"pub-hashtag\">#$1</span>"
+        );
+        // 5. @mentions
+        s = s.replaceAll(
+            "@([A-Za-z\\u00C0-\\u00FF]+(?: [A-Za-z\\u00C0-\\u00FF]+){0,2})",
+            "<span class=\"mention-badge\">@$1</span>"
+        );
+        return s;
+    }
+%>
 <%
     /* ============================================================
        COMPOSANT PUBLICATION  -  publication.jsp
@@ -149,13 +187,9 @@
             if (sbTags.length() > 0) taggedNames = sbTags.toString();
         }
 
-        // Echapper description
+        // Echapper description + linkifier
         String desc = pub.getDescritpion();
-        String descSafe = "";
-        if (desc != null) {
-            descSafe = desc.replace("&", "&amp;").replace("<", "&lt;")
-                    .replace(">", "&gt;").replace("\n", "<br>");
-        }
+        String descSafe = linkifyDesc(desc);
 
         // ---- Publication partagee : charger la pub originale ----
         boolean isSharedPost = pub.getIdpuborigine() != null && !pub.getIdpuborigine().trim().isEmpty();
@@ -167,7 +201,7 @@
             if (origPubs != null && origPubs.length > 0) {
                 Publication orig = origPubs[0];
                 String od = orig.getDescritpion();
-                origDesc = od != null ? od.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;").replace("\n","<br>") : "";
+                origDesc = linkifyDesc(od);
                 origDate = (orig.getDaty() != null ? orig.getDaty().toString() : "") + " \u00e0 " + (orig.getHeure() != null ? orig.getHeure() : "");
                 String origTypePubId2 = orig.getIdtypepublication() != null ? orig.getIdtypepublication() : "";
                 origTypePubLib2 = origTypePubId2;
@@ -372,7 +406,7 @@
         <!-- Partager (seulement pour les pubs d'autres personnes, pas un partage deja) -->
         <% if (pub.getIdutilisateur() != _pubRefuser && !isSharedPost) { %>
         <%  String _shareAuteurEsc = auteur.replace("'","\\'").replace("\"","\\\"");
-            String _shareTexteEsc  = descSafe.isEmpty() ? "" : descSafe.replace("<br>"," ").replace("'","\\'").replace("\"","\\\""); %>
+            String _shareTexteEsc  = descSafe.isEmpty() ? "" : descSafe.replaceAll("<[^>]+>"," ").replaceAll("\\s+"," ").trim().replace("'","\\'").replace("\"","\\\""); %>
         <button class="fa-action-btn" onclick="openShareModal('<%= idpub %>','<%= _shareAuteurEsc %>','<%= pub.getDaty() %>&nbsp;&agrave;&nbsp;<%= pub.getHeure() != null ? pub.getHeure() : "" %>','<%= _shareTexteEsc %>')">
             <i class="bi bi-share"></i>&nbsp;<span>Partager</span>
         </button>
@@ -437,3 +471,25 @@
 })();
 </script>
 <% } %>
+
+<script>
+function deletePublication(idpub) {
+    if (!confirm('\u00cates-vous s\u00fbr de vouloir supprimer cette publication ? Cette action est irr\u00e9versible.')) return;
+    fetch('<%= _pubCtx %>/pages/publication/ajax/traitement-delete.jsp?idpublication=' + encodeURIComponent(idpub))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            var card = document.getElementById('pub-' + idpub);
+            if (card) {
+                card.style.transition = 'opacity 0.4s, transform 0.4s';
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.95)';
+                setTimeout(function() { card.remove(); }, 400);
+            }
+        } else {
+            alert('Erreur : ' + data.error);
+        }
+    })
+    .catch(function(err) { alert('Erreur r\u00e9seau : ' + err); });
+}
+</script>
