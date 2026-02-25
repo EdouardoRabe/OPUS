@@ -57,7 +57,7 @@ public class Profil extends ClassMAPTable {
             // System.out.println("ID utilisateur pour contribution: " +
             // this.idutilisateur);
             // filtre.setIdutilisateur(this.idutilisateur);
-            filtre.setIdtypepublication("TPB000001");
+            filtre.setIdtypepublication("TPB000004");
             Object[] res = CGenUtil.rechercher(filtre, null, null, c, " and idutilisateur = " + this.idutilisateur);
             if (res != null) {
                 count = res.length;
