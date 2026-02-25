@@ -9,7 +9,7 @@ CREATE OR REPLACE VIEW public.historiqueactiflib AS
             WHEN (estactif = 1) THEN 'Cree'::text
             WHEN (estactif = 11) THEN 'Valide'::text
             WHEN (estactif = 100) THEN 'Actif'::text
-            ELSE 'Inconnu'::text
+            ELSE 'Inconnu'::text 
         END AS estactiflib,
     description
    FROM public.historiqueactif ha;
@@ -38,7 +38,7 @@ SELECT
         ORDER BY daty DESC, heure DESC
         LIMIT 1
     ) AS photoprofil,
-    -- Derniere photo de couverture (type=0)
+    -- Derniere photo de couverture (type=0) 
     (
         SELECT image
         FROM photo
@@ -58,7 +58,7 @@ SELECT
          WHERE ha.idutilisateur = CAST(u.refuser AS varchar)
          ORDER BY ha.daty DESC, ha.id DESC
          LIMIT 1),
-        CASE WHEN u.estactif = 1 THEN 11 ELSE 0 END
+        CASE WHEN u.estactif = 1 THEN 1 ELSE 0 END
     ) AS etatdetail,
     COALESCE(
         (SELECT
@@ -73,7 +73,7 @@ SELECT
          WHERE ha.idutilisateur = CAST(u.refuser AS varchar)
          ORDER BY ha.daty DESC, ha.id DESC
          LIMIT 1),
-        CASE WHEN u.estactif = 1 THEN 'Valide' ELSE 'Banni' END
+        CASE WHEN u.estactif = 1 THEN 'Cree' ELSE 'Banni' END
     ) AS etatlib
 FROM utilisateur u
     LEFT JOIN profil pr   ON pr.idutilisateur = u.refuser

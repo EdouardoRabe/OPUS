@@ -27,6 +27,12 @@
     String libEnteteAffiche[] = {"ID", "Signalant", "Signal&eacute;", "Motif", "Description", "Date", "Heure", "Publication"};
     pr.getTableau().setLibelleAffiche(libEnteteAffiche);
 
+    // Lien APJ sur la colonne idsignalement vers detail-signalement.jsp
+    String lienTableau[] = {lienBase + "?but=mod/detail-signalement.jsp"};
+    String colonneLien[] = {"idsignalement"};
+    pr.getTableau().setLien(lienTableau);
+    pr.getTableau().setColonneLien(colonneLien);
+
     Signalementpublicationlib[] allSig = (Signalementpublicationlib[]) pr.getListe();
 %>
 

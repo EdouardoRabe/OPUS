@@ -5,7 +5,7 @@ import java.sql.Connection;
 
 public class Typesignalement extends ClassMAPTable {
 
-    private String idtypesignalement;
+    private String idTypesignalement;
     private String libelle;
 
     public Typesignalement() {
@@ -25,15 +25,15 @@ public class Typesignalement extends ClassMAPTable {
     @Override
     public void construirePK(Connection c) throws Exception {
         this.preparePk("TSG", "get_seq_typesignalement");
-        this.setTypesignalement(makePK(c));
+        this.setIdTypesignalement(makePK(c));
     }
 
     public String getIdTypesignalement() {
-        return idtypesignalement;
+        return idTypesignalement;
     }
 
-    public void setTypesignalement(String typesignalement) {
-        this.idtypesignalement = typesignalement;
+    public void setIdTypesignalement(String typesignalement) {
+        this.idTypesignalement = typesignalement;
     }
 
     public String getLibelle() {

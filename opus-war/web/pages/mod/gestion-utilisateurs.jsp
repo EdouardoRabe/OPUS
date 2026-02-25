@@ -14,17 +14,17 @@
     String targetRef = request.getParameter("refuser");
     if (action != null && targetRef != null && !targetRef.isEmpty()) {
         try {
-            if ("activer".equals(action)) {
+            if ("valider".equals(action)) {
+                uEjb.activeUtilisateur(targetRef);
+                actionMsg = "Utilisateur valid\u00e9 et activ\u00e9 avec succ\u00e8s.";
+            } else if ("activer".equals(action)) {
                 uEjb.activeUtilisateur(targetRef);
                 actionMsg = "Utilisateur activ\u00e9 avec succ\u00e8s.";
             } else if ("desactiver".equals(action)) {
                 String descDesac = request.getParameter("description");
                 uEjb.desactiveUtilisateur(targetRef, descDesac);
                 actionMsg = "Utilisateur d\u00e9sactiv\u00e9 avec succ\u00e8s.";
-            } else if ("supprimer".equals(action)) {
-                uEjb.deleteUtilisateurs(targetRef);
-                actionMsg = "Utilisateur supprim\u00e9 avec succ\u00e8s.";
-            }
+            } 
         } catch (Exception ex) {
             actionErr = ex.getMessage();
         }
@@ -242,14 +242,14 @@
         <div class="usr-card-menu">
             <button class="usr-menu-btn" onclick="toggleUsrMenu(this, event)" title="Options">&#8942;</button>
             <div class="usr-menu-dropdown" id="usr-dd-<%= i %>">
-                <a href="<%= lienBase %>?but=annuaire/fiche-utilisateur.jsp&amp;refuser=<%= ref %>">
+                <a href="<%= lienBase %>?but=annuaire/fiche-utilisateur.jsp&amp;idprofil=<%= p.getIdprofil() %>">
                     <i class="fa fa-eye"></i> Voir profil
                 </a>
                 <% if (!isSelf) { %>
                     <% if (etatDetail == ConstantEtatUser.etatUtilisateurCreer) { %>
                     <!-- Utilisateur créé → Valider -->
                     <form method="post" style="margin:0;" onsubmit="return confirm('Valider cet utilisateur ?');">
-                        <input type="hidden" name="action" value="activer"/>
+                        <input type="hidden" name="action" value="valider"/>
                         <input type="hidden" name="refuser" value="<%= ref %>"/>
                         <button type="submit" class="usr-action-link">
                             <i class="fa fa-check-circle"></i> Valider
@@ -275,13 +275,6 @@
                         </button>
                     </form>
                     <% } %>
-                    <form method="post" style="margin:0;" onsubmit="return confirm('Supprimer d\u00e9finitivement cet utilisateur ?');">
-                        <input type="hidden" name="action" value="supprimer"/>
-                        <input type="hidden" name="refuser" value="<%= ref %>"/>
-                        <button type="submit" class="usr-action-link usr-action-danger">
-                            <i class="fa fa-trash"></i> Supprimer
-                        </button>
-                    </form>
                 <% } %>
             </div>
         </div>
@@ -320,7 +313,7 @@
 
         <!-- Bouton Voir profil -->
         <a class="btn btn-outline-primary btn-speciality"
-           href="<%= lienBase %>?but=annuaire/fiche-utilisateur.jsp&amp;refuser=<%= ref %>">
+           href="<%= lienBase %>?but=annuaire/fiche-utilisateur.jsp&amp;idprofil=<%= p.getIdprofil() %>">
             <i class="fa fa-eye" style="margin-right:5px;"></i>Voir profil
         </a>
 
