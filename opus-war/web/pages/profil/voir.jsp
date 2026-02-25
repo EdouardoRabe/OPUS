@@ -670,6 +670,19 @@
     </div>
   </div>
 
+  <!-- ── Sécurité ── -->
+  <div class="pv-section">
+    <div class="pv-section-header">
+      <h2><i class="bi bi-shield-lock-fill"></i> Sécurité</h2>
+    </div>
+    <div style="padding:4px 0;">
+      <button class="pv-btn-add" onclick="pvOpenModal('modalPassword')" style="gap:6px;">
+        <i class="bi bi-key-fill"></i> Modifier le mot de passe
+      </button>
+      <p style="font-size:12px;color:#888;margin-top:6px;">Protégez votre compte en modifiant régulièrement votre mot de passe.</p>
+    </div>
+  </div>
+
   <!-- ── Réseaux Sociaux ── -->
   <div class="pv-section">
     <div class="pv-section-header">
@@ -1053,6 +1066,34 @@ function pvDeleteSocial(smId) {
   .catch(function(e) { alert("Erreur réseau : " + e); });
 }
 
+/* ── Met à jour le placeholder du champ social selon le réseau sélectionné ── */
+function pvUpdateSocialPlaceholder() {
+  var sel   = document.getElementById('socialSelect');
+  var input = document.getElementById('socialValeur');
+  var hint  = document.getElementById('socialUrlHint');
+  var hintText = document.getElementById('socialUrlHintText');
+  var opt   = sel.options[sel.selectedIndex];
+
+  if (!opt || !opt.value) {
+    input.placeholder = 'ex: monpseudo ou https://...';
+    hint.style.display = 'none';
+    return;
+  }
+
+  var pattern = opt.getAttribute('data-urlpattern') || '';
+  var label   = opt.textContent.trim();
+
+  if (pattern && pattern.indexOf('{value}') !== -1) {
+    var baseUrl = pattern.split('{value}')[0];
+    input.placeholder = 'Votre pseudo ' + label + ' (ex: johndoe)';
+    hintText.textContent = baseUrl + ' est déjà inclus automatiquement';
+    hint.style.display = 'block';
+  } else {
+    input.placeholder = 'Lien ou identifiant ' + label;
+    hint.style.display = 'none';
+  }
+}
+
 /* ── Helpers modals ── */
 function pvOpenModal(id)  { document.getElementById(id).style.display = "flex"; }
 function pvCloseModal(id) { document.getElementById(id).style.display = "none"; }
@@ -1084,6 +1125,89 @@ function pvUploadPhoto(inputId, typeVal, apresOk) {
     } else { alert("Erreur : " + d.error); }
   })
   .catch(function(e){ alert("Erreur réseau : " + e); });
+}
+
+/* ── Toggle eye icon on password fields ── */
+function pvTogglePwdEye(span) {
+  var inp = span.parentElement.querySelector('input');
+  var ico = span.querySelector('i');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    ico.className = 'fa fa-eye-slash';
+  } else {
+    inp.type = 'password';
+    ico.className = 'fa fa-eye';
+  }
+}
+
+/* ── Changer le mot de passe ── */
+function pvChangePassword() {
+  var alertBox = document.getElementById('pwdAlert');
+  var oldPwd   = document.getElementById('pwdOld').value;
+  var newPwd   = document.getElementById('pwdNew').value;
+  var confPwd  = document.getElementById('pwdConfirm').value;
+
+  alertBox.style.display = 'none';
+
+  if (!oldPwd || !newPwd || !confPwd) {
+    pvPwdAlert('Veuillez remplir tous les champs.', false);
+    return;
+  }
+  if (newPwd.length < 3) {
+    pvPwdAlert('Le nouveau mot de passe doit contenir au moins 3 caractères.', false);
+    return;
+  }
+  if (newPwd !== confPwd) {
+    pvPwdAlert('Les deux mots de passe ne correspondent pas.', false);
+    return;
+  }
+
+  var btn = document.getElementById('btnSavePwd');
+  btn.disabled = true;
+  btn.textContent = 'En cours...';
+
+  var fd = new FormData();
+  fd.append('oldPassword', oldPwd);
+  fd.append('newPassword', newPwd);
+  fd.append('confirmPassword', confPwd);
+
+  fetch('<%= request.getContextPath() %>/pages/profil/ajax/traitement-password.jsp', {
+    method: 'POST', body: fd
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.success) {
+      pvPwdAlert(d.message, true);
+      document.getElementById('pwdOld').value = '';
+      document.getElementById('pwdNew').value = '';
+      document.getElementById('pwdConfirm').value = '';
+      setTimeout(function() { pvCloseModal('modalPassword'); alertBox.style.display = 'none'; }, 2000);
+    } else {
+      pvPwdAlert(d.error || 'Erreur inconnue.', false);
+    }
+  })
+  .catch(function(e) {
+    pvPwdAlert('Erreur réseau : ' + e, false);
+  })
+  .finally(function() {
+    btn.disabled = false;
+    btn.textContent = 'Enregistrer';
+  });
+}
+
+function pvPwdAlert(msg, isSuccess) {
+  var box = document.getElementById('pwdAlert');
+  box.style.display = 'block';
+  box.textContent = msg;
+  if (isSuccess) {
+    box.style.background = '#d4edda';
+    box.style.color = '#155724';
+    box.style.border = '1px solid #c3e6cb';
+  } else {
+    box.style.background = '#f8d7da';
+    box.style.color = '#721c24';
+    box.style.border = '1px solid #f5c6cb';
+  }
 }
 
 // ========== PUBLICATIONS DU PROFIL ==========
@@ -1248,23 +1372,68 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
+<!-- Modal : Modifier le mot de passe -->
+<div class="pv-modal-overlay" id="modalPassword">
+  <div class="pv-modal">
+    <h3><i class="bi bi-shield-lock"></i> Modifier le mot de passe</h3>
+
+    <div id="pwdAlert" style="display:none;padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:13px;"></div>
+
+    <label>Ancien mot de passe *</label>
+    <div style="position:relative;">
+      <input type="password" id="pwdOld" placeholder="Votre mot de passe actuel"
+             style="width:100%;padding:8px 38px 8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+      <span onclick="pvTogglePwdEye(this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:#999;">
+        <i class="fa fa-eye"></i>
+      </span>
+    </div>
+
+    <label style="margin-top:10px;display:block;">Nouveau mot de passe *</label>
+    <div style="position:relative;">
+      <input type="password" id="pwdNew" placeholder="Au moins 3 caractères"
+             style="width:100%;padding:8px 38px 8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+      <span onclick="pvTogglePwdEye(this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:#999;">
+        <i class="fa fa-eye"></i>
+      </span>
+    </div>
+
+    <label style="margin-top:10px;display:block;">Confirmer le nouveau mot de passe *</label>
+    <div style="position:relative;">
+      <input type="password" id="pwdConfirm" placeholder="Retapez le nouveau mot de passe"
+             style="width:100%;padding:8px 38px 8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+      <span onclick="pvTogglePwdEye(this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:#999;">
+        <i class="fa fa-eye"></i>
+      </span>
+    </div>
+
+    <div class="pv-modal-footer">
+      <button type="button" class="pv-btn-cancel" onclick="pvCloseModal('modalPassword')">Annuler</button>
+      <button type="button" class="pv-btn-save" id="btnSavePwd" onclick="pvChangePassword()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal : Ajouter Réseau Social -->
 <div class="pv-modal-overlay" id="modalAddSocial">
   <div class="pv-modal">
     <h3>Ajouter un réseau social</h3>
     <label>Réseau social *</label>
-    <select id="socialSelect">
+    <select id="socialSelect" onchange="pvUpdateSocialPlaceholder()">
       <option value="">— Sélectionner —</option>
       <% for (int rsi = 0; rsi < allReseaux.length; rsi++) { %>
       <option value="<%= allReseaux[rsi].getIdReseauSocial() %>"
               data-icone="<%= allReseaux[rsi].getIconeClass() != null ? allReseaux[rsi].getIconeClass() : "" %>"
-              data-couleur="<%= allReseaux[rsi].getCouleurHex() != null ? allReseaux[rsi].getCouleurHex() : "" %>">
+              data-couleur="<%= allReseaux[rsi].getCouleurHex() != null ? allReseaux[rsi].getCouleurHex() : "" %>"
+              data-urlpattern="<%= allReseaux[rsi].getUrlPattern() != null ? allReseaux[rsi].getUrlPattern().replace("<","&lt;") : "" %>">
         <%= allReseaux[rsi].getLibelle() != null ? allReseaux[rsi].getLibelle().replace("<","&lt;") : "" %>
       </option>
       <% } %>
     </select>
     <label>Identifiant / URL *</label>
     <input type="text" id="socialValeur" placeholder="ex: monpseudo ou https://..." style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+    <p id="socialUrlHint" style="display:none;font-size:12px;color:#888;margin:4px 0 0 2px;">
+      <i class="bi bi-info-circle"></i> <span id="socialUrlHintText"></span>
+    </p>
     <div class="pv-modal-footer">
       <button type="button" class="pv-btn-cancel" onclick="pvCloseModal('modalAddSocial')">Annuler</button>
       <button type="button" class="pv-btn-save" onclick="pvAddSocial()">Ajouter</button>
