@@ -11,7 +11,7 @@
     <link href="${pageContext.request.contextPath}/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
     <!-- FontAwesome 4.4.0 (du projet) -->
-    <link href="${pageContext.request.contextPath}/dist/css/font-awesome-4.4.0/css/font-awesome.min.css"
+    <link href="${pageContext.request.contextPath}/dist/js/font-awesome-4.4.0/css/font-awesome.min.css"
       rel="stylesheet" type="text/css" />
 
     <!-- OPUS CUSTOM THEME (local, utilisant les fonts du projet) -->
@@ -101,7 +101,8 @@
                     <div class="input-icon-wrap">
                       <span class="glyphicon glyphicon-lock input-icon"></span>
                       <input type="password" id="pwd" name="password" class="form-control-custom with-icon"
-                        placeholder="Min. 8 caractères" required />
+                        placeholder="Min. 8 caractères" required style="padding-right:2.8rem;" />
+                      <span onclick="togglePwdEye(this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:#999;font-size:1.1rem;z-index:5;"><i class="fa fa-eye"></i></span>
                     </div>
                     <div class="info-badge"><i class="fa fa-info-circle"></i> Minimum 8 caractères</div>
                   </div>
@@ -110,7 +111,8 @@
                     <div class="input-icon-wrap">
                       <span class="glyphicon glyphicon-lock input-icon"></span>
                       <input type="password" id="pwd-confirm" class="form-control-custom with-icon"
-                        placeholder="Répétez votre mot de passe" required />
+                        placeholder="Répétez votre mot de passe" required style="padding-right:2.8rem;" />
+                      <span onclick="togglePwdEye(this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:#999;font-size:1.1rem;z-index:5;"><i class="fa fa-eye"></i></span>
                     </div>
                     <div id="pwd-feedback"></div>
                   </div>
@@ -134,6 +136,12 @@
         <script src="${pageContext.request.contextPath}/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
 
         <script>
+          function togglePwdEye(span) {
+            var inp = span.parentElement.querySelector('input[type=password], input[type=text]');
+            var ico = span.querySelector('i');
+            if (inp.type === 'password') { inp.type = 'text'; ico.className = 'fa fa-eye-slash'; }
+            else { inp.type = 'password'; ico.className = 'fa fa-eye'; }
+          }
           (function () {
             var pwd = document.getElementById('pwd');
             var confirm = document.getElementById('pwd-confirm');

@@ -17,7 +17,7 @@
     <link href="${pageContext.request.contextPath}/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
     <!-- FontAwesome 4.4.0 (du projet) -->
-    <link href="${pageContext.request.contextPath}/dist/css/font-awesome-4.4.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="${pageContext.request.contextPath}/dist/js/font-awesome-4.4.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
 
     <!-- OPUS CUSTOM THEME (local, utilisant les fonts du projet) -->
     <link href="${pageContext.request.contextPath}/assets/css/alumni-theme.css" rel="stylesheet" type="text/css" />
