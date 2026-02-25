@@ -17,7 +17,7 @@
     <link href="${pageContext.request.contextPath}/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
     <!-- FontAwesome 4.4.0 (du projet) -->
-    <link href="${pageContext.request.contextPath}/dist/css/font-awesome-4.4.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="${pageContext.request.contextPath}/dist/js/font-awesome-4.4.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
 
     <!-- OPUS CUSTOM THEME (local, utilisant les fonts du projet) -->
     <link href="${pageContext.request.contextPath}/assets/css/alumni-theme.css" rel="stylesheet" type="text/css" />
@@ -59,7 +59,7 @@
                 <label class="field-label">Identifiant</label>
                 <div class="input-icon-wrap">
                   <span class="glyphicon glyphicon-user input-icon"></span>
-                  <input type="text" id="identifiant" name="identifiant" class="form-control-custom with-icon" placeholder="Numéro ETU" required />
+                  <input type="text" id="identifiant" name="identifiant" class="form-control-custom with-icon" placeholder="Numéro ETU" value="ETU000001" required />
                 </div>
                 <div class="info-badge">
                   <i class="fa fa-info-circle"></i> Ex&nbsp;: <strong>ETU003356</strong>
@@ -69,7 +69,10 @@
                 <label class="field-label">Mot de passe</label>
                 <div class="input-icon-wrap">
                   <span class="glyphicon glyphicon-lock input-icon"></span>
-                  <input type="password" name="passe" class="form-control-custom with-icon" placeholder="••••••••" required />
+                  <input type="password" id="passe" name="passe" class="form-control-custom with-icon" placeholder="••••••••" value="test" required style="padding-right:2.8rem;" />
+                  <span class="toggle-password" onclick="togglePasswordVisibility()" title="Afficher/masquer le mot de passe" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--gray-400);font-size:1.1rem;z-index:5;">
+                    <i class="fa fa-eye" id="eye-icon"></i>
+                  </span>
                 </div>
               </div>
               <button type="submit" class="btn-login" id="login-btn">
@@ -93,6 +96,19 @@
     <script src="${pageContext.request.contextPath}/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
 
     <script>
+      // Toggle visibilité du mot de passe
+      function togglePasswordVisibility() {
+        var passInput = document.getElementById('passe');
+        var eyeIcon = document.getElementById('eye-icon');
+        if (passInput.type === 'password') {
+          passInput.type = 'text';
+          eyeIcon.className = 'fa fa-eye-slash';
+        } else {
+          passInput.type = 'password';
+          eyeIcon.className = 'fa fa-eye';
+        }
+      }
+
       // Mémoriser le numéro ETU dans localStorage
       (function () {
         // Charger le dernier numéro ETU au chargement de la page
