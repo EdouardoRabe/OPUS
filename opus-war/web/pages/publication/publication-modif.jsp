@@ -238,7 +238,8 @@
 
         fetch("<%= request.getContextPath() %>/pages/publication/ajax/traitement-update.jsp", {
             method: "POST",
-            body: new FormData(this)
+            headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+            body: new URLSearchParams(new FormData(this)).toString()
         })
         .then(function(r) { return r.json(); })
         .then(function(data) {
