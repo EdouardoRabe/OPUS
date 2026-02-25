@@ -528,6 +528,9 @@
                     <a href="<%= ctx %>/pages/module.jsp?but=alumni/notifications.jsp" class="fa-nav-link">
                         <i class="bi bi-bell-fill"></i> Notifications
                     </a>
+                    <a href="<%= ctx %>/pages/module.jsp?but=alumni/publications-enregistrees.jsp" class="fa-nav-link">
+                        <i class="bi bi-bookmarks-fill"></i> Enregistrements
+                    </a>
                 </nav>
             </div>
         </div>
@@ -1823,7 +1826,19 @@
     });
     function savePublication(idpub) {
         fetch(CTX + '/pages/alumni/ajax/save-publication.jsp?idpublication=' + encodeURIComponent(idpub))
-        .then(function(r){return r.json();}).then(function(d){ if(d.success) Swal.fire({toast:true,position:'top-end',icon:'success',title:'Sauvegardée',timer:1500,showConfirmButton:false}); else alert('Erreur sauvegarde'); });
+        .then(function(r){return r.json();}).then(function(d){
+            if(d.success) {
+                var btn = document.getElementById('save-btn-' + idpub);
+                if (btn) {
+                    if (d.saved) {
+                        btn.innerHTML = '<i class="bi bi-bookmark-fill"></i> Annuler l\'enregistrement';
+                    } else {
+                        btn.innerHTML = '<i class="bi bi-bookmark"></i> Enregistrer';
+                    }
+                }
+                Swal.fire({toast:true,position:'top-end',icon:'success',title: d.saved ? 'Publication enregistr\u00e9e' : 'Enregistrement annul\u00e9',timer:1500,showConfirmButton:false});
+            } else alert('Erreur: ' + (d.error || 'Inconnue'));
+        });
     }
     function reportPublication(idpub) {
         window.location.href = CTX + '/pages/module.jsp?but=alumni/signaler-publication.jsp&idpublication=' + encodeURIComponent(idpub);

@@ -6,6 +6,7 @@
 <%@ page import="alumni.Reactiontype" %>
 <%@ page import="alumni.Typepublication" %>
 <%@ page import="alumni.Identification" %>
+<%@ page import="alumni.Publicationenregistrement" %>
 <%@ page import="bean.CGenUtil" %>
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.util.Map" %>
@@ -58,6 +59,9 @@
     Object _lsAttr = request.getAttribute("_pub_lastScore");
     if (_lsAttr != null) _pubLastScore = _lsAttr.toString();
 
+    // Mode cartes uniquement (pour charger-feed.jsp / infinite scroll)
+    boolean _pubCardsOnly = request.getAttribute("_pub_cardsOnly") != null;
+
     // Highlight publication modifiee
     String _highlightPub = request.getParameter("highlight");
     if (_highlightPub == null) _highlightPub = "";
@@ -84,6 +88,13 @@
         String initA = String.valueOf(Character.toUpperCase(_partsA[0].charAt(0)));
         if (_partsA.length > 1) initA += Character.toUpperCase(_partsA[_partsA.length - 1].charAt(0));
         String _authorPhoto = (String) _pubUserPhotos.get(new Integer(pub.getIdutilisateur()));
+
+        // --- Enregistrement (saved/bookmark) ---
+        boolean _isSaved = false;
+        Publicationenregistrement[] _enrArr = (Publicationenregistrement[]) CGenUtil.rechercher(
+                new Publicationenregistrement(), null, null, _pubConn,
+                " and idpublication = '" + idpub + "' and idutilisateur = " + _pubRefuser);
+        if (_enrArr != null && _enrArr.length > 0) _isSaved = true;
 
         // --- Medias ---
         Media[] medias = (Media[]) CGenUtil.rechercher(
@@ -226,8 +237,8 @@
             <div class="pub-menu">
                 <button class="pub-menu-btn" onclick="togglePubMenu(this,event)" title="Plus d'options"><i class="bi bi-three-dots-vertical"></i></button>
                 <div class="pub-menu-dropdown">
-                    <button class="pub-menu-item" onclick="savePublication('<%= idpub %>')">
-                        <i class="bi bi-bookmark"></i> Enregistrer
+                    <button class="pub-menu-item" id="save-btn-<%= idpub %>" onclick="savePublication('<%= idpub %>')">
+                        <i class="bi bi-bookmark<%= _isSaved ? "-fill" : "" %>"></i> <%= _isSaved ? "Annuler l'enregistrement" : "Enregistrer" %>
                     </button>
                     <% if (pub.getIdutilisateur() == _pubRefuser) { %>
                     <button class="pub-menu-item" onclick="window.location.href='module.jsp?but=publication/publication-modif.jsp&idpublication=<%= idpub %>&from=' + encodeURIComponent(new URLSearchParams(window.location.search).get('but') || 'accueil.jsp')">
@@ -412,7 +423,8 @@
 <%
     } // fin for publications
 
-    // --- Infinite scroll : curseur + sentinel ---
+    // --- Infinite scroll : curseur + sentinel (seulement en mode complet) ---
+    if (!_pubCardsOnly) {
     boolean _hasMore = (_pubPubs.length == 10);
 %>
 <span id="feed-cursor" style="display:none"
@@ -458,3 +470,6 @@ function deletePublication(idpub) {
     .catch(function(err) { alert('Erreur r\u00e9seau : ' + err); });
 }
 </script>
+<%
+    } // fin if !_pubCardsOnly
+%>
