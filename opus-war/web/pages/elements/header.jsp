@@ -187,7 +187,6 @@
     <!-- Logo -->
     <a class="topnav-brand" href="<%= lien %>?but=accueil.jsp">
       <div class="topnav-logo">
-      iuezgfiuegzfiuezifdugeziu
         <img src="${pageContext.request.contextPath}/dist/img/ITU_logo.png" alt="ITU Logo" style="width: 100%; height: 100%; object-fit: contain;">
       </div>
     </a>
@@ -259,7 +258,7 @@
           <button class="topnav-link" type="button" id="notif-bell-btn" title="<%= libelle %>" aria-expanded="false" style="position:relative;">
             <i class="<%= bsIcon %>"></i>
             <span class="topnav-link-label"><%= libelle %></span>
-            <span id="notif-badge" class="badge" style="display:none;position:absolute;top:-6px;right:-6px;background:#e00;color:#fff;font-size:11px;font-weight:600;padding:2px 6px;border-radius:10px;direction:ltr;unicode-bidi:bidi-override;min-width:18px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,.2);border:2px solid #fff;">0</span>
+            <span id="notif-badge" class="badge" style="display:none;position:absolute;top:12px;right:2px;background:#b2d235;color:#1c1e29;font-size:11px;font-weight:600;padding:2px 6px;border-radius:10px;direction:ltr;unicode-bidi:bidi-override;min-width:18px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,.2);border:2px solid #fff;transform:rotate(0deg);">0</span>
           </button>
           <div id="notif-dropdown-panel" class="topnav-submenu" style="min-width:400px;max-width:420px;right:0;left:auto;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.18);border:1px solid #e0e0e0;overflow:hidden;">
             <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:#fafbfc;border-bottom:1px solid #eee;">
