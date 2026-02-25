@@ -14,32 +14,6 @@
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.regex.Pattern" %>
-<%@ page import="java.util.regex.Matcher" %>
-<%!
-    private static String linkifyDesc(String raw) {
-        if (raw == null || raw.trim().isEmpty()) return "";
-        String s = raw.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-        s = s.replace("\n", "<br>");
-        s = s.replaceAll(
-            "(https?://[A-Za-z0-9._~:/?#\\[\\]@!$&'()*+,;=%-]+)",
-            "<a href=\"$1\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"pub-link\">$1</a>"
-        );
-        s = s.replaceAll(
-            "(?<!href=\\\"|/)(www\\.[A-Za-z0-9._~:/?#\\[\\]@!$&'()*+,;=%-]+)",
-            "<a href=\"http://$1\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"pub-link\">$1</a>"
-        );
-        s = s.replaceAll(
-            "#([A-Za-z0-9_]+)",
-            "<span class=\"pub-hashtag\">#$1</span>"
-        );
-        s = s.replaceAll(
-            "@([A-Za-z\\u00C0-\\u00FF]+(?: [A-Za-z\\u00C0-\\u00FF]+){0,2})",
-            "<span class=\"mention-badge\">@$1</span>"
-        );
-        return s;
-    }
-%>
 <%
     // =========================================================
     // AJAX : Chargement progressif du fil d'actualite (score-based)
@@ -104,7 +78,6 @@
         Map userNames  = new HashMap();
         Map userPhotos = new HashMap();
         Map userProfils = new HashMap();
-        Map userBanned = new HashMap(); // Integer -> Boolean (true if banned)
         if (allProfils != null) {
             for (int i = 0; i < allProfils.length; i++) {
                 Integer _key = new Integer(allProfils[i].getIdutilisateur());
@@ -113,8 +86,6 @@
                     userPhotos.put(_key, ctx + "/" + allProfils[i].getPhotoProfil().trim());
                 if (allProfils[i].getIdprofil() != null && !allProfils[i].getIdprofil().trim().isEmpty())
                     userProfils.put(_key, allProfils[i].getIdprofil().trim());
-                if (allProfils[i].getEstactif() == 0)
-                    userBanned.put(_key, Boolean.TRUE);
             }
         }
 
@@ -178,11 +149,9 @@
             + "+COALESCE((SELECT COUNT(*) FROM publicationcommentaire pc WHERE pc.idpublication=p.idpublication AND pc.etat=1),0)*3"
             + "-COALESCE((SELECT pv.nbvue FROM publicationvue pv WHERE pv.idpublication=p.idpublication AND pv.idutilisateur=" + refuserConnecte + "),0)*4"
             + "+CASE WHEN p.daty::date=CURRENT_DATE THEN 15 WHEN p.daty::date>=CURRENT_DATE-7 THEN 8 WHEN p.daty::date>=CURRENT_DATE-30 THEN 3 ELSE 0 END";
-        // --- Filtre utilisateurs bannis ---
-        String _banW = " AND p.idutilisateur NOT IN (SELECT refuser FROM utilisateur WHERE estactif = 0)";
         String _pSql =
             "SELECT sub.idpublication, sub.score FROM ("
-            + "  SELECT p.idpublication,(" + _sC + ") AS score FROM publication p WHERE p.etat=1" + _banW + _visW2 + _hashW
+            + "  SELECT p.idpublication,(" + _sC + ") AS score FROM publication p WHERE p.etat=1" + _visW2 + _hashW
             + ") sub WHERE sub.score < " + cursorScore
             + " OR (sub.score = " + cursorScore + " AND sub.idpublication < '" + cursorId + "')"
             + " ORDER BY sub.score DESC, sub.idpublication DESC LIMIT 10";
