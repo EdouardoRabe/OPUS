@@ -1168,7 +1168,7 @@ WHERE NOT EXISTS (
 INSERT INTO profiltypestatut(idprofiltypestatut, libelle, couleur)
 SELECT getseqprofiltypestatut(),
     'Taken',
-    '#bba64a'
+    '#e69a45'
 WHERE NOT EXISTS (
         SELECT 1
         FROM profiltypestatut
@@ -1177,7 +1177,7 @@ WHERE NOT EXISTS (
 INSERT INTO profiltypestatut(idprofiltypestatut, libelle, couleur)
 SELECT getseqprofiltypestatut(),
     'Neutre',
-    '#808080'
+    '#0a66c2'
 WHERE NOT EXISTS (
         SELECT 1
         FROM profiltypestatut

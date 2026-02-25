@@ -89,9 +89,9 @@
 
             /* --- Redirect si c'est son propre profil --- */
             if (profil.getRefuser() == myRefuser) {
-%>
-<script>window.location.href = "<%= _lien %>?but=profil/voir.jsp&idprofil=<%= h(idprofil) %>";</script>
-<%
+                    %>
+                    <script>window.location.href = "<%= _lien %>?but=profil/voir.jsp&idprofil=<%= h(idprofil) %>";</script>
+                    <%
                 return;
             }
 
