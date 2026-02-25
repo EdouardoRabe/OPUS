@@ -58,6 +58,10 @@
     Object _lsAttr = request.getAttribute("_pub_lastScore");
     if (_lsAttr != null) _pubLastScore = _lsAttr.toString();
 
+    // Highlight publication modifiee
+    String _highlightPub = request.getParameter("highlight");
+    if (_highlightPub == null) _highlightPub = "";
+
     if (_pubPubs.length == 0) {
 %>
 <div class="fa-empty-feed">
@@ -210,7 +214,7 @@
         }
 %>
 <!-- ====== CARD PUBLICATION ====== -->
-<div id="pub-<%= idpub %>" class="fa-post-card">
+<div id="pub-<%= idpub %>" class="fa-post-card<%= idpub.equals(_highlightPub) ? " pub-highlight" : "" %>">
 
     <!-- EN-TETE -->
     <div class="fa-post-header">
@@ -226,7 +230,7 @@
                         <i class="bi bi-bookmark"></i> Enregistrer
                     </button>
                     <% if (pub.getIdutilisateur() == _pubRefuser) { %>
-                    <button class="pub-menu-item" onclick="window.location.href='module.jsp?but=publication/publication-modif.jsp&idpublication=<%= idpub %>'">
+                    <button class="pub-menu-item" onclick="window.location.href='module.jsp?but=publication/publication-modif.jsp&idpublication=<%= idpub %>&from=' + encodeURIComponent(new URLSearchParams(window.location.search).get('but') || 'accueil.jsp')">
                         <i class="bi bi-pencil"></i> Modifier
                     </button>
                     <button class="pub-menu-item" onclick="deletePublication('<%= idpub %>')">
@@ -419,3 +423,16 @@
 <div id="feed-loader" style="display:none;text-align:center;padding:20px;">
     <div class="fa-feed-spinner"></div>
 </div>
+
+<% if (!_highlightPub.isEmpty()) { %>
+<script>
+(function() {
+    var el = document.getElementById("pub-<%= _highlightPub %>");
+    if (el) {
+        setTimeout(function() {
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 300);
+    }
+})();
+</script>
+<% } %>
