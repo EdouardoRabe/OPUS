@@ -937,25 +937,7 @@ VALUES (
            1,
            'MENDYN000999'
        );
-INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
-VALUES (
-           'MENDYN000007',
-           'Offres d''emploi',
-           'bi-list-ul',
-           'module.jsp?but=carriere/offres.jsp',
-           1,
-           1,
-           'MENDYN000003'
-       ),
-       (
-           'MENDYN000008',
-           'Publier une offre',
-           'bi-plus-circle-fill',
-           'module.jsp?but=carriere/publier-offre.jsp',
-           2,
-           1,
-           'MENDYN000003'
-       );
+
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
 VALUES (
            'MENDYN000009',
