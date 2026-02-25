@@ -472,6 +472,8 @@
     .fa-feed-end { text-align:center; padding:12px 0; color:var(--fa-text-secondary); font-size:13px; }
     /* ---- Publication partagee : bloc original embedded ---- */
     .fa-shared-embed { border:1.5px solid var(--fa-border); border-radius:10px; margin:10px 0 4px; padding:12px 14px; background:#f8f9fb; cursor:default; }
+    .fa-shared-embed--clickable { cursor:pointer; transition:border-color .2s, box-shadow .2s; }
+    .fa-shared-embed--clickable:hover { border-color:var(--itu-blue,#008BFF); box-shadow:0 2px 12px rgba(0,139,255,.15); }
     .fa-shared-embed-header { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:6px; font-size:13px; }
     .fa-shared-embed-author { font-weight:700; }
     .fa-shared-embed-date { color:#888; font-size:12px; }
@@ -495,6 +497,13 @@
     .share-submit-btn { background:var(--itu-blue,#008BFF); color:#fff; border:none; border-radius:20px; padding:7px 18px; font-size:14px; font-weight:700; cursor:pointer; }
     .share-submit-btn:hover { opacity:.88; }
     .share-submit-btn:disabled { opacity:.5; cursor:default; }
+    /* ---- Modale detail publication (clic sur partage) ---- */
+    #pub-detail-modal { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.55); align-items:center; justify-content:center; }
+    #pub-detail-modal .pub-detail-box { background:#f0f2f5; border-radius:14px; width:min(620px,96vw); max-height:92vh; display:flex; flex-direction:column; box-shadow:0 10px 40px rgba(0,0,0,.3); overflow:hidden; }
+    #pub-detail-modal .pub-detail-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; background:#fff; border-bottom:1px solid var(--fa-border); }
+    #pub-detail-modal .pub-detail-title { margin:0; font-size:16px; font-weight:700; }
+    #pub-detail-modal .pub-detail-body { padding:16px; overflow-y:auto; flex:1; }
+    #pub-detail-modal .pub-detail-body .fa-post-card { margin:0; }
 </style>
 
 <div class="fa-layout">
@@ -844,6 +853,19 @@
         <div class="share-footer">
             <button class="share-cancel-btn" onclick="closeShareModal()">Annuler</button>
             <button class="share-submit-btn" id="share-submit-btn" onclick="submitShare()"><i class="bi bi-send-fill"></i>&nbsp;Partager</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODALE DETAIL PUBLICATION ==================== -->
+<div id="pub-detail-modal">
+    <div class="pub-detail-box">
+        <div class="pub-detail-header">
+            <h3 class="pub-detail-title">Publication</h3>
+            <button class="rdm-close" onclick="closePublicationDetail()">&times;</button>
+        </div>
+        <div class="pub-detail-body" id="pub-detail-content">
+            <div style="text-align:center;padding:40px;"><div class="fa-feed-spinner"></div></div>
         </div>
     </div>
 </div>
@@ -2228,7 +2250,7 @@
         if (modal && e.target === modal) closeReactionDetails();
     });
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') { closeReactionDetails(); closeShareModal(); }
+        if (e.key === 'Escape') { closeReactionDetails(); closeShareModal(); closePublicationDetail(); }
     });
 
     // ========== PARTAGE PUBLICATION ==========
@@ -2276,5 +2298,28 @@
     document.addEventListener('click', function(e) {
         var sm = document.getElementById('share-modal');
         if (sm && e.target === sm) closeShareModal();
+        var pdm = document.getElementById('pub-detail-modal');
+        if (pdm && e.target === pdm) closePublicationDetail();
     });
+
+    // ========== DETAIL PUBLICATION (clic sur partage embarque) ==========
+    function openPublicationDetail(idpub) {
+        if (!idpub) return;
+        var modal = document.getElementById('pub-detail-modal');
+        var content = document.getElementById('pub-detail-content');
+        content.innerHTML = '<div style="text-align:center;padding:40px;"><div class="fa-feed-spinner"></div></div>';
+        modal.style.display = 'flex';
+        fetch(CTX + '/pages/alumni/ajax/voir-publication.jsp?idpublication=' + encodeURIComponent(idpub))
+            .then(function(r) { return r.text(); })
+            .then(function(html) {
+                content.innerHTML = html;
+            })
+            .catch(function(e) {
+                content.innerHTML = '<p style="color:red;padding:20px;text-align:center;">Erreur: ' + e + '</p>';
+            });
+    }
+    function closePublicationDetail() {
+        document.getElementById('pub-detail-modal').style.display = 'none';
+        document.getElementById('pub-detail-content').innerHTML = '';
+    }
 </script>

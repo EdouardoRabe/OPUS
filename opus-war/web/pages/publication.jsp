@@ -275,15 +275,15 @@
         <% } %>
 
         <% if (isSharedPost) { %>
-        <!-- Publication originale embarquee -->
-        <div class="fa-shared-embed">
+        <!-- Publication originale embarquee — cliquable pour voir en detail -->
+        <div class="fa-shared-embed fa-shared-embed--clickable" onclick="openPublicationDetail('<%= origIdpuborigine %>')" title="Voir la publication originale">
             <div class="fa-shared-embed-header">
                 <span class="fa-shared-embed-author"><%= origAuteur %></span>
                 <span class="fa-shared-embed-date">&nbsp;&middot;&nbsp;<%= origDate %></span>
                 <% if (!origTypePubLib2.isEmpty()) { %><span class="fa-type-badge"><%= origTypePubLib2 %></span><% } %>
             </div>
             <% if (!origDesc.isEmpty()) { %><div class="fa-shared-embed-text"><%= origDesc %></div><% } %>
-            <% if (!origMediaUrl.isEmpty()) { %><img src="<%= origMediaUrl %>" alt="" onclick="openMediaZoom(this.src)"><% } %>
+            <% if (!origMediaUrl.isEmpty()) { %><img src="<%= origMediaUrl %>" alt="" onclick="event.stopPropagation();openMediaZoom(this.src)"><% } %>
         </div>
         <% } %>
     </div>
