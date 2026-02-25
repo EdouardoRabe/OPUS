@@ -59,6 +59,7 @@
             Map userNames = new HashMap();
             Map userPhotos = new HashMap();
             Map userProfils = new HashMap();
+            Map userBanned = new HashMap();
             if (allProfils != null) {
                 for (int i = 0; i < allProfils.length; i++) {
                     Integer _key = new Integer(allProfils[i].getIdutilisateur());
@@ -67,6 +68,8 @@
                         userPhotos.put(_key, allProfils[i].getPhotoProfil().trim());
                     if (allProfils[i].getIdprofil() != null)
                         userProfils.put(_key, allProfils[i].getIdprofil());
+                    if (allProfils[i].getEstactif() == 0)
+                        userBanned.put(_key, Boolean.TRUE);
                 }
             }
 
@@ -82,6 +85,8 @@
                 String idcomm = c.getIdpublicationcommentaire();
                 String auteur = (String) userNames.get(new Integer(c.getIdutilisateur()));
                 if (auteur == null) auteur = "Utilisateur";
+                boolean commAuteurBanni = userBanned.containsKey(new Integer(c.getIdutilisateur()));
+                if (commAuteurBanni) auteur = "Utilisateur indisponible";
 
                 // --- APJ: Reactions sur ce commentaire ---
                 Commentairereaction[] cReacts = (Commentairereaction[]) CGenUtil.rechercher(
@@ -165,14 +170,15 @@
                 sbComm.append(",\"description\":\"").append(ej(c.getDescription())).append("\"");
                 sbComm.append(",\"auteur\":\"").append(ej(auteur)).append("\"");
                 sbComm.append(",\"idutilisateur\":").append(c.getIdutilisateur());
-                String _photoPath = (String) userPhotos.get(new Integer(c.getIdutilisateur()));
+                String _photoPath = commAuteurBanni ? null : (String) userPhotos.get(new Integer(c.getIdutilisateur()));
                 sbComm.append(",\"photo\":\"").append(_photoPath != null ? ej(_photoPath) : "").append("\"");
-                String _idprofilAuteur = (String) userProfils.get(new Integer(c.getIdutilisateur()));
+                String _idprofilAuteur = commAuteurBanni ? null : (String) userProfils.get(new Integer(c.getIdutilisateur()));
                 sbComm.append(",\"idprofil\":\"").append(_idprofilAuteur != null ? ej(_idprofilAuteur) : "").append("\"");
                 String parent = c.getIdpublicationcommentaire_1();
                 sbComm.append(",\"idparent\":\"").append(parent != null ? ej(parent) : "").append("\"");
                 sbComm.append(",\"reactions\":").append(sbReact.toString());
                 sbComm.append(",\"myReaction\":\"").append(ej(myReaction)).append("\"");
+                sbComm.append(",\"banned\":").append(commAuteurBanni ? "true" : "false");
                 sbComm.append("}");
             }
             sbComm.append("]");
