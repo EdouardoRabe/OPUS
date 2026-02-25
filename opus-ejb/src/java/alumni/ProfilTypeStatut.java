@@ -3,7 +3,6 @@ package alumni;
 import bean.ClassMAPTable;
 import java.sql.Connection;
 
-
 public class ProfilTypeStatut extends ClassMAPTable {
 
     private String idprofiltypestatut;
@@ -44,7 +43,6 @@ public class ProfilTypeStatut extends ClassMAPTable {
         this.libelle = libelle;
     }
 
-
     @Override
     public String getTuppleID() {
         return getIdprofiltypestatut();
@@ -61,11 +59,14 @@ public class ProfilTypeStatut extends ClassMAPTable {
         this.setIdprofiltypestatut(makePK(c));
     }
 
+    
     @Override
     public String toString() {
+
         return "ProfilTypeStatut{" +
                 "idprofiltypestatut='" + idprofiltypestatut + '\'' +
                 ", libelle='" + libelle + '\'' +
+                ", couleur='" + couleur + '\'' +
                 '}';
     }
 }
