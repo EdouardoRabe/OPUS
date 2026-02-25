@@ -357,7 +357,7 @@
                     <a href="<%= ctx %>/pages/module.jsp?but=profil/voir.jsp&currentMenu=MENDYN000009" class="fa-nav-link">
                         <i class="bi bi-person-fill"></i>&nbsp;Mon profil
                     </a>
-                    <a href="<%= ctx %>/pages/module.jsp?but=alumni/accueil.jsp" class="fa-nav-link">
+                    <a href="<%= ctx %>/pages/module.jsp?but=accueil.jsp" class="fa-nav-link">
                         <i class="bi bi-newspaper"></i>&nbsp;Fil d'actualité
                     </a>
                     <a href="<%= ctx %>/pages/module.jsp?but=alumni/notifications.jsp" class="fa-nav-link fa-nav-link--active">
