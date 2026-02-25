@@ -902,15 +902,6 @@ VALUES (
         NULL
     ),
     (
-        'MENDYN000003',
-        'Carriere',
-        'bi-briefcase-fill',
-        '#',
-        3,
-        0,
-        NULL
-    ),
-    (
         'MENDYN000004',
         'Mon Profil',
         'bi-person-circle',
@@ -1074,7 +1065,6 @@ WHERE typecible = 'PROMOTION'
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000001', 'MENDYN000001', '*', 0, 'etu'),
     ('USRM000002', 'MENDYN000002', '*', 0, 'etu'),
-    ('USRM000003', 'MENDYN000003', '*', 0, 'etu'),
     ('USRM000004', 'MENDYN000004', '*', 0, 'etu'),
     ('USRM000005', 'MENDYN000005', '*', 0, 'etu'),
     ('USRM000007', 'MENDYN000007', '*', 0, 'etu'),
@@ -1092,7 +1082,6 @@ VALUES ('USRM000001', 'MENDYN000001', '*', 0, 'etu'),
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000012', 'MENDYN000001', '*', 0, 'md'),
     ('USRM000013', 'MENDYN000002', '*', 0, 'md'),
-    ('USRM000014', 'MENDYN000003', '*', 0, 'md'),
     ('USRM000015', 'MENDYN000004', '*', 0, 'md'),
     ('USRM000016', 'MENDYN000005', '*', 0, 'md'),
     ('USRM000017', 'MENDYN000006', '*', 0, 'md'),
