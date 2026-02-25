@@ -167,7 +167,7 @@ ALTER FUNCTION public.constructabsence(utilisateur_ character varying) OWNER TO 
 CREATE FUNCTION public.constructlistabsence() RETURNS TABLE(id date, utilisateur character varying, jourperdu double precision)
     LANGUAGE plpgsql
     AS $$
-declare 
+declare
     r record;
     datytmp date;
     nbrejourtmp float8;
@@ -3486,11 +3486,11 @@ ALTER FUNCTION public.getseqtypeactionmetier() OWNER TO postgres;
 
 CREATE FUNCTION public.getseqtypebase() RETURNS integer
     LANGUAGE plpgsql
-    AS $$    
+    AS $$
 
 BEGIN
 
-RETURN (SELECT nextval('seqtypebase'));	
+RETURN (SELECT nextval('seqtypebase'));
 
 END
 

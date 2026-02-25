@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- SCRIPT COMPLET OPUS ALUMNI
 -- Date: 2026-02-25
--- Note: Les tables 'utilisateur' et 'role' existent déjà dans la base
+-- Note: Les tables 'utilisateur' et 'role' existent deja dans la base
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- ╔═══════════════════════════════════════════════════════════════════════════════╗
 -- ║ SECTION 1: TABLES DE BASE (sans FK vers utilisateur)                          ║
@@ -657,7 +657,7 @@ VALUES (
     );
 INSERT INTO typesignalement (idtypesignalement, libelle)
 VALUES ('TSG000004', 'Harcelement ou discrimination');
--- Réseaux sociaux
+-- Reseaux sociaux
 INSERT INTO reseauxsociaux (
         idreseausocial,
         libelle,
@@ -852,7 +852,7 @@ VALUES (
     ),
     (
         'phone',
-        'Téléphone',
+        'Telephone',
         'tel:{value}',
         'fas fa-phone',
         '#34C759',
@@ -1120,16 +1120,16 @@ SELECT setval('seq_typesignalement', 10);
 -- ╔═══════════════════════════════════════════════════════════════════════════════╗
 -- ║ VERIFICATION                                                                  ║
 -- ╚═══════════════════════════════════════════════════════════════════════════════╝
-SELECT 'Tables créées' AS status,
+SELECT 'Tables crees' AS status,
     COUNT(*) AS nb
 FROM information_schema.tables
 WHERE table_schema = 'public'
     AND table_type = 'BASE TABLE';
-SELECT 'Vues créées' AS status,
+SELECT 'Vues crees' AS status,
     COUNT(*) AS nb
 FROM information_schema.views
 WHERE table_schema = 'public';
-SELECT 'Séquences créées' AS status,
+SELECT 'Sequences crees' AS status,
     COUNT(*) AS nb
 FROM information_schema.sequences
 WHERE sequence_schema = 'public';

@@ -60,7 +60,7 @@
                 ident.insertToTableWithHisto(userId, conn);
 
                 // Creer une notification pour l'utilisateur identifie
-                String lien = "module.jsp?but=alumni/fil-actualite.jsp#pub-" + idpub;
+                String lien = "module.jsp?but=alumni/accueil.jsp#pub-" + idpub;
                 Notification.creerEtEnvoyer(conn, userId, targetUserId,
                     nomSource + " vous a identifie(e) dans une publication",
                     Notification.TYPE_IDENTIFICATION, lien);
