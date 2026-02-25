@@ -8,7 +8,7 @@
     <title>OPUS — En attente de validation</title>
 
     <link href="${pageContext.request.contextPath}/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="${pageContext.request.contextPath}/dist/css/font-awesome-4.4.0/css/font-awesome.min.css"
+    <link href="${pageContext.request.contextPath}/dist/js/font-awesome-4.4.0/css/font-awesome.min.css"
       rel="stylesheet" type="text/css" />
     <link href="${pageContext.request.contextPath}/assets/css/alumni-theme.css" rel="stylesheet" type="text/css" />
     <link href="${pageContext.request.contextPath}/assets/css/opus-theme.css" rel="stylesheet" type="text/css" />
