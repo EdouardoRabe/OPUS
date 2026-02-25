@@ -292,6 +292,7 @@
 .ppub-load-more-btn { background:transparent; border:1.5px solid #0a66c2; color:#0a66c2; border-radius:20px; padding:6px 20px; font-size:13px; font-weight:700; cursor:pointer; }
 .ppub-load-more-btn:hover { background:#0a66c2; color:#fff; }
 </style>
+<link rel="stylesheet" href="<%= ctx %>/assets/css/publication-cards.css">
 
 <div class="fu-wrap">
 
@@ -470,7 +471,45 @@
 
 </div>
 
+<!-- ==================== MODALES PUBLICATIONS ==================== -->
+<div id="react-detail-modal">
+    <div class="react-detail-box">
+        <div id="react-detail-content"></div>
+    </div>
+</div>
+<div id="share-modal">
+    <div class="share-box">
+        <div class="share-header">
+            <h3 class="share-title">Partager la publication</h3>
+            <button class="rdm-close" onclick="closeShareModal()">&times;</button>
+        </div>
+        <div class="share-body">
+            <textarea id="share-description" class="share-textarea" placeholder="Dites quelque chose... (optionnel)"></textarea>
+            <div class="share-original" id="share-original-preview">
+                <div class="share-orig-author" id="share-orig-author"></div>
+                <div class="share-orig-date" id="share-orig-date"></div>
+                <div class="share-orig-text" id="share-orig-text"></div>
+            </div>
+        </div>
+        <div class="share-footer">
+            <button class="share-cancel-btn" onclick="closeShareModal()">Annuler</button>
+            <button class="share-submit-btn" id="share-submit-btn" onclick="submitShare()">Partager</button>
+        </div>
+    </div>
+</div>
+<div id="pub-detail-modal">
+    <div class="pub-detail-box">
+        <div class="pub-detail-header">
+            <h3 class="pub-detail-title">Publication</h3>
+            <button class="rdm-close" onclick="closePublicationDetail()">&times;</button>
+        </div>
+        <div class="pub-detail-body" id="pub-detail-content"></div>
+    </div>
+</div>
+
 <script>
+var CTX = '<%= ctx %>';
+var CURRENT_USER_ID = '<%= myRefuser %>';
 (function() {
     var ctx = '<%= request.getContextPath() %>';
     var fuIdprofil = '<%= h(idprofil) %>';
@@ -501,20 +540,9 @@
         fuLoadPubs(iduser, idprofil, cursorId);
     };
 
-    window.openMediaZoom = window.openMediaZoom || function(src) {
-        var ov = document.getElementById('fuMediaZoom');
-        if (!ov) {
-            ov = document.createElement('div'); ov.id = 'fuMediaZoom';
-            ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:10000;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
-            ov.onclick = function() { ov.remove(); };
-            var img = document.createElement('img');
-            img.style.cssText = 'max-width:95vw;max-height:92vh;border-radius:6px;object-fit:contain;';
-            img.src = src; ov.appendChild(img); document.body.appendChild(ov);
-        } else { ov.querySelector('img').src = src; ov.style.display = 'flex'; }
-    };
-
     document.addEventListener('DOMContentLoaded', function() {
         fuLoadPubs(fuIduser, fuIdprofil, '');
     });
 })();
 </script>
+<script src="<%= ctx %>/assets/js/publication-cards.js"></script>

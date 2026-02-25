@@ -367,14 +367,14 @@
         <% } %>
 
         <% if (ffIsShared) { %>
-        <div class="fa-shared-embed">
+        <div class="fa-shared-embed fa-shared-embed--clickable" onclick="openPublicationDetail('<%= ffOrigId %>')" title="Voir la publication originale">
             <div class="fa-shared-embed-header">
                 <span class="fa-shared-embed-author"><%= ffOrigAuteur %></span>
                 <span class="fa-shared-embed-date">&nbsp;&middot;&nbsp;<%= ffOrigDate %></span>
                 <% if (!ffOrigTypePubLib.isEmpty()) { %><span class="fa-type-badge"><%= ffOrigTypePubLib %></span><% } %>
             </div>
             <% if (!ffOrigDesc.isEmpty()) { %><div class="fa-shared-embed-text"><%= ffOrigDesc %></div><% } %>
-            <% if (!ffOrigMediaUrl.isEmpty()) { %><img src="<%= ffOrigMediaUrl %>" alt="" onclick="openMediaZoom(this.src)" style="width:100%;border-radius:8px;margin-top:6px;max-height:200px;object-fit:cover;cursor:pointer;"><% } %>
+            <% if (!ffOrigMediaUrl.isEmpty()) { %><img src="<%= ffOrigMediaUrl %>" alt="" onclick="event.stopPropagation();openMediaZoom(this.src)" style="width:100%;border-radius:8px;margin-top:6px;max-height:200px;object-fit:cover;cursor:pointer;"><% } %>
         </div>
         <% } %>
     </div>
