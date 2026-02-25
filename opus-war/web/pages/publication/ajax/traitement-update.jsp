@@ -1,6 +1,7 @@
 <%@ page pageEncoding="UTF-8" buffer="none" %>
 <%@ page import="user.UserEJB" %>
 <%@ page import="alumni.Publication" %>
+<%@ page import="bean.CGenUtil" %>
 <%@ page import="utilitaire.UtilDB" %>
 <%@ page import="java.sql.Connection" %>
 <%
@@ -27,11 +28,14 @@
         }
 
         // --- Verifier que la publication appartient au user connecte ---
-        Connection connCheck = new UtilDB().GetConn();
-        Publication existante = new Publication();
-        existante.setIdpublication(idpublication.trim());
-        existante.remplirDepuisDB(connCheck);
-        connCheck.close();
+        Publication critere = new Publication();
+        critere.setIdpublication(idpublication.trim());
+        Publication[] found = (Publication[]) CGenUtil.rechercher(critere, null, null, "");
+        if (found == null || found.length == 0) {
+            out.print("{\"success\":false,\"error\":\"Publication introuvable\"}");
+            return;
+        }
+        Publication existante = found[0];
 
         if (existante.getIdutilisateur() != refUser) {
             out.print("{\"success\":false,\"error\":\"Vous ne pouvez modifier que vos propres publications\"}");

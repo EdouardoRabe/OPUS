@@ -8,7 +8,9 @@
 <%
     String lien     = (String) session.getValue("lien");
     String id       = "";
-    String apres    = "accueil.jsp";
+    String fromPage = request.getParameter("from");
+    if (fromPage == null || fromPage.isEmpty()) fromPage = "accueil.jsp";
+    String apres    = fromPage;
     String mapping  = "alumni.Publication";
     String nomtable = "publication";
     String titre    = "Modification publication";
@@ -73,9 +75,9 @@
 <!-- ═══ PAGE HEADER ═══ -->
 <div class="page-header-top">
     <h1 class="page-title-lg">
-        <a href="<%= lien %>?but=accueil.jsp"
+        <a href="<%= lien %>?but=<%= apres %>"
            style="color:var(--gray-400);margin-right:10px;font-size:1rem;vertical-align:middle;"
-           title="Retour à l'accueil">
+           title="Retour">
             <i class="fa fa-arrow-left"></i>
         </a>
         <i class="fa fa-pencil" style="color:var(--itu-blue);font-size:1.1rem;margin-right:8px;"></i>
@@ -217,7 +219,7 @@
 
             <!-- Boutons -->
             <div style="display:flex;justify-content:flex-end;align-items:center;gap:0.75rem;margin-top:1.75rem;padding-top:1.25rem;">
-                <a href="<%= lien %>?but=accueil.jsp" class="btn btn-ghost">Annuler</a>
+                <a href="<%= lien %>?but=<%= apres %>" class="btn btn-ghost">Annuler</a>
                 <button type="submit" id="btnSubmit" class="btn btn-primary"
                         style="display:inline-flex;align-items:center;gap:6px;">
                     <i class="fa fa-check"></i> Enregistrer
@@ -244,8 +246,7 @@
         .then(function(r) { return r.json(); })
         .then(function(data) {
             if (data.success) {
-                alert("Publication modifi\u00e9e avec succ\u00e8s !");
-                window.location.href = "<%= lien %>?but=accueil.jsp";
+                window.location.href = "<%= lien %>?but=<%= apres %>&highlight=" + data.id;
             } else {
                 alert("Erreur : " + data.error);
                 btn.disabled = false;
