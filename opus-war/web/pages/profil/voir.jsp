@@ -747,14 +747,10 @@
       %>
         <a class="pv-social-item" id="social-<%= smIdStr %>"
            href="<%= smUrl %>" target="_blank" rel="noopener noreferrer"
-           title="<%= smLibelle %>: <%= smValeur %>">
-          <div class="pv-social-icon" style="background:<%= smCouleur %>">
-            <i class="<%= smIcone %>"></i>
-          </div>
-          <div class="pv-social-info">
-            <span class="pv-social-name"><%= smLibelle %></span>
-            <span class="pv-social-val"><%= smValeur %></span>
-          </div>
+           title="<%= smLibelle %>: <%= smValeur %>"
+           style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+          <i class="<%= smIcone %>" style="color:<%= smCouleur %>;font-size:18px;"></i>
+          <span><%= smLibelle %>: <%= smValeur %></span>
           <button class="pv-social-del" type="button" title="Supprimer"
                   onclick="event.preventDefault();event.stopPropagation();pvDeleteSocial('<%= smIdStr %>')">×</button>
         </a>

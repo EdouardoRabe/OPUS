@@ -251,6 +251,17 @@
     String cvUrl = !cvPath.isEmpty() ? (ctx + "/" + cvPath) : "";
 %>
 
+<!-- Font Awesome 6 (for social icons) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+<style>
+/* Fix FA6 icon fonts - ensure proper rendering */
+.fab, .fa-brands { font-family: "Font Awesome 6 Brands" !important; font-weight: 400 !important; }
+.fas, .fa-solid, .fa { font-family: "Font Awesome 6 Free" !important; font-weight: 900 !important; }
+.far, .fa-regular { font-family: "Font Awesome 6 Free" !important; font-weight: 400 !important; }
+/* Minimum icon size */
+.fu-social-icon { font-size: 16px !important; display: inline-block; width: 20px; text-align: center; }
+</style>
+
 <style>
 /* ═══════════════════════════════════════
    FICHE UTILISATEUR  •  LinkedIn-style
@@ -433,9 +444,9 @@
                         String smUrl = urlPattern.replace("{value}", valeur);
                         if (smUrl.isEmpty()) smUrl = valeur;
                 %>
-                    <a href="<%= h(smUrl) %>" target="_blank" rel="noopener noreferrer" class="fu-tag grey" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
-                        <i class="<%= icone %>" style="color:<%= couleur %>;"></i>
-                        <%= h(lib) %>: <%= h(valeur) %>
+                    <a href="<%= h(smUrl) %>" target="_blank" rel="noopener noreferrer" class="fu-tag grey" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+                        <i class="<%= icone %> fu-social-icon" style="color:<%= couleur %>;font-size:18px;"></i>
+                        <span><%= h(lib) %>: <%= h(valeur) %></span>
                     </a>
                 <% } } %>
             </div>
