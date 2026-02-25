@@ -1218,3 +1218,16 @@ WHERE NOT EXISTS (
             AND v.champvisibilite = 'localisation'
             AND v.status = 0
     );
+create table publicationenregistrement (
+    idpublicationenregistrement SERIAL PRIMARY KEY,
+    idpublication VARCHAR(20) NOT NULL,
+    idutilisateur INTEGER NOT NULL,
+    daty Date NOT NULL DEFAULT NOW(),
+    heure VarcHAR(8) NOT NULL DEFAULT to_char(NOW(), ' HH24:MI:SS'),
+    UNIQUE(idpublication, idutilisateur),
+    FOREIGN KEY (idpublication) REFERENCES publication(idpublication),
+    FOREIGN KEY (idutilisateur) REFERENCES utilisateur(refuser)
+);
+CREATE SEQUENCE seq_publicationenregistrement START WITH 1 INCREMENT BY 1 CACHE 1;
+CREATE FUNCTION get_seq_publicationenregistrement() RETURNS INTEGER LANGUAGE plpgsql AS $$ BEGIN RETURN nextval('seq_publicationenregistrement');
+END $$;
