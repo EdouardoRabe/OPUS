@@ -878,243 +878,235 @@ DELETE FROM USERMENU
 WHERE idmenu LIKE 'MENDYN%';
 DELETE FROM MENUDYNAMIQUE
 WHERE id LIKE 'MENDYN%';
-
-
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
 VALUES (
-           'MENDYN000001',
-           'Accueil',
-           'bi-house-door-fill',
-           'module.jsp?but=accueil.jsp',
-           1,
-           0,
-           NULL
-       ),
-       (
-           'MENDYN000002',
-           'Reseau',
-           'bi-people-fill',
-           '#',
-           2,
-           0,
-           NULL
-       ),
-       (
-           'MENDYN000004',
-           'Mon Profil',
-           'bi-person-circle',
-           '#',
-           5,
-           0,
-           NULL
-       ),
-       (
-           'MENDYN000999',
-           'Administration',
-           'bi-gear-fill',
-           '#',
-           99,
-           0,
-           NULL
-       );
+        'MENDYN000001',
+        'Accueil',
+        'bi-house-door-fill',
+        'module.jsp?but=accueil.jsp',
+        1,
+        0,
+        NULL
+    ),
+    (
+        'MENDYN000002',
+        'Reseau',
+        'bi-people-fill',
+        '#',
+        2,
+        0,
+        NULL
+    ),
+    (
+        'MENDYN000004',
+        'Mon Profil',
+        'bi-person-circle',
+        '#',
+        5,
+        0,
+        NULL
+    ),
+    (
+        'MENDYN000999',
+        'Administration',
+        'bi-gear-fill',
+        '#',
+        99,
+        0,
+        NULL
+    );
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
 VALUES (
-           'MENDYN000005',
-           'Annuaire',
-           'bi-book-fill',
-           'module.jsp?but=annuaire/annuaire.jsp',
-           1,
-           1,
-           'MENDYN000002'
-       ),
-       (
-           'MENDYN000006',
-           'Gestion Specialites',
-           'bi-tags-fill',
-           'module.jsp?but=specialite/specialite-list.jsp',
-           2,
-           1,
-           'MENDYN000999'
-       );
-
+        'MENDYN000005',
+        'Annuaire',
+        'bi-book-fill',
+        'module.jsp?but=annuaire/annuaire.jsp',
+        1,
+        1,
+        'MENDYN000002'
+    ),
+    (
+        'MENDYN000006',
+        'Gestion Specialites',
+        'bi-tags-fill',
+        'module.jsp?but=specialite/specialite-list.jsp',
+        2,
+        1,
+        'MENDYN000999'
+    );
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
 VALUES (
-           'MENDYN000009',
-           'Voir ma fiche',
-           'bi-person-badge-fill',
-           'module.jsp?but=profil/voir.jsp',
-           1,
-           1,
-           'MENDYN000004'
-       ),
-       (
-           'MENDYN000010',
-           'Modifier le profil',
-           'bi-pencil-square',
-           'module.jsp?but=profil/modifier.jsp',
-           2,
-           1,
-           'MENDYN000004'
-       ),
-       (
-           'MENDYN000011',
-           'Deconnexion',
-           'bi-box-arrow-right',
-           'deconnexion.jsp',
-           3,
-           1,
-           'MENDYN000004'
-       );
+        'MENDYN000009',
+        'Voir ma fiche',
+        'bi-person-badge-fill',
+        'module.jsp?but=profil/voir.jsp',
+        1,
+        1,
+        'MENDYN000004'
+    ),
+    (
+        'MENDYN000010',
+        'Modifier le profil',
+        'bi-pencil-square',
+        'module.jsp?but=profil/modifier.jsp',
+        2,
+        1,
+        'MENDYN000004'
+    ),
+    (
+        'MENDYN000011',
+        'Deconnexion',
+        'bi-box-arrow-right',
+        'deconnexion.jsp',
+        3,
+        1,
+        'MENDYN000004'
+    );
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
 VALUES (
-           'MENDYN000023',
-           'Gestion des utilisateurs',
-           'bi-people',
-           'module.jsp?but=mod/gestion-utilisateurs.jsp',
-           1,
-           1,
-           'MENDYN000999'
-       ),
-       (
-           'MENDYN000024',
-           'Gestion des signalements',
-           'bi-shield-exclamation',
-           'module.jsp?but=mod/gestion-signalements.jsp',
-           2,
-           1,
-           'MENDYN000999'
-       );
+        'MENDYN000023',
+        'Gestion des utilisateurs',
+        'bi-people',
+        'module.jsp?but=mod/gestion-utilisateurs.jsp',
+        1,
+        1,
+        'MENDYN000999'
+    ),
+    (
+        'MENDYN000024',
+        'Gestion des signalements',
+        'bi-shield-exclamation',
+        'module.jsp?but=mod/gestion-signalements.jsp',
+        2,
+        1,
+        'MENDYN000999'
+    );
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
 VALUES (
-           'MENDYN000014',
-           'Notifications',
-           'bi-bell-fill',
-           '#',
-           6,
-           0,
-           NULL
-       );
+        'MENDYN000014',
+        'Notifications',
+        'bi-bell-fill',
+        '#',
+        6,
+        0,
+        NULL
+    );
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
 VALUES (
-           'MENDYN000015',
-           'Evenements',
-           'bi-calendar-event-fill',
-           '#',
-           4,
-           0,
-           NULL
-       ),
-       (
-           'MENDYN000016',
-           'Saisie',
-           'bi-plus-circle-fill',
-           'module.jsp?but=evenement/evenement-saisie.jsp',
-           1,
-           1,
-           'MENDYN000015'
-       ),
-       (
-           'MENDYN000017',
-           'Liste',
-           'bi-list-ul',
-           'module.jsp?but=evenement/evenement-list.jsp',
-           2,
-           1,
-           'MENDYN000015'
-       ),
-       (
-           'MENDYN000018',
-           'Calendrier',
-           'bi-calendar-heart-fill',
-           'module.jsp?but=evenement/evenement-calendar.jsp',
-           3,
-           1,
-           'MENDYN000015'
-       );
+        'MENDYN000015',
+        'Evenements',
+        'bi-calendar-event-fill',
+        '#',
+        4,
+        0,
+        NULL
+    ),
+    (
+        'MENDYN000016',
+        'Saisie',
+        'bi-plus-circle-fill',
+        'module.jsp?but=evenement/evenement-saisie.jsp',
+        1,
+        1,
+        'MENDYN000015'
+    ),
+    (
+        'MENDYN000017',
+        'Liste',
+        'bi-list-ul',
+        'module.jsp?but=evenement/evenement-list.jsp',
+        2,
+        1,
+        'MENDYN000015'
+    ),
+    (
+        'MENDYN000018',
+        'Calendrier',
+        'bi-calendar-heart-fill',
+        'module.jsp?but=evenement/evenement-calendar.jsp',
+        3,
+        1,
+        'MENDYN000015'
+    );
 ALTER TABLE publicationvisibilite
-    ADD COLUMN IF NOT EXISTS anneeref INTEGER,
+ADD COLUMN IF NOT EXISTS anneeref INTEGER,
     ADD COLUMN IF NOT EXISTS anneedirection CHAR(1) DEFAULT '+';
 -- Migrer les anciennes lignes (anneemin -> anneeref, direction par defaut '+')
 UPDATE publicationvisibilite
 SET anneeref = anneemin,
     anneedirection = '+'
 WHERE typecible = 'PROMOTION'
-  AND anneemin IS NOT NULL
-  AND anneeref IS NULL;
+    AND anneemin IS NOT NULL
+    AND anneeref IS NULL;
 -- Droits role etu
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000001', 'MENDYN000001', '*', 0, 'etu'),
-       ('USRM000002', 'MENDYN000002', '*', 0, 'etu'),
-       ('USRM000004', 'MENDYN000004', '*', 0, 'etu'),
-       ('USRM000005', 'MENDYN000005', '*', 0, 'etu'),
-       ('USRM000007', 'MENDYN000007', '*', 0, 'etu'),
-       ('USRM000008', 'MENDYN000008', '*', 0, 'etu'),
-       ('USRM000009', 'MENDYN000009', '*', 0, 'etu'),
-       ('USRM000010', 'MENDYN000010', '*', 0, 'etu'),
-       ('USRM000011', 'MENDYN000011', '*', 0, 'etu'),
-       ('USRM000025', 'MENDYN000024', '*', 1, 'etu'),
-       ('USRM000027', 'MENDYN000014', '*', 0, 'etu'),
-       ('USRM000029', 'MENDYN000015', '*', 0, 'etu'),
-       ('USRM000035', 'MENDYN000018', '*', 0, 'etu');
+    ('USRM000002', 'MENDYN000002', '*', 0, 'etu'),
+    ('USRM000004', 'MENDYN000004', '*', 0, 'etu'),
+    ('USRM000005', 'MENDYN000005', '*', 0, 'etu'),
+    ('USRM000007', 'MENDYN000007', '*', 0, 'etu'),
+    ('USRM000008', 'MENDYN000008', '*', 0, 'etu'),
+    ('USRM000009', 'MENDYN000009', '*', 0, 'etu'),
+    ('USRM000010', 'MENDYN000010', '*', 0, 'etu'),
+    ('USRM000011', 'MENDYN000011', '*', 0, 'etu'),
+    ('USRM000025', 'MENDYN000024', '*', 1, 'etu'),
+    ('USRM000027', 'MENDYN000014', '*', 0, 'etu'),
+    ('USRM000029', 'MENDYN000015', '*', 0, 'etu'),
+    ('USRM000035', 'MENDYN000018', '*', 0, 'etu');
 -- Droits role md
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000012', 'MENDYN000001', '*', 0, 'md'),
-       ('USRM000013', 'MENDYN000002', '*', 0, 'md'),
-       ('USRM000015', 'MENDYN000004', '*', 0, 'md'),
-       ('USRM000016', 'MENDYN000005', '*', 0, 'md'),
-       ('USRM000017', 'MENDYN000006', '*', 0, 'md'),
-       ('USRM000018', 'MENDYN000007', '*', 0, 'md'),
-       ('USRM000019', 'MENDYN000008', '*', 0, 'md'),
-       ('USRM000020', 'MENDYN000009', '*', 0, 'md'),
-       ('USRM000021', 'MENDYN000010', '*', 0, 'md'),
-       ('USRM000022', 'MENDYN000011', '*', 0, 'md'),
-       ('USRM000099', 'MENDYN000999', '*', 0, 'md'),
-       ('USRM000023', 'MENDYN000023', '*', 0, 'md'),
-       ('USRM000024', 'MENDYN000024', '*', 0, 'md'),
-       ('USRM000028', 'MENDYN000014', '*', 0, 'md'),
-       ('USRM000030', 'MENDYN000015', '*', 0, 'md'),
-       ('USRM000032', 'MENDYN000016', '*', 0, 'md'),
-       ('USRM000034', 'MENDYN000017', '*', 0, 'md'),
-       ('USRM000036', 'MENDYN000018', '*', 0, 'md');
+    ('USRM000013', 'MENDYN000002', '*', 0, 'md'),
+    ('USRM000015', 'MENDYN000004', '*', 0, 'md'),
+    ('USRM000016', 'MENDYN000005', '*', 0, 'md'),
+    ('USRM000017', 'MENDYN000006', '*', 0, 'md'),
+    ('USRM000018', 'MENDYN000007', '*', 0, 'md'),
+    ('USRM000019', 'MENDYN000008', '*', 0, 'md'),
+    ('USRM000020', 'MENDYN000009', '*', 0, 'md'),
+    ('USRM000021', 'MENDYN000010', '*', 0, 'md'),
+    ('USRM000022', 'MENDYN000011', '*', 0, 'md'),
+    ('USRM000099', 'MENDYN000999', '*', 0, 'md'),
+    ('USRM000023', 'MENDYN000023', '*', 0, 'md'),
+    ('USRM000024', 'MENDYN000024', '*', 0, 'md'),
+    ('USRM000028', 'MENDYN000014', '*', 0, 'md'),
+    ('USRM000030', 'MENDYN000015', '*', 0, 'md'),
+    ('USRM000032', 'MENDYN000016', '*', 0, 'md'),
+    ('USRM000034', 'MENDYN000017', '*', 0, 'md'),
+    ('USRM000036', 'MENDYN000018', '*', 0, 'md');
 -- Sous-menu Reseau Professionnel sous RESEAU (niveau 1)
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
 VALUES (
-           'MENDYN000019',
-           'Reseau pro',
-           'bi-diagram-3-fill',
-           'module.jsp?but=alumni/reseau-professionnel.jsp',
-           3,
-           1,
-           'MENDYN000002'
-       );
+        'MENDYN000019',
+        'Reseau pro',
+        'bi-diagram-3-fill',
+        'module.jsp?but=alumni/reseau-professionnel.jsp',
+        3,
+        1,
+        'MENDYN000002'
+    );
 -- Droits role etu
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000045', 'MENDYN000019', '*', 0, 'etu');
 -- Droits role md
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000046', 'MENDYN000019', '*', 0, 'md');
-
 -- Sous-menu Carte sous RESEAU (niveau 1)
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
 VALUES (
-           'MENDYN000020',
-           'Carte',
-           'bi-globe-americas',
-           'module.jsp?but=map/cart.jsp',
-           3,
-           0,
-           NULL
-       );
-
+        'MENDYN000020',
+        'Carte',
+        'bi-globe-americas',
+        'module.jsp?but=map/cart.jsp',
+        3,
+        0,
+        NULL
+    );
 -- Droits role etu pour la Carte
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000047', 'MENDYN000020', '*', 0, 'etu');
-
 -- Droits role md pour la Carte
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000048', 'MENDYN000020', '*', 0, 'md');
-
-
 -- ╔═══════════════════════════════════════════════════════════════════════════════╗
 -- ║ SECTION 16: MISE A JOUR DES SEQUENCES                                         ║
 -- ╚═══════════════════════════════════════════════════════════════════════════════╝
@@ -1218,16 +1210,21 @@ WHERE NOT EXISTS (
             AND v.champvisibilite = 'localisation'
             AND v.status = 0
     );
-create table publicationenregistrement (
-    idpublicationenregistrement SERIAL PRIMARY KEY,
+DROP TABLE IF EXISTS publicationenregistrement;
+-- 2) Recreer avec PK VARCHAR(20) comme les autres beans APJ
+CREATE TABLE publicationenregistrement (
+    idpublicationenregistrement VARCHAR(20) PRIMARY KEY,
     idpublication VARCHAR(20) NOT NULL,
     idutilisateur INTEGER NOT NULL,
-    daty Date NOT NULL DEFAULT NOW(),
-    heure VarcHAR(8) NOT NULL DEFAULT to_char(NOW(), ' HH24:MI:SS'),
+    daty DATE NOT NULL DEFAULT CURRENT_DATE,
+    heure VARCHAR(8) NOT NULL DEFAULT to_char(NOW(), 'HH24:MI:SS'),
     UNIQUE(idpublication, idutilisateur),
     FOREIGN KEY (idpublication) REFERENCES publication(idpublication),
     FOREIGN KEY (idutilisateur) REFERENCES utilisateur(refuser)
 );
+-- 3) Sequence + fonction APJ
 CREATE SEQUENCE seq_publicationenregistrement START WITH 1 INCREMENT BY 1 CACHE 1;
 CREATE FUNCTION get_seq_publicationenregistrement() RETURNS INTEGER LANGUAGE plpgsql AS $$ BEGIN RETURN nextval('seq_publicationenregistrement');
 END $$;
+select *
+from publicationenregistrement;
