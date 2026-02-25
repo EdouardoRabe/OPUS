@@ -79,7 +79,7 @@ INSERT INTO poste (idposte, libelle) VALUES
 
 -- --- CLUSTER A : Java + BDD | Informatique 2024 ---
 INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, id, estactif) VALUES
-(200, 'ETU000010', 'paop', 'Andriamina Toky',        'DIR42', 'etu', 'ETU000010', 1),
+(200, 'ETU000010', 'paop', 'Andriamina Toky',        'DIR42', 'md', 'ETU000010', 1),
 (201, 'ETU000011', 'paop', 'Rakotoarisoa Lalaina',    'DIR42', 'etu', 'ETU000011', 1),
 (202, 'ETU000012', 'paop', 'Razafimahefa Nivo',       'DIR42', 'etu', 'ETU000012', 1),
 (203, 'ETU000013', 'paop', 'Andrianasolo Heritiana',  'DIR42', 'etu', 'ETU000013', 1),
