@@ -104,7 +104,21 @@
         .fa-layout { grid-template-columns: 1fr; }
         .fa-sidebar-left { display: none; }
     }
-    .fa-sidebar-left, .fa-sidebar-right { position: sticky; top: 80px; }
+    .fa-sidebar-right { position: sticky; top: 80px; }
+    .fa-sidebar-left {
+        position: sticky;
+        top: 80px;
+        height: calc(100vh - 96px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        scrollbar-color: #d1d5db transparent;
+    }
+    .fa-sidebar-left::-webkit-scrollbar { width: 4px; }
+    .fa-sidebar-left::-webkit-scrollbar-track { background: transparent; }
+    .fa-sidebar-left::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+    .fa-sidebar-left::-webkit-scrollbar-thumb:hover { background: #adb5bd; }
     .fa-feed-center { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
     /* ---- Widget sidebar droite ---- */
     .fa-widget-card {
@@ -182,15 +196,33 @@
     .fa-composer-full { margin-top: 10px; border-top: 1px solid var(--fa-border); padding-top: 12px; }
     .fa-composer-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
     .fa-type-select { margin-left: 6px; padding: 3px 8px; border: 1px solid var(--fa-border); border-radius: 6px; font-size: 13px; background: #f0f2f5; }
-    /* ---- Barre de filtre ---- */
-    .fa-filter-bar { display:flex; align-items:center; gap:8px; background:var(--fa-card-bg); border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.12); padding:10px 14px; flex-wrap:wrap; }
-    .fa-filter-input { padding:5px 10px; border:1px solid var(--fa-border); border-radius:8px; font-size:13px; background:#f0f2f5; color:var(--fa-text); width:130px; outline:none; }
-    .fa-filter-input:focus { border-color:var(--itu-blue,#008BFF); background:#fff; }
-    .fa-filter-lier-label { font-size:13px; color:var(--fa-text-secondary); display:flex; align-items:center; gap:4px; cursor:pointer; white-space:nowrap; }
-    .fa-filter-apply { padding:6px 14px; background:var(--itu-blue,#008BFF); color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:5px; }
-    .fa-filter-apply:hover { background:#0069cc; }
-    .fa-filter-reset { padding:6px 10px; background:#e4e6eb; border:none; border-radius:8px; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; }
-    .fa-filter-reset:hover { background:#d8dadf; }
+    /* ---- Panneau filtre sidebar ---- */
+    .fa-filter-panel { background:var(--fa-card-bg); border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.12); overflow:hidden; margin-top:12px; }
+    .fa-filter-panel-header { display:flex; align-items:center; justify-content:space-between; padding:13px 16px 11px; border-bottom:1px solid var(--fa-border); }
+    .fa-filter-panel-title { display:flex; align-items:center; gap:8px; font-weight:700; font-size:15px; color:var(--fa-text); }
+    .fa-filter-panel-clear { background:none; border:none; font-size:12px; color:var(--fa-text-secondary); cursor:pointer; padding:3px 7px; border-radius:6px; display:flex; align-items:center; gap:4px; transition:background .15s,color .15s; }
+    .fa-filter-panel-clear:hover { background:#fde8e8; color:#e53935; }
+    .fa-filter-panel-body { padding:12px 14px; display:flex; flex-direction:column; gap:12px; }
+    .fa-filter-group { display:flex; flex-direction:column; gap:5px; }
+    .fa-filter-group-label { font-size:11px; font-weight:700; color:var(--fa-text-secondary); text-transform:uppercase; letter-spacing:.5px; display:flex; align-items:center; gap:5px; }
+    .fa-filter-group-input { padding:7px 10px; border:1.5px solid var(--fa-border); border-radius:8px; font-size:13px; background:#f0f2f5; color:var(--fa-text); outline:none; width:100%; box-sizing:border-box; transition:border-color .15s,background .15s; }
+    .fa-filter-group-input:focus { border-color:var(--itu-blue,#008BFF); background:#fff; }
+    /* Type publication : liste radio moderne */
+    .fa-typepub-list { display:flex; flex-direction:column; gap:3px; max-height:220px; overflow-y:auto; }
+    .fa-typepub-item { display:flex; align-items:center; gap:9px; padding:7px 10px; border-radius:8px; cursor:pointer; font-size:13px; color:var(--fa-text); border:1.5px solid transparent; transition:background .15s,border-color .15s; user-select:none; }
+    .fa-typepub-item:hover { background:#e7f3ff; border-color:#b8dbff; }
+    .fa-typepub-item.active { background:#e7f3ff; border-color:var(--itu-blue,#008BFF); color:var(--itu-blue,#008BFF); font-weight:600; }
+    .fa-typepub-dot { width:14px; height:14px; border-radius:50%; border:2px solid #ccc; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:border-color .15s,background .15s; }
+    .fa-typepub-item.active .fa-typepub-dot { border-color:var(--itu-blue,#008BFF); background:var(--itu-blue,#008BFF); }
+    .fa-typepub-item.active .fa-typepub-dot::after { content:''; width:5px; height:5px; border-radius:50%; background:#fff; display:block; }
+    /* Lier critères */
+    .fa-filter-lier-row { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--fa-text-secondary); cursor:pointer; padding:2px 0; }
+    /* Footer bouttons */
+    .fa-filter-panel-footer { padding:8px 14px 14px; display:flex; gap:8px; }
+    .fa-filter-btn-apply { flex:1; padding:9px 12px; background:var(--itu-blue,#008BFF); color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px; transition:background .15s; }
+    .fa-filter-btn-apply:hover { background:#0069cc; }
+    .fa-filter-btn-reset { padding:9px 10px; background:#e4e6eb; border:none; border-radius:8px; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s; }
+    .fa-filter-btn-reset:hover { background:#d8dadf; }
     /* ---- Visibilite composer ---- */
     .fa-vis-section { margin-top:8px; border:1px solid var(--fa-border); border-radius:8px; overflow:hidden; }
     .fa-vis-header { display:flex; align-items:center; gap:7px; padding:8px 12px; cursor:pointer; background:#f8f9fb; font-size:13px; color:var(--fa-text-secondary); user-select:none; }
@@ -537,6 +569,60 @@
                 </nav>
             </div>
         </div>
+
+        <!-- ===== PANNEAU FILTRE ===== -->
+        <div class="fa-filter-panel">
+            <div class="fa-filter-panel-header">
+                <span class="fa-filter-panel-title">
+                    <i class="bi bi-sliders fa-widget-icon"></i> Filtres
+                </span>
+                <button type="button" class="fa-filter-panel-clear" id="filter-reset-btn" onclick="reinitialiserFiltre()" style="display:none">
+                    <i class="bi bi-x-circle-fill"></i> Effacer
+                </button>
+            </div>
+            <!-- Datalists -->
+            <datalist id="dl-f-spec"><% for (int _fi=0;_fi<allSpecialites.length;_fi++){%><option value="<%= allSpecialites[_fi].getLibelle() %>"><% } %></datalist>
+            <datalist id="dl-f-parc"><% for (int _fi=0;_fi<allParcours.length;_fi++){%><option value="<%= allParcours[_fi].getLibelle() %>"><% } %></datalist>
+            <div class="fa-filter-panel-body">
+                <!-- Spécialité -->
+                <div class="fa-filter-group">
+                    <label class="fa-filter-group-label" for="filter-spec-input"><i class="bi bi-mortarboard-fill"></i>&nbsp;Sp&eacute;cialit&eacute;</label>
+                    <input list="dl-f-spec" id="filter-spec-input" class="fa-filter-group-input" placeholder="Sp&eacute;cialit&eacute;..." autocomplete="off">
+                </div>
+                <!-- Parcours -->
+                <div class="fa-filter-group">
+                    <label class="fa-filter-group-label" for="filter-parc-input"><i class="bi bi-diagram-3-fill"></i>&nbsp;Parcours</label>
+                    <input list="dl-f-parc" id="filter-parc-input" class="fa-filter-group-input" placeholder="Parcours..." autocomplete="off">
+                </div>
+                <!-- Promotion -->
+                <div class="fa-filter-group">
+                    <label class="fa-filter-group-label" for="filter-promo-input"><i class="bi bi-calendar-fill"></i>&nbsp;Promotion</label>
+                    <input id="filter-promo-input" class="fa-filter-group-input" placeholder="ex: 2023+" maxlength="6" autocomplete="off">
+                </div>
+                <!-- Type de publication : liste single-select -->
+                <div class="fa-filter-group">
+                    <div class="fa-filter-group-label"><i class="bi bi-tag-fill"></i>&nbsp;Type de publication</div>
+                    <div class="fa-typepub-list" id="typepub-list">
+                        <% for (int _fi=0;_fi<typesPub.length;_fi++){%>
+                        <div class="fa-typepub-item" onclick="selectTypePub(this,'<%= typesPub[_fi].getLibelle().replace("'","\\'") %>')" data-libelle="<%= typesPub[_fi].getLibelle() %>">
+                            <span class="fa-typepub-dot"></span>
+                            <%= typesPub[_fi].getLibelle() %>
+                        </div>
+                        <% } %>
+                    </div>
+                    <input type="hidden" id="filter-typepub-input" value="">
+                </div>
+                <!-- Lier critères -->
+                <label class="fa-filter-lier-row" title="Relier les crit&egrave;res (ET)">
+                    <input type="checkbox" id="filter-lier">&nbsp;Lier les crit&egrave;res
+                </label>
+            </div>
+            <div class="fa-filter-panel-footer">
+                <button type="button" class="fa-filter-btn-apply" onclick="appliquerFiltre()">
+                    <i class="bi bi-funnel-fill"></i>&nbsp;Appliquer
+                </button>
+            </div>
+        </div>
     </aside>
 
     <!-- ===== COLONNE CENTRALE : Fil ===== -->
@@ -549,23 +635,6 @@
         <% if (msgErreur != null) { %>
         <script>document.addEventListener('DOMContentLoaded',function(){Swal.fire({icon:'error',title:'Erreur',text:'<%= msgErreur.replace("'","\\'").replace("<","&lt;") %>',confirmButtonColor:'var(--itu-blue)'});});</script>
         <% } %>
-
-        <!-- ===== FILTRE DU FIL ===== -->
-        <!-- Datalists pour le filtre -->
-        <datalist id="dl-f-spec"><% for (int _fi=0;_fi<allSpecialites.length;_fi++){%><option value="<%= allSpecialites[_fi].getLibelle() %>"><% } %></datalist>
-        <datalist id="dl-f-parc"><% for (int _fi=0;_fi<allParcours.length;_fi++){%><option value="<%= allParcours[_fi].getLibelle() %>"><% } %></datalist>
-        <datalist id="dl-f-typepub"><% for (int _fi=0;_fi<typesPub.length;_fi++){%><option value="<%= typesPub[_fi].getLibelle() %>"><% } %></datalist>
-        <div class="fa-filter-bar" id="feed-filter-bar">
-            <input list="dl-f-spec" id="filter-spec-input" class="fa-filter-input" placeholder="Sp&eacute;cialit&eacute;..." autocomplete="off">
-            <input list="dl-f-parc" id="filter-parc-input" class="fa-filter-input" placeholder="Parcours..." autocomplete="off">
-            <input id="filter-promo-input" class="fa-filter-input" placeholder="Ann&eacute;e ex: 2023+" maxlength="6" autocomplete="off">
-            <input list="dl-f-typepub" id="filter-typepub-input" class="fa-filter-input" placeholder="Type de publication..." autocomplete="off">
-            <label class="fa-filter-lier-label" title="Relier les crit&egrave;res (ET)">
-                <input type="checkbox" id="filter-lier">&nbsp;Lier
-            </label>
-            <button type="button" class="fa-filter-apply" onclick="appliquerFiltre()"><i class="bi bi-sliders"></i>&nbsp;Filtrer</button>
-            <button type="button" class="fa-filter-reset" onclick="reinitialiserFiltre()" id="filter-reset-btn" style="display:none"><i class="bi bi-x-lg"></i></button>
-        </div>
 
         <!-- ===== COMPOSER ===== -->
         <div class="fa-composer-card" id="composer-card">
@@ -767,24 +836,6 @@
                 request.setAttribute("_pub_ctx", ctx);
                 request.setAttribute("_pub_conn", conn);
         %>
-        <!-- Charger moment.js et définir formatPublicationTime AVANT la jsp:include -->
-        <script src="<%= ctx %>/assets/js/moment.min.js"></script>
-        <script>
-            function formatPublicationTime(daty, heure) {
-                if (!daty || typeof moment === 'undefined') return (daty + ' à ' + heure);
-                // Combiner la date (YYYY-MM-DD) et l'heure (HH:mm) au format de moment
-                var combinedStr = daty + ' ' + (heure && heure.trim() ? heure : '00:00');
-                var m = moment(combinedStr, 'YYYY-MM-DD HH:mm');
-                if (!m.isValid()) return daty + ' à ' + heure;
-                // Utiliser le format calendrier (Aujourd'hui à, Hier à, lundi à, etc.)
-                return m.calendar(null, {
-                    sameDay: '[Aujourd\'hui à] HH:mm',
-                    lastDay: '[Hier à] HH:mm',
-                    lastWeek: 'dddd [à] HH:mm',
-                    sameElse: 'DD/MM/YYYY HH:mm'
-                });
-            }
-        </script>
         <jsp:include page="publication.jsp" />
         <%
         } catch (Exception e) {
@@ -1975,6 +2026,20 @@
         if (!txt) return '';
         return map[txt] || '';
     }
+    // Single-select pour le type de publication
+    function selectTypePub(el, libelle) {
+        var input = document.getElementById('filter-typepub-input');
+        var items = document.querySelectorAll('.fa-typepub-item');
+        if (input.value === libelle) {
+            // Déselectionner
+            el.classList.remove('active');
+            input.value = '';
+        } else {
+            items.forEach(function(i){ i.classList.remove('active'); });
+            el.classList.add('active');
+            input.value = libelle;
+        }
+    }
     function appliquerFiltre() {
         var spec    = _resolveFilterId('filter-spec-input',    _SPEC_MAP);
         var parc    = _resolveFilterId('filter-parc-input',    _PARC_MAP);
@@ -1997,13 +2062,16 @@
         cursor.setAttribute('data-has-more', 'true');
         feed.querySelectorAll('.fa-post-card, .fa-feed-end').forEach(function(el){ el.remove(); });
         if (sentinel) sentinel.style.display = 'block';
-        document.getElementById('filter-reset-btn').style.display = (spec||parc||promo||typepub) ? 'inline-flex' : 'none';
+        document.getElementById('filter-reset-btn').style.display = (spec||parc||promo||typepub) ? 'flex' : 'none';
         if (window.triggerFeedLoad) window.triggerFeedLoad();
     }
     function reinitialiserFiltre() {
-        ['filter-spec-input','filter-parc-input','filter-promo-input','filter-typepub-input'].forEach(function(id){
+        ['filter-spec-input','filter-parc-input','filter-promo-input'].forEach(function(id){
             document.getElementById(id).value = '';
         });
+        // Vider la sélection de type de publication
+        document.getElementById('filter-typepub-input').value = '';
+        document.querySelectorAll('.fa-typepub-item').forEach(function(i){ i.classList.remove('active'); });
         document.getElementById('filter-lier').checked = false;
         appliquerFiltre();
     }
