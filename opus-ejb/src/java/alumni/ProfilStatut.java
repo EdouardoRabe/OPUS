@@ -2,14 +2,16 @@ package alumni;
 
 import bean.ClassMAPTable;
 import java.sql.Connection;
-import java.sql.Date;
+import java.sql.Timestamp;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 public class ProfilStatut extends ClassMAPTable {
 
     private String id;
     private String idprofil;
     private String idprofiltypestatut;
-    private Date daty;
+    private Timestamp daty;
 
     public ProfilStatut() {
         setNomTable("profilstatut");
@@ -39,11 +41,11 @@ public class ProfilStatut extends ClassMAPTable {
         this.idprofiltypestatut = idprofiltypestatut;
     }
 
-    public Date getDaty() {
+    public Timestamp getDaty() {
         return daty;
     }
 
-    public void setDaty(Date daty) {
+    public void setDaty(Timestamp daty) {
         this.daty = daty;
     }
 
@@ -59,8 +61,18 @@ public class ProfilStatut extends ClassMAPTable {
 
     @Override
     public void construirePK(Connection c) throws Exception {
-        this.preparePk("PS", "getseqprofilstatut");
-        this.setId(makePK(c));
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = c.createStatement();
+            rs = stmt.executeQuery("SELECT getseqprofilstatut()");
+            if (rs.next()) {
+                this.setId(rs.getString(1));
+            }
+        } finally {
+            if (rs != null) try { rs.close(); } catch (Exception ignore) {}
+            if (stmt != null) try { stmt.close(); } catch (Exception ignore) {}
+        }
     }
 
     @Override

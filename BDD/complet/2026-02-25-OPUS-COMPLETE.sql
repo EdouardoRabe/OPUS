@@ -1194,28 +1194,3 @@ CREATE TABLE IF NOT EXISTS profilstatut (
     idprofiltypestatut VARCHAR(12) NOT NULL REFERENCES profiltypestatut(idprofiltypestatut),
     daty TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
--- initial data for profilstatut
-INSERT INTO profilstatut(id, idprofil, idprofiltypestatut)
-SELECT getseqprofilstatut(),
-    'PRF000010',
-    (
-        SELECT idprofiltypestatut
-        FROM profiltypestatut
-        WHERE libelle = 'Taken'
-    );
--- View: latest profile status with type details
-CREATE OR REPLACE VIEW v_profilstatut_latest AS
-SELECT ps.id,
-    ps.idprofil,
-    ps.idprofiltypestatut,
-    pts.libelle,
-    pts.couleur,
-    ps.daty
-FROM profilstatut ps
-    INNER JOIN profiltypestatut pts ON ps.idprofiltypestatut = pts.idprofiltypestatut
-WHERE (ps.idprofil, ps.daty) IN (
-        SELECT idprofil,
-            MAX(daty)
-        FROM profilstatut
-        GROUP BY idprofil
-    );
