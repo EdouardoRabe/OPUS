@@ -627,6 +627,12 @@ INSERT INTO typepublication (idtypepublication, libelle)
 VALUES ('TPB000002', 'Stage');
 INSERT INTO typepublication (idtypepublication, libelle)
 VALUES ('TPB000003', 'Evenement');
+INSERT INTO typepublication (idtypepublication, libelle)
+VALUES ('TPB000004', 'Projet');
+INSERT INTO typepublication (idtypepublication, libelle)
+VALUES ('TPB000005', 'Recherche d''opportunite');
+INSERT INTO typepublication (idtypepublication, libelle)
+VALUES ('TPB000006', 'Autre');
 -- Types de media
 INSERT INTO mediatype (idmediatype, libelle)
 VALUES ('MDT000001', 'Image');
