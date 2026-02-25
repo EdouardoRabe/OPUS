@@ -112,13 +112,28 @@
         overflow-y: auto;
         overflow-x: hidden;
         overscroll-behavior: contain;
+        padding-right: 6px;
         scrollbar-width: thin;
-        scrollbar-color: #d1d5db transparent;
+        scrollbar-color: rgba(96, 110, 122, 0.31) transparent;
     }
-    .fa-sidebar-left::-webkit-scrollbar { width: 4px; }
-    .fa-sidebar-left::-webkit-scrollbar-track { background: transparent; }
-    .fa-sidebar-left::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
-    .fa-sidebar-left::-webkit-scrollbar-thumb:hover { background: #adb5bd; }
+    .fa-sidebar-left::-webkit-scrollbar { width: 5px; }
+    .fa-sidebar-left::-webkit-scrollbar-track {
+        background: rgba(0,0,0,.04);
+        border-radius: 999px;
+        margin: 8px 0;
+    }
+    .fa-sidebar-left::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--itu-blue,#008BFF) 0%, var(--itu-violet,#5B23FF) 100%);
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.6);
+        box-shadow: 0 0 4px rgba(0,139,255,.25);
+        transition: opacity .2s;
+        opacity: .6;
+    }
+    .fa-sidebar-left::-webkit-scrollbar-thumb:hover {
+        opacity: 1;
+        box-shadow: 0 0 8px rgba(0,139,255,.45);
+    }
     .fa-feed-center { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
     /* ---- Widget sidebar droite ---- */
     .fa-widget-card {
@@ -200,13 +215,36 @@
     .fa-filter-panel { background:var(--fa-card-bg); border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.12); overflow:hidden; margin-top:12px; }
     .fa-filter-panel-header { display:flex; align-items:center; justify-content:space-between; padding:13px 16px 11px; border-bottom:1px solid var(--fa-border); }
     .fa-filter-panel-title { display:flex; align-items:center; gap:8px; font-weight:700; font-size:15px; color:var(--fa-text); }
-    .fa-filter-panel-clear { background:none; border:none; font-size:12px; color:var(--fa-text-secondary); cursor:pointer; padding:3px 7px; border-radius:6px; display:flex; align-items:center; gap:4px; transition:background .15s,color .15s; }
-    .fa-filter-panel-clear:hover { background:#fde8e8; color:#e53935; }
+    .fa-filter-reset-icon { background:none; border:none; font-size:16px; color:var(--fa-text-secondary); cursor:pointer; padding:5px 8px; border-radius:6px; display:flex; align-items:center; justify-content:center; transition:all .2s cubic-bezier(.4,0,.2,1); }
+    .fa-filter-reset-icon:hover { background:rgba(0,139,255,.1); color:var(--itu-blue,#008BFF); transform:rotate(15deg); }
+    .fa-filter-reset-icon:active { transform:rotate(20deg) scale(.95); }
     .fa-filter-panel-body { padding:12px 14px; display:flex; flex-direction:column; gap:12px; }
     .fa-filter-group { display:flex; flex-direction:column; gap:5px; }
     .fa-filter-group-label { font-size:11px; font-weight:700; color:var(--fa-text-secondary); text-transform:uppercase; letter-spacing:.5px; display:flex; align-items:center; gap:5px; }
-    .fa-filter-group-input { padding:7px 10px; border:1.5px solid var(--fa-border); border-radius:8px; font-size:13px; background:#f0f2f5; color:var(--fa-text); outline:none; width:100%; box-sizing:border-box; transition:border-color .15s,background .15s; }
-    .fa-filter-group-input:focus { border-color:var(--itu-blue,#008BFF); background:#fff; }
+    .fa-filter-group-input { padding:9px 12px; border:1.5px solid #e5e7eb; border-radius:10px; font-size:13px; background:linear-gradient(135deg,#f9fafb 0%,#f5f6f8 100%); color:var(--fa-text); outline:none; width:100%; box-sizing:border-box; transition:all .2s cubic-bezier(.4,0,.2,1); box-shadow:0 1px 2px rgba(0,0,0,.04); }
+    .fa-filter-group-input::placeholder { color:#9ca3af; }
+    .fa-filter-group-input:hover { border-color:#d1d5db; background:linear-gradient(135deg,#fff 0%,#f9fafb 100%); box-shadow:0 2px 6px rgba(0,139,255,.08); }
+    .fa-filter-group-input:focus { border-color:var(--itu-blue,#008BFF); background:#fff; box-shadow:0 0 0 3px rgba(0,139,255,.12), 0 2px 8px rgba(0,139,255,.15); }
+    /* Custom dropdown styles */
+    .fa-filter-dropdown { position:relative; }
+    .fa-filter-dropdown-trigger { display:flex; align-items:center; justify-content:space-between; padding:9px 12px; border:1.5px solid #e5e7eb; border-radius:10px; font-size:13px; background:linear-gradient(135deg,#f9fafb 0%,#f5f6f8 100%); color:var(--fa-text); cursor:pointer; width:100%; box-sizing:border-box; transition:all .2s cubic-bezier(.4,0,.2,1); box-shadow:0 1px 2px rgba(0,0,0,.04); user-select:none; }
+    .fa-filter-dropdown-trigger:hover { border-color:#d1d5db; background:linear-gradient(135deg,#fff 0%,#f9fafb 100%); box-shadow:0 2px 6px rgba(0,139,255,.08); }
+    .fa-filter-dropdown-trigger.active { border-color:var(--itu-blue,#008BFF); background:#fff; box-shadow:0 0 0 3px rgba(0,139,255,.12), 0 2px 8px rgba(0,139,255,.15); }
+    .fa-filter-dropdown-icon { color:#9ca3af; transition:transform .2s; font-size:12px; }
+    .fa-filter-dropdown-trigger.active .fa-filter-dropdown-icon { transform:rotate(180deg); color:var(--itu-blue,#008BFF); }
+    .fa-filter-dropdown-menu { position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1.5px solid #e5e7eb; border-radius:10px; box-shadow:0 10px 32px rgba(0,0,0,.12); z-index:1000; display:none; flex-direction:column; max-height:260px; overflow-y:auto; overflow-x:hidden; }
+    .fa-filter-dropdown-menu.active { display:flex; animation:slideDown .2s cubic-bezier(.4,0,.2,1); }
+    @keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+    .fa-filter-dropdown-menu::-webkit-scrollbar { width:4px; }
+    .fa-filter-dropdown-menu::-webkit-scrollbar-track { background:transparent; }
+    .fa-filter-dropdown-menu::-webkit-scrollbar-thumb { background:rgba(0,139,255,.2); border-radius:3px; }
+    .fa-filter-dropdown-menu::-webkit-scrollbar-thumb:hover { background:rgba(0,139,255,.4); }
+    .fa-filter-dropdown-item { padding:10px 12px; cursor:pointer; font-size:13px; color:var(--fa-text); border-bottom:1px solid #f3f4f6; transition:all .15s; display:flex; align-items:center; gap:8px; }
+    .fa-filter-dropdown-item:last-child { border-bottom:none; }
+    .fa-filter-dropdown-item:hover { background:#f0f4ff; color:var(--itu-blue,#008BFF); padding-left:16px; }
+    .fa-filter-dropdown-item.selected { background:#e7f3ff; color:var(--itu-blue,#008BFF); font-weight:600; }
+    .fa-filter-dropdown-item::before { content:''; width:12px; height:12px; border-radius:3px; border:1.5px solid #d1d5db; transition:all .2s; }
+    .fa-filter-dropdown-item.selected::before { background:var(--itu-blue,#008BFF); border-color:var(--itu-blue,#008BFF); }
     /* Type publication : liste radio moderne */
     .fa-typepub-list { display:flex; flex-direction:column; gap:3px; max-height:220px; overflow-y:auto; }
     .fa-typepub-item { display:flex; align-items:center; gap:9px; padding:7px 10px; border-radius:8px; cursor:pointer; font-size:13px; color:var(--fa-text); border:1.5px solid transparent; transition:background .15s,border-color .15s; user-select:none; }
@@ -605,28 +643,47 @@
                 <span class="fa-filter-panel-title">
                     <i class="bi bi-sliders fa-widget-icon"></i> Filtres
                 </span>
-                <button type="button" class="fa-filter-panel-clear" id="filter-reset-btn" onclick="reinitialiserFiltre()" style="display:none">
-                    <i class="bi bi-x-circle-fill"></i> Effacer
+                <button type="button" class="fa-filter-reset-icon" id="filter-reset-icon-btn" title="Réinitialiser et actualiser" onclick="reinitialiserFiltreEtActualiser()" style="">
+                    <i class="bi bi-arrow-clockwise"></i>
                 </button>
             </div>
-            <!-- Datalists -->
-            <datalist id="dl-f-spec"><% for (int _fi=0;_fi<allSpecialites.length;_fi++){%><option value="<%= allSpecialites[_fi].getLibelle() %>"><% } %></datalist>
-            <datalist id="dl-f-parc"><% for (int _fi=0;_fi<allParcours.length;_fi++){%><option value="<%= allParcours[_fi].getLibelle() %>"><% } %></datalist>
             <div class="fa-filter-panel-body">
                 <!-- Spécialité -->
                 <div class="fa-filter-group">
-                    <label class="fa-filter-group-label" for="filter-spec-input"><i class="bi bi-mortarboard-fill"></i>&nbsp;Sp&eacute;cialit&eacute;</label>
-                    <input list="dl-f-spec" id="filter-spec-input" class="fa-filter-group-input" placeholder="Sp&eacute;cialit&eacute;..." autocomplete="off">
+                    <label class="fa-filter-group-label"><i class="bi bi-mortarboard-fill"></i>&nbsp;Sp&eacute;cialit&eacute;</label>
+                    <div class="fa-filter-dropdown">
+                        <div class="fa-filter-dropdown-trigger" id="filter-spec-trigger" onclick="toggleFilterDropdown('spec')">
+                            <span id="filter-spec-label">S&eacute;lectionner...</span>
+                            <i class="bi bi-chevron-down fa-filter-dropdown-icon"></i>
+                        </div>
+                        <div class="fa-filter-dropdown-menu" id="filter-spec-menu">
+                            <% for (int _fi=0;_fi<allSpecialites.length;_fi++){%>
+                            <div class="fa-filter-dropdown-item" onclick="selectFilterOption('spec','<%= allSpecialites[_fi].getLibelle().replace("'","\\'") %>')" data-value="<%= allSpecialites[_fi].getLibelle() %>"><%= allSpecialites[_fi].getLibelle() %></div>
+                            <% } %>
+                        </div>
+                        <input type="hidden" id="filter-spec-input" value="">
+                    </div>
                 </div>
                 <!-- Parcours -->
                 <div class="fa-filter-group">
-                    <label class="fa-filter-group-label" for="filter-parc-input"><i class="bi bi-diagram-3-fill"></i>&nbsp;Parcours</label>
-                    <input list="dl-f-parc" id="filter-parc-input" class="fa-filter-group-input" placeholder="Parcours..." autocomplete="off">
+                    <label class="fa-filter-group-label"><i class="bi bi-diagram-3-fill"></i>&nbsp;Parcours</label>
+                    <div class="fa-filter-dropdown">
+                        <div class="fa-filter-dropdown-trigger" id="filter-parc-trigger" onclick="toggleFilterDropdown('parc')">
+                            <span id="filter-parc-label">S&eacute;lectionner...</span>
+                            <i class="bi bi-chevron-down fa-filter-dropdown-icon"></i>
+                        </div>
+                        <div class="fa-filter-dropdown-menu" id="filter-parc-menu">
+                            <% for (int _fi=0;_fi<allParcours.length;_fi++){%>
+                            <div class="fa-filter-dropdown-item" onclick="selectFilterOption('parc','<%= allParcours[_fi].getLibelle().replace("'","\\'") %>')" data-value="<%= allParcours[_fi].getLibelle() %>"><%= allParcours[_fi].getLibelle() %></div>
+                            <% } %>
+                        </div>
+                        <input type="hidden" id="filter-parc-input" value="">
+                    </div>
                 </div>
                 <!-- Promotion -->
                 <div class="fa-filter-group">
-                    <label class="fa-filter-group-label" for="filter-promo-input"><i class="bi bi-calendar-fill"></i>&nbsp;Promotion</label>
-                    <input id="filter-promo-input" class="fa-filter-group-input" placeholder="ex: 2023+" maxlength="6" autocomplete="off">
+                    <label class="fa-filter-group-label"><i class="bi bi-calendar-fill"></i>&nbsp;Promotion</label>
+                    <input id="filter-promo-input" class="fa-filter-group-input" placeholder="ex: 2023+" maxlength="6" autocomplete="off" >
                 </div>
                 <!-- Type de publication : liste single-select -->
                 <div class="fa-filter-group">
@@ -2140,6 +2197,45 @@
         if (!txt) return '';
         return map[txt] || '';
     }
+    // Dropdowns modernes pour spec et parc
+    function toggleFilterDropdown(type) {
+        var menu = document.getElementById('filter-' + type + '-menu');
+        var trigger = document.getElementById('filter-' + type + '-trigger');
+        var isActive = menu.classList.contains('active');
+        // Fermer tous les autres dropdowns
+        document.querySelectorAll('.fa-filter-dropdown-menu.active').forEach(function(m) {
+            if (m !== menu) { m.classList.remove('active'); m.previousElementSibling.classList.remove('active'); }
+        });
+        if (isActive) {
+            menu.classList.remove('active');
+            trigger.classList.remove('active');
+        } else {
+            menu.classList.add('active');
+            trigger.classList.add('active');
+        }
+    }
+    function selectFilterOption(type, val) {
+        var input = document.getElementById('filter-' + type + '-input');
+        var label = document.getElementById('filter-' + type + '-label');
+        var menu = document.getElementById('filter-' + type + '-menu');
+        var trigger = document.getElementById('filter-' + type + '-trigger');
+        input.value = val;
+        label.textContent = val;
+        menu.querySelectorAll('.fa-filter-dropdown-item').forEach(function(i){ i.classList.remove('selected'); });
+        var selectedItem = menu.querySelector('[data-value="' + val.replace(/"/g,'&quot;') + '"]');
+        if (selectedItem) selectedItem.classList.add('selected');
+        menu.classList.remove('active');
+        trigger.classList.remove('active');
+    }
+    // Fermer les dropdowns au clic en dehors
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.fa-filter-dropdown')) {
+            document.querySelectorAll('.fa-filter-dropdown-menu.active').forEach(function(m) {
+                m.classList.remove('active');
+                m.previousElementSibling.classList.remove('active');
+            });
+        }
+    });
     // Single-select pour le type de publication
     function selectTypePub(el, libelle) {
         var input = document.getElementById('filter-typepub-input');
@@ -2176,18 +2272,27 @@
         cursor.setAttribute('data-has-more', 'true');
         feed.querySelectorAll('.fa-post-card, .fa-feed-end').forEach(function(el){ el.remove(); });
         if (sentinel) sentinel.style.display = 'block';
-        document.getElementById('filter-reset-btn').style.display = (spec||parc||promo||typepub) ? 'flex' : 'none';
+        document.getElementById('filter-reset-icon-btn').style.display = (spec||parc||promo||typepub) ? 'flex' : 'none';
         if (window.triggerFeedLoad) window.triggerFeedLoad();
     }
     function reinitialiserFiltre() {
         ['filter-spec-input','filter-parc-input','filter-promo-input'].forEach(function(id){
             document.getElementById(id).value = '';
         });
+        // Réinitialiser les labels des dropdowns custom
+        document.getElementById('filter-spec-label').textContent = 'Sélectionner...';
+        document.getElementById('filter-parc-label').textContent = 'Sélectionner...';
+        // Enlever les classes selected
+        document.querySelectorAll('.fa-filter-dropdown-item.selected').forEach(function(i){ i.classList.remove('selected'); });
         // Vider la sélection de type de publication
         document.getElementById('filter-typepub-input').value = '';
         document.querySelectorAll('.fa-typepub-item').forEach(function(i){ i.classList.remove('active'); });
         document.getElementById('filter-lier').checked = false;
         appliquerFiltre();
+    }
+    function reinitialiserFiltreEtActualiser() {
+        reinitialiserFiltre();
+        setTimeout(function() { location.reload(); }, 300);
     }
 
     // ========== VISIBILITE FORM ==========
