@@ -10,6 +10,7 @@
 <%@ page import="alumni.Historique" %>
 <%@ page import="alumni.Specialite" %>
 <%@ page import="alumni.Specialiteprofil" %>
+<%@ page import="alumni.Publicationhashtag" %>
 
 <%
     UserEJB uEJB = (UserEJB) session.getAttribute("u");
@@ -96,6 +97,39 @@
         }
         request.setAttribute("topSpecs", topSpecialities);
 
+        // 5. Most Demanded Specialities (from Publication Hashtags)
+        List<Map<String, Object>> demandedSpecs = new ArrayList<Map<String, Object>>();
+        Publicationhashtag phTmp = new Publicationhashtag();
+        Publicationhashtag[] pHashtags = (Publicationhashtag[]) CGenUtil.rechercher(phTmp, null, null, conn, " and typetag = 'SPECIALITE'");
+        if (pHashtags != null) {
+            Map<String, Integer> demandCounts = new HashMap<String, Integer>();
+            for (Publicationhashtag ph : pHashtags) {
+                if (ph.getIdref() != null) {
+                    demandCounts.put(ph.getIdref(), demandCounts.getOrDefault(ph.getIdref(), 0) + 1);
+                }
+            }
+            List<Map.Entry<String, Integer>> demandList = new ArrayList<Map.Entry<String, Integer>>(demandCounts.entrySet());
+            Collections.sort(demandList, new Comparator<Map.Entry<String, Integer>>() {
+                public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+                    return o2.getValue().compareTo(o1.getValue());
+                }
+            });
+            
+            Specialite sTmp = new Specialite();
+            int j = 0;
+            for (Map.Entry<String, Integer> entry : demandList) {
+                if (j++ >= 5) break;
+                Specialite[] sArr = (Specialite[]) CGenUtil.rechercher(sTmp, null, null, conn, " and idspecialite = '" + entry.getKey() + "'");
+                if (sArr != null && sArr.length > 0) {
+                    Map<String, Object> dm = new HashMap<String, Object>();
+                    dm.put("libelle", sArr[0].getLibelle());
+                    dm.put("count", entry.getValue());
+                    demandedSpecs.add(dm);
+                }
+            }
+        }
+        request.setAttribute("demandedSpecs", demandedSpecs);
+
     } catch (Exception e) {
         e.printStackTrace();
     } finally {
@@ -104,29 +138,33 @@
 %>
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
 
     :root {
-        --dash-primary: #008BFF;
-        --dash-secondary: #5B23FF;
-        --dash-bg: #f8fafc;
+        --dash-primary: #1E40AF;
+        --dash-secondary: #3B82F6;
+        --dash-accent: #F59E0B;
+        --dash-bg: #F8FAFC;
         --dash-card-bg: #ffffff;
-        --dash-text: #1e293b;
-        --dash-text-light: #64748b;
-        --dash-border: #e2e8f0;
-        --dash-success: #10b981;
+        --dash-text: #1E3A8A;
+        --dash-text-light: #475569;
+        --dash-border: #E2E8F0;
+        --dash-success: #10B981;
+        --dash-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        --dash-shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     }
 
     body {
         background-color: var(--dash-bg);
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Fira Sans', sans-serif;
         margin: 0;
         color: var(--dash-text);
+        -webkit-font-smoothing: antialiased;
     }
 
     .dash-container {
-        padding: 24px;
-        max-width: 1200px;
+        padding: 40px 24px;
+        max-width: 1440px;
         margin: 0 auto;
     }
 
@@ -156,15 +194,16 @@
     .dash-stat-card {
         background: var(--dash-card-bg);
         border: 1px solid var(--dash-border);
-        border-radius: 16px;
+        border-radius: 12px;
         padding: 24px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: var(--dash-shadow);
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
     }
 
     .dash-stat-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+        box-shadow: var(--dash-shadow-hover);
     }
 
     .dash-stat-label {
@@ -182,16 +221,27 @@
 
     .dash-stat-icon {
         float: right;
-        font-size: 24px;
-        padding: 12px;
-        border-radius: 12px;
-        background: #f0f7ff;
+        font-size: 20px;
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background: #EFF6FF;
         color: var(--dash-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .dash-main-grid {
         display: grid;
-        grid-template-columns: 2fr 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+
+    .dash-full-grid {
+        display: grid;
+        grid-template-columns: 1fr;
         gap: 24px;
     }
 
@@ -204,15 +254,18 @@
     .dash-card {
         background: var(--dash-card-bg);
         border: 1px solid var(--dash-border);
-        border-radius: 20px;
-        padding: 30px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border-radius: 12px;
+        padding: 32px;
+        box-shadow: var(--dash-shadow);
     }
 
     .dash-card-title {
-        font-size: 20px;
-        font-weight: 700;
-        margin: 0 0 25px 0;
+        font-size: 16px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--dash-text-light);
+        margin: 0 0 24px 0;
         display: flex;
         align-items: center;
         gap: 12px;
@@ -220,6 +273,14 @@
 
     .dash-card-title i {
         color: var(--dash-primary);
+        font-size: 1.2em;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .dash-stat-card, .dash-stat-card:hover {
+            transform: none !important;
+            transition: none !important;
+        }
     }
 
     /* Chart Wrapper */
@@ -276,6 +337,16 @@
             </div>
         </div>
     </div>
+
+    <!-- Second Row -->
+    <div class="dash-full-grid">
+        <div class="dash-card">
+            <h2 class="dash-card-title"><i class="bi bi-bar-chart-fill"></i>Sp&eacute;cialit&eacute;s les plus demand&eacute;es (Hashtags)</h2>
+            <div class="chart-wrapper">
+                <canvas id="demandChart"></canvas>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -329,17 +400,20 @@ $(function() {
                     ticks: {
                         beginAtZero: true,
                         stepSize: 1,
-                        fontFamily: 'Plus Jakarta Sans',
-                        fontColor: '#64748b'
+                        fontFamily: "'Fira Sans', sans-serif",
+                        fontColor: '#64748b',
+                        padding: 10
                     },
                     gridLines: {
-                        color: '#f1f5f9'
+                        color: '#F1F5F9',
+                        drawBorder: false
                     }
                 }],
                 xAxes: [{
                     ticks: {
-                        fontFamily: 'Plus Jakarta Sans',
-                        fontColor: '#64748b'
+                        fontFamily: "'Fira Sans', sans-serif",
+                        fontColor: '#64748b',
+                        padding: 10
                     },
                     gridLines: {
                         display: false
@@ -347,11 +421,14 @@ $(function() {
                 }]
             },
             tooltips: {
-                backgroundColor: '#1e293b',
-                titleFontFamily: 'Plus Jakarta Sans',
-                bodyFontFamily: 'Plus Jakarta Sans',
-                cornerRadius: 8,
-                padding: 12
+                backgroundColor: '#0F172A',
+                titleFontFamily: "'Fira Sans', sans-serif",
+                bodyFontFamily: "'Fira Sans', sans-serif",
+                titleFontSize: 14,
+                bodyFontSize: 13,
+                cornerRadius: 4,
+                padding: 12,
+                displayColors: false
             }
         }
     });
@@ -399,16 +476,88 @@ $(function() {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    padding: 20,
-                    fontFamily: 'Plus Jakarta Sans',
-                    fontColor: '#64748b'
+                    padding: 25,
+                    fontFamily: "'Fira Sans', sans-serif",
+                    fontColor: '#64748b',
+                    fontSize: 12
                 }
             },
             tooltips: {
-                backgroundColor: '#1e293b',
-                titleFontFamily: 'Plus Jakarta Sans',
-                bodyFontFamily: 'Plus Jakarta Sans',
-                cornerRadius: 8,
+                backgroundColor: '#0F172A',
+                titleFontFamily: "'Fira Sans', sans-serif",
+                bodyFontFamily: "'Fira Sans', sans-serif",
+                cornerRadius: 4,
+                padding: 12,
+                displayColors: true
+            }
+        }
+    });
+
+    // Demand Chart
+    <%
+        List<Map<String, Object>> dSpecs = (List<Map<String, Object>>) request.getAttribute("demandedSpecs");
+        StringBuilder dLabels = new StringBuilder();
+        StringBuilder dData = new StringBuilder();
+        if (dSpecs != null) {
+            for (int k = 0; k < dSpecs.size(); k++) {
+                Map m = dSpecs.get(k);
+                dLabels.append("'").append(((String)m.get("libelle")).replace("'", "\\'")).append("'");
+                dData.append(m.get("count"));
+                if (k < dSpecs.size() - 1) {
+                    dLabels.append(",");
+                    dData.append(",");
+                }
+            }
+        }
+    %>
+    var ctxDemand = document.getElementById('demandChart').getContext('2d');
+    var demandChart = new Chart(ctxDemand, {
+        type: 'horizontalBar',
+        data: {
+            labels: [<%= dLabels.toString() %>],
+            datasets: [{
+                label: 'Nombre de mentions',
+                data: [<%= dData.toString() %>],
+                backgroundColor: '#5B23FF',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            legend: {
+                display: false
+            },
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        stepSize: 1,
+                        fontFamily: "'Fira Sans', sans-serif",
+                        fontColor: '#64748b',
+                        padding: 10
+                    },
+                    gridLines: {
+                        color: '#F1F5F9',
+                        drawBorder: false
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        fontFamily: "'Fira Sans', sans-serif",
+                        fontColor: '#64748b',
+                        padding: 10
+                    },
+                    gridLines: {
+                        display: false
+                    }
+                }]
+            },
+            tooltips: {
+                backgroundColor: '#0F172A',
+                titleFontFamily: "'Fira Sans', sans-serif",
+                bodyFontFamily: "'Fira Sans', sans-serif",
+                cornerRadius: 4,
                 padding: 12
             }
         }
