@@ -25,6 +25,7 @@
     int visTelephone = 1;
     int visGenre = 1;
     int visSocialMedia = 1;
+    int visLocalisation = 1;
     
     if (uEJB != null && uEJB.getUser() != null) {
         int refuser = uEJB.getUser().getRefuser();
@@ -55,6 +56,7 @@
                         else if ("telephone".equals(ch)) visTelephone = st;
                         else if ("genre".equals(ch)) visGenre = st;
                         else if ("socialmedia".equals(ch)) visSocialMedia = st;
+                        else if ("localisation".equals(ch)) visLocalisation = st;
                     }
                 }
             }
@@ -285,6 +287,15 @@ alert("ERREUR: <%= erreur.replace("\"", "'").replace("\n", " ").replace("\r", ""
             <div><div class="cf-item-label">R&eacute;seaux sociaux</div><div class="cf-item-desc">Vos comptes sur les r&eacute;seaux sociaux</div></div>
           </div>
           <label class="cf-toggle"><input type="checkbox" name="status_socialmedia" value="1" <%= visSocialMedia == 1 ? "checked" : "" %>><span class="slider"></span></label>
+        </div>
+
+        <!-- Localisation Map -->
+        <div class="cf-item">
+          <div class="cf-item-left">
+            <div class="cf-item-icon red"><i class="bi bi-geo-alt-fill"></i></div>
+            <div><div class="cf-item-label">Localisation (Carte)</div><div class="cf-item-desc">Afficher votre position sur la carte interactive</div></div>
+          </div>
+          <label class="cf-toggle"><input type="checkbox" name="status_localisation" value="1" <%= visLocalisation == 1 ? "checked" : "" %>><span class="slider"></span></label>
         </div>
       </div>
 

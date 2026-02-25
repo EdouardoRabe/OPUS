@@ -1103,18 +1103,23 @@ VALUES ('USRM000012', 'MENDYN000001', '*', 0, 'md'),
     ('USRM000032', 'MENDYN000016', '*', 0, 'md'),
     ('USRM000034', 'MENDYN000017', '*', 0, 'md'),
     ('USRM000036', 'MENDYN000018', '*', 0, 'md');
-
 -- Sous-menu Reseau Professionnel sous RESEAU (niveau 1)
-INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
-    ('MENDYN000019', 'Reseau pro', 'bi-diagram-3-fill', 'module.jsp?but=alumni/reseau-professionnel.jsp', 3, 1, 'MENDYN000002');
-
+INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
+VALUES (
+        'MENDYN000019',
+        'Reseau pro',
+        'bi-diagram-3-fill',
+        'module.jsp?but=alumni/reseau-professionnel.jsp',
+        3,
+        1,
+        'MENDYN000002'
+    );
 -- Droits role etu
-INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
-    ('USRM000045', 'MENDYN000019', '*', 0, 'etu');
-
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
+VALUES ('USRM000045', 'MENDYN000019', '*', 0, 'etu');
 -- Droits role md
-INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
-    ('USRM000046', 'MENDYN000019', '*', 0, 'md');
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
+VALUES ('USRM000046', 'MENDYN000019', '*', 0, 'md');
 -- ╔═══════════════════════════════════════════════════════════════════════════════╗
 -- ║ SECTION 16: MISE A JOUR DES SEQUENCES                                         ║
 -- ╚═══════════════════════════════════════════════════════════════════════════════╝
@@ -1143,7 +1148,6 @@ SELECT 'Sequences crees' AS status,
     COUNT(*) AS nb
 FROM information_schema.sequences
 WHERE sequence_schema = 'public';
-
 -- corrected definitions with varchar identifiers, sequences and helpers
 -- sequence & function for profiltypestatut
 CREATE SEQUENCE IF NOT EXISTS seq_profiltypestatut START 1;
@@ -1194,3 +1198,28 @@ CREATE TABLE IF NOT EXISTS profilstatut (
     idprofiltypestatut VARCHAR(12) NOT NULL REFERENCES profiltypestatut(idprofiltypestatut),
     daty TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE profilemplacement (
+    id VARCHAR(20) PRIMARY KEY,
+    idprofil VARCHAR(20) NOT NULL,
+    longitude DOUBLE PRECISION NOT NULL,
+    latitude DOUBLE PRECISION NOT NULL,
+    FOREIGN KEY(idprofil) REFERENCES profil(idprofil)
+);
+CREATE SEQUENCE seq_profilemplacement;
+CREATE OR REPLACE FUNCTION get_seq_profilemplacement() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN nextval('seq_profilemplacement');
+END;
+$$;
+CREATE VIEW v_profil_localisation AS
+SELECT p.*,
+    pe.longitude,
+    pe.latitude,
+    pe.id AS idemplacement
+FROM profillib p
+    JOIN profilemplacement pe ON p.idprofil = pe.idprofil
+WHERE NOT EXISTS (
+        SELECT 1
+        FROM visibilite v
+        WHERE v.idprofil = p.idprofil
+            AND v.champvisibilite = 'localisation'
+            AND v.status = 0
+    );
