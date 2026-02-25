@@ -1087,10 +1087,17 @@ function chargerCommentaires(idpub) {
             var html = '';
             html += '<div id="comm-' + c.id + '" class="fa-comment-item' + replyClass + '">';
             html += '<div class="fa-comment-inner">';
+            if (c.banned) {
+                html += '<div class="fa-avatar fa-avatar--xs" style="background:#ccc;color:#888;cursor:default;"><i class="bi bi-person-slash" style="font-size:0.8em;"></i></div>';
+                html += '<div class="fa-comment-content">';
+                html += '<div class="fa-comment-bubble">';
+                html += '<span class="fa-comment-author" style="color:#888;cursor:default;"><i class="bi bi-person-slash"></i> ' + escHtml(c.auteur) + '</span>';
+            } else {
             html += '<div class="fa-avatar fa-avatar--xs">' + escHtml(initials) + '</div>';
             html += '<div class="fa-comment-content">';
             html += '<div class="fa-comment-bubble">';
             html += '<span class="fa-comment-author">' + escHtml(c.auteur) + '</span>';
+            }
             html += '<span class="fa-comment-text">' + formatMentions(c.description) + '</span>';
             html += '</div>';
 

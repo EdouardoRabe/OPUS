@@ -76,6 +76,17 @@
         if (res != null && res.length > 0) profil = res[0];
 
         if (profil != null) {
+            /* --- Redirect si l'utilisateur est banni --- */
+            if (profil.getEstactif() == 0) {
+%>
+<script>
+    alert("Ce profil n'est plus disponible");
+    window.location.href = "<%= ctx %>/pages/module.jsp?but=accueil.jsp";
+</script>
+<%
+                return;
+            }
+
             /* --- Redirect si c'est son propre profil --- */
             if (profil.getRefuser() == myRefuser) {
 %>
