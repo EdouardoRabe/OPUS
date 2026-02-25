@@ -436,3 +436,25 @@
 })();
 </script>
 <% } %>
+
+<script>
+function deletePublication(idpub) {
+    if (!confirm('\u00cates-vous s\u00fbr de vouloir supprimer cette publication ? Cette action est irr\u00e9versible.')) return;
+    fetch('<%= _pubCtx %>/pages/publication/ajax/traitement-delete.jsp?idpublication=' + encodeURIComponent(idpub))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            var card = document.getElementById('pub-' + idpub);
+            if (card) {
+                card.style.transition = 'opacity 0.4s, transform 0.4s';
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.95)';
+                setTimeout(function() { card.remove(); }, 400);
+            }
+        } else {
+            alert('Erreur : ' + data.error);
+        }
+    })
+    .catch(function(err) { alert('Erreur r\u00e9seau : ' + err); });
+}
+</script>
