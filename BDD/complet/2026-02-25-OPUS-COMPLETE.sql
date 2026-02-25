@@ -971,7 +971,7 @@ VALUES (
         'MENDYN000010',
         'Modifier le profil',
         'bi-pencil-square',
-        'module.jsp?but=profil/modifier.jsp',
+        'module.jsp?but=profil/profil-modif.jsp',
         2,
         1,
         'MENDYN000004'

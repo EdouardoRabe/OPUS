@@ -30,7 +30,7 @@ INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALU
 -- Sous-menus de MON PROFIL
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
 ('MENDYN000009', 'Voir ma fiche',     'bi-person-badge-fill', 'module.jsp?but=profil/voir.jsp',     1, 1, 'MENDYN000004'),
-('MENDYN000010', 'Modifier le profil','bi-pencil-square',     'module.jsp?but=profil/modifier.jsp', 2, 1, 'MENDYN000004'),
+('MENDYN000010', 'Modifier le profil','bi-pencil-square',     'module.jsp?but=profil/profil-modif.jsp', 2, 1, 'MENDYN000004'),
 ('MENDYN000011', 'Deconnexion',       'bi-box-arrow-right',   'deconnexion.jsp',                    3, 1, 'MENDYN000004');
 
 -- Sous-menus de ADMINISTRATION
