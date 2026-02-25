@@ -1166,13 +1166,14 @@ function pvChangePassword() {
   btn.disabled = true;
   btn.textContent = 'En cours...';
 
-  var fd = new FormData();
-  fd.append('oldPassword', oldPwd);
-  fd.append('newPassword', newPwd);
-  fd.append('confirmPassword', confPwd);
+  var data = new URLSearchParams();
+  data.append('oldPassword', oldPwd);
+  data.append('newPassword', newPwd);
+  data.append('confirmPassword', confPwd);
 
   fetch('<%= request.getContextPath() %>/pages/profil/ajax/traitement-password.jsp', {
-    method: 'POST', body: fd
+    method: 'POST', body: data,
+    headers: {'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'}
   })
   .then(function(r) { return r.json(); })
   .then(function(d) {

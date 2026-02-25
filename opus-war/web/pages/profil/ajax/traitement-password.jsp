@@ -1,12 +1,11 @@
 <%@ page pageEncoding="UTF-8" %>
 <%@ page import="user.UserEJB" %>
-<%@ page import="user.UserEJBClient" %>
 <%@ page import="historique.MapUtilisateur" %>
-<%@ page import="historique.ParamCrypt" %>
-<%@ page import="bean.CGenUtil" %>
 <%@ page import="utilitaire.UtilDB" %>
-<%@ page import="utilitaireAcade.Utilitaire" %>
+<%@ page import="utilitaire.Utilitaire" %>
 <%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.PreparedStatement" %>
+<%@ page import="java.sql.ResultSet" %>
 <%
     request.setCharacterEncoding("UTF-8");
     response.setContentType("application/json; charset=UTF-8");
@@ -36,46 +35,50 @@
             out.print("{\"success\":false,\"error\":\"Les mots de passe ne correspondent pas\"}"); return;
         }
 
-        // Verifier l'ancien mot de passe via testLogin
-        try {
-            UserEJB uTest = UserEJBClient.lookupUserEJBBeanLocal();
-            uTest.testLogin(mu.getLoginuser(), oldPassword.trim());
-        } catch (Exception loginEx) {
-            out.print("{\"success\":false,\"error\":\"L'ancien mot de passe est incorrect\"}"); return;
-        }
-
         conn = new UtilDB().GetConn();
         conn.setAutoCommit(false);
 
-        // Recuperer les parametres de cryptage existants
-        ParamCrypt[] pcs = (ParamCrypt[]) CGenUtil.rechercher(
-            new ParamCrypt(), null, null, conn,
-            " and idutilisateur='" + String.valueOf(refuser).replace("'","''") + "'"
-        );
+        // Recuperer les parametres de cryptage et le mot de passe stocke
+        int niveau = 0;
+        int sens = 0;
+        String storedPwd = null;
 
-        int niveau;
-        int sens;
-        if (pcs != null && pcs.length > 0) {
-            niveau = pcs[0].getNiveau();
-            sens = pcs[0].getCroissante();
+        PreparedStatement psPC = conn.prepareStatement(
+            "SELECT p.niveau, p.croissante, u.pwduser " +
+            "FROM paramcrypt p JOIN utilisateur u ON CAST(u.refuser AS varchar) = p.idutilisateur " +
+            "WHERE p.idutilisateur = ?"
+        );
+        psPC.setString(1, String.valueOf(refuser));
+        ResultSet rsPC = psPC.executeQuery();
+        if (rsPC.next()) {
+            niveau = rsPC.getInt("niveau");
+            sens = rsPC.getInt("croissante");
+            storedPwd = rsPC.getString("pwduser");
         } else {
-            // Generer de nouveaux parametres si aucun n'existe
-            niveau = (int) Math.round(Math.random() * 10.0);
-            sens = (int) Math.round(Math.random());
-            if (niveau == 0) niveau = -5;
+            rsPC.close(); psPC.close();
+            conn.rollback();
+            out.print("{\"success\":false,\"error\":\"Parametres de cryptage introuvables\"}"); return;
+        }
+        rsPC.close(); psPC.close();
+
+        // Verifier l'ancien mot de passe
+        String oldPwdCrypt = Utilitaire.cryptWord(oldPassword.trim().toLowerCase(), niveau, sens == 0);
+        if (storedPwd == null || !storedPwd.equals(oldPwdCrypt)) {
+            conn.rollback();
+            out.print("{\"success\":false,\"error\":\"L'ancien mot de passe est incorrect\"}"); return;
         }
 
         // Crypter le nouveau mot de passe
         String newPwdCrypt = Utilitaire.cryptWord(newPassword.trim().toLowerCase(), niveau, sens == 0);
 
         // Mettre a jour le mot de passe dans la table utilisateur
-        java.sql.PreparedStatement ps = conn.prepareStatement(
+        PreparedStatement psUp = conn.prepareStatement(
             "UPDATE utilisateur SET pwduser = ? WHERE refuser = ?"
         );
-        ps.setString(1, newPwdCrypt);
-        ps.setInt(2, refuser);
-        int updated = ps.executeUpdate();
-        ps.close();
+        psUp.setString(1, newPwdCrypt);
+        psUp.setInt(2, refuser);
+        int updated = psUp.executeUpdate();
+        psUp.close();
 
         if (updated == 0) {
             conn.rollback();
@@ -93,7 +96,6 @@
         if (conn != null) try { conn.rollback(); } catch (Exception ignore) {}
         String errMsg = e.getMessage() != null ? e.getMessage().replace("\"","\\\"").replace("\n"," ") : "Erreur inconnue";
         out.print("{\"success\":false,\"error\":\"" + errMsg + "\"}");
-        System.err.println("traitement-password.jsp - erreur: " + e.getMessage());
     } finally {
         if (conn != null) try { conn.close(); } catch (Exception ignore) {}
     }

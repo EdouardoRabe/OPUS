@@ -69,8 +69,8 @@
                 <label class="field-label">Mot de passe</label>
                 <div class="input-icon-wrap">
                   <span class="glyphicon glyphicon-lock input-icon"></span>
-                  <input type="password" id="passe" name="passe" class="form-control-custom with-icon" placeholder="••••••••" value="test" required />
-                  <span class="toggle-password" onclick="togglePasswordVisibility()" title="Afficher/masquer le mot de passe" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:#999;font-size:16px;z-index:2;">
+                  <input type="password" id="passe" name="passe" class="form-control-custom with-icon" placeholder="••••••••" value="test" required style="padding-right:2.8rem;" />
+                  <span class="toggle-password" onclick="togglePasswordVisibility()" title="Afficher/masquer le mot de passe" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--gray-400);font-size:1.1rem;z-index:5;">
                     <i class="fa fa-eye" id="eye-icon"></i>
                   </span>
                 </div>
