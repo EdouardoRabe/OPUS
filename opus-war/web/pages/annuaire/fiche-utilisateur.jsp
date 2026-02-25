@@ -251,6 +251,17 @@
     String cvUrl = !cvPath.isEmpty() ? (ctx + "/" + cvPath) : "";
 %>
 
+<!-- Font Awesome 6 (for social icons) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+<style>
+/* Fix FA6 icon fonts - ensure proper rendering */
+.fab, .fa-brands { font-family: "Font Awesome 6 Brands" !important; font-weight: 400 !important; }
+.fas, .fa-solid, .fa { font-family: "Font Awesome 6 Free" !important; font-weight: 900 !important; }
+.far, .fa-regular { font-family: "Font Awesome 6 Free" !important; font-weight: 400 !important; }
+/* Minimum icon size */
+.fu-social-icon { font-size: 16px !important; display: inline-block; width: 20px; text-align: center; }
+</style>
+
 <style>
 /* ═══════════════════════════════════════
    FICHE UTILISATEUR  •  LinkedIn-style
@@ -417,15 +428,27 @@
                     for (int ii = 0; ii < socialMedias.length; ii++) {
                         ProfilSocialMedia sm = socialMedias[ii];
                         String lib = "";
+                        String urlPattern = "";
+                        String icone = "bi bi-link-45deg";
+                        String couleur = "#6c757d";
                         for (int ri = 0; ri < allReseaux.length; ri++) {
                             if (allReseaux[ri].getIdReseauSocial() != null &&
                                 allReseaux[ri].getIdReseauSocial().equals(sm.getIdReseauSocial())) {
                                 lib = allReseaux[ri].getLibelle() != null ? allReseaux[ri].getLibelle() : "";
+                                urlPattern = allReseaux[ri].getUrlPattern() != null ? allReseaux[ri].getUrlPattern() : "";
+                                if (allReseaux[ri].getIconeClass() != null) icone = allReseaux[ri].getIconeClass();
+                                if (allReseaux[ri].getCouleurHex() != null) couleur = allReseaux[ri].getCouleurHex();
                                 break;
                             }
                         }
+                        String valeur = sm.getValeur() != null ? sm.getValeur() : "";
+                        String smUrl = urlPattern.replace("{value}", valeur);
+                        if (smUrl.isEmpty()) smUrl = valeur;
                 %>
-                    <span class="fu-tag grey"><%= h(lib + ": " + (sm.getValeur()!=null?sm.getValeur():"")) %></span>
+                    <a href="<%= h(smUrl) %>" target="_blank" rel="noopener noreferrer" class="fu-tag grey" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+                        <i class="<%= icone %> fu-social-icon" style="color:<%= couleur %>;font-size:18px;"></i>
+                        <span><%= h(lib) %>: <%= h(valeur) %></span>
+                    </a>
                 <% } } %>
             </div>
         </div>
