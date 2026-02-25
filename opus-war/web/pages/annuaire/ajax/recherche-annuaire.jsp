@@ -41,12 +41,12 @@
 
         // Construction du filtre SQL sur la vue profillib
         StringBuilder where = new StringBuilder();
-        where.append(" and nom IS NOT NULL"); // exclure les utilisateurs sans profil
+        where.append(" and nom IS NOT NULL and estactif = 1"); // exclure les utilisateurs sans profil ou inactifs
 
         if (qNom != null && !qNom.trim().isEmpty()) {
             String safe = qNom.trim().replace("'", "''").toLowerCase();
-            where.append(" and (LOWER(nom) LIKE '%").append(safe).append("%'")
-                 .append(" OR LOWER(prenom) LIKE '%").append(safe).append("%')");
+            where.append(" and (LOWER(COALESCE(nom,'') || ' ' || COALESCE(prenom,'')) LIKE '%").append(safe).append("%'")
+                 .append(" OR LOWER(COALESCE(prenom,'') || ' ' || COALESCE(nom,'')) LIKE '%").append(safe).append("%')");
         }
 
         if (qPromotion != null && !qPromotion.trim().isEmpty()) {
