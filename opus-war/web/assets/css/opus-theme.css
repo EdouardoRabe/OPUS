@@ -1,25 +1,4 @@
-/*
- * ============================================================
- *  OPUS — Charte graphique globale
- *  Chargé EN DERNIER sur toutes les pages pour surcharger les
- *  thèmes ITU, APJ-Design-System et AdminLTE existants.
- *
- *  Primaires : Bleu #283a97 · Bleu Nuit #1c1e29
- *              Vert #b2d235 · Bleu Noir #1c1e21
- *  Secondaires: Bleu Gris #d0dce7 · Rose #e46a91
- *               Violet #536ae4 · Rouge #fd3022
- * ============================================================
- */
-
-/* ────────────────────────────────────────────────────────────
-   1.  REMPLACEMENTS DES VARIABLES CSS
-       Surcharge les deux systèmes de variables existants :
-         – alumni-theme.css / alumni-topnav.css / alumni-navbar-module.css  (--itu-*)
-         – apj-global-style.css  (--Primaire-*  --Onyx-*)
-   ──────────────────────────────────────────────────────────── */
 :root {
-
-    /* ── A. Variables ITU (alumni-theme, alumni-topnav, alumni-navbar-module) ── */
 
     /* Fonds sombres */
     --itu-dark:           #1c1e29;   /* Bleu Nuit  → sidebar, navbar bg */

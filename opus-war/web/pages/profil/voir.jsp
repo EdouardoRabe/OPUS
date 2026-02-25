@@ -1150,6 +1150,90 @@ function pvUploadCV() {
   .catch(function(e){ alert("Erreur réseau : " + e); });
 }
 
+/* ── Toggle eye icon on password fields ── */
+function pvTogglePwdEye(span) {
+  var inp = span.parentElement.querySelector('input');
+  var ico = span.querySelector('i');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    ico.className = 'fa fa-eye-slash';
+  } else {
+    inp.type = 'password';
+    ico.className = 'fa fa-eye';
+  }
+}
+
+/* ── Changer le mot de passe ── */
+function pvChangePassword() {
+  var alertBox = document.getElementById('pwdAlert');
+  var oldPwd   = document.getElementById('pwdOld').value;
+  var newPwd   = document.getElementById('pwdNew').value;
+  var confPwd  = document.getElementById('pwdConfirm').value;
+
+  alertBox.style.display = 'none';
+
+  if (!oldPwd || !newPwd || !confPwd) {
+    pvPwdAlert('Veuillez remplir tous les champs.', false);
+    return;
+  }
+  if (newPwd.length < 3) {
+    pvPwdAlert('Le nouveau mot de passe doit contenir au moins 3 caractères.', false);
+    return;
+  }
+  if (newPwd !== confPwd) {
+    pvPwdAlert('Les deux mots de passe ne correspondent pas.', false);
+    return;
+  }
+
+  var btn = document.getElementById('btnSavePwd');
+  btn.disabled = true;
+  btn.textContent = 'En cours...';
+
+  var data = new URLSearchParams();
+  data.append('oldPassword', oldPwd);
+  data.append('newPassword', newPwd);
+  data.append('confirmPassword', confPwd);
+
+  fetch('<%= request.getContextPath() %>/pages/profil/ajax/traitement-password.jsp', {
+    method: 'POST', body: data,
+    headers: {'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'}
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.success) {
+      pvPwdAlert(d.message, true);
+      document.getElementById('pwdOld').value = '';
+      document.getElementById('pwdNew').value = '';
+      document.getElementById('pwdConfirm').value = '';
+      setTimeout(function() { pvCloseModal('modalPassword'); alertBox.style.display = 'none'; }, 2000);
+    } else {
+      pvPwdAlert(d.error || 'Erreur inconnue.', false);
+    }
+  })
+  .catch(function(e) {
+    pvPwdAlert('Erreur réseau : ' + e, false);
+  })
+  .finally(function() {
+    btn.disabled = false;
+    btn.textContent = 'Enregistrer';
+  });
+}
+
+function pvPwdAlert(msg, isSuccess) {
+  var box = document.getElementById('pwdAlert');
+  box.style.display = 'block';
+  box.textContent = msg;
+  if (isSuccess) {
+    box.style.background = '#d4edda';
+    box.style.color = '#155724';
+    box.style.border = '1px solid #c3e6cb';
+  } else {
+    box.style.background = '#f8d7da';
+    box.style.color = '#721c24';
+    box.style.border = '1px solid #f5c6cb';
+  }
+}
+
 // ========== PUBLICATIONS DU PROFIL ==========
 function pvLoadPubs(idutilisateur, idprofil, cursorId) {
     var container = document.getElementById('pvPublications');

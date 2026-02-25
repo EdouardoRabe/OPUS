@@ -1,87 +1,316 @@
+<%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
 <%@ page import="user.*" %>
 <%@ page import="bean.*" %>
 <%@ page import="utilitaire.*" %>
 <%@ page import="affichage.*" %>
 <%@ page import="alumni.Profil" %>
 <%
-    String lien     = (String) session.getValue("lien");
-    String apres    = "profil/voir.jsp";
-    String classe   = "alumni.Profil";
-    String nomtable = "profil";
-    String titre    = "Modifier mon profil";
-    String id       = "";
-    String htmlForm = "";
-    String idpromotion   = "";
-    String idparcours    = "";
-    String idutilisateur = "";
-    String idgenre       = "";
+        String lien     = (String) session.getValue("lien");
+        String apres    = "profil/voir.jsp";
+        String classe   = "alumni.Profil";
+        String nomtable = "profil";
+        String titre    = "Modifier mon profil";
+        String id       = "";
+        String htmlForm = "";
+        String idpromotion   = "";
+        String idparcours    = "";
+        String idutilisateur = "";
+        String idgenre       = "";
+        String _prenom       = "";
+        String _nom          = "";
+        String _promotionLib = "";
+        String _parcoursLib  = "";
+        String _fullName     = "Profil OPUS";
+        String _avatarInitials = "U";
 
-    try {
-        Profil t = new Profil();
-        PageUpdate pu = new PageUpdate(t, request, (user.UserEJB) session.getValue("u"));
-        pu.setLien(lien);
-        pu.setTitre(titre);
+        try {
+                Profil t = new Profil();
+                PageUpdate pu = new PageUpdate(t, request, (user.UserEJB) session.getValue("u"));
+                pu.setLien(lien);
+                pu.setTitre(titre);
 
-        pu.getFormu().getChamp("idprofil").setLibelle("ID");
-        pu.getFormu().getChamp("idprofil").setAutre("readonly");
-        pu.getFormu().getChamp("email").setLibelle("Email");
-        pu.getFormu().getChamp("nom").setLibelle("Nom");
-        pu.getFormu().getChamp("prenom").setLibelle("Pr&eacute;nom");
-        pu.getFormu().getChamp("dtn").setLibelle("Date de naissance");
-        pu.getFormu().getChamp("telephone").setLibelle("T&eacute;l&eacute;phone");
-        pu.getFormu().getChamp("idpromotion").setVisible(false);
-        pu.getFormu().getChamp("idparcours").setVisible(false);
-        pu.getFormu().getChamp("idutilisateur").setVisible(false);
-        pu.getFormu().getChamp("idgenre").setVisible(false);
+                pu.getFormu().getChamp("idprofil").setLibelle("ID");
+                pu.getFormu().getChamp("idprofil").setAutre("readonly");
+                pu.getFormu().getChamp("email").setLibelle("Email");
+                pu.getFormu().getChamp("nom").setLibelle("Nom");
+                pu.getFormu().getChamp("prenom").setLibelle("Pr&eacute;nom");
+                pu.getFormu().getChamp("dtn").setLibelle("Date de naissance");
+                pu.getFormu().getChamp("telephone").setLibelle("T&eacute;l&eacute;phone");
+                pu.getFormu().getChamp("idpromotion").setVisible(false);
+                pu.getFormu().getChamp("idparcours").setVisible(false);
+                pu.getFormu().getChamp("idutilisateur").setVisible(false);
+                pu.getFormu().getChamp("idgenre").setVisible(false);
 
-        pu.preparerDataFormu();
-        id           = pu.getBase().getTuppleID();
-        Profil base  = (Profil) pu.getBase();
-        idpromotion   = base.getIdpromotion()   != null ? base.getIdpromotion()   : "";
-        idparcours    = base.getIdparcours()    != null ? base.getIdparcours()    : "";
-        idutilisateur = String.valueOf(base.getIdutilisateur());
-        idgenre       = base.getIdgenre()       != null ? base.getIdgenre()       : "";
-        htmlForm = pu.getFormu().getHtmlInsert();
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
+                pu.preparerDataFormu();
+                id           = pu.getBase().getTuppleID();
+                Profil base  = (Profil) pu.getBase();
+                if (base != null) {
+                    idpromotion   = base.getIdpromotion()   != null ? base.getIdpromotion()   : "";
+                    idparcours    = base.getIdparcours()    != null ? base.getIdparcours()    : "";
+                    idutilisateur = String.valueOf(base.getIdutilisateur());
+                    idgenre       = base.getIdgenre()       != null ? base.getIdgenre()       : "";
+                    _prenom       = base.getPrenom()        != null ? base.getPrenom()        : "";
+                    _nom          = base.getNom()           != null ? base.getNom()           : "";
+                }
+                htmlForm = pu.getFormu().getHtmlInsert();
+        } catch (Exception e) {
+                e.printStackTrace();
+        }
+
+        _fullName = (_prenom + " " + _nom).trim();
+        if (_fullName.isEmpty()) _fullName = "Profil OPUS";
+        StringBuilder initials = new StringBuilder();
+        if (!_prenom.isEmpty()) initials.append(Character.toUpperCase(_prenom.charAt(0)));
+        if (!_nom.isEmpty()) initials.append(Character.toUpperCase(_nom.charAt(0)));
+        if (initials.length() > 0) _avatarInitials = initials.toString();
 %>
-<div class="content-wrapper">
-    <div class="row">
-        <div class="col-md-3"></div>
-        <div class="col-md-6">
-            <div class="box-fiche">
-                <div class="box">
-                    <div class="box-title with-border">
-                        <h1 class="box-title">
-                            <a href="<%= lien %>?but=<%= apres %>">
-                                <i class="fa fa-arrow-circle-left"></i>
-                            </a>
-                            <%= titre %>
-                        </h1>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVJkEZSbVkFvwj6GWGcsA3UbVDA46NmCcc9syThH05yu85Z+I6QILv3GVpnwnbaIPN1zcEvGWxQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<style>
+:root {
+    --itu-blue: #283a97;
+    --itu-dark: #1c1e29;
+    --itu-violet: #5B23FF;
+    --pvl-border: #e2e6ea;
+    --pvl-card-bg: #fff;
+    --pvl-text: #1c1e21;
+    --pvl-text-sec: #65676b;
+    --pv-primary: #0a66c2;
+}
+.pv-profile-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    max-width: 960px;
+    margin: 24px auto 40px;
+    padding: 0 12px;
+}
+.pvl-main {
+    min-width: 0;
+}
+.pv-card {
+    background: var(--pvl-card-bg);
+    border-radius: 18px;
+    border: 1px solid #e6e9ef;
+    box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
+    padding-bottom: 24px;
+    overflow: hidden;
+    font-family: "Segoe UI", system-ui, sans-serif;
+}
+.pv-cover {
+    height: 120px;
+    background: linear-gradient(135deg, #002147 0%, var(--pv-primary) 60%, #378fe9 100%);
+    border-radius: 18px 18px 0 0;
+    position: relative;
+}
+.pv-avatar-wrap {
+    margin-top: -42px;
+    margin-left: 28px;
+    position: relative;
+    z-index: 2;
+}
+.pv-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(180deg, #3b82f6, #0a66c2);
+    color: #fff;
+    font-size: 32px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.pv-top {
+    padding: 20px 30px 16px;
+    border-bottom: 1px solid #eef2f8;
+}
+.pv-name {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--pvl-text);
+    margin-bottom: 4px;
+}
+.pv-headline {
+    font-size: 14px;
+    color: var(--pvl-text-sec);
+}
+.profil-edit-header {
+    margin-bottom: 8px;
+}
+.profil-edit-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.profil-edit-kicker {
+    margin: 0;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--pv-primary);
+}
+.profil-edit-title {
+    margin: 0;
+    font-size: 24px;
+}
+.profil-edit-subhead {
+    margin: 6px 0 0;
+    color: #566075;
+    font-size: 14px;
+}
+.profil-edit-back {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid rgba(10, 102, 194, 0.2);
+    color: var(--pv-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.profil-edit-back:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(10, 102, 194, 0.25);
+}
+.pv-section {
+    padding: 24px 32px 0;
+}
+.pv-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+.pv-section-header h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.profil-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.profil-edit-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+.profil-edit-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.profil-edit-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+.profil-edit-submit {
+    background: var(--pv-primary);
+    border: none;
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+.profil-edit-submit:hover {
+    background: #00408c;
+    transform: translateY(-1px);
+}
+.profil-edit-hidden {
+    display: none;
+}
+.pv-extra-link {
+    padding: 10px 22px;
+    border-radius: 30px;
+    border: 1px solid #cad4e5;
+    color: var(--pv-primary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.pv-extra-link:hover {
+    background: #f4f7ff;
+    border-color: var(--pv-primary);
+}
+@media (max-width: 650px) {
+    .pv-card {
+        border-radius: 12px;
+    }
+    .pv-section {
+        padding: 20px;
+    }
+    .profil-edit-actions {
+        justify-content: stretch;
+    }
+}
+#uploadBox{
+    display: none !important;
+}
+</style>
+<div class="pv-profile-layout">
+    <main class="pvl-main">
+        <div class="pv-card">
+            <div class="pv-top">
+                <div class="profil-edit-heading">
+                    <a class="profil-edit-back" href="<%= lien %>?but=<%= apres %>" aria-label="Retour au profil public">
+                        <i class="fa fa-arrow-left"></i>
+                    </a>
+                    <div>
+                        <p class="profil-edit-kicker">Profil OPUS</p>
+                        <h1 class="profil-edit-title"><%= titre %></h1>
                     </div>
-                    <form action="<%= lien %>?but=apresTarif.jsp" method="post">
-                        <%= htmlForm %>
-
-                        <input type="hidden" name="acte"          value="update">
-                        <input type="hidden" name="classe"        value="<%= classe %>">
-                        <input type="hidden" name="nomtable"      value="<%= nomtable %>">
-                        <input type="hidden" name="bute"          value="<%= apres %>">
-                        <input type="hidden" name="idprofil"      value="<%= id %>">
-                        <input type="hidden" name="idpromotion"   value="<%= idpromotion %>">
-                        <input type="hidden" name="idparcours"    value="<%= idparcours %>">
-                        <input type="hidden" name="idutilisateur" value="<%= idutilisateur %>">
-                        <input type="hidden" name="idgenre"       value="<%= idgenre %>">
-
-                        <div class="row">
-                            <div class="col-md-11">
-                                <button class="btn btn-primary pull-right" type="submit">Enregistrer</button>
-                            </div>
-                            <br><br>
-                        </div>
-                    </form>
                 </div>
             </div>
+            <div class="pv-section">
+                <div class="pv-section-header">
+                    <h2><i class="fa fa-user-pen"></i> Détails du profil</h2>
+                    <a class="pv-extra-link" href="<%= lien %>?but=<%= apres %>">
+                        <i class="fa fa-eye"></i> Voir le profil
+                    </a>
+                </div>
+                <form class="profil-edit-form" action="<%= lien %>?but=apresTarif.jsp" method="post">
+                    <div class="profil-edit-body">
+                        <div class="profil-edit-fields">
+                            <%= htmlForm %>
+                        </div>
+                        <div class="profil-edit-hidden" aria-hidden="true">
+                            <input type="hidden" name="acte"          value="update">
+                            <input type="hidden" name="classe"        value="<%= classe %>">
+                            <input type="hidden" name="nomtable"      value="<%= nomtable %>">
+                            <input type="hidden" name="bute"          value="<%= apres %>">
+                            <input type="hidden" name="idprofil"      value="<%= id %>">
+                            <input type="hidden" name="idpromotion"   value="<%= idpromotion %>">
+                            <input type="hidden" name="idparcours"    value="<%= idparcours %>">
+                            <input type="hidden" name="idutilisateur" value="<%= idutilisateur %>">
+                            <input type="hidden" name="idgenre"       value="<%= idgenre %>">
+                        </div>
+                    </div>
+                    <div class="profil-edit-actions">
+                        <a class="pv-extra-link" href="<%= lien %>?but=<%= apres %>">
+                            <i class="fa fa-arrow-left"></i> Retour
+                        </a>
+                        <button class="profil-edit-submit" type="submit">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
+    </main>
 </div>

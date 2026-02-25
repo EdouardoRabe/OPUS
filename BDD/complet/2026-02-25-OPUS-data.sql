@@ -12,20 +12,17 @@
 --
 -- Clusters thematiques (pour accentuer les scores de compatibilite) :
 --   Cluster A (200-209): Java + BDD          | Informatique  | Promotion 2024
---   Cluster B (210-219): Python + IA         | Data Science  | Promotion 2024
---   Cluster C (220-229): Reseaux + Securite  | Reseaux       | Promotion 2023
---   Cluster D (230-239): JavaScript + Mobile | Informatique  | Promotion 2023
---   Cluster E (240-249): DevOps + Cloud      | Genie Logiciel| Promotion 2022
+--   Cluster B (210-219): Python + IA         | Design        | Promotion 2024
+--   Cluster C (220-229): Reseaux + Securite  | Informatique  | Promotion 2023
+--   Cluster D (230-239): JavaScript + Mobile | Design        | Promotion 2023
+--   Cluster E (240-249): DevOps + Cloud      | Informatique  | Promotion 2022
 -- =====================================================================
 
 -- =====================================================================
--- SECTION 1 : PARCOURS (4 nouveaux, PRC000001 Informatique deja existant)
+-- SECTION 1 : PARCOURS (1 nouveau, PRC000001 Informatique deja existant)
 -- =====================================================================
 INSERT INTO parcours (idparcours, libelle) VALUES
-('PRC000002', 'Reseaux et Telecommunications'),
-('PRC000003', 'Data Science et Big Data'),
-('PRC000004', 'Cybersecurite'),
-('PRC000005', 'Genie Logiciel');
+('PRC000002', 'Design');
 
 -- =====================================================================
 -- SECTION 2 : PROMOTIONS
@@ -36,11 +33,11 @@ INSERT INTO promotion (idpromotion, annee, libelle, idparcours) VALUES
 ('PRM000003', 2022, 'P17', 'PRC000001'),
 ('PRM000004', 2021, 'P16', 'PRC000001'),
 ('PRM000005', 2025, 'P20', 'PRC000001'),
-('PRM000006', 2023, 'P18-RT', 'PRC000002'),
-('PRM000007', 2024, 'P19-RT', 'PRC000002'),
-('PRM000008', 2024, 'P19-DS', 'PRC000003'),
-('PRM000009', 2024, 'P19-CS', 'PRC000004'),
-('PRM000010', 2022, 'P17-GL', 'PRC000005');
+('PRM000006', 2023, 'P18-D', 'PRC000002'),
+('PRM000007', 2024, 'P19-D', 'PRC000002'),
+('PRM000008', 2022, 'P17-D', 'PRC000002'),
+('PRM000009', 2021, 'P16-D', 'PRC000002'),
+('PRM000010', 2025, 'P20-D', 'PRC000002');
 
 -- =====================================================================
 -- SECTION 3 : SPECIALITES (tags du reseau)
@@ -90,7 +87,7 @@ INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, 
 (208, 'ETU000018', 'paop', 'Randriamiarana Zo',       'DIR42', 'etu', 'ETU000018', 1),
 (209, 'ETU000019', 'paop', 'Rakotomalala Fanja',      'DIR42', 'etu', 'ETU000019', 1);
 
--- --- CLUSTER B : Python + IA | Data Science 2024 ---
+-- --- CLUSTER B : Python + IA | Design 2024 ---
 INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, id, estactif) VALUES
 (210, 'ETU000020', 'paop', 'Rajaonarison Miora',      'DIR42', 'etu', 'ETU000020', 1),
 (211, 'ETU000021', 'paop', 'Randrianarisoa Vola',     'DIR42', 'etu', 'ETU000021', 1),
@@ -103,7 +100,7 @@ INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, 
 (218, 'ETU000028', 'paop', 'Rakotonirina Narindra',   'DIR42', 'etu', 'ETU000028', 1),
 (219, 'ETU000029', 'paop', 'Andriamalala Hasina',     'DIR42', 'etu', 'ETU000029', 1);
 
--- --- CLUSTER C : Reseaux + Securite | Reseaux 2023 ---
+-- --- CLUSTER C : Reseaux + Securite | Informatique 2023 ---
 INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, id, estactif) VALUES
 (220, 'ETU000030', 'paop', 'Razafy Elia',             'DIR42', 'etu', 'ETU000030', 1),
 (221, 'ETU000031', 'paop', 'Randriamahefa Onjaniaina','DIR42', 'etu', 'ETU000031', 1),
@@ -116,7 +113,7 @@ INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, 
 (228, 'ETU000038', 'paop', 'Rakotoarivony Lanto',     'DIR42', 'etu', 'ETU000038', 1),
 (229, 'ETU000039', 'paop', 'Razoharinoro Mamitiana',  'DIR42', 'etu', 'ETU000039', 1);
 
--- --- CLUSTER D : JavaScript + Mobile | Informatique 2023 ---
+-- --- CLUSTER D : JavaScript + Mobile | Design 2023 ---
 INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, id, estactif) VALUES
 (230, 'ETU000040', 'paop', 'Randrianarivo Adeline',   'DIR42', 'etu', 'ETU000040', 1),
 (231, 'ETU000041', 'paop', 'Rasamoelina Voahirana',   'DIR42', 'etu', 'ETU000041', 1),
@@ -129,7 +126,7 @@ INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, 
 (238, 'ETU000048', 'paop', 'Rabetsimba Herica',       'DIR42', 'etu', 'ETU000048', 1),
 (239, 'ETU000049', 'paop', 'Andrianjafy Mihaja',      'DIR42', 'etu', 'ETU000049', 1);
 
--- --- CLUSTER E : DevOps + Cloud | Genie Logiciel 2022 ---
+-- --- CLUSTER E : DevOps + Cloud | Informatique 2022 ---
 INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, id, estactif) VALUES
 (240, 'ETU000050', 'paop', 'Rasoamampionona Tantely', 'DIR42', 'etu', 'ETU000050', 1),
 (241, 'ETU000051', 'paop', 'Randriamanana Aina',      'DIR42', 'etu', 'ETU000051', 1),
@@ -169,10 +166,10 @@ INSERT INTO paramcrypt (id, niveau, croissante, idutilisateur) VALUES
 -- idprofil : PRF000010 a PRF000059 (PRF000001-003 deja existants)
 -- idgenre  : GEN000001=Masculin  GEN000002=Feminin
 -- Cluster A -> PRM000001 (2024), PRC000001 (Informatique)
--- Cluster B -> PRM000008 (2024), PRC000003 (Data Science)
--- Cluster C -> PRM000006 (2023), PRC000002 (Reseaux)
--- Cluster D -> PRM000002 (2023), PRC000001 (Informatique)
--- Cluster E -> PRM000010 (2022), PRC000005 (Genie Logiciel)
+-- Cluster B -> PRM000007 (2024), PRC000002 (Design)
+-- Cluster C -> PRM000002 (2023), PRC000001 (Informatique)
+-- Cluster D -> PRM000006 (2023), PRC000002 (Design)
+-- Cluster E -> PRM000003 (2022), PRC000001 (Informatique)
 -- =====================================================================
 
 -- Cluster A
@@ -190,55 +187,55 @@ INSERT INTO profil (idprofil, email, nom, prenom, dtn, telephone, idpromotion, i
 
 -- Cluster B
 INSERT INTO profil (idprofil, email, nom, prenom, dtn, telephone, idpromotion, idparcours, idutilisateur, idgenre) VALUES
-('PRF000020','rajaonarison.miora@itu.mg',     'Rajaonarison',    'Miora',      '2000-02-14','034 20 000 00','PRM000008','PRC000003',210,'GEN000002'),
-('PRF000021','randrianarisoa.vola@itu.mg',    'Randrianarisoa',  'Vola',       '2001-10-07','034 20 000 01','PRM000008','PRC000003',211,'GEN000002'),
-('PRF000022','ravoavy.harena@itu.mg',         'Ravoavy',         'Harena',     '1999-08-21','034 20 000 02','PRM000008','PRC000003',212,'GEN000001'),
-('PRF000023','andriamasinoro.tiana@itu.mg',   'Andriamasinoro',  'Tiana',      '2001-03-15','034 20 000 03','PRM000008','PRC000003',213,'GEN000002'),
-('PRF000024','rakotomanana.haja@itu.mg',      'Rakotomanana',    'Haja',       '2000-07-28','034 20 000 04','PRM000008','PRC000003',214,'GEN000001'),
-('PRF000025','razanamasy.fitia@itu.mg',       'Razanamasy',      'Fitia',      '2001-11-02','034 20 000 05','PRM000008','PRC000003',215,'GEN000002'),
-('PRF000026','andriambelo.nina@itu.mg',       'Andriambelo',     'Nina',       '2000-05-18','034 20 000 06','PRM000008','PRC000003',216,'GEN000002'),
-('PRF000027','randriatsara.haingo@itu.mg',    'Randriatsara',    'Haingo',     '1999-09-11','034 20 000 07','PRM000008','PRC000003',217,'GEN000002'),
-('PRF000028','rakotonirina.narindra@itu.mg',  'Rakotonirina',    'Narindra',   '2001-01-24','034 20 000 08','PRM000008','PRC000003',218,'GEN000001'),
-('PRF000029','andriamalala.hasina@itu.mg',    'Andriamalala',    'Hasina',     '2000-04-06','034 20 000 09','PRM000008','PRC000003',219,'GEN000001');
+('PRF000020','rajaonarison.miora@itu.mg',     'Rajaonarison',    'Miora',      '2000-02-14','034 20 000 00','PRM000007','PRC000002',210,'GEN000002'),
+('PRF000021','randrianarisoa.vola@itu.mg',    'Randrianarisoa',  'Vola',       '2001-10-07','034 20 000 01','PRM000007','PRC000002',211,'GEN000002'),
+('PRF000022','ravoavy.harena@itu.mg',         'Ravoavy',         'Harena',     '1999-08-21','034 20 000 02','PRM000007','PRC000002',212,'GEN000001'),
+('PRF000023','andriamasinoro.tiana@itu.mg',   'Andriamasinoro',  'Tiana',      '2001-03-15','034 20 000 03','PRM000007','PRC000002',213,'GEN000002'),
+('PRF000024','rakotomanana.haja@itu.mg',      'Rakotomanana',    'Haja',       '2000-07-28','034 20 000 04','PRM000007','PRC000002',214,'GEN000001'),
+('PRF000025','razanamasy.fitia@itu.mg',       'Razanamasy',      'Fitia',      '2001-11-02','034 20 000 05','PRM000007','PRC000002',215,'GEN000002'),
+('PRF000026','andriambelo.nina@itu.mg',       'Andriambelo',     'Nina',       '2000-05-18','034 20 000 06','PRM000007','PRC000002',216,'GEN000002'),
+('PRF000027','randriatsara.haingo@itu.mg',    'Randriatsara',    'Haingo',     '1999-09-11','034 20 000 07','PRM000007','PRC000002',217,'GEN000002'),
+('PRF000028','rakotonirina.narindra@itu.mg',  'Rakotonirina',    'Narindra',   '2001-01-24','034 20 000 08','PRM000007','PRC000002',218,'GEN000001'),
+('PRF000029','andriamalala.hasina@itu.mg',    'Andriamalala',    'Hasina',     '2000-04-06','034 20 000 09','PRM000007','PRC000002',219,'GEN000001');
 
 -- Cluster C
 INSERT INTO profil (idprofil, email, nom, prenom, dtn, telephone, idpromotion, idparcours, idutilisateur, idgenre) VALUES
-('PRF000030','razafy.elia@itu.mg',            'Razafy',          'Elia',       '1999-12-09','034 30 000 00','PRM000006','PRC000002',220,'GEN000001'),
-('PRF000031','randriamahefa.onjaniaina@itu.mg','Randriamahefa',  'Onjaniaina', '2000-10-17','034 30 000 01','PRM000006','PRC000002',221,'GEN000002'),
-('PRF000032','rakotovao.tsiry@itu.mg',        'Rakotovao',       'Tsiry',      '2001-06-30','034 30 000 02','PRM000006','PRC000002',222,'GEN000001'),
-('PRF000033','andrianasy.mialy@itu.mg',       'Andrianasy',      'Mialy',      '1999-02-13','034 30 000 03','PRM000006','PRC000002',223,'GEN000002'),
-('PRF000034','rabemananjara.nirina@itu.mg',   'Rabemananjara',   'Nirina',     '2000-08-26','034 30 000 04','PRM000006','PRC000002',224,'GEN000002'),
-('PRF000035','razandriamanana.faly@itu.mg',   'Razandriamanana', 'Faly',       '2001-04-10','034 30 000 05','PRM000006','PRC000002',225,'GEN000001'),
-('PRF000036','andrianarivo.soja@itu.mg',      'Andrianarivo',    'Soja',       '1999-11-23','034 30 000 06','PRM000006','PRC000002',226,'GEN000001'),
-('PRF000037','randriambololona.mija@itu.mg',  'Randriambololona','Mija',       '2000-03-07','034 30 000 07','PRM000006','PRC000002',227,'GEN000002'),
-('PRF000038','rakotoarivony.lanto@itu.mg',    'Rakotoarivony',   'Lanto',      '2001-09-20','034 30 000 08','PRM000006','PRC000002',228,'GEN000002'),
-('PRF000039','razoharinoro.mamitiana@itu.mg', 'Razoharinoro',    'Mamitiana',  '1999-07-04','034 30 000 09','PRM000006','PRC000002',229,'GEN000001');
+('PRF000030','razafy.elia@itu.mg',            'Razafy',          'Elia',       '1999-12-09','034 30 000 00','PRM000002','PRC000001',220,'GEN000001'),
+('PRF000031','randriamahefa.onjaniaina@itu.mg','Randriamahefa',  'Onjaniaina', '2000-10-17','034 30 000 01','PRM000002','PRC000001',221,'GEN000002'),
+('PRF000032','rakotovao.tsiry@itu.mg',        'Rakotovao',       'Tsiry',      '2001-06-30','034 30 000 02','PRM000002','PRC000001',222,'GEN000001'),
+('PRF000033','andrianasy.mialy@itu.mg',       'Andrianasy',      'Mialy',      '1999-02-13','034 30 000 03','PRM000002','PRC000001',223,'GEN000002'),
+('PRF000034','rabemananjara.nirina@itu.mg',   'Rabemananjara',   'Nirina',     '2000-08-26','034 30 000 04','PRM000002','PRC000001',224,'GEN000002'),
+('PRF000035','razandriamanana.faly@itu.mg',   'Razandriamanana', 'Faly',       '2001-04-10','034 30 000 05','PRM000002','PRC000001',225,'GEN000001'),
+('PRF000036','andrianarivo.soja@itu.mg',      'Andrianarivo',    'Soja',       '1999-11-23','034 30 000 06','PRM000002','PRC000001',226,'GEN000001'),
+('PRF000037','randriambololona.mija@itu.mg',  'Randriambololona','Mija',       '2000-03-07','034 30 000 07','PRM000002','PRC000001',227,'GEN000002'),
+('PRF000038','rakotoarivony.lanto@itu.mg',    'Rakotoarivony',   'Lanto',      '2001-09-20','034 30 000 08','PRM000002','PRC000001',228,'GEN000002'),
+('PRF000039','razoharinoro.mamitiana@itu.mg', 'Razoharinoro',    'Mamitiana',  '1999-07-04','034 30 000 09','PRM000002','PRC000001',229,'GEN000001');
 
 -- Cluster D
 INSERT INTO profil (idprofil, email, nom, prenom, dtn, telephone, idpromotion, idparcours, idutilisateur, idgenre) VALUES
-('PRF000040','randrianarivo.adeline@itu.mg',  'Randrianarivo',   'Adeline',    '2001-05-16','034 40 000 00','PRM000002','PRC000001',230,'GEN000002'),
-('PRF000041','rasamoelina.voahirana@itu.mg',  'Rasamoelina',     'Voahirana',  '2000-01-29','034 40 000 01','PRM000002','PRC000001',231,'GEN000002'),
-('PRF000042','razafindrakoto.beby@itu.mg',    'Razafindrakoto',  'Beby',       '1999-10-11','034 40 000 02','PRM000002','PRC000001',232,'GEN000002'),
-('PRF000043','andriamahefarivo.dina@itu.mg',  'Andriamahefarivo','Dina',       '2001-07-24','034 40 000 03','PRM000002','PRC000001',233,'GEN000002'),
-('PRF000044','ranaivo.mamy@itu.mg',           'Ranaivo',         'Mamy',       '2000-03-08','034 40 000 04','PRM000002','PRC000001',234,'GEN000001'),
-('PRF000045','rajaonaivo.laingo@itu.mg',      'Rajaonaivo',      'Laingo',     '1999-12-21','034 40 000 05','PRM000002','PRC000001',235,'GEN000001'),
-('PRF000046','andrianaivo.felana@itu.mg',     'Andrianaivo',     'Felana',     '2001-08-04','034 40 000 06','PRM000002','PRC000001',236,'GEN000002'),
-('PRF000047','ramanantsoa.lova@itu.mg',       'Ramanantsoa',     'Lova',       '2000-04-17','034 40 000 07','PRM000002','PRC000001',237,'GEN000001'),
-('PRF000048','rabetsimba.herica@itu.mg',      'Rabetsimba',      'Herica',     '1999-11-30','034 40 000 08','PRM000002','PRC000001',238,'GEN000001'),
-('PRF000049','andrianjafy.mihaja@itu.mg',     'Andrianjafy',     'Mihaja',     '2001-06-13','034 40 000 09','PRM000002','PRC000001',239,'GEN000002');
+('PRF000040','randrianarivo.adeline@itu.mg',  'Randrianarivo',   'Adeline',    '2001-05-16','034 40 000 00','PRM000006','PRC000002',230,'GEN000002'),
+('PRF000041','rasamoelina.voahirana@itu.mg',  'Rasamoelina',     'Voahirana',  '2000-01-29','034 40 000 01','PRM000006','PRC000002',231,'GEN000002'),
+('PRF000042','razafindrakoto.beby@itu.mg',    'Razafindrakoto',  'Beby',       '1999-10-11','034 40 000 02','PRM000006','PRC000002',232,'GEN000002'),
+('PRF000043','andriamahefarivo.dina@itu.mg',  'Andriamahefarivo','Dina',       '2001-07-24','034 40 000 03','PRM000006','PRC000002',233,'GEN000002'),
+('PRF000044','ranaivo.mamy@itu.mg',           'Ranaivo',         'Mamy',       '2000-03-08','034 40 000 04','PRM000006','PRC000002',234,'GEN000001'),
+('PRF000045','rajaonaivo.laingo@itu.mg',      'Rajaonaivo',      'Laingo',     '1999-12-21','034 40 000 05','PRM000006','PRC000002',235,'GEN000001'),
+('PRF000046','andrianaivo.felana@itu.mg',     'Andrianaivo',     'Felana',     '2001-08-04','034 40 000 06','PRM000006','PRC000002',236,'GEN000002'),
+('PRF000047','ramanantsoa.lova@itu.mg',       'Ramanantsoa',     'Lova',       '2000-04-17','034 40 000 07','PRM000006','PRC000002',237,'GEN000001'),
+('PRF000048','rabetsimba.herica@itu.mg',      'Rabetsimba',      'Herica',     '1999-11-30','034 40 000 08','PRM000006','PRC000002',238,'GEN000001'),
+('PRF000049','andrianjafy.mihaja@itu.mg',     'Andrianjafy',     'Mihaja',     '2001-06-13','034 40 000 09','PRM000006','PRC000002',239,'GEN000002');
 
 -- Cluster E
 INSERT INTO profil (idprofil, email, nom, prenom, dtn, telephone, idpromotion, idparcours, idutilisateur, idgenre) VALUES
-('PRF000050','rasoamampionona.tantely@itu.mg','Rasoamampionona', 'Tantely',    '1999-04-26','034 50 000 00','PRM000010','PRC000005',240,'GEN000002'),
-('PRF000051','randriamanana.aina@itu.mg',     'Randriamanana',   'Aina',       '2000-09-09','034 50 000 01','PRM000010','PRC000005',241,'GEN000002'),
-('PRF000052','rakotobe.nary@itu.mg',          'Rakotobe',        'Nary',       '2001-02-22','034 50 000 02','PRM000010','PRC000005',242,'GEN000001'),
-('PRF000053','andrianantenaina.soa@itu.mg',   'Andrianantenaina','Soa',        '1999-08-05','034 50 000 03','PRM000010','PRC000005',243,'GEN000002'),
-('PRF000054','razanajatovo.solo@itu.mg',      'Razanajatovo',    'Solo',       '2000-12-18','034 50 000 04','PRM000010','PRC000005',244,'GEN000001'),
-('PRF000055','randriamboavonjy.feno@itu.mg',  'Randriamboavonjy','Feno',       '2001-05-31','034 50 000 05','PRM000010','PRC000005',245,'GEN000001'),
-('PRF000056','raharinoro.manitra@itu.mg',     'Raharinoro',      'Manitra',    '1999-03-14','034 50 000 06','PRM000010','PRC000005',246,'GEN000002'),
-('PRF000057','andriamasinoro.harisoa@itu.mg', 'Andriamasinoro',  'Harisoa',    '2000-07-27','034 50 000 07','PRM000010','PRC000005',247,'GEN000002'),
-('PRF000058','rakotovelo.tsanta@itu.mg',      'Rakotovelo',      'Tsanta',     '2001-01-10','034 50 000 08','PRM000010','PRC000005',248,'GEN000001'),
-('PRF000059','ramaharosoa.finaritra@itu.mg',  'Ramaharosoa',     'Finaritra',  '1999-06-23','034 50 000 09','PRM000010','PRC000005',249,'GEN000002');
+('PRF000050','rasoamampionona.tantely@itu.mg','Rasoamampionona', 'Tantely',    '1999-04-26','034 50 000 00','PRM000003','PRC000001',240,'GEN000002'),
+('PRF000051','randriamanana.aina@itu.mg',     'Randriamanana',   'Aina',       '2000-09-09','034 50 000 01','PRM000003','PRC000001',241,'GEN000002'),
+('PRF000052','rakotobe.nary@itu.mg',          'Rakotobe',        'Nary',       '2001-02-22','034 50 000 02','PRM000003','PRC000001',242,'GEN000001'),
+('PRF000053','andrianantenaina.soa@itu.mg',   'Andrianantenaina','Soa',        '1999-08-05','034 50 000 03','PRM000003','PRC000001',243,'GEN000002'),
+('PRF000054','razanajatovo.solo@itu.mg',      'Razanajatovo',    'Solo',       '2000-12-18','034 50 000 04','PRM000003','PRC000001',244,'GEN000001'),
+('PRF000055','randriamboavonjy.feno@itu.mg',  'Randriamboavonjy','Feno',       '2001-05-31','034 50 000 05','PRM000003','PRC000001',245,'GEN000001'),
+('PRF000056','raharinoro.manitra@itu.mg',     'Raharinoro',      'Manitra',    '1999-03-14','034 50 000 06','PRM000003','PRC000001',246,'GEN000002'),
+('PRF000057','andriamasinoro.harisoa@itu.mg', 'Andriamasinoro',  'Harisoa',    '2000-07-27','034 50 000 07','PRM000003','PRC000001',247,'GEN000002'),
+('PRF000058','rakotovelo.tsanta@itu.mg',      'Rakotovelo',      'Tsanta',     '2001-01-10','034 50 000 08','PRM000003','PRC000001',248,'GEN000001'),
+('PRF000059','ramaharosoa.finaritra@itu.mg',  'Ramaharosoa',     'Finaritra',  '1999-06-23','034 50 000 09','PRM000003','PRC000001',249,'GEN000002');
 
 -- =====================================================================
 -- SECTION 8 : SPECIALITEPROFIL

@@ -178,7 +178,11 @@
         // ---- Publication partagee : charger la pub originale ----
         boolean isSharedPost = pub.getIdpuborigine() != null && !pub.getIdpuborigine().trim().isEmpty();
         String origDesc = "", origAuteur = "", origDate = "", origMediaUrl = "", origTypePubLib2 = "";
+        String origAuteurPhoto = null;
+        String origAuteurInitials = "";
+        String origProfileUrl = "#";
         boolean origIsVideo = false;
+        Media[] origMedias = new Media[0];
         String origIdpuborigine = isSharedPost ? pub.getIdpuborigine().trim() : "";
         if (isSharedPost) {
             Publication[] origPubs = (Publication[]) CGenUtil.rechercher(
@@ -194,18 +198,35 @@
                     if (_pubTypesPub[t2].getIdtypepublication().equals(origTypePubId2)) { origTypePubLib2 = _pubTypesPub[t2].getLibelle(); break; }
                 }
                 String oAuteur = (String) _pubUserNames.get(new Integer(orig.getIdutilisateur()));
+                origAuteurPhoto = (String) _pubUserPhotos.get(new Integer(orig.getIdutilisateur()));
+                String origAuteurIdprofil = (String) _pubUserProfils.get(new Integer(orig.getIdutilisateur()));
                 if (oAuteur == null) {
                     alumni.ProfilLib[] op2 = (alumni.ProfilLib[]) CGenUtil.rechercher(
                         new alumni.ProfilLib(), null, null, _pubConn, " and refuser = " + orig.getIdutilisateur());
-                    if (op2 != null && op2.length > 0) { oAuteur = (op2[0].getNom() != null ? op2[0].getNom() : "") + (op2[0].getPrenom() != null ? " " + op2[0].getPrenom() : ""); }
+                    if (op2 != null && op2.length > 0) {
+                        oAuteur = (op2[0].getNom() != null ? op2[0].getNom() : "") + (op2[0].getPrenom() != null ? " " + op2[0].getPrenom() : "");
+                        if (origAuteurPhoto == null && op2[0].getPhotoProfil() != null) {
+                            origAuteurPhoto = _pubCtx + "/" + op2[0].getPhotoProfil();
+                        }
+                        if (origAuteurIdprofil == null && op2[0].getIdprofil() != null) {
+                            origAuteurIdprofil = op2[0].getIdprofil();
+                        }
+                    }
                 }
                 origAuteur = oAuteur != null ? oAuteur.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;") : "Utilisateur";
-                Media[] om2 = (Media[]) CGenUtil.rechercher(new Media(), null, null, _pubConn, " and idpublication = '" + origIdpuborigine + "'");
-                if (om2 != null && om2.length > 0 && om2[0].getMediaurl() != null) {
-                    String omu = om2[0].getMediaurl();
-                    origMediaUrl = omu.startsWith("http") ? omu : _pubCtx + "/UploadDownloadFileServlet?fileName=" + java.net.URLEncoder.encode(omu, "UTF-8");
-                    origIsVideo = "MDT000002".equals(om2[0].getIdmediatype());
+                // Initiales de l'auteur original
+                String[] _origPartsA = origAuteur.trim().split("\\s+");
+                origAuteurInitials = String.valueOf(Character.toUpperCase(_origPartsA[0].charAt(0)));
+                if (_origPartsA.length > 1) origAuteurInitials += Character.toUpperCase(_origPartsA[_origPartsA.length - 1].charAt(0));
+                // URL profil auteur original
+                if (orig.getIdutilisateur() == _pubRefuser) {
+                    origProfileUrl = _pubCtx + "/pages/module.jsp?but=profil/voir.jsp";
+                } else if (origAuteurIdprofil != null && !origAuteurIdprofil.isEmpty()) {
+                    origProfileUrl = _pubCtx + "/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp?idprofil=" + origAuteurIdprofil;
                 }
+                // Charger TOUS les medias de la pub originale
+                origMedias = (Media[]) CGenUtil.rechercher(new Media(), null, null, _pubConn, " and idpublication = '" + origIdpuborigine + "'");
+                if (origMedias == null) origMedias = new Media[0];
             } else { isSharedPost = false; } // pub originale supprimee
         }
 
@@ -319,18 +340,53 @@
         <% } %>
 
         <% if (isSharedPost) { %>
-        <!-- Publication originale embarquee — cliquable pour voir en detail -->
+        <!-- Publication originale embarquee — style Facebook -->
         <div class="fa-shared-embed fa-shared-embed--clickable" onclick="openPublicationDetail('<%= origIdpuborigine %>')" title="Voir la publication originale">
-            <div class="fa-shared-embed-header">
-                <span class="fa-shared-embed-author"><%= origAuteur %></span>
-                <span class="fa-shared-embed-date">&nbsp;&middot;&nbsp;<%= origDate %></span>
-                <% if (!origTypePubLib2.isEmpty()) { %><span class="fa-type-badge"><%= origTypePubLib2 %></span><% } %>
+            <!-- En-tete avec avatar comme une vraie pub -->
+            <div class="fa-shared-embed-header-full">
+                <a href="<%= origProfileUrl %>" onclick="event.stopPropagation();" style="text-decoration:none;">
+                    <div class="fa-avatar fa-avatar--sm" style="<%= origAuteurPhoto != null ? "background:transparent;" : "" %>">
+                        <% if (origAuteurPhoto != null) { %><img src="<%= origAuteurPhoto %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                        <% } else { %><%= origAuteurInitials %><% } %>
+                    </div>
+                </a>
+                <div class="fa-shared-embed-meta">
+                    <a href="<%= origProfileUrl %>" onclick="event.stopPropagation();" style="text-decoration:none;color:inherit;">
+                        <strong class="fa-shared-embed-author"><%= origAuteur %></strong>
+                    </a>
+                    <div class="fa-shared-embed-date-line">
+                        <span class="fa-shared-embed-date"><%= origDate %></span>
+                        <% if (!origTypePubLib2.isEmpty()) { %><span class="fa-type-badge"><%= origTypePubLib2 %></span><% } %>
+                    </div>
+                </div>
             </div>
+            <!-- Texte de la pub originale -->
             <% if (!origDesc.isEmpty()) { %><div class="fa-shared-embed-text"><%= origDesc %></div><% } %>
-            <% if (!origMediaUrl.isEmpty()) {
-                if (origIsVideo) { %><video src="<%= origMediaUrl %>" controls preload="metadata" style="width:100%;border-radius:8px;margin-top:6px;max-height:200px;" onclick="event.stopPropagation();"></video><%
-                } else { %><img src="<%= origMediaUrl %>" alt="" onclick="event.stopPropagation();openMediaZoom(this.src)"><% }
-            } %>
+            <!-- Medias de la pub originale (grille comme une pub normale) -->
+            <% if (origMedias.length > 0) {
+                int origShowCount = origMedias.length > 4 ? 4 : origMedias.length;
+                int origExtraCount = origMedias.length - 4;
+            %>
+            <div class="fa-media-grid grid-<%= origMedias.length >= 4 ? 4 : origMedias.length %>" style="margin-top:8px;">
+            <% for (int om = 0; om < origShowCount; om++) {
+                String omUrl = origMedias[om].getMediaurl();
+                if (omUrl != null && !omUrl.startsWith("http")) {
+                    omUrl = _pubCtx + "/UploadDownloadFileServlet?fileName=" + java.net.URLEncoder.encode(omUrl, "UTF-8");
+                }
+                boolean omIsVideo = "MDT000002".equals(origMedias[om].getIdmediatype());
+            %>
+                <div class="fa-media-grid-item" onclick="event.stopPropagation();<%= omIsVideo ? "openVideoZoom('" + omUrl.replace("'","\\\\'") + "')" : "openMediaZoom('" + omUrl.replace("'","\\\\'") + "')" %>">
+                    <% if (omIsVideo) { %>
+                    <video src="<%= omUrl %>" preload="metadata" muted></video>
+                    <span class="fa-media-video-badge"><i class="bi bi-play-fill"></i> Vid&eacute;o</span>
+                    <% } else { %>
+                    <img src="<%= omUrl %>" alt="media">
+                    <% } %>
+                    <% if (om == 3 && origExtraCount > 0) { %><div class="fa-media-grid-overlay">+<%= origExtraCount %></div><% } %>
+                </div>
+            <% } %>
+            </div>
+            <% } %>
         </div>
         <% } %>
     </div>
