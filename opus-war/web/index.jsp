@@ -54,15 +54,15 @@
 
           <!-- LOGIN FORM -->
           <div id="login-form">
-            <form action="<%=but%>" method="post" autocomplete="off">
+            <form action="<%=but%>" method="post">
               <div class="form-group">
                 <label class="field-label">Identifiant</label>
                 <div class="input-icon-wrap">
                   <span class="glyphicon glyphicon-user input-icon"></span>
-                  <input type="text" name="identifiant" class="form-control-custom with-icon" placeholder="Numéro ETU ou e-mail" required />
+                  <input type="text" id="identifiant" name="identifiant" class="form-control-custom with-icon" placeholder="Numéro ETU" required />
                 </div>
                 <div class="info-badge">
-                  <i class="fa fa-info-circle"></i> Ex&nbsp;: <strong>ETU003356</strong> ou votre adresse e-mail
+                  <i class="fa fa-info-circle"></i> Ex&nbsp;: <strong>ETU003356</strong>
                 </div>
               </div>
               <div class="form-group" style="margin-bottom: 2rem;">
@@ -93,12 +93,23 @@
     <script src="${pageContext.request.contextPath}/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
 
     <script>
-      // Effet focus sur le bouton de connexion
+      // Mémoriser le numéro ETU dans localStorage
       (function () {
+        // Charger le dernier numéro ETU au chargement de la page
+        var lastEtu = localStorage.getItem('lastEtuLogin');
+        if (lastEtu) {
+          document.getElementById('identifiant').value = lastEtu;
+        }
+
+        // Sauvegarder le numéro ETU lors de la soumission du formulaire
         var btn = document.getElementById('login-btn');
         var form = btn ? btn.closest('form') : null;
         if (form) {
           form.addEventListener('submit', function () {
+            var etuValue = document.getElementById('identifiant').value.trim();
+            if (etuValue) {
+              localStorage.setItem('lastEtuLogin', etuValue);
+            }
             btn.disabled = true;
             btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Connexion…';
           });
