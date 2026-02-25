@@ -106,6 +106,8 @@
     String _genrelib    = profil != null && profil.getGenrelib()       != null ? profil.getGenrelib()       : "";
     String _idgenre     = profil != null && profil.getIdgenre()        != null ? profil.getIdgenre()        : "";
     int _contribution   = profil != null ? profil.getContribution() : 0;
+    String _cv          = profil != null && profil.getCv()             != null ? profil.getCv()             : "";
+    String _cvUrl       = _cv.isEmpty() ? "" : request.getContextPath() + "/" + _cv;
     
     // Emplacement vars
     String _empId = emplacement != null ? emplacement.getId() : "";
@@ -595,6 +597,16 @@
            style="padding:6px 16px;background:#fff;color:#0a66c2;border:1px solid #0a66c2;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block">
           <i class="fa fa-lock"></i> Confidentialité
         </a>
+        <button onclick="pvOpenModal('modalCV')"
+           style="padding:6px 16px;background:#fff;color:#0a66c2;border:1px solid #0a66c2;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;">
+          <i class="bi bi-file-earmark-text"></i> CV
+        </button>
+        <% if (!_cv.isEmpty()) { %>
+        <a href="<%= _cvUrl %>" target="_blank"
+           style="padding:6px 16px;background:#28a745;color:#fff;border:none;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block">
+          <i class="bi bi-download"></i> Télécharger CV
+        </a>
+        <% } %>
       </div>
     </div>
   </div>
@@ -1118,6 +1130,26 @@ function pvUploadPhoto(inputId, typeVal, apresOk) {
   .catch(function(e){ alert("Erreur réseau : " + e); });
 }
 
+/* ── Upload CV ── */
+function pvUploadCV() {
+  var fi = document.getElementById('fileCV');
+  if (!fi.files[0]) { alert("Sélectionnez un fichier CV."); return; }
+  var fd = new FormData();
+  fd.append("cv", fi.files[0]);
+  fetch("<%= request.getContextPath() %>/pages/profil/ajax/traitement-cv.jsp", {
+    method: "POST", body: fd
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if (d.success) {
+      alert("CV importé avec succès !");
+      pvCloseModal('modalCV');
+      location.reload();
+    } else { alert("Erreur : " + d.error); }
+  })
+  .catch(function(e){ alert("Erreur réseau : " + e); });
+}
+
 // ========== PUBLICATIONS DU PROFIL ==========
 function pvLoadPubs(idutilisateur, idprofil, cursorId) {
     var container = document.getElementById('pvPublications');
@@ -1402,6 +1434,22 @@ function pvSaveLoc() {
           cover.insertBefore(i, cover.firstChild);
         }
       })">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal : Import CV -->
+<div class="pv-modal-overlay" id="modalCV">
+  <div class="pv-modal">
+    <h3>Importer votre CV</h3>
+    <p style="font-size:12px; color:#666; margin-bottom:10px;">Formats acceptés : PDF, DOC, DOCX (max 10 Mo)</p>
+    <input type="file" id="fileCV" accept=".pdf,.doc,.docx" style="margin-top:8px">
+    <% if (!_cv.isEmpty()) { %>
+    <p style="margin-top:10px; font-size:12px; color:#28a745;"><i class="bi bi-check-circle"></i> CV actuel : <a href="<%= _cvUrl %>" target="_blank"><%= _cv.substring(_cv.lastIndexOf("/") + 1) %></a></p>
+    <% } %>
+    <div class="pv-modal-footer">
+      <button type="button" class="pv-btn-cancel" onclick="pvCloseModal('modalCV')">Annuler</button>
+      <button type="button" class="pv-btn-save" onclick="pvUploadCV()">Importer</button>
     </div>
   </div>
 </div>

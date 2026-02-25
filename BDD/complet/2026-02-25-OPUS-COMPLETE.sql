@@ -83,6 +83,7 @@ CREATE TABLE profil(
     idparcours VARCHAR(20) NOT NULL,
     idutilisateur INTEGER NOT NULL,
     idgenre VARCHAR(20) NOT NULL,
+    cv VARCHAR(150),
     PRIMARY KEY(idprofil),
     UNIQUE(idutilisateur),
     UNIQUE(email),
@@ -459,9 +460,6 @@ END $$;
 CREATE SEQUENCE seq_profilsocialmedia START WITH 1 INCREMENT BY 1 CACHE 1;
 CREATE FUNCTION getseqprofilsocialmedia() RETURNS INTEGER LANGUAGE plpgsql AS $$ BEGIN RETURN nextval('seq_profilsocialmedia');
 END $$;
-CREATE SEQUENCE seqHistoriqueActif START WITH 1 INCREMENT BY 1 CACHE 1;
-CREATE FUNCTION getseqhistoriqueactif() RETURNS BIGINT LANGUAGE plpgsql AS $$ BEGIN RETURN nextval('seqHistoriqueActif');
-END $$;
 CREATE SEQUENCE cnapsuser_id_seq START WITH 1 INCREMENT BY 1 CACHE 1;
 CREATE FUNCTION getseqcnapsuser() RETURNS BIGINT LANGUAGE sql AS $$
 SELECT nextval('cnapsuser_id_seq');
@@ -477,7 +475,7 @@ SELECT p.idpromotion,
     pr.libelle AS libelleparcours
 FROM promotion p
     JOIN parcours pr ON p.idparcours = pr.idparcours;
-CREATE VIEW profillib AS
+CREATE or replace VIEW profillib AS
 SELECT pr.idprofil,
     pr.email,
     pr.nom,
@@ -546,7 +544,8 @@ SELECT pr.idprofil,
             WHEN u.estactif = 1 THEN 'Cree'
             ELSE 'Banni'
         END
-    ) AS etatlib
+    ) AS etatlib,
+    pr.cv
 FROM utilisateur u
     LEFT JOIN profil pr ON pr.idutilisateur = u.refuser
     LEFT JOIN promotion p ON p.idpromotion = pr.idpromotion

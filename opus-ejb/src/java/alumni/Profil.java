@@ -18,6 +18,7 @@ public class Profil extends ClassMAPTable {
     // linked genre (homme / femme etc)
     private String idgenre;
     private int idutilisateur;
+    private String cv;
 
     public Profil() {
         setNomTable("profil");
@@ -170,6 +171,14 @@ public class Profil extends ClassMAPTable {
 
     public void setIdutilisateur(int idutilisateur) {
         this.idutilisateur = idutilisateur;
+    }
+
+    public String getCv() {
+        return cv;
+    }
+
+    public void setCv(String cv) {
+        this.cv = cv;
     }
 
     public static Profil findByRefUser(int refuser, Connection c) throws Exception {

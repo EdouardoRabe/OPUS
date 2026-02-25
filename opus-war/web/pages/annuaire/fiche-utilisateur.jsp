@@ -245,6 +245,10 @@
     }
     if (headline.isEmpty() && !parcLib.isEmpty()) headline = parcLib;
     if (headline.isEmpty()) headline = "Alumni";
+
+    // CV
+    String cvPath = profil.getCv() != null ? profil.getCv().trim() : "";
+    String cvUrl = !cvPath.isEmpty() ? (ctx + "/" + cvPath) : "";
 %>
 
 <style>
@@ -504,6 +508,21 @@
                 </div>
             <% } } %>
         </div>
+
+        <!-- CV -->
+        <% if (!cvUrl.isEmpty()) { %>
+        <div class="fu-section">
+            <h2><i class="bi bi-file-earmark-text-fill"></i> Curriculum Vitae</h2>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <a href="<%= h(cvUrl) %>" target="_blank" class="fu-btn fu-btn-primary" download>
+                    <i class="bi bi-download"></i> T&eacute;l&eacute;charger le CV
+                </a>
+                <a href="<%= h(cvUrl) %>" target="_blank" class="fu-btn fu-btn-outline">
+                    <i class="bi bi-eye"></i> Voir le CV
+                </a>
+            </div>
+        </div>
+        <% } %>
 
         <!-- Publications -->
         <div class="fu-section" id="fuPubSection" style="border-top:1px solid #dce0e4;margin-top:6px;">
