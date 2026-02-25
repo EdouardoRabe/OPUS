@@ -33,6 +33,16 @@ VALUES ('CRY000101', 4, 1, '101') ON CONFLICT DO NOTHING;
 INSERT INTO paramcrypt (id, niveau, croissante, idutilisateur)
 VALUES ('CRY000102', 4, 1, '102') ON CONFLICT DO NOTHING;
 
+-- ======================== PROFILS ========================
+-- Lies aux utilisateurs : refuser 100 (Rakoto Jean), 101 (Rasoa Marie), 102 (Rasolobe Andry)
+-- Prerequis : parcours PRC000001, promotion PRM000001, genre GEN000001/GEN000002 (dans OPUS-COMPLETE.sql)
+INSERT INTO profil (idprofil, email, nom, prenom, dtn, telephone, idpromotion, idparcours, idutilisateur, idgenre)
+VALUES ('PRF000001', 'rakoto@itu.mg', 'Rakoto', 'Jean', '2000-01-15', '034 00 000 01', 'PRM000001', 'PRC000001', 100, 'GEN000001') ON CONFLICT DO NOTHING;
+INSERT INTO profil (idprofil, email, nom, prenom, dtn, telephone, idpromotion, idparcours, idutilisateur, idgenre)
+VALUES ('PRF000002', 'rasoa@itu.mg', 'Rasoa', 'Marie', '2001-03-20', '034 00 000 02', 'PRM000001', 'PRC000001', 101, 'GEN000002') ON CONFLICT DO NOTHING;
+INSERT INTO profil (idprofil, email, nom, prenom, dtn, telephone, idpromotion, idparcours, idutilisateur, idgenre)
+VALUES ('PRF000003', 'rasolobe@itu.mg', 'Rasolobe', 'Andry', '1999-06-10', '034 00 000 03', 'PRM000001', 'PRC000001', 102, 'GEN000001') ON CONFLICT DO NOTHING;
+
 -- ======================== TYPES DE PUBLICATION SUPPLEMENTAIRES ========================
 INSERT INTO typepublication (idtypepublication, libelle) VALUES ('TPB000004', 'Projet') ON CONFLICT DO NOTHING;
 INSERT INTO typepublication (idtypepublication, libelle) VALUES ('TPB000005', 'Recherche d''opportunite') ON CONFLICT DO NOTHING;
