@@ -217,8 +217,8 @@
                     String tid = types[t].getIdTypesignalement();
                     String tlib = types[t].getLibelle();
                 %>
-                <li class="sig-type-item" onclick="toggleCheckbox(this)">
-                    <input type="checkbox" name="typesignalement" value="<%= tid %>" id="tsg_<%= tid %>"/>
+                <li class="sig-type-item" onclick="toggleRadio(this)">
+                    <input type="radio" name="typesignalement" value="<%= tid %>" id="tsg_<%= tid %>"/>
                     <label class="sig-type-label" for="tsg_<%= tid %>"><%= tlib %></label>
                 </li>
                 <% } %>
@@ -244,11 +244,11 @@
 </div>
 
 <script>
-    function toggleCheckbox(li) {
-        var cb = li.querySelector('input[type="checkbox"]');
-        // ne toggle que si le click n'est pas directement sur le checkbox
+    function toggleRadio(li) {
+        var radio = li.querySelector('input[type="radio"]');
+        // ne toggle que si le click n'est pas directement sur le radio
         if (event && event.target.tagName !== 'INPUT') {
-            cb.checked = !cb.checked;
+            radio.checked = !radio.checked;
         }
         updateSubmitBtn();
     }
@@ -258,9 +258,9 @@
         document.getElementById('btnSubmitSignal').disabled = (checked.length === 0);
     }
 
-    // Ecouter les changements directement sur les checkboxes aussi
-    document.querySelectorAll('#formSignalement input[name="typesignalement"]').forEach(function(cb) {
-        cb.addEventListener('change', updateSubmitBtn);
+    // Ecouter les changements directement sur les radio buttons aussi
+    document.querySelectorAll('#formSignalement input[name="typesignalement"]').forEach(function(radio) {
+        radio.addEventListener('change', updateSubmitBtn);
     });
 
     // Soumission AJAX
@@ -272,16 +272,13 @@
         btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Envoi...';
 
         var formData = new FormData(form);
-        // Collecter les types coches
-        var checkedTypes = [];
-        document.querySelectorAll('#formSignalement input[name="typesignalement"]:checked').forEach(function(cb) {
-            checkedTypes.push(cb.value);
-        });
+        // Récupérer le type sélectionné (un seul)
+        var selectedType = document.querySelector('#formSignalement input[name="typesignalement"]:checked');
 
         var params = 'idpublication=' + encodeURIComponent(formData.get('idpublication'));
         params += '&description=' + encodeURIComponent(formData.get('description') || '');
-        for (var i = 0; i < checkedTypes.length; i++) {
-            params += '&typesignalement=' + encodeURIComponent(checkedTypes[i]);
+        if (selectedType) {
+            params += '&typesignalement=' + encodeURIComponent(selectedType.value);
         }
 
         fetch(form.action, {
@@ -293,7 +290,7 @@
         .then(function(d) {
             if (d.success) {
                 alert("Merci pour votre signalement. Nous utilisons vos retours pour améliorer la plateforme et détecter les contenus inappropriés.");
-                window.location.href = '<%= ctx %>/page/acceuil.jsp'; // Redirige vers l'accueil
+                window.location.href = '<%= ctx %>/pages/module.jsp?but=accueil.jsp'; // Redirige vers l'accueil
             } else {
                 alert(d.error || 'Erreur inconnue');
                 btn.disabled = false;

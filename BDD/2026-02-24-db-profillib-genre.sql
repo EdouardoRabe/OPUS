@@ -1,5 +1,6 @@
 -- ================================================================
 -- 2026-02-24 : Mise a jour vue profillib avec genre (idgenre + genrelib)
+--              + etatdetail / etatlib depuis historiqueactif
 -- ================================================================
 
 DROP VIEW IF EXISTS profillib;
@@ -43,7 +44,30 @@ SELECT
     u.profile,
     u.idrole,
     u.refuser,
-    u.loginuser
+    u.loginuser,
+    -- Dernier etat detaille depuis historiqueactif
+    COALESCE(
+        (SELECT ha.estactif FROM historiqueactif ha
+         WHERE ha.idutilisateur = CAST(u.refuser AS varchar)
+         ORDER BY ha.daty DESC, ha.id DESC
+         LIMIT 1),
+        CASE WHEN u.estactif = 1 THEN 1 ELSE 0 END
+    ) AS etatdetail,
+    COALESCE(
+        (SELECT
+            CASE
+                WHEN ha.estactif = 0 THEN 'Banni'
+                WHEN ha.estactif = 1 THEN 'Cree'
+                WHEN ha.estactif = 11 THEN 'Valide'
+                WHEN ha.estactif = 100 THEN 'Actif'
+                ELSE 'Inconnu'
+            END
+         FROM historiqueactif ha
+         WHERE ha.idutilisateur = CAST(u.refuser AS varchar)
+         ORDER BY ha.daty DESC, ha.id DESC
+         LIMIT 1),
+        CASE WHEN u.estactif = 1 THEN 'Cree' ELSE 'Banni' END
+    ) AS etatlib
 FROM utilisateur u
     LEFT JOIN profil pr    ON pr.idutilisateur = u.refuser
     LEFT JOIN promotion p  ON p.idpromotion    = pr.idpromotion
@@ -51,4 +75,4 @@ FROM utilisateur u
     LEFT JOIN genre g      ON g.idgenre        = pr.idgenre;
 
 -- Test
-SELECT idprofil, nom, prenom, idgenre, genrelib FROM profillib LIMIT 5;
+SELECT idprofil, nom, prenom, idgenre, genrelib, etatdetail, etatlib FROM profillib LIMIT 5;

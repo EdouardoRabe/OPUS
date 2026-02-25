@@ -1,5 +1,6 @@
 CREATE OR REPLACE VIEW profillib AS
- SELECT pr.idprofil,
+ SELECT 
+    pr.idprofil,
     pr.email,
     pr.nom,
     pr.prenom,
@@ -32,7 +33,7 @@ CREATE OR REPLACE VIEW profillib AS
           ORDER BY ha.daty DESC, ha.id DESC
          LIMIT 1),
         CASE
-            WHEN (u.estactif = 1) THEN 11
+            WHEN (u.estactif = 1) THEN 1
             ELSE 0
         END) AS etatdetail,
     COALESCE(( SELECT
@@ -48,7 +49,7 @@ CREATE OR REPLACE VIEW profillib AS
           ORDER BY ha.daty DESC, ha.id DESC
          LIMIT 1),
         CASE
-            WHEN (u.estactif = 1) THEN 'Valide'::text
+            WHEN (u.estactif = 1) THEN 'Créé'::text
             ELSE 'Banni'::text
         END) AS etatlib,
         pr.idgenre,
@@ -58,3 +59,5 @@ CREATE OR REPLACE VIEW profillib AS
      LEFT JOIN promotion p ON (((p.idpromotion)::text = (pr.idpromotion)::text)))
      LEFT JOIN parcours parc ON (((parc.idparcours)::text = (pr.idparcours)::text)))
      LEFT JOIN genre g ON (((g.idgenre)::text = (pr.idgenre)::text));
+
+select * from profillib;
