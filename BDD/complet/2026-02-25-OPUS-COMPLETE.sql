@@ -934,12 +934,12 @@ VALUES (
     ),
     (
         'MENDYN000006',
-        'Specialites',
+        'Gestion Specialites',
         'bi-tags-fill',
         'module.jsp?but=specialite/specialite-list.jsp',
         2,
         1,
-        'MENDYN000002'
+        'MENDYN000999'
     );
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
 VALUES (
@@ -1071,7 +1071,6 @@ VALUES ('USRM000001', 'MENDYN000001', '*', 0, 'etu'),
     ('USRM000003', 'MENDYN000003', '*', 0, 'etu'),
     ('USRM000004', 'MENDYN000004', '*', 0, 'etu'),
     ('USRM000005', 'MENDYN000005', '*', 0, 'etu'),
-    ('USRM000006', 'MENDYN000006', '*', 0, 'etu'),
     ('USRM000007', 'MENDYN000007', '*', 0, 'etu'),
     ('USRM000008', 'MENDYN000008', '*', 0, 'etu'),
     ('USRM000009', 'MENDYN000009', '*', 0, 'etu'),
@@ -1104,6 +1103,18 @@ VALUES ('USRM000012', 'MENDYN000001', '*', 0, 'md'),
     ('USRM000032', 'MENDYN000016', '*', 0, 'md'),
     ('USRM000034', 'MENDYN000017', '*', 0, 'md'),
     ('USRM000036', 'MENDYN000018', '*', 0, 'md');
+
+-- Sous-menu Reseau Professionnel sous RESEAU (niveau 1)
+INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
+    ('MENDYN000019', 'Reseau pro', 'bi-diagram-3-fill', 'module.jsp?but=alumni/reseau-professionnel.jsp', 3, 1, 'MENDYN000002');
+
+-- Droits role etu
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
+    ('USRM000035', 'MENDYN000019', '*', 0, 'etu');
+
+-- Droits role md
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
+    ('USRM000036', 'MENDYN000019', '*', 0, 'md');
 -- ╔═══════════════════════════════════════════════════════════════════════════════╗
 -- ║ SECTION 16: MISE A JOUR DES SEQUENCES                                         ║
 -- ╚═══════════════════════════════════════════════════════════════════════════════╝
