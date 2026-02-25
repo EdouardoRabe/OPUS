@@ -114,6 +114,35 @@ document.addEventListener('click', function() {
     closeAllReactionBars();
 });
 
+// ========== RAFRAICHIR CARTE PUBLICATION (sans recharger la page) ==========
+function _refreshPublicationCard(idpub) {
+    fetch(CTX + '/pages/alumni/ajax/voir-publication.jsp?idpublication=' + encodeURIComponent(idpub))
+        .then(function(r) { return r.text(); })
+        .then(function(html) {
+            var card = document.getElementById('pub-' + idpub);
+            if (!card) return;
+            var commDiv = document.getElementById('commentaires-' + idpub);
+            var wasCommOpen = commDiv && commDiv.style.display !== 'none';
+            var isInModal = !!card.closest('#pub-fb-details');
+            var temp = document.createElement('div');
+            temp.innerHTML = html;
+            var newCard = temp.querySelector('.fa-post-card');
+            if (!newCard) return;
+            card.parentNode.replaceChild(newCard, card);
+            if (wasCommOpen) {
+                var nc = document.getElementById('commentaires-' + idpub);
+                if (nc) { nc.style.display = 'block'; chargerCommentaires(idpub); }
+            }
+            if (isInModal) {
+                var mg = newCard.querySelector('.fa-media-grid');
+                if (mg) mg.style.display = 'none';
+                newCard.removeAttribute('onclick');
+                newCard.style.cursor = 'default';
+            }
+        })
+        .catch(function(e) { console.error('Erreur refresh card:', e); });
+}
+
 // ========== REACTIONS PUBLICATION ==========
 function toggleReaction(idpub, idreactiontype) {
     fetch(CTX + '/pages/alumni/ajax/reagir-publication.jsp?idpublication=' + encodeURIComponent(idpub) + '&idreactiontype=' + encodeURIComponent(idreactiontype))
@@ -124,9 +153,7 @@ function toggleReaction(idpub, idreactiontype) {
         .then(function(body) {
             try { var data = JSON.parse(body); } catch(e) { alert('Erreur serveur (reaction): ' + body.substring(0, 200)); return; }
             if (data.success) {
-                var url = new URL(window.location.href);
-                url.searchParams.set('scrollTo', 'pub-' + idpub);
-                window.location.href = url.toString();
+                _refreshPublicationCard(idpub);
             } else {
                 alert('Erreur reaction: ' + (data.error || 'Inconnue'));
             }
@@ -814,9 +841,8 @@ function submitShare() {
     .then(function(data) {
         if (data.success) {
             closeShareModal();
-            var url = new URL(window.location.href);
-            url.searchParams.set('scrollTo', 'pub-' + data.idpublication);
-            window.location.href = url.toString();
+            if (typeof Swal !== 'undefined') Swal.fire({toast:true,position:'top-end',icon:'success',title:'Publication partag\u00e9e !',timer:2500,showConfirmButton:false});
+            else alert('Publication partagée !');
         } else {
             btn.disabled = false;
             alert('Erreur lors du partage: ' + (data.error || 'Inconnue'));
