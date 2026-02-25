@@ -379,6 +379,7 @@
             <div class="fu-actions">
                 <% if (!email.isEmpty()) { %><a class="fu-btn fu-btn-primary" href="mailto:<%= h(email) %>"><i class="bi bi-envelope-fill"></i> Contacter</a><% } %>
                 <a class="fu-btn fu-btn-outline" href="<%= _lien %>?but=annuaire/annuaire.jsp"><i class="bi bi-people-fill"></i> Annuaire</a>
+                <button class="fu-btn fu-btn-outline" onclick="fuCopyProfileLink()"><i class="bi bi-link-45deg"></i> Copier le lien</button>
             </div>
         </div>
 
@@ -561,18 +562,42 @@
     </div>
 </div>
 <div id="pub-detail-modal">
-    <div class="pub-detail-box">
-        <div class="pub-detail-header">
-            <h3 class="pub-detail-title">Publication</h3>
-            <button class="rdm-close" onclick="closePublicationDetail()">&times;</button>
+    <div class="pub-fb-box" id="pub-fb-box">
+        <button class="pub-fb-close" onclick="closePublicationDetail()">&times;</button>
+        <div class="pub-fb-media" id="pub-fb-media">
+            <div class="pub-fb-media-content" id="pub-fb-media-content"></div>
+            <button class="pub-fb-nav pub-fb-nav-prev" id="pub-fb-prev" onclick="pubFbNavPrev()"><i class="bi bi-chevron-left"></i></button>
+            <button class="pub-fb-nav pub-fb-nav-next" id="pub-fb-next" onclick="pubFbNavNext()"><i class="bi bi-chevron-right"></i></button>
+            <div class="pub-fb-media-counter" id="pub-fb-counter"></div>
         </div>
-        <div class="pub-detail-body" id="pub-detail-content"></div>
+        <div class="pub-fb-details" id="pub-fb-details">
+            <div style="text-align:center;padding:40px;"><div class="fa-feed-spinner"></div></div>
+        </div>
     </div>
 </div>
 
 <script>
 var CTX = '<%= ctx %>';
 var CURRENT_USER_ID = '<%= myRefuser %>';
+
+/* ── Copier le lien du profil ── */
+function fuCopyProfileLink() {
+    var url = window.location.origin + '<%= request.getContextPath() %>/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp?idprofil=' + encodeURIComponent('<%= h(idprofil) %>');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function() {
+            if (typeof Swal !== 'undefined') Swal.fire({toast:true,position:'top-end',icon:'success',title:'Lien du profil copi\u00e9 !',timer:2000,showConfirmButton:false});
+            else alert('Lien copi\u00e9 !');
+        }).catch(function() { _fuFallbackCopy(url); });
+    } else { _fuFallbackCopy(url); }
+}
+function _fuFallbackCopy(txt) {
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); alert('Lien du profil copi\u00e9 !'); } catch(e) { alert('Impossible de copier'); }
+    document.body.removeChild(ta);
+}
+
 (function() {
     var ctx = '<%= request.getContextPath() %>';
     var fuIdprofil = '<%= h(idprofil) %>';

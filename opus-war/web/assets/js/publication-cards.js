@@ -114,6 +114,35 @@ document.addEventListener('click', function() {
     closeAllReactionBars();
 });
 
+// ========== RAFRAICHIR CARTE PUBLICATION (sans recharger la page) ==========
+function _refreshPublicationCard(idpub) {
+    fetch(CTX + '/pages/alumni/ajax/voir-publication.jsp?idpublication=' + encodeURIComponent(idpub))
+        .then(function(r) { return r.text(); })
+        .then(function(html) {
+            var card = document.getElementById('pub-' + idpub);
+            if (!card) return;
+            var commDiv = document.getElementById('commentaires-' + idpub);
+            var wasCommOpen = commDiv && commDiv.style.display !== 'none';
+            var isInModal = !!card.closest('#pub-fb-details');
+            var temp = document.createElement('div');
+            temp.innerHTML = html;
+            var newCard = temp.querySelector('.fa-post-card');
+            if (!newCard) return;
+            card.parentNode.replaceChild(newCard, card);
+            if (wasCommOpen) {
+                var nc = document.getElementById('commentaires-' + idpub);
+                if (nc) { nc.style.display = 'block'; chargerCommentaires(idpub); }
+            }
+            if (isInModal) {
+                var mg = newCard.querySelector('.fa-media-grid');
+                if (mg) mg.style.display = 'none';
+                newCard.removeAttribute('onclick');
+                newCard.style.cursor = 'default';
+            }
+        })
+        .catch(function(e) { console.error('Erreur refresh card:', e); });
+}
+
 // ========== REACTIONS PUBLICATION ==========
 function toggleReaction(idpub, idreactiontype) {
     fetch(CTX + '/pages/alumni/ajax/reagir-publication.jsp?idpublication=' + encodeURIComponent(idpub) + '&idreactiontype=' + encodeURIComponent(idreactiontype))
@@ -124,9 +153,7 @@ function toggleReaction(idpub, idreactiontype) {
         .then(function(body) {
             try { var data = JSON.parse(body); } catch(e) { alert('Erreur serveur (reaction): ' + body.substring(0, 200)); return; }
             if (data.success) {
-                var url = new URL(window.location.href);
-                url.searchParams.set('scrollTo', 'pub-' + idpub);
-                window.location.href = url.toString();
+                _refreshPublicationCard(idpub);
             } else {
                 alert('Erreur reaction: ' + (data.error || 'Inconnue'));
             }
@@ -814,9 +841,8 @@ function submitShare() {
     .then(function(data) {
         if (data.success) {
             closeShareModal();
-            var url = new URL(window.location.href);
-            url.searchParams.set('scrollTo', 'pub-' + data.idpublication);
-            window.location.href = url.toString();
+            if (typeof Swal !== 'undefined') Swal.fire({toast:true,position:'top-end',icon:'success',title:'Publication partag\u00e9e !',timer:2500,showConfirmButton:false});
+            else alert('Publication partagée !');
         } else {
             btn.disabled = false;
             alert('Erreur lors du partage: ' + (data.error || 'Inconnue'));
@@ -831,28 +857,157 @@ document.addEventListener('click', function(e) {
     if (pdm && e.target === pdm) closePublicationDetail();
 });
 
-// ========== DETAIL PUBLICATION (clic sur partage embarque) ==========
-function openPublicationDetail(idpub) {
+// ========== DETAIL PUBLICATION (Facebook-style modal) ==========
+var _pubFbMedias = [];
+var _pubFbIndex = 0;
+var _pubFbCurrentId = null;
+
+function onPubCardClick(e, idpub) {
+    if (e.target.closest('button, a, input, textarea, select, .fa-post-actions, .fa-comments-zone, .pub-menu, .fa-reaction-bar, .fa-tag-zone, .fa-shared-embed, .fa-media-grid-item, .fa-post-counters')) return;
+    openPublicationDetail(idpub);
+}
+
+function _neutralizeFeedCardIds(idpub) {
+    var feedCard = document.getElementById('pub-' + idpub);
+    if (!feedCard) return;
+    if (feedCard.closest('#pub-fb-details')) return;
+    var els = feedCard.querySelectorAll('[id]');
+    for (var i = 0; i < els.length; i++) {
+        els[i].setAttribute('data-feed-id', els[i].id);
+        els[i].id = '_feed_' + els[i].id;
+    }
+    feedCard.setAttribute('data-feed-id', feedCard.id);
+    feedCard.id = '_feed_' + feedCard.id;
+}
+
+function _restoreFeedCardIds() {
+    var els = document.querySelectorAll('[data-feed-id]');
+    for (var i = 0; i < els.length; i++) {
+        els[i].id = els[i].getAttribute('data-feed-id');
+        els[i].removeAttribute('data-feed-id');
+    }
+}
+
+function openPublicationDetail(idpub, mediaIdx) {
     if (!idpub) return;
+    // If modal is already open for another pub, close cleanly first
+    if (_pubFbCurrentId) {
+        _restoreFeedCardIds();
+        var mc2 = document.getElementById('pub-fb-media-content');
+        if (mc2) { mc2.querySelectorAll('video').forEach(function(v){v.pause();}); mc2.innerHTML = ''; }
+        document.getElementById('pub-fb-details').innerHTML = '';
+    }
     var modal = document.getElementById('pub-detail-modal');
-    var content = document.getElementById('pub-detail-content');
-    content.innerHTML = '<div style="text-align:center;padding:40px;"><div class="fa-feed-spinner"></div></div>';
+    var box   = document.getElementById('pub-fb-box');
+    var details = document.getElementById('pub-fb-details');
+    _pubFbCurrentId = idpub;
+    _pubFbMedias = [];
+    var feedCard = document.getElementById('pub-' + idpub);
+    if (feedCard && !feedCard.closest('#pub-fb-details')) {
+        try { _pubFbMedias = JSON.parse(feedCard.getAttribute('data-medias') || '[]'); } catch(ex){}
+    }
+    _neutralizeFeedCardIds(idpub);
+    if (_pubFbMedias.length > 0) {
+        box.classList.remove('pub-fb-box--no-media');
+        _pubFbIndex = (typeof mediaIdx === 'number' && mediaIdx >= 0 && mediaIdx < _pubFbMedias.length) ? mediaIdx : 0;
+        renderPubFbMedia();
+    } else {
+        box.classList.add('pub-fb-box--no-media');
+    }
+    details.innerHTML = '<div style="text-align:center;padding:40px;"><div class="fa-feed-spinner"></div></div>';
     modal.style.display = 'flex';
     fetch(CTX + '/pages/alumni/ajax/voir-publication.jsp?idpublication=' + encodeURIComponent(idpub))
         .then(function(r) { return r.text(); })
         .then(function(html) {
-            content.innerHTML = html;
+            details.innerHTML = html;
+            var loadedCard = details.querySelector('.fa-post-card');
+            if (_pubFbMedias.length === 0 && loadedCard) {
+                try { _pubFbMedias = JSON.parse(loadedCard.getAttribute('data-medias') || '[]'); } catch(ex){}
+                if (_pubFbMedias.length > 0) {
+                    box.classList.remove('pub-fb-box--no-media');
+                    _pubFbIndex = (typeof mediaIdx === 'number' && mediaIdx >= 0 && mediaIdx < _pubFbMedias.length) ? mediaIdx : 0;
+                    renderPubFbMedia();
+                }
+            }
+            if (_pubFbMedias.length > 0) {
+                var mg = details.querySelector('.fa-media-grid');
+                if (mg) mg.style.display = 'none';
+            }
+            if (loadedCard) {
+                loadedCard.removeAttribute('onclick');
+                loadedCard.style.cursor = 'default';
+            }
+            if (loadedCard) {
+                var pid = loadedCard.id ? loadedCard.id.replace('pub-','') : idpub;
+                var commDiv = document.getElementById('commentaires-' + pid);
+                if (commDiv && commDiv.style.display === 'none') {
+                    commDiv.style.display = 'block';
+                    if (typeof chargerCommentaires === 'function') chargerCommentaires(pid);
+                }
+            }
         })
         .catch(function(e) {
-            content.innerHTML = '<p style="color:red;padding:20px;text-align:center;">Erreur: ' + e + '</p>';
+            details.innerHTML = '<p style="color:red;padding:20px;text-align:center;">Erreur: ' + e + '</p>';
         });
 }
+
+function renderPubFbMedia() {
+    var content = document.getElementById('pub-fb-media-content');
+    var counter = document.getElementById('pub-fb-counter');
+    var prevBtn = document.getElementById('pub-fb-prev');
+    var nextBtn = document.getElementById('pub-fb-next');
+    if (!_pubFbMedias.length) return;
+    var m = _pubFbMedias[_pubFbIndex];
+    if (m.type === 'video') {
+        content.innerHTML = '<video src="' + escHtml(m.url) + '" controls autoplay style="max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;"></video>';
+    } else {
+        content.innerHTML = '<img src="' + escHtml(m.url) + '" alt="Media">';
+    }
+    if (_pubFbMedias.length > 1) {
+        counter.textContent = (_pubFbIndex + 1) + ' / ' + _pubFbMedias.length;
+        counter.style.display = 'block';
+    } else { counter.style.display = 'none'; }
+    prevBtn.classList.toggle('pub-fb-nav--visible', _pubFbIndex > 0);
+    nextBtn.classList.toggle('pub-fb-nav--visible', _pubFbIndex < _pubFbMedias.length - 1);
+}
+
+function pubFbNavPrev() { if (_pubFbIndex > 0) { _pubFbIndex--; renderPubFbMedia(); } }
+function pubFbNavNext() { if (_pubFbIndex < _pubFbMedias.length - 1) { _pubFbIndex++; renderPubFbMedia(); } }
+
 function closePublicationDetail() {
     var modal = document.getElementById('pub-detail-modal');
-    if (modal) {
-        modal.style.display = 'none';
-        document.getElementById('pub-detail-content').innerHTML = '';
+    if (modal) modal.style.display = 'none';
+    var mc = document.getElementById('pub-fb-media-content');
+    if (mc) {
+        mc.querySelectorAll('video').forEach(function(v){v.pause();});
+        mc.innerHTML = '';
     }
+    var det = document.getElementById('pub-fb-details');
+    if (det) det.innerHTML = '';
+    _restoreFeedCardIds();
+    _pubFbCurrentId = null;
+}
+
+// ========== COPIER LIEN PUBLICATION ==========
+function copyPublicationLink(idpub) {
+    var url = window.location.origin + CTX + '/pages/module.jsp?but=accueil.jsp&highlight=' + encodeURIComponent(idpub);
+    _doCopyText(url, 'Lien de la publication copi\u00e9 !');
+}
+function _doCopyText(txt, msg) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).then(function() {
+            if (typeof Swal !== 'undefined') Swal.fire({toast:true,position:'top-end',icon:'success',title:msg,timer:2000,showConfirmButton:false});
+            else alert(msg);
+        }).catch(function() { _fallbackCopy(txt, msg); });
+    } else { _fallbackCopy(txt, msg); }
+}
+function _fallbackCopy(txt, msg) {
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); if (typeof Swal !== 'undefined') Swal.fire({toast:true,position:'top-end',icon:'success',title:msg,timer:2000,showConfirmButton:false}); else alert(msg); }
+    catch(e) { alert('Impossible de copier'); }
+    document.body.removeChild(ta);
 }
 
 // ========== MODALE DETAIL REACTIONS ==========
@@ -936,4 +1091,9 @@ document.addEventListener('click', function(e) {
 });
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') { closeReactionDetails(); closeShareModal(); closePublicationDetail(); }
+    var pdm = document.getElementById('pub-detail-modal');
+    if (pdm && pdm.style.display === 'flex') {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); pubFbNavPrev(); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); pubFbNavNext(); }
+    }
 });
