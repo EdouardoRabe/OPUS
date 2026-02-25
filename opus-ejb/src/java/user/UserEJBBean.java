@@ -363,7 +363,7 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
         HistoriqueLocal rl = null;
 
         try {
-            if (u.getIdrole().compareTo("admin") == 0 || u.getIdrole().compareTo("dg") == 0
+            if (u.getIdrole().compareTo("md") == 0 || u.getIdrole().compareTo("dg") == 0
                     || u.getIdrole().compareTo("adminFacture") == 0) {
                 rl = HistoriqueEJBClient.lookupHistoriqueEJBBeanLocal();
                 int i = rl.deleteUtilisateurs(refuser, u.getTuppleID());
@@ -593,8 +593,9 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             int etatActuel = ua.getEstActif();
 
             if (etatActuel == ConstantEtatUser.etatUtilisateurCreer) {
-                // Utilisateur vient d'etre cree -> on le valide
+                // Utilisateur vient d'etre cree -> on le valide ET on l'active
                 ua.changerActifVers(ConstantEtatUser.etatUtilisateurValider, refUser, c, "Validation utilisateur");
+                ua.changerActifVers(ConstantEtatUser.etatUtilisateurActiver, refUser, c, "Activation utilisateur");
             } else if (etatActuel == ConstantEtatUser.etatUtilisateurBanis) {
                 // Utilisateur banni -> on le reactive
                 ua.changerActifVers(ConstantEtatUser.etatUtilisateurActiver, refUser, c, "Reactivation utilisateur");

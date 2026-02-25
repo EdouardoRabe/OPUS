@@ -15,6 +15,7 @@ public class ProfilLib extends Profil {
     private int refuser;
     private String loginuser;
     private String genrelib;
+    private String idprofil;
 
     public ProfilLib() {
         setNomTable("profillib");
@@ -135,5 +136,11 @@ public class ProfilLib extends Profil {
 
     public void setGenrelib(String genrelib) {
         this.genrelib = genrelib;
+    }
+    public String getIdprofil(){
+        return this.idprofil;
+    }
+    public void setIdprofil(String idprofil){
+        this.idprofil = idprofil;
     }
 }
