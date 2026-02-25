@@ -130,7 +130,7 @@
 
         // Requete ProfilLib
         StringBuilder where = new StringBuilder();
-        where.append(" and nom IS NOT NULL");
+        where.append(" and nom IS NOT NULL and estactif = 1");
 
         if (hasNom) {
             String safe = qNom.trim().replace("'", "''").toLowerCase();

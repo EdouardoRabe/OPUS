@@ -128,7 +128,7 @@
 
         // Requete ProfilLib
         StringBuilder where = new StringBuilder();
-        where.append(" and nom IS NOT NULL");
+        where.append(" and nom IS NOT NULL and estactif = 1");
 
         if (hasSearch) {
             // Recherche multi-mots : chaque mot est recherche dans nom, prenom ou loginuser (OR)
