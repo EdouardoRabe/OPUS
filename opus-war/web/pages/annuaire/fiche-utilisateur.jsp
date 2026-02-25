@@ -375,6 +375,7 @@
             <div class="fu-actions">
                 <% if (!email.isEmpty()) { %><a class="fu-btn fu-btn-primary" href="mailto:<%= h(email) %>"><i class="bi bi-envelope-fill"></i> Contacter</a><% } %>
                 <a class="fu-btn fu-btn-outline" href="<%= _lien %>?but=annuaire/annuaire.jsp"><i class="bi bi-people-fill"></i> Annuaire</a>
+                <button class="fu-btn fu-btn-outline" onclick="fuCopyProfileLink()"><i class="bi bi-link-45deg"></i> Copier le lien</button>
             </div>
         </div>
 
@@ -554,6 +555,25 @@
 <script>
 var CTX = '<%= ctx %>';
 var CURRENT_USER_ID = '<%= myRefuser %>';
+
+/* ── Copier le lien du profil ── */
+function fuCopyProfileLink() {
+    var url = window.location.origin + '<%= request.getContextPath() %>/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp?idprofil=' + encodeURIComponent('<%= h(idprofil) %>');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function() {
+            if (typeof Swal !== 'undefined') Swal.fire({toast:true,position:'top-end',icon:'success',title:'Lien du profil copi\u00e9 !',timer:2000,showConfirmButton:false});
+            else alert('Lien copi\u00e9 !');
+        }).catch(function() { _fuFallbackCopy(url); });
+    } else { _fuFallbackCopy(url); }
+}
+function _fuFallbackCopy(txt) {
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); alert('Lien du profil copi\u00e9 !'); } catch(e) { alert('Impossible de copier'); }
+    document.body.removeChild(ta);
+}
+
 (function() {
     var ctx = '<%= request.getContextPath() %>';
     var fuIdprofil = '<%= h(idprofil) %>';

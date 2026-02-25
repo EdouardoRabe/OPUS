@@ -255,9 +255,26 @@
                 ? _pubCtx + "/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp?idprofil=" + authorIdprofil
                 : "#";
         }
+
+        // Build media JSON for Facebook-style detail modal
+        StringBuffer _mediasJsonSb = new StringBuffer("[");
+        for (int _mi = 0; _mi < medias.length; _mi++) {
+            if (_mi > 0) _mediasJsonSb.append(",");
+            String _miUrl = medias[_mi].getMediaurl();
+            if (_miUrl != null && !_miUrl.startsWith("http")) {
+                _miUrl = _pubCtx + "/UploadDownloadFileServlet?fileName=" + java.net.URLEncoder.encode(_miUrl, "UTF-8");
+            }
+            boolean _miVid = "MDT000002".equals(medias[_mi].getIdmediatype());
+            _mediasJsonSb.append("{\"url\":\"").append(_miUrl.replace("\\","\\\\").replace("\"","\\\"").replace("'","&#39;")).append("\",\"type\":\"")
+                         .append(_miVid ? "video" : "image").append("\"}");
+        }
+        _mediasJsonSb.append("]");
+        String _mediasJson = _mediasJsonSb.toString();
 %>
 <!-- ====== CARD PUBLICATION ====== -->
-<div id="pub-<%= idpub %>" class="fa-post-card<%= idpub.equals(_highlightPub) ? " pub-highlight" : "" %>">
+<div id="pub-<%= idpub %>" class="fa-post-card<%= idpub.equals(_highlightPub) ? " pub-highlight" : "" %>"
+     data-medias='<%= _mediasJson %>'
+     onclick="onPubCardClick(event,'<%= idpub %>')">
 
     <!-- EN-TETE -->
     <div class="fa-post-header">
@@ -275,6 +292,9 @@
                 <div class="pub-menu-dropdown">
                     <button class="pub-menu-item" id="save-btn-<%= idpub %>" onclick="savePublication('<%= idpub %>')">
                         <i class="bi bi-bookmark<%= _isSaved ? "-fill" : "" %>"></i> <%= _isSaved ? "Annuler l'enregistrement" : "Enregistrer" %>
+                    </button>
+                    <button class="pub-menu-item" onclick="event.stopPropagation();copyPublicationLink('<%= idpub %>')">
+                        <i class="bi bi-link-45deg"></i> Copier le lien
                     </button>
                     <% if (pub.getIdutilisateur() == _pubRefuser) { %>
                     <button class="pub-menu-item" onclick="window.location.href='module.jsp?but=publication/publication-modif.jsp&idpublication=<%= idpub %>&from=' + encodeURIComponent(new URLSearchParams(window.location.search).get('but') || 'accueil.jsp')">
@@ -326,7 +346,7 @@
             }
             boolean isVideo = "MDT000002".equals(medias[m].getIdmediatype());
         %>
-            <div class="fa-media-grid-item" onclick="<%= isVideo ? "openVideoZoom('" + mUrl.replace("'","\\\\'") + "')" : "openMediaZoom('" + mUrl.replace("'","\\\\'") + "')" %>">
+            <div class="fa-media-grid-item" onclick="event.stopPropagation();openPublicationDetail('<%= idpub %>',<%= m %>)">
                 <% if (isVideo) { %>
                 <video src="<%= mUrl %>" preload="metadata" muted></video>
                 <span class="fa-media-video-badge"><i class="bi bi-play-fill"></i> Vid&eacute;o</span>

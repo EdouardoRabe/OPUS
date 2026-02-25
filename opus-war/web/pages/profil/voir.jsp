@@ -595,6 +595,10 @@
            style="padding:6px 16px;background:#fff;color:#0a66c2;border:1px solid #0a66c2;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block">
           <i class="fa fa-lock"></i> Confidentialité
         </a>
+        <button onclick="pvCopyProfileLink()"
+           style="padding:6px 16px;background:#fff;color:#0a66c2;border:1px solid #0a66c2;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;">
+          <i class="bi bi-link-45deg"></i> Copier le lien
+        </button>
       </div>
     </div>
   </div>
@@ -1025,6 +1029,24 @@ function pvDeleteSpec(spId) {
 var _statutUrl = "<%= request.getContextPath() %>/pages/profil/ajax/traitement-profilstatut.jsp";
 var _idprofil = "<%= _idprofil %>";
 var _idutilisateur = "<%= uEJB.getUser().getRefuser() %>";
+
+/* ── Copier le lien du profil ── */
+function pvCopyProfileLink() {
+    var url = window.location.origin + "<%= request.getContextPath() %>/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp?idprofil=" + encodeURIComponent(_idprofil);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function() {
+            if (typeof Swal !== 'undefined') Swal.fire({toast:true,position:'top-end',icon:'success',title:'Lien du profil copi\u00e9 !',timer:2000,showConfirmButton:false});
+            else alert('Lien copi\u00e9 !');
+        }).catch(function() { _pvFallbackCopy(url); });
+    } else { _pvFallbackCopy(url); }
+}
+function _pvFallbackCopy(txt) {
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); alert('Lien du profil copi\u00e9 !'); } catch(e) { alert('Impossible de copier le lien'); }
+    document.body.removeChild(ta);
+}
 
 function pvShowStatutForm() {
   document.getElementById("statutSelect").value = "";
