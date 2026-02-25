@@ -23,6 +23,7 @@
     Poste[] allPostes = null;
     ReseauSocial[] allReseaux = null;
     ProfilSocialMedia[] socialMedias = null;
+    ProfilTypeStatut[] allStatutTypes = null;
     String     _erreur = null;
     if (uEJB != null && uEJB.getUser() != null) {
         MapUtilisateur mu = uEJB.getUser();
@@ -51,6 +52,7 @@
             // Listes de référence
             allSpecialites = (Specialite[]) CGenUtil.rechercher(new Specialite(), null, null, conn, " order by libelle");
             allPostes = (Poste[]) CGenUtil.rechercher(new Poste(), null, null, conn, " order by libelle");
+            allStatutTypes = (ProfilTypeStatut[]) CGenUtil.rechercher(new ProfilTypeStatut(), null, null, conn, " order by libelle");
 
             // Chargement des réseaux sociaux disponibles
             allReseaux = (ReseauSocial[]) CGenUtil.rechercher(new ReseauSocial(), null, null, conn, " and actif=1 order by priorite desc");
@@ -76,6 +78,7 @@
     if (allPostes == null) allPostes = new Poste[0];
     if (allReseaux == null) allReseaux = new ReseauSocial[0];
     if (socialMedias == null) socialMedias = new ProfilSocialMedia[0];
+    if (allStatutTypes == null) allStatutTypes = new ProfilTypeStatut[0];
     String _idprofil    = profil != null && profil.getIdprofil()       != null ? profil.getIdprofil()       : "";
     String _nom         = profil != null && profil.getNom()            != null ? profil.getNom()            : "";
     String _prenom      = profil != null && profil.getPrenom()         != null ? profil.getPrenom()         : "";
@@ -552,6 +555,10 @@
            style="padding:6px 16px;background:#0a66c2;color:#fff;border:none;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block">
           Modifier le profil
         </a>
+        <button onclick="pvShowStatutForm()"
+           style="padding:6px 16px;background:#fff;color:#0a66c2;border:1px solid #0a66c2;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;">
+          <i class="bi bi-star-fill"></i> Statut
+        </button>
         <a href="<%= _lien %>?but=profil/confidentialite.jsp"
            style="padding:6px 16px;background:#fff;color:#0a66c2;border:1px solid #0a66c2;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block">
           <i class="fa fa-lock"></i> Confidentialité
@@ -968,6 +975,38 @@ function pvDeleteSpec(spId) {
 }
 
 /* ════════════════════════════════════════
+   STATUT CRUD
+   ════════════════════════════════════════ */
+var _statutUrl = "<%= request.getContextPath() %>/pages/profil/ajax/traitement-profilstatut.jsp";
+var _idprofil = "<%= _idprofil %>";
+var _idutilisateur = "<%= uEJB.getUser().getRefuser() %>";
+
+function pvShowStatutForm() {
+  document.getElementById("statutSelect").value = "";
+  pvOpenModal("modalStatut");
+}
+
+function pvSaveStatut() {
+  var statutId = document.getElementById("statutSelect").value;
+  if (!statutId) { alert("Veuillez sélectionner un statut"); return; }
+
+  var data = new URLSearchParams();
+  data.append("action", "update");
+  data.append("idprofil", _idprofil);
+  data.append("idprofiltypestatut", statutId);
+
+  fetch(_statutUrl, { method: "POST", body: data,
+    headers: {"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","X-Requested-With":"XMLHttpRequest"}
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.success) { pvCloseModal("modalStatut"); location.reload(); }
+    else alert("Erreur : " + d.error);
+  })
+  .catch(function(e) { alert("Erreur réseau : " + e); });
+}
+
+/* ════════════════════════════════════════
    SOCIAL MEDIA CRUD
    ════════════════════════════════════════ */
 var _socialUrl = "<%= request.getContextPath() %>/pages/profil/ajax/traitement-socialmedia.jsp";
@@ -1096,6 +1135,26 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script src="<%= request.getContextPath() %>/assets/js/publication-cards.js"></script>
+
+<!-- Modal : Changer le Profil Statut -->
+<div class="pv-modal-overlay" id="modalStatut">
+  <div class="pv-modal">
+    <h3>Modifier le statut</h3>
+    <label>Statut</label>
+    <select id="statutSelect" style="width:100%;">
+      <option value=""  >Sélectionnez un statut...</option>
+      <% for (int i = 0; i < allStatutTypes.length; i++) {
+          ProfilTypeStatut pts = allStatutTypes[i];
+      %>
+      <option value="<%= pts.getIdprofiltypestatut() %>"><%= pts.getLibelle() %></option>
+      <% } %>
+    </select>
+    <div class="pv-modal-footer">
+      <button class="pv-btn-cancel" onclick="pvCloseModal('modalStatut')">Annuler</button>
+      <button class="pv-btn-save" onclick="pvSaveStatut()">Enregistrer</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════ MODALS ═══════════════ -->
 <style>
