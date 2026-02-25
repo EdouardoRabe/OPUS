@@ -93,11 +93,13 @@
             visLier      = request.getParameter("vis_lier");
         }
 
-        if (description == null || description.trim().isEmpty()) {
-            session.setAttribute("pubErreur", "Le texte de la publication ne peut pas etre vide.");
+        boolean hasMedia = (mediaItems != null && mediaItems.size() > 0);
+        if ((description == null || description.trim().isEmpty()) && !hasMedia) {
+            session.setAttribute("pubErreur", "Veuillez ajouter un texte ou un fichier media.");
             response.sendRedirect(redirectUrl);
             return;
         }
+        if (description == null) description = "";
         if (idtypepublication == null || idtypepublication.trim().isEmpty()) {
             idtypepublication = "TPB000001";
         }
