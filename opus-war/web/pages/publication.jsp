@@ -225,9 +225,18 @@
                     <button class="pub-menu-item" onclick="savePublication('<%= idpub %>')">
                         <i class="bi bi-bookmark"></i> Enregistrer
                     </button>
+                    <% if (pub.getIdutilisateur() == _pubRefuser) { %>
+                    <button class="pub-menu-item" onclick="window.location.href='module.jsp?but=publication/publication-modif.jsp&idpublication=<%= idpub %>'">
+                        <i class="bi bi-pencil"></i> Modifier
+                    </button>
+                    <button class="pub-menu-item" onclick="deletePublication('<%= idpub %>')">
+                        <i class="bi bi-trash"></i> Supprimer
+                    </button>
+                    <% } else { %>
                     <button class="pub-menu-item" onclick="reportPublication('<%= idpub %>')">
                         <i class="bi bi-flag"></i> Signaler
                     </button>
+                    <% } %>
                 </div>
             </div>
             <div class="fa-post-author">
