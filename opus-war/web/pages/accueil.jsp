@@ -768,7 +768,8 @@
             <!-- Formulaire complet (masqué par défaut) -->
             <div class="fa-composer-full" id="composer-full" style="display:none;">
                 <form method="POST" enctype="multipart/form-data" id="form-pub"
-                      action="<%= ctx %>/pages/alumni/ajax/creer-publication.jsp">
+                      action="<%= ctx %>/pages/alumni/ajax/creer-publication.jsp"
+                      onsubmit="return validatePubFormSize()">
                     <div class="fa-composer-header">
                         <div class="fa-avatar fa-avatar--md"<%= !_connPhotoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>><% if (!_connPhotoUrl.isEmpty()) { %><img src="<%= _connPhotoUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initialConnecte %><% } %></div>
                         <div>
@@ -2028,15 +2029,26 @@
     }
     // ========== COMPOSER MULTI-MEDIA PREVIEW ==========
     var _composerFiles = []; // {file, url, type}
+    var _MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 Mo
     function previewComposerMedia(input) {
         if (!input.files || input.files.length === 0) return;
+        var rejected = [];
         for (var i = 0; i < input.files.length; i++) {
             var f = input.files[i];
+            if (f.size > _MAX_FILE_SIZE) {
+                var sizeMB = (f.size / (1024 * 1024)).toFixed(1);
+                rejected.push(f.name + ' (' + sizeMB + ' Mo)');
+                continue;
+            }
             var isVideo = f.type && f.type.startsWith('video/');
             _composerFiles.push({file: f, url: URL.createObjectURL(f), type: isVideo ? 'video' : 'image'});
         }
+        if (rejected.length > 0) {
+            Swal.fire({icon:'error', title:'Fichier trop volumineux',
+                html:'La taille maximale autoris\u00e9e est de 50 Mo.<br>' + rejected.join('<br>'),
+                confirmButtonColor:'#1877f2'});
+        }
         renderComposerMediaGrid();
-        // Rebuild the file input's files from _composerFiles
         syncComposerFileInput();
     }
     function renderComposerMediaGrid() {
@@ -2098,6 +2110,26 @@
         if (inp) inp.value = '';
         document.getElementById('composer-img-preview').style.display = 'none';
         document.getElementById('composer-media-grid').innerHTML = '';
+    }
+    // ========== VALIDATION TAILLE FICHIER ==========
+    function validatePubFormSize() {
+        var totalSize = 0;
+        for (var i = 0; i < _composerFiles.length; i++) {
+            if (_composerFiles[i].file.size > _MAX_FILE_SIZE) {
+                Swal.fire({icon:'error', title:'Fichier trop volumineux',
+                    text:_composerFiles[i].file.name + ' d\u00e9passe la limite de 50 Mo.',
+                    confirmButtonColor:'#1877f2'});
+                return false;
+            }
+            totalSize += _composerFiles[i].file.size;
+        }
+        if (totalSize > _MAX_FILE_SIZE) {
+            Swal.fire({icon:'error', title:'Fichiers trop volumineux',
+                text:'La taille totale (' + (totalSize / (1024*1024)).toFixed(1) + ' Mo) d\u00e9passe la limite de 50 Mo.',
+                confirmButtonColor:'#1877f2'});
+            return false;
+        }
+        return true;
     }
     // ========== MENU PUBLICATION (3 points) ==========
     function togglePubMenu(btn, e) {
