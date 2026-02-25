@@ -271,8 +271,24 @@
         padding: 4px 0; font-family: inherit; min-height: 80px;
     }
     .fa-composer-textarea::placeholder { color: var(--fa-text-secondary); }
-    .fa-img-preview-wrap { position: relative; margin: 8px 0; display: inline-block; }
-    .fa-img-preview { max-width: 100%; max-height: 300px; border-radius: 8px; display: block; }
+    .fa-img-preview-wrap { position: relative; margin: 8px 0; }
+    .fa-media-preview-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; border-radius: 8px; overflow: hidden; }
+    .fa-media-preview-grid.count-1 { grid-template-columns: 1fr; }
+    .fa-media-preview-grid.count-1 .fa-media-preview-item img,
+    .fa-media-preview-grid.count-1 .fa-media-preview-item video { max-height: 300px; }
+    .fa-media-preview-item { position: relative; overflow: hidden; }
+    .fa-media-preview-item img, .fa-media-preview-item video { width: 100%; height: 150px; object-fit: cover; display: block; }
+    .fa-media-preview-grid.count-1 .fa-media-preview-item img,
+    .fa-media-preview-grid.count-1 .fa-media-preview-item video { height: auto; max-height: 300px; }
+    .fa-media-preview-grid.count-3 .fa-media-preview-item:first-child { grid-column: 1 / -1; }
+    .fa-media-preview-grid.count-3 .fa-media-preview-item:first-child img,
+    .fa-media-preview-grid.count-3 .fa-media-preview-item:first-child video { height: 200px; }
+    .fa-media-preview-remove {
+        position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,.6);
+        border: none; color: #fff; border-radius: 50%; width: 24px; height: 24px;
+        cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; z-index: 2;
+    }
+    .fa-media-preview-video-badge { position: absolute; bottom: 6px; left: 6px; background: rgba(0,0,0,.6); color: #fff; border-radius: 4px; padding: 2px 6px; font-size: 11px; z-index: 2; }
     .fa-img-remove-btn {
         position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,.6);
         border: none; color: #fff; border-radius: 50%; width: 28px; height: 28px;
@@ -316,6 +332,19 @@
     .fa-post-text { font-size: 15px; color: var(--fa-text); line-height: 1.5; margin: 0 0 8px; }
     .fa-post-media { margin: 0; }
     .fa-post-img { width: 100%; max-height: 500px; object-fit: cover; display: block; cursor: zoom-in; }
+    .fa-post-video { width: 100%; max-height: 500px; display: block; border-radius: 0; background: #000; }
+    .fa-media-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; }
+    .fa-media-grid.grid-1 { grid-template-columns: 1fr; }
+    .fa-media-grid.grid-1 .fa-media-grid-item img,
+    .fa-media-grid.grid-1 .fa-media-grid-item video { max-height: 500px; }
+    .fa-media-grid.grid-3 .fa-media-grid-item:first-child { grid-column: 1 / -1; }
+    .fa-media-grid-item { position: relative; overflow: hidden; cursor: pointer; }
+    .fa-media-grid-item img { width: 100%; height: 250px; object-fit: cover; display: block; }
+    .fa-media-grid-item video { width: 100%; height: 250px; object-fit: cover; display: block; background: #000; }
+    .fa-media-grid.grid-1 .fa-media-grid-item img { height: auto; }
+    .fa-media-grid.grid-1 .fa-media-grid-item video { height: auto; }
+    .fa-media-grid-overlay { position: absolute; inset: 0; background: rgba(0,0,0,.5); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 28px; font-weight: 700; }
+    .fa-media-video-badge { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,.65); color: #fff; border-radius: 4px; padding: 3px 8px; font-size: 12px; pointer-events: none; }
     .fa-post-counters { display: flex; align-items: center; justify-content: space-between; padding: 6px 16px; font-size: 13px; color: var(--fa-text-secondary); min-height: 28px; }
     .fa-counter { display: flex; align-items: center; gap: 4px; }
     .fa-counter--link { cursor: pointer; }
@@ -670,8 +699,7 @@
                     <textarea name="description" class="fa-composer-textarea" rows="4"
                               placeholder="Quoi de neuf, <%= nomConnecte %> ?"></textarea>
                     <div id="composer-img-preview" style="display:none;" class="fa-img-preview-wrap">
-                        <img id="composer-img-previewImg" src="" class="fa-img-preview" alt="apercu">
-                        <button type="button" class="fa-img-remove-btn" onclick="removeComposerImg()"><i class="bi bi-x-lg"></i></button>
+                        <div id="composer-media-grid" class="fa-media-preview-grid count-0"></div>
                     </div>
                     <!-- Zone identification -->
                     <div class="fa-composer-tags-area">
@@ -738,8 +766,8 @@
                     <div class="fa-composer-footer">
                         <label class="fa-attach-btn">
                             <i class="bi bi-image"></i>&nbsp;Photo/Vid&eacute;o
-                            <input type="file" id="composer-img-input" name="image" accept="image/*" style="display:none;"
-                                   onchange="previewComposerImg(this)">
+                            <input type="file" id="composer-img-input" name="media" accept="image/*,video/mp4" multiple style="display:none;"
+                                   onchange="previewComposerMedia(this)">
                         </label>
                         <div class="fa-composer-submit-group">
                             <button type="button" class="fa-btn-cancel" onclick="closeComposer()">Annuler</button>
@@ -767,6 +795,7 @@
                 Map userNames = new HashMap();
                 Map userPhotos = new HashMap();
                 Map userProfils = new HashMap();
+                Map userBanned = new HashMap();
                 if (allProfils != null) {
                     for (int i = 0; i < allProfils.length; i++) {
                         Integer _key = new Integer(allProfils[i].getIdutilisateur());
@@ -775,6 +804,8 @@
                             userPhotos.put(_key, ctx + "/" + allProfils[i].getPhotoProfil().trim());
                         if (allProfils[i].getIdprofil() != null)
                             userProfils.put(_key, allProfils[i].getIdprofil());
+                        if (allProfils[i].getEstactif() == 0)
+                            userBanned.put(_key, Boolean.TRUE);
                     }
                 }
 
@@ -805,7 +836,7 @@
                     + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE') OR " + _vsSpecExist + ")"
                     + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PROMOTION') OR " + _vsPromoExist + ")"
                     + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PARCOURS') OR " + _vsParcExist + ")))"; 
-                String _initSql = "SELECT p.idpublication,(" + _sE + ") AS score FROM publication p WHERE p.etat=1" + _visW + " ORDER BY score DESC,p.idpublication DESC LIMIT 10";
+                String _initSql = "SELECT p.idpublication,(" + _sE + ") AS score FROM publication p WHERE p.etat=1 AND p.idutilisateur NOT IN (SELECT refuser FROM utilisateur WHERE estactif = 0)" + _visW + " ORDER BY score DESC,p.idpublication DESC LIMIT 10";
                 List _pids = new ArrayList(); List _pscores = new ArrayList();
                 Statement _st = null; ResultSet _rs = null;
                 try {
@@ -828,6 +859,7 @@
                 request.setAttribute("_pub_userNames", userNames);
                 request.setAttribute("_pub_userPhotos", userPhotos);
                 request.setAttribute("_pub_userProfils", userProfils);
+                request.setAttribute("_pub_userBanned", userBanned);
                 request.setAttribute("_pub_reactTypes", reactTypes);
                 request.setAttribute("_pub_typesPub", typesPub);
                 request.setAttribute("_pub_refuser", new Integer(refuserConnecte));
@@ -1346,6 +1378,16 @@
                     var html = '';
                     html += '<div id="comm-' + c.id + '" class="fa-comment-item' + replyClass + '">';
                     html += '<div class="fa-comment-inner">';
+
+                    if (c.banned) {
+                        // Utilisateur banni — avatar generique, pas de lien
+                        html += '<div class="fa-avatar fa-avatar--xs" style="background:#ccc;color:#888;cursor:default;"><i class="bi bi-person-slash" style="font-size:0.8em;"></i></div>';
+                        html += '<div class="fa-comment-content">';
+                        html += '<div class="fa-comment-bubble">';
+                        html += '<span class="fa-comment-author" style="color:#888;cursor:default;"><i class="bi bi-person-slash"></i> ' + escHtml(c.auteur) + '</span>';
+                        html += '<span class="fa-comment-text">' + formatMentions(c.description) + '</span>';
+                        html += '</div>';
+                    } else {
                     var profileUrl;
                     if (c.idutilisateur === data.refuser) {
                         // C'est mon commentaire, aller vers mon profil
@@ -1380,6 +1422,7 @@
                     }
                     html += '<span class="fa-comment-text">' + formatMentions(c.description) + '</span>';
                     html += '</div>';
+                    } // fin else (non banni)
 
                     // Calcul total reactions + lib de ma reaction (c.reactions est maintenant un tableau trié)
                     var totalCReact = 0;
@@ -1870,20 +1913,78 @@
         var ta = document.querySelector('#composer-full textarea[name="description"]');
         if (ta) ta.value = '';
     }
-    function previewComposerImg(input) {
-        if (!input.files || !input.files[0]) return;
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('composer-img-previewImg').src = e.target.result;
-            document.getElementById('composer-img-preview').style.display = 'block';
-        };
-        reader.readAsDataURL(input.files[0]);
+    // ========== COMPOSER MULTI-MEDIA PREVIEW ==========
+    var _composerFiles = []; // {file, url, type}
+    function previewComposerMedia(input) {
+        if (!input.files || input.files.length === 0) return;
+        for (var i = 0; i < input.files.length; i++) {
+            var f = input.files[i];
+            var isVideo = f.type && f.type.startsWith('video/');
+            _composerFiles.push({file: f, url: URL.createObjectURL(f), type: isVideo ? 'video' : 'image'});
+        }
+        renderComposerMediaGrid();
+        // Rebuild the file input's files from _composerFiles
+        syncComposerFileInput();
+    }
+    function renderComposerMediaGrid() {
+        var grid = document.getElementById('composer-media-grid');
+        var wrap = document.getElementById('composer-img-preview');
+        grid.innerHTML = '';
+        grid.className = 'fa-media-preview-grid count-' + _composerFiles.length;
+        if (_composerFiles.length === 0) { wrap.style.display = 'none'; return; }
+        wrap.style.display = 'block';
+        for (var i = 0; i < _composerFiles.length; i++) {
+            var item = document.createElement('div');
+            item.className = 'fa-media-preview-item';
+            if (_composerFiles[i].type === 'video') {
+                var vid = document.createElement('video');
+                vid.src = _composerFiles[i].url;
+                vid.muted = true;
+                vid.preload = 'metadata';
+                item.appendChild(vid);
+                var badge = document.createElement('span');
+                badge.className = 'fa-media-preview-video-badge';
+                badge.innerHTML = '<i class="bi bi-play-fill"></i> Vid\u00e9o';
+                item.appendChild(badge);
+            } else {
+                var img = document.createElement('img');
+                img.src = _composerFiles[i].url;
+                item.appendChild(img);
+            }
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'fa-media-preview-remove';
+            btn.innerHTML = '<i class="bi bi-x-lg"></i>';
+            btn.setAttribute('data-idx', i);
+            btn.onclick = function(){ removeComposerMediaItem(parseInt(this.getAttribute('data-idx'))); };
+            item.appendChild(btn);
+            grid.appendChild(item);
+        }
+    }
+    function removeComposerMediaItem(idx) {
+        if (idx >= 0 && idx < _composerFiles.length) {
+            URL.revokeObjectURL(_composerFiles[idx].url);
+            _composerFiles.splice(idx, 1);
+        }
+        renderComposerMediaGrid();
+        syncComposerFileInput();
+    }
+    function syncComposerFileInput() {
+        // Rebuild the file input using DataTransfer
+        var inp = document.getElementById('composer-img-input');
+        var dt = new DataTransfer();
+        for (var i = 0; i < _composerFiles.length; i++) {
+            dt.items.add(_composerFiles[i].file);
+        }
+        inp.files = dt.files;
     }
     function removeComposerImg() {
+        for (var i = 0; i < _composerFiles.length; i++) URL.revokeObjectURL(_composerFiles[i].url);
+        _composerFiles = [];
         var inp = document.getElementById('composer-img-input');
         if (inp) inp.value = '';
         document.getElementById('composer-img-preview').style.display = 'none';
-        document.getElementById('composer-img-previewImg').src = '';
+        document.getElementById('composer-media-grid').innerHTML = '';
     }
     // ========== MENU PUBLICATION (3 points) ==========
     function togglePubMenu(btn, e) {
@@ -1913,6 +2014,19 @@
         overlay.appendChild(img);
         overlay.addEventListener('click', function(){ document.body.removeChild(overlay); });
         document.addEventListener('keydown', function esc(e){ if(e.key==='Escape'){ document.body.removeChild(overlay); document.removeEventListener('keydown',esc); } });
+        document.body.appendChild(overlay);
+    }
+    function openVideoZoom(src) {
+        var overlay = document.createElement('div');
+        overlay.className = 'fa-media-overlay';
+        overlay.style.cursor = 'default';
+        var vid = document.createElement('video');
+        vid.src = src; vid.controls = true; vid.autoplay = true;
+        vid.style.maxWidth = '92vw'; vid.style.maxHeight = '92vh'; vid.style.borderRadius = '4px';
+        vid.addEventListener('click', function(e){ e.stopPropagation(); });
+        overlay.appendChild(vid);
+        overlay.addEventListener('click', function(){ vid.pause(); document.body.removeChild(overlay); });
+        document.addEventListener('keydown', function esc(e){ if(e.key==='Escape'){ vid.pause(); document.body.removeChild(overlay); document.removeEventListener('keydown',esc); } });
         document.body.appendChild(overlay);
     }
 

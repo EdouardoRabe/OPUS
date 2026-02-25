@@ -4,6 +4,8 @@
 <%@ page import="bean.CGenUtil" %>
 <%@ page import="utilitaire.UtilDB" %>
 <%@ page import="alumni.ProfilLib" %>
+<%@ page import="alumni.ProfilStatut" %>
+<%@ page import="alumni.ProfilTypeStatut" %>
 <%@ page import="alumni.ExperienceLib" %>
 <%@ page import="alumni.Visibilite" %>
 <%@ page import="alumni.Specialite" %>
@@ -58,6 +60,10 @@
     Map champVis = new HashMap(); // champ -> status
     List specLabels = new ArrayList(); // specialite libelles
     String _erreur = null;
+    
+    // Statut du profil
+    String _statutColor = "#0a66c2"; // couleur par défaut
+    String _statutLibelle = "";
 
     Connection conn = null;
     try {
@@ -70,6 +76,17 @@
         if (res != null && res.length > 0) profil = res[0];
 
         if (profil != null) {
+            /* --- Redirect si l'utilisateur est banni --- */
+            if (profil.getEstactif() == 0) {
+%>
+<script>
+    alert("Ce profil n'est plus disponible");
+    window.location.href = "<%= ctx %>/pages/module.jsp?but=accueil.jsp";
+</script>
+<%
+                return;
+            }
+
             /* --- Redirect si c'est son propre profil --- */
             if (profil.getRefuser() == myRefuser) {
 %>
@@ -119,6 +136,32 @@
                 ProfilSocialMedia smf = new ProfilSocialMedia();
                 smf.setIdprofil(idprofil);
                 socialMedias = (ProfilSocialMedia[]) CGenUtil.rechercher(smf, null, null, conn, "");
+            }
+            
+            // Charger le statut du profil
+            try {
+                ProfilStatut psFiltre = new ProfilStatut();
+                psFiltre.setIdprofil(idprofil);
+                Object[] psRes = CGenUtil.rechercher(psFiltre, null, null, conn, " order by daty desc limit 1");
+                if (psRes != null && psRes.length > 0) {
+                    ProfilStatut ps = (ProfilStatut) psRes[0];
+                    if (ps.getIdprofiltypestatut() != null) {
+                        ProfilTypeStatut ptsFiltre = new ProfilTypeStatut();
+                        ptsFiltre.setIdprofiltypestatut(ps.getIdprofiltypestatut());
+                        Object[] ptsRes = CGenUtil.rechercher(ptsFiltre, null, null, conn, "");
+                        if (ptsRes != null && ptsRes.length > 0) {
+                            ProfilTypeStatut pts = (ProfilTypeStatut) ptsRes[0];
+                            if (pts.getCouleur() != null && !pts.getCouleur().isEmpty()) {
+                                _statutColor = pts.getCouleur();
+                            }
+                            if (pts.getLibelle() != null) {
+                                _statutLibelle = pts.getLibelle();
+                            }
+                        }
+                    }
+                }
+            } catch (Exception estatut) {
+                System.err.println("fiche-utilisateur.jsp - erreur chargement statut: " + estatut.getMessage());
             }
         }
     } catch (Exception e) {
@@ -225,6 +268,7 @@
 /* Avatar */
 .fu-avatar-wrap{display:inline-block;margin-top:-60px;margin-left:32px;position:relative;z-index:1}
 .fu-avatar{width:120px;height:120px;border-radius:50%;border:4px solid #fff;box-shadow:0 2px 12px rgba(0,0,0,.25);background:#0a66c2;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;color:#fff;overflow:hidden;line-height:1}
+.fu-avatar--with-status{box-shadow:0 0 0 3px var(--fu-status-color, #0a66c2), 0 2px 12px rgba(0,0,0,.25)}
 .fu-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 
 /* Top */
@@ -310,8 +354,8 @@
         </div>
 
         <!-- Avatar -->
-        <div class="fu-avatar-wrap">
-            <div class="fu-avatar"<%= !photoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>>
+        <div class="fu-avatar-wrap" style="--fu-status-color: <%= _statutColor %>;">
+            <div class="fu-avatar fu-avatar--with-status"<%= !photoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %> title="<%= _statutLibelle %>">
                 <% if (!photoUrl.isEmpty()) { %><img src="<%= h(photoUrl) %>" alt="<%= h(displayName) %>"><% } else { %><%= initials %><% } %>
             </div>
         </div>
