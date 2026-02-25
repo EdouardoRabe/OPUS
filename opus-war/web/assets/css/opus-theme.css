@@ -509,6 +509,10 @@ a:focus {
     color: var(--itu-lime, #b2d235) !important;
 }
 
+.topnav-logo {
+    background: transparent !important;
+}
+
 /* Liens de navigation */
 .alumni-topnav .topnav-link,
 .alumni-topnav .nav-link {
@@ -615,4 +619,8 @@ a:focus {
 }
 ::-webkit-scrollbar-thumb:hover {
     background: #283a97;
+}
+
+.topnav-search {
+    height: 40px !important;
 }

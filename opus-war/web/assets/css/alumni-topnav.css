@@ -83,7 +83,6 @@
 .topnav-logo {
   width: 52px;
   height: 52px;
-  background: linear-gradient(135deg, var(--itu-violet), var(--itu-blue));
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -112,8 +111,11 @@
 
 .topnav-search-wrap {
   position: relative;
-  flex: 0 1 clamp(160px, 16vw, 260px);
-  min-width: 130px;
+  flex: 0 1 clamp(120px, 12vw, 200px);
+  min-width: 100px;
+  align-self: center;
+  display: flex;
+  align-items: center;
 }
 .topnav-search-wrap i {
   position: absolute;
@@ -130,7 +132,7 @@
   color: var(--gray-500); font-size: 0.82rem; pointer-events: none;
 }
 .topnav-search {
-  height: 52px;
+  height: 40px !important;
   width: 100%;
   background: #f8fbff;
   border: 1.5px solid #dce9ff;
@@ -525,7 +527,7 @@
 /* ═══ RESPONSIVE ═══ */
 @media (max-width: 1100px) {
   .topnav-main-row { gap: 0.65rem; }
-  .topnav-search-wrap { flex-basis: 180px; }
+  .topnav-search-wrap { flex-basis: 140px; }
   .topnav-link { min-width: 60px; padding: 0 0.55rem; font-size: 0.68rem; }
 }
 @media (max-width: 768px) {

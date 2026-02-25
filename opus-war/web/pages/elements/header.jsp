@@ -197,7 +197,7 @@
         <input value="recherche-global.jsp" name="but" type="hidden">
         <div class="topnav-search-container">
           <i class="bi bi-search"></i>
-          <input class="topnav-search" type="text" name="q" placeholder="Rechercher...">
+          <input class="topnav-search" style="heigth: 42px !important;" type="text" name="q" placeholder="Rechercher...">
         </div>
       </form>
     </div>
