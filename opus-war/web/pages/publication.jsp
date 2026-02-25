@@ -71,6 +71,7 @@
     Map _pubUserNames             = (Map) request.getAttribute("_pub_userNames");
     Map _pubUserPhotos            = (Map) request.getAttribute("_pub_userPhotos");
     Map _pubUserProfils           = (Map) request.getAttribute("_pub_userProfils");
+    Map _pubUserBanned            = (Map) request.getAttribute("_pub_userBanned");
     Reactiontype[] _pubReactTypes = (Reactiontype[]) request.getAttribute("_pub_reactTypes");
     Typepublication[] _pubTypesPub = (Typepublication[]) request.getAttribute("_pub_typesPub");
     int _pubRefuser               = ((Integer) request.getAttribute("_pub_refuser")).intValue();
@@ -84,6 +85,7 @@
     if (_pubUserNames == null) _pubUserNames = new HashMap();
     if (_pubUserPhotos == null) _pubUserPhotos = new HashMap();
     if (_pubUserProfils == null) _pubUserProfils = new HashMap();
+    if (_pubUserBanned == null) _pubUserBanned = new HashMap();
     if (_pubReactTypes == null) _pubReactTypes = new Reactiontype[0];
     if (_pubTypesPub == null) _pubTypesPub = new Typepublication[0];
     if (_pubInitialConnecte == null) _pubInitialConnecte = "U";
@@ -117,11 +119,16 @@
         String auteur = (String) _pubUserNames.get(new Integer(pub.getIdutilisateur()));
         if (auteur == null) auteur = "Utilisateur";
 
+        // Verification si l'auteur est banni
+        boolean _authorBanned = _pubUserBanned.containsKey(new Integer(pub.getIdutilisateur()));
+        if (_authorBanned) { auteur = "Utilisateur indisponible"; }
+
         // Initiales auteur
         String[] _partsA = auteur.trim().split("\\s+");
         String initA = String.valueOf(Character.toUpperCase(_partsA[0].charAt(0)));
         if (_partsA.length > 1) initA += Character.toUpperCase(_partsA[_partsA.length - 1].charAt(0));
         String _authorPhoto = (String) _pubUserPhotos.get(new Integer(pub.getIdutilisateur()));
+        if (_authorBanned) { _authorPhoto = null; }
 
         // --- Medias ---
         Media[] medias = (Media[]) CGenUtil.rechercher(
@@ -194,6 +201,7 @@
         // ---- Publication partagee : charger la pub originale ----
         boolean isSharedPost = pub.getIdpuborigine() != null && !pub.getIdpuborigine().trim().isEmpty();
         String origDesc = "", origAuteur = "", origDate = "", origMediaUrl = "", origTypePubLib2 = "";
+        boolean origIsVideo = false;
         String origIdpuborigine = isSharedPost ? pub.getIdpuborigine().trim() : "";
         if (isSharedPost) {
             Publication[] origPubs = (Publication[]) CGenUtil.rechercher(
@@ -219,6 +227,7 @@
                 if (om2 != null && om2.length > 0 && om2[0].getMediaurl() != null) {
                     String omu = om2[0].getMediaurl();
                     origMediaUrl = omu.startsWith("http") ? omu : _pubCtx + "/UploadDownloadFileServlet?fileName=" + java.net.URLEncoder.encode(omu, "UTF-8");
+                    origIsVideo = "MDT000002".equals(om2[0].getIdmediatype());
                 }
             } else { isSharedPost = false; } // pub originale supprimee
         }
@@ -239,7 +248,9 @@
         // URL profil auteur
         String authorIdprofil = (String) _pubUserProfils.get(new Integer(pub.getIdutilisateur()));
         String profileUrl;
-        if (pub.getIdutilisateur() == _pubRefuser) {
+        if (_authorBanned) {
+            profileUrl = "javascript:void(0)";
+        } else if (pub.getIdutilisateur() == _pubRefuser) {
             profileUrl = _pubCtx + "/pages/module.jsp?but=profil/voir.jsp";
         } else {
             profileUrl = authorIdprofil != null && !authorIdprofil.isEmpty()
@@ -252,9 +263,13 @@
 
     <!-- EN-TETE -->
     <div class="fa-post-header">
+        <% if (_authorBanned) { %>
+        <div class="fa-avatar fa-avatar--md" style="cursor:default;background:#ccc;color:#888;"><i class="bi bi-person-slash" style="font-size:1.2em;"></i></div>
+        <% } else { %>
         <a href="<%= profileUrl %>" style="text-decoration:none;cursor:pointer;">
             <div class="fa-avatar fa-avatar--md" style="<%= _authorPhoto != null ? "background:transparent;" : "" %>cursor:pointer;"><% if (_authorPhoto != null) { %><img src="<%= _authorPhoto %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initA %><% } %></div>
         </a>
+        <% } %>
         <div class="fa-post-meta">
             <!-- Menu 3 points -->
             <div class="pub-menu">
@@ -278,9 +293,13 @@
                 </div>
             </div>
             <div class="fa-post-author">
+                <% if (_authorBanned) { %>
+                <strong style="color:#888;cursor:default;"><i class="bi bi-person-slash"></i> <%= auteur %></strong>
+                <% } else { %>
                 <a href="<%= profileUrl %>" style="text-decoration:none;color:inherit;cursor:pointer;">
                     <strong style="cursor:pointer;"><%= auteur %></strong>
                 </a>
+                <% } %>
                 <% if (!taggedNames.isEmpty()) { %>
                 <span class="fa-post-with">avec <strong><%= taggedNames %></strong></span>
                 <% } %>
@@ -297,14 +316,28 @@
         <% if (descSafe != null && !descSafe.isEmpty()) { %>
         <p class="fa-post-text"><%= descSafe %></p>
         <% } %>
-        <% for (int m = 0; m < medias.length; m++) {
+        <% if (medias.length > 0) {
+            int showCount = medias.length > 4 ? 4 : medias.length;
+            int extraCount = medias.length - 4;
+        %>
+        <div class="fa-media-grid grid-<%= medias.length >= 4 ? 4 : medias.length %>">
+        <% for (int m = 0; m < showCount; m++) {
             String mUrl = medias[m].getMediaurl();
             if (mUrl != null && !mUrl.startsWith("http")) {
                 mUrl = _pubCtx + "/UploadDownloadFileServlet?fileName=" + java.net.URLEncoder.encode(mUrl, "UTF-8");
             }
+            boolean isVideo = "MDT000002".equals(medias[m].getIdmediatype());
         %>
-        <div class="fa-post-media">
-            <img src="<%= mUrl %>" class="fa-post-img" alt="media" onclick="openMediaZoom(this.src)">
+            <div class="fa-media-grid-item" onclick="<%= isVideo ? "openVideoZoom('" + mUrl.replace("'","\\\\'") + "')" : "openMediaZoom('" + mUrl.replace("'","\\\\'") + "')" %>">
+                <% if (isVideo) { %>
+                <video src="<%= mUrl %>" preload="metadata" muted></video>
+                <span class="fa-media-video-badge"><i class="bi bi-play-fill"></i> Vid&eacute;o</span>
+                <% } else { %>
+                <img src="<%= mUrl %>" alt="media">
+                <% } %>
+                <% if (m == 3 && extraCount > 0) { %><div class="fa-media-grid-overlay">+<%= extraCount %></div><% } %>
+            </div>
+        <% } %>
         </div>
         <% } %>
 
@@ -317,7 +350,10 @@
                 <% if (!origTypePubLib2.isEmpty()) { %><span class="fa-type-badge"><%= origTypePubLib2 %></span><% } %>
             </div>
             <% if (!origDesc.isEmpty()) { %><div class="fa-shared-embed-text"><%= origDesc %></div><% } %>
-            <% if (!origMediaUrl.isEmpty()) { %><img src="<%= origMediaUrl %>" alt="" onclick="event.stopPropagation();openMediaZoom(this.src)"><% } %>
+            <% if (!origMediaUrl.isEmpty()) {
+                if (origIsVideo) { %><video src="<%= origMediaUrl %>" controls preload="metadata" style="width:100%;border-radius:8px;margin-top:6px;max-height:200px;" onclick="event.stopPropagation();"></video><%
+                } else { %><img src="<%= origMediaUrl %>" alt="" onclick="event.stopPropagation();openMediaZoom(this.src)"><% }
+            } %>
         </div>
         <% } %>
     </div>

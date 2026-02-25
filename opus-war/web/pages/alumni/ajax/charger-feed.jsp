@@ -104,6 +104,7 @@
         Map userNames  = new HashMap();
         Map userPhotos = new HashMap();
         Map userProfils = new HashMap();
+        Map userBanned = new HashMap(); // Integer -> Boolean (true if banned)
         if (allProfils != null) {
             for (int i = 0; i < allProfils.length; i++) {
                 Integer _key = new Integer(allProfils[i].getIdutilisateur());
@@ -112,6 +113,8 @@
                     userPhotos.put(_key, ctx + "/" + allProfils[i].getPhotoProfil().trim());
                 if (allProfils[i].getIdprofil() != null && !allProfils[i].getIdprofil().trim().isEmpty())
                     userProfils.put(_key, allProfils[i].getIdprofil().trim());
+                if (allProfils[i].getEstactif() == 0)
+                    userBanned.put(_key, Boolean.TRUE);
             }
         }
 
@@ -175,9 +178,11 @@
             + "+COALESCE((SELECT COUNT(*) FROM publicationcommentaire pc WHERE pc.idpublication=p.idpublication AND pc.etat=1),0)*3"
             + "-COALESCE((SELECT pv.nbvue FROM publicationvue pv WHERE pv.idpublication=p.idpublication AND pv.idutilisateur=" + refuserConnecte + "),0)*4"
             + "+CASE WHEN p.daty::date=CURRENT_DATE THEN 15 WHEN p.daty::date>=CURRENT_DATE-7 THEN 8 WHEN p.daty::date>=CURRENT_DATE-30 THEN 3 ELSE 0 END";
+        // --- Filtre utilisateurs bannis ---
+        String _banW = " AND p.idutilisateur NOT IN (SELECT refuser FROM utilisateur WHERE estactif = 0)";
         String _pSql =
             "SELECT sub.idpublication, sub.score FROM ("
-            + "  SELECT p.idpublication,(" + _sC + ") AS score FROM publication p WHERE p.etat=1" + _visW2 + _hashW
+            + "  SELECT p.idpublication,(" + _sC + ") AS score FROM publication p WHERE p.etat=1" + _banW + _visW2 + _hashW
             + ") sub WHERE sub.score < " + cursorScore
             + " OR (sub.score = " + cursorScore + " AND sub.idpublication < '" + cursorId + "')"
             + " ORDER BY sub.score DESC, sub.idpublication DESC LIMIT 10";
@@ -223,11 +228,16 @@
             String auteur = (String) userNames.get(new Integer(pub.getIdutilisateur()));
             if (auteur == null) auteur = "Utilisateur";
 
+            // Verification si l'auteur est banni
+            boolean _authorBanned = userBanned.containsKey(new Integer(pub.getIdutilisateur()));
+            if (_authorBanned) { auteur = "Utilisateur indisponible"; }
+
             // Initiales auteur
             String[] _partsA = auteur.trim().split("\\s+");
             String initA = String.valueOf(Character.toUpperCase(_partsA[0].charAt(0)));
             if (_partsA.length > 1) initA += Character.toUpperCase(_partsA[_partsA.length - 1].charAt(0));
             String _authorPhoto = (String) userPhotos.get(new Integer(pub.getIdutilisateur()));
+            if (_authorBanned) { _authorPhoto = null; }
 
             // Medias
             Media[] medias = (Media[]) CGenUtil.rechercher(
@@ -281,6 +291,7 @@
             // ---- Partage: charger la pub originale si idpuborigine est defini ----
             boolean ffIsShared = pub.getIdpuborigine() != null && !pub.getIdpuborigine().trim().isEmpty();
             String ffOrigDesc = "", ffOrigAuteur = "", ffOrigDate = "", ffOrigMediaUrl = "", ffOrigTypePubLib = "";
+            boolean ffOrigIsVideo = false;
             String ffOrigId = ffIsShared ? pub.getIdpuborigine().trim() : "";
             if (ffIsShared) {
                 Publication[] ffOrigPubs = (Publication[]) CGenUtil.rechercher(
@@ -306,6 +317,7 @@
                     if (ffOM != null && ffOM.length > 0 && ffOM[0].getMediaurl() != null) {
                         String omu = ffOM[0].getMediaurl();
                         ffOrigMediaUrl = omu.startsWith("http") ? omu : ctx + "/UploadDownloadFileServlet?fileName=" + java.net.URLEncoder.encode(omu, "UTF-8");
+                        ffOrigIsVideo = "MDT000002".equals(ffOM[0].getIdmediatype());
                     }
                 } else { ffIsShared = false; }
             }
@@ -329,7 +341,9 @@
             }
             // URL du profil auteur
             String ffProfileUrl;
-            if (pub.getIdutilisateur() == refuserConnecte) {
+            if (_authorBanned) {
+                ffProfileUrl = "javascript:void(0)";
+            } else if (pub.getIdutilisateur() == refuserConnecte) {
                 ffProfileUrl = ctx + "/pages/module.jsp?but=profil/voir.jsp";
             } else {
                 String ffIdprofil = (String) userProfils.get(new Integer(pub.getIdutilisateur()));
@@ -343,9 +357,13 @@
 
     <!-- EN-TETE -->
     <div class="fa-post-header">
+        <% if (_authorBanned) { %>
+        <div class="fa-avatar fa-avatar--md" style="cursor:default;background:#ccc;color:#888;"><i class="bi bi-person-slash" style="font-size:1.2em;"></i></div>
+        <% } else { %>
         <a href="<%= ffProfileUrl %>" style="text-decoration:none;cursor:pointer;">
             <div class="fa-avatar fa-avatar--md" style="<%= _authorPhoto != null ? "background:transparent;" : "" %>cursor:pointer;"><% if (_authorPhoto != null) { %><img src="<%= _authorPhoto %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initA %><% } %></div>
         </a>
+        <% } %>
         <div class="fa-post-meta">
             <!-- Menu 3 points -->
             <div class="pub-menu">
@@ -360,7 +378,11 @@
                 </div>
             </div>
             <div class="fa-post-author">
+                <% if (_authorBanned) { %>
+                <strong style="color:#888;cursor:default;"><i class="bi bi-person-slash"></i> <%= auteur %></strong>
+                <% } else { %>
                 <a href="<%= ffProfileUrl %>" style="text-decoration:none;color:inherit;cursor:pointer;"><strong style="cursor:pointer;"><%= auteur %></strong></a>
+                <% } %>
                 <% if (!taggedNames.isEmpty()) { %>
                 <span class="fa-post-with">avec <strong><%= taggedNames %></strong></span>
                 <% } %>
@@ -377,14 +399,28 @@
         <% if (descSafe != null && !descSafe.isEmpty()) { %>
         <p class="fa-post-text"><%= descSafe %></p>
         <% } %>
-        <% for (int m = 0; m < medias.length; m++) {
+        <% if (medias.length > 0) {
+            int showCount = medias.length > 4 ? 4 : medias.length;
+            int extraCount = medias.length - 4;
+        %>
+        <div class="fa-media-grid grid-<%= medias.length >= 4 ? 4 : medias.length %>">
+        <% for (int m = 0; m < showCount; m++) {
             String mUrl = medias[m].getMediaurl();
             if (mUrl != null && !mUrl.startsWith("http")) {
                 mUrl = ctx + "/UploadDownloadFileServlet?fileName=" + java.net.URLEncoder.encode(mUrl, "UTF-8");
             }
+            boolean isVideo = "MDT000002".equals(medias[m].getIdmediatype());
         %>
-        <div class="fa-post-media">
-            <img src="<%= mUrl %>" class="fa-post-img" alt="media" onclick="openMediaZoom(this.src)">
+            <div class="fa-media-grid-item" onclick="<%= isVideo ? "openVideoZoom('" + mUrl.replace("'","\\\\'") + "')" : "openMediaZoom('" + mUrl.replace("'","\\\\'") + "')" %>">
+                <% if (isVideo) { %>
+                <video src="<%= mUrl %>" preload="metadata" muted></video>
+                <span class="fa-media-video-badge"><i class="bi bi-play-fill"></i> Vid&eacute;o</span>
+                <% } else { %>
+                <img src="<%= mUrl %>" alt="media">
+                <% } %>
+                <% if (m == 3 && extraCount > 0) { %><div class="fa-media-grid-overlay">+<%= extraCount %></div><% } %>
+            </div>
+        <% } %>
         </div>
         <% } %>
 
@@ -396,7 +432,11 @@
                 <% if (!ffOrigTypePubLib.isEmpty()) { %><span class="fa-type-badge"><%= ffOrigTypePubLib %></span><% } %>
             </div>
             <% if (!ffOrigDesc.isEmpty()) { %><div class="fa-shared-embed-text"><%= ffOrigDesc %></div><% } %>
-            <% if (!ffOrigMediaUrl.isEmpty()) { %><img src="<%= ffOrigMediaUrl %>" alt="" onclick="event.stopPropagation();openMediaZoom(this.src)" style="width:100%;border-radius:8px;margin-top:6px;max-height:200px;object-fit:cover;cursor:pointer;"><% } %>
+            <% if (!ffOrigMediaUrl.isEmpty()) {
+                if (ffOrigIsVideo) { %><video src="<%= ffOrigMediaUrl %>" controls preload="metadata" style="width:100%;border-radius:8px;margin-top:6px;max-height:200px;" onclick="event.stopPropagation();"></video><%
+                } else { %><img src="<%= ffOrigMediaUrl %>" alt="" onclick="event.stopPropagation();openMediaZoom(this.src)" style="width:100%;border-radius:8px;margin-top:6px;max-height:200px;object-fit:cover;cursor:pointer;"><%
+                }
+            } %>
         </div>
         <% } %>
     </div>

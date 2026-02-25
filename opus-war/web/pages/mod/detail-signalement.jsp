@@ -104,6 +104,7 @@
         Map userNames = new HashMap();
         Map userPhotos = new HashMap();
         Map userProfils = new HashMap();
+        Map userBanned = new HashMap();
         if (allProfils != null) {
             for (int i = 0; i < allProfils.length; i++) {
                 Integer _key = new Integer(allProfils[i].getIdutilisateur());
@@ -112,6 +113,8 @@
                     userPhotos.put(_key, ctx + "/" + allProfils[i].getPhotoProfil().trim());
                 if (allProfils[i].getIdprofil() != null)
                     userProfils.put(_key, allProfils[i].getIdprofil());
+                if (allProfils[i].getEstactif() == 0)
+                    userBanned.put(_key, Boolean.TRUE);
             }
         }
 %>
@@ -196,6 +199,7 @@
         request.setAttribute("_pub_userNames", userNames);
         request.setAttribute("_pub_userPhotos", userPhotos);
         request.setAttribute("_pub_userProfils", userProfils);
+        request.setAttribute("_pub_userBanned", userBanned);
         request.setAttribute("_pub_reactTypes", reactTypes);
         request.setAttribute("_pub_typesPub", typesPub);
         request.setAttribute("_pub_refuser", new Integer(refuserConnecte));

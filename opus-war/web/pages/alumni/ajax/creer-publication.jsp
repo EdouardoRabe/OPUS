@@ -40,12 +40,12 @@
         String idtypepublication = null;
         String identifications = null;
         String visSpec = null, visParc = null, visPromoAnnee = null, visLier = null;
-        FileItem imageItem = null;
+        List mediaItems = new java.util.ArrayList(); // List<FileItem>
 
         if (ServletFileUpload.isMultipartContent(request)) {
             DiskFileItemFactory factory = new DiskFileItemFactory();
             ServletFileUpload upload = new ServletFileUpload(factory);
-            upload.setSizeMax(10 * 1024 * 1024); // 10 Mo max
+            upload.setSizeMax(50 * 1024 * 1024); // 50 Mo max (videos)
             List items = upload.parseRequest(request);
             for (int i = 0; i < items.size(); i++) {
                 FileItem item = (FileItem) items.get(i);
@@ -61,7 +61,7 @@
                     else if ("vis_lier".equals(fieldName)) visLier = fieldValue;
                 } else {
                     if (item.getSize() > 0 && item.getName() != null && !item.getName().trim().isEmpty()) {
-                        imageItem = item;
+                        mediaItems.add(item);
                     }
                 }
             }
@@ -102,8 +102,9 @@
             pub.construirePK(conn);
             pub.insertToTableWithHisto(userId, conn);
 
-            // Si image uploadee, sauvegarder le fichier et creer l'entite Media
-            if (imageItem != null) {
+            // Sauvegarder chaque media uploade (images et videos)
+            for (int mi = 0; mi < mediaItems.size(); mi++) {
+                FileItem mediaFile = (FileItem) mediaItems.get(mi);
                 // Repertoire de stockage (meme pattern que UploadDownloadFileServlet)
                 String basePath = System.getProperty("jboss.server.base.dir")
                     + File.separator + "deployments" + File.separator + "dossier.war"
@@ -112,18 +113,25 @@
                 if (!dir.exists()) dir.mkdirs();
 
                 // Nom unique: timestamp + nom original (nettoye)
-                String origName = imageItem.getName();
+                String origName = mediaFile.getName();
                 if (origName.contains("\\")) origName = origName.substring(origName.lastIndexOf("\\") + 1);
                 if (origName.contains("/")) origName = origName.substring(origName.lastIndexOf("/") + 1);
                 String safeName = origName.replaceAll("[^a-zA-Z0-9._-]", "_");
-                String fileName = System.currentTimeMillis() + "_" + safeName;
+                String fileName = System.currentTimeMillis() + "_" + mi + "_" + safeName;
                 File dest = new File(basePath + File.separator + fileName);
-                imageItem.write(dest);
+                mediaFile.write(dest);
 
-                // Creer entite Media (APJ) - chemin relatif pour UploadDownloadFileServlet
+                // Determiner le type de media (Image ou Video)
+                String contentType = mediaFile.getContentType();
+                String mediaTypeId = "MDT000001"; // Image par defaut
+                if (contentType != null && contentType.startsWith("video/")) {
+                    mediaTypeId = "MDT000002"; // Video
+                }
+
+                // Creer entite Media (APJ)
                 Media media = new Media();
                 media.setMediaurl("/async/publications/" + fileName);
-                media.setIdmediatype("MDT000001"); // Image
+                media.setIdmediatype(mediaTypeId);
                 media.setIdpublication(pub.getIdpublication());
                 media.construirePK(conn);
                 media.insertToTableWithHisto(userId, conn);
