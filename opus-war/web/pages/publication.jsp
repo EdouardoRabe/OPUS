@@ -252,7 +252,8 @@
                 <% } %>
             </div>
             <div class="fa-post-date">
-                <%= pub.getDaty() %>&nbsp;&agrave;&nbsp;<%= pub.getHeure() != null ? pub.getHeure() : "" %>
+                <span id="post-date-<%= idpub %>"></span>
+                <script>document.getElementById('post-date-<%= idpub %>').textContent = formatPublicationTime('<%= pub.getDaty() %>', '<%= pub.getHeure() %>');</script>
                 <span class="fa-type-badge"><%= typePubLib %></span>
             </div>
         </div>

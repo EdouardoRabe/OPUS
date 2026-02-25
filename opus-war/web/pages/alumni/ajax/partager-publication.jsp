@@ -73,7 +73,7 @@
         // Notification au propriétaire de la pub originale
         if (origPub.getIdutilisateur() != refuser) {
             String nomSource = Notification.getNomUtilisateur(conn, refuser);
-            String lien = "module.jsp?but=alumni/accueil.jsp&scrollTo=pub-" + newId;
+            String lien = "module.jsp?but=accueil.jsp&scrollTo=pub-" + newId;
             Notification.creerEtEnvoyer(conn, userId, origPub.getIdutilisateur(),
                 nomSource + " a partage votre publication",
                 Notification.TYPE_MENTION, lien);

@@ -761,6 +761,24 @@
                 request.setAttribute("_pub_ctx", ctx);
                 request.setAttribute("_pub_conn", conn);
         %>
+        <!-- Charger moment.js et définir formatPublicationTime AVANT la jsp:include -->
+        <script src="<%= ctx %>/assets/js/moment.min.js"></script>
+        <script>
+            function formatPublicationTime(daty, heure) {
+                if (!daty || typeof moment === 'undefined') return (daty + ' à ' + heure);
+                // Combiner la date (YYYY-MM-DD) et l'heure (HH:mm) au format de moment
+                var combinedStr = daty + ' ' + (heure && heure.trim() ? heure : '00:00');
+                var m = moment(combinedStr, 'YYYY-MM-DD HH:mm');
+                if (!m.isValid()) return daty + ' à ' + heure;
+                // Utiliser le format calendrier (Aujourd'hui à, Hier à, lundi à, etc.)
+                return m.calendar(null, {
+                    sameDay: '[Aujourd\'hui à] HH:mm',
+                    lastDay: '[Hier à] HH:mm',
+                    lastWeek: 'dddd [à] HH:mm',
+                    sameElse: 'DD/MM/YYYY HH:mm'
+                });
+            }
+        </script>
         <jsp:include page="publication.jsp" />
         <%
         } catch (Exception e) {

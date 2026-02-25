@@ -105,7 +105,7 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
             <div>
                 <span style="font-size:14px;color:#666;">
-                    <strong><%= notifs.length %></strong> notification(s)
+                    <strong><%= notifs.length %></strong> notification(s) test
                     <% if (nbNonLu > 0) { %>
                         &mdash; <span style="color:#e00;font-weight:bold;"><%= nbNonLu %> non lue(s)</span>
                     <% } %>
