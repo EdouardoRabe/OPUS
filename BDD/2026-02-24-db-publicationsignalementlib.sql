@@ -20,6 +20,5 @@ FROM signalementpublication s
     LEFT JOIN profil prsignalant ON prsignalant.idutilisateur = s.idutilisateur
     LEFT JOIN profil prsignale ON prsignale.idutilisateur = pub.idutilisateur;
 
-drop view if exists signalementpublicationlib;
 
 select * from signalementpublicationlib;

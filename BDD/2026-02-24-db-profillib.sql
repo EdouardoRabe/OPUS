@@ -49,7 +49,7 @@ CREATE OR REPLACE VIEW profillib AS
           ORDER BY ha.daty DESC, ha.id DESC
          LIMIT 1),
         CASE
-            WHEN (u.estactif = 1) THEN 'Créé'::text
+            WHEN (u.estactif = 1) THEN 'Cree'::text
             ELSE 'Banni'::text
         END) AS etatlib,
         pr.idgenre,

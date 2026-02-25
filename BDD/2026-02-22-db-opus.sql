@@ -248,7 +248,7 @@ CREATE TABLE signalementpublication(
    idpublication VARCHAR(20)  NOT NULL,
    idutilisateur integer NOT NULL,
    PRIMARY KEY(idsignalementpublication),
-   FOREIGN KEY(typesignalement) REFERENCES typesignalement(typesignalement),
+   FOREIGN KEY(typesignalement) REFERENCES typesignalement(idtypesignalement),
    FOREIGN KEY(idpublication) REFERENCES publication(idpublication),
    FOREIGN KEY(idutilisateur) REFERENCES utilisateur(refuser)
 );
