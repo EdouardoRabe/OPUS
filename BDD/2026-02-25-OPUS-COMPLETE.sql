@@ -186,7 +186,7 @@ CREATE TABLE historiqueactif(
     id VARCHAR(250) NOT NULL,
     idutilisateur VARCHAR(250),
     estactif INTEGER,
-    daty TIMESTAMP WITHOUT TIME ZONE,
+    daty Date,
     description VARCHAR(250),
     PRIMARY KEY(id)
 );
@@ -303,7 +303,7 @@ CREATE TABLE publicationvue (
     idpublicationvue SERIAL PRIMARY KEY,
     idutilisateur INTEGER NOT NULL,
     idpublication VARCHAR(20) NOT NULL,
-    datvue TIMESTAMP NOT NULL DEFAULT NOW(),
+    datvue Date NOT NULL DEFAULT NOW(),
     nbvue INTEGER NOT NULL DEFAULT 1,
     CONSTRAINT uq_pubvue UNIQUE (idutilisateur, idpublication)
 );
@@ -334,8 +334,8 @@ CREATE TABLE profilsocialmedia (
     idprofil VARCHAR(20) NOT NULL,
     idreseausocial VARCHAR(20) NOT NULL,
     valeur VARCHAR(255) NOT NULL,
-    datycreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    datymodification TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    datycreation Date ,
+    datymodification Date ,
     FOREIGN KEY (idprofil) REFERENCES profil(idprofil) ON DELETE CASCADE,
     FOREIGN KEY (idreseausocial) REFERENCES reseauxsociaux(idreseausocial) ON DELETE CASCADE,
     UNIQUE(idprofil, idreseausocial)
@@ -1133,3 +1133,18 @@ SELECT 'Sequences crees' AS status,
     COUNT(*) AS nb
 FROM information_schema.sequences
 WHERE sequence_schema = 'public';
+
+create table publicationenregistrement (
+    idpublicationenregistrement SERIAL PRIMARY KEY,
+    idpublication VARCHAR(20) NOT NULL,
+    idutilisateur INTEGER NOT NULL,
+    daty Date NOT NULL DEFAULT NOW(),
+    heure VarcHAR(8) NOT NULL DEFAULT to_char(NOW(), ' HH24:MI:SS'),
+    UNIQUE(idpublication, idutilisateur),
+    FOREIGN KEY (idpublication) REFERENCES publication(idpublication),
+    FOREIGN KEY (idutilisateur) REFERENCES utilisateur(refuser)
+);
+
+CREATE SEQUENCE seq_publicationenregistrement START WITH 1 INCREMENT BY 1 CACHE 1;
+CREATE FUNCTION get_seq_publicationenregistrement() RETURNS INTEGER LANGUAGE plpgsql AS $$ BEGIN RETURN nextval('seq_publicationenregistrement');
+END $$;

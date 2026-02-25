@@ -51,9 +51,16 @@ function savePublication(idpub) {
     fetch(CTX + '/pages/alumni/ajax/save-publication.jsp?idpublication=' + encodeURIComponent(idpub))
     .then(function(r){return r.json();}).then(function(d){
         if(d.success) {
-            if (typeof Swal !== 'undefined') Swal.fire({toast:true,position:'top-end',icon:'success',title:'Sauvegardée',timer:1500,showConfirmButton:false});
-            else alert('Publication sauvegardée');
-        } else alert('Erreur sauvegarde');
+            var btn = document.getElementById('save-btn-' + idpub);
+            if (btn) {
+                if (d.saved) {
+                    btn.innerHTML = '<i class="bi bi-bookmark-fill"></i> Annuler l\'enregistrement';
+                } else {
+                    btn.innerHTML = '<i class="bi bi-bookmark"></i> Enregistrer';
+                }
+            }
+            if (typeof Swal !== 'undefined') Swal.fire({toast:true,position:'top-end',icon:'success',title: d.saved ? 'Publication enregistr\u00e9e' : 'Enregistrement annul\u00e9',timer:1500,showConfirmButton:false});
+        } else alert('Erreur: ' + (d.error || 'Inconnue'));
     });
 }
 function reportPublication(idpub) {
