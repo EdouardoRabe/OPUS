@@ -106,6 +106,8 @@
     String _genrelib    = profil != null && profil.getGenrelib()       != null ? profil.getGenrelib()       : "";
     String _idgenre     = profil != null && profil.getIdgenre()        != null ? profil.getIdgenre()        : "";
     int _contribution   = profil != null ? profil.getContribution() : 0;
+    String _cv          = profil != null && profil.getCv()             != null ? profil.getCv()             : "";
+    String _cvUrl       = _cv.isEmpty() ? "" : request.getContextPath() + "/" + _cv;
     
     // Emplacement vars
     String _empId = emplacement != null ? emplacement.getId() : "";
@@ -380,7 +382,7 @@
    ════════════════════════════════ */
 :root {
   --itu-blue: #008BFF;
-  --itu-dark: #1c1e29;
+  --itu-dark: #362F4F;
   --itu-violet: #5B23FF;
   --pvl-border: #e2e6ea;
   --pvl-card-bg: #fff;
@@ -595,6 +597,16 @@
            style="padding:6px 16px;background:#fff;color:#0a66c2;border:1px solid #0a66c2;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block">
           <i class="fa fa-lock"></i> Confidentialité
         </a>
+        <button onclick="pvOpenModal('modalCV')"
+           style="padding:6px 16px;background:#fff;color:#0a66c2;border:1px solid #0a66c2;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;">
+          <i class="bi bi-file-earmark-text"></i> CV
+        </button>
+        <% if (!_cv.isEmpty()) { %>
+        <a href="<%= _cvUrl %>" target="_blank"
+           style="padding:6px 16px;background:#28a745;color:#fff;border:none;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block">
+          <i class="bi bi-download"></i> Télécharger CV
+        </a>
+        <% } %>
       </div>
     </div>
   </div>
@@ -699,19 +711,6 @@
         <label><i class="bi bi-fingerprint pv-info-icon"></i>ID Profil</label>
         <span id="fi-id" style="font-family:monospace;font-size:12px;color:#888;">—</span>
       </div>
-    </div>
-  </div>
-
-  <!-- ── Sécurité ── -->
-  <div class="pv-section">
-    <div class="pv-section-header">
-      <h2><i class="bi bi-shield-lock-fill"></i> Sécurité</h2>
-    </div>
-    <div style="padding:4px 0;">
-      <button class="pv-btn-add" onclick="pvOpenModal('modalPassword')" style="gap:6px;">
-        <i class="bi bi-key-fill"></i> Modifier le mot de passe
-      </button>
-      <p style="font-size:12px;color:#888;margin-top:6px;">Protégez votre compte en modifiant régulièrement votre mot de passe.</p>
     </div>
   </div>
 
@@ -1098,34 +1097,6 @@ function pvDeleteSocial(smId) {
   .catch(function(e) { alert("Erreur réseau : " + e); });
 }
 
-/* ── Met à jour le placeholder du champ social selon le réseau sélectionné ── */
-function pvUpdateSocialPlaceholder() {
-  var sel   = document.getElementById('socialSelect');
-  var input = document.getElementById('socialValeur');
-  var hint  = document.getElementById('socialUrlHint');
-  var hintText = document.getElementById('socialUrlHintText');
-  var opt   = sel.options[sel.selectedIndex];
-
-  if (!opt || !opt.value) {
-    input.placeholder = 'ex: monpseudo ou https://...';
-    hint.style.display = 'none';
-    return;
-  }
-
-  var pattern = opt.getAttribute('data-urlpattern') || '';
-  var label   = opt.textContent.trim();
-
-  if (pattern && pattern.indexOf('{value}') !== -1) {
-    var baseUrl = pattern.split('{value}')[0];
-    input.placeholder = 'Votre pseudo ' + label + ' (ex: johndoe)';
-    hintText.textContent = baseUrl + ' est déjà inclus automatiquement';
-    hint.style.display = 'block';
-  } else {
-    input.placeholder = 'Lien ou identifiant ' + label;
-    hint.style.display = 'none';
-  }
-}
-
 /* ── Helpers modals ── */
 function pvOpenModal(id)  { document.getElementById(id).style.display = "flex"; }
 function pvCloseModal(id) { document.getElementById(id).style.display = "none"; }
@@ -1154,6 +1125,26 @@ function pvUploadPhoto(inputId, typeVal, apresOk) {
     if (d.success) {
       apresOk("<%= request.getContextPath() %>/" + d.image);
       pvCloseModal(typeVal === 1 ? "modalPDP" : "modalPDC");
+    } else { alert("Erreur : " + d.error); }
+  })
+  .catch(function(e){ alert("Erreur réseau : " + e); });
+}
+
+/* ── Upload CV ── */
+function pvUploadCV() {
+  var fi = document.getElementById('fileCV');
+  if (!fi.files[0]) { alert("Sélectionnez un fichier CV."); return; }
+  var fd = new FormData();
+  fd.append("cv", fi.files[0]);
+  fetch("<%= request.getContextPath() %>/pages/profil/ajax/traitement-cv.jsp", {
+    method: "POST", body: fd
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if (d.success) {
+      alert("CV importé avec succès !");
+      pvCloseModal('modalCV');
+      location.reload();
     } else { alert("Erreur : " + d.error); }
   })
   .catch(function(e){ alert("Erreur réseau : " + e); });
@@ -1468,68 +1459,23 @@ function pvSaveLoc() {
   </div>
 </div>
 
-<!-- Modal : Modifier le mot de passe -->
-<div class="pv-modal-overlay" id="modalPassword">
-  <div class="pv-modal">
-    <h3><i class="bi bi-shield-lock"></i> Modifier le mot de passe</h3>
-
-    <div id="pwdAlert" style="display:none;padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:13px;"></div>
-
-    <label>Ancien mot de passe *</label>
-    <div style="position:relative;">
-      <input type="password" id="pwdOld" placeholder="Votre mot de passe actuel"
-             style="width:100%;padding:8px 38px 8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
-      <span onclick="pvTogglePwdEye(this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:#999;">
-        <i class="fa fa-eye"></i>
-      </span>
-    </div>
-
-    <label style="margin-top:10px;display:block;">Nouveau mot de passe *</label>
-    <div style="position:relative;">
-      <input type="password" id="pwdNew" placeholder="Au moins 3 caractères"
-             style="width:100%;padding:8px 38px 8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
-      <span onclick="pvTogglePwdEye(this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:#999;">
-        <i class="fa fa-eye"></i>
-      </span>
-    </div>
-
-    <label style="margin-top:10px;display:block;">Confirmer le nouveau mot de passe *</label>
-    <div style="position:relative;">
-      <input type="password" id="pwdConfirm" placeholder="Retapez le nouveau mot de passe"
-             style="width:100%;padding:8px 38px 8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
-      <span onclick="pvTogglePwdEye(this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:#999;">
-        <i class="fa fa-eye"></i>
-      </span>
-    </div>
-
-    <div class="pv-modal-footer">
-      <button type="button" class="pv-btn-cancel" onclick="pvCloseModal('modalPassword')">Annuler</button>
-      <button type="button" class="pv-btn-save" id="btnSavePwd" onclick="pvChangePassword()">Enregistrer</button>
-    </div>
-  </div>
-</div>
-
 <!-- Modal : Ajouter Réseau Social -->
 <div class="pv-modal-overlay" id="modalAddSocial">
   <div class="pv-modal">
     <h3>Ajouter un réseau social</h3>
     <label>Réseau social *</label>
-    <select id="socialSelect" onchange="pvUpdateSocialPlaceholder()">
+    <select id="socialSelect">
       <option value="">— Sélectionner —</option>
       <% for (int rsi = 0; rsi < allReseaux.length; rsi++) { %>
       <option value="<%= allReseaux[rsi].getIdReseauSocial() %>"
               data-icone="<%= allReseaux[rsi].getIconeClass() != null ? allReseaux[rsi].getIconeClass() : "" %>"
-              data-couleur="<%= allReseaux[rsi].getCouleurHex() != null ? allReseaux[rsi].getCouleurHex() : "" %>"
-              data-urlpattern="<%= allReseaux[rsi].getUrlPattern() != null ? allReseaux[rsi].getUrlPattern().replace("<","&lt;") : "" %>">
+              data-couleur="<%= allReseaux[rsi].getCouleurHex() != null ? allReseaux[rsi].getCouleurHex() : "" %>">
         <%= allReseaux[rsi].getLibelle() != null ? allReseaux[rsi].getLibelle().replace("<","&lt;") : "" %>
       </option>
       <% } %>
     </select>
     <label>Identifiant / URL *</label>
     <input type="text" id="socialValeur" placeholder="ex: monpseudo ou https://..." style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
-    <p id="socialUrlHint" style="display:none;font-size:12px;color:#888;margin:4px 0 0 2px;">
-      <i class="bi bi-info-circle"></i> <span id="socialUrlHintText"></span>
-    </p>
     <div class="pv-modal-footer">
       <button type="button" class="pv-btn-cancel" onclick="pvCloseModal('modalAddSocial')">Annuler</button>
       <button type="button" class="pv-btn-save" onclick="pvAddSocial()">Ajouter</button>
@@ -1572,6 +1518,22 @@ function pvSaveLoc() {
           cover.insertBefore(i, cover.firstChild);
         }
       })">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal : Import CV -->
+<div class="pv-modal-overlay" id="modalCV">
+  <div class="pv-modal">
+    <h3>Importer votre CV</h3>
+    <p style="font-size:12px; color:#666; margin-bottom:10px;">Formats acceptés : PDF, DOC, DOCX (max 10 Mo)</p>
+    <input type="file" id="fileCV" accept=".pdf,.doc,.docx" style="margin-top:8px">
+    <% if (!_cv.isEmpty()) { %>
+    <p style="margin-top:10px; font-size:12px; color:#28a745;"><i class="bi bi-check-circle"></i> CV actuel : <a href="<%= _cvUrl %>" target="_blank"><%= _cv.substring(_cv.lastIndexOf("/") + 1) %></a></p>
+    <% } %>
+    <div class="pv-modal-footer">
+      <button type="button" class="pv-btn-cancel" onclick="pvCloseModal('modalCV')">Annuler</button>
+      <button type="button" class="pv-btn-save" onclick="pvUploadCV()">Importer</button>
     </div>
   </div>
 </div>
