@@ -80,7 +80,7 @@
                     }
 
                     String nomSource = Notification.getNomUtilisateur(conn, refuser);
-                    String lien = "module.jsp?but=alumni/accueil.jsp&scrollTo=pub-" + idpub;
+                    String lien = "module.jsp?but=accueil.jsp&scrollTo=pub-" + idpub;
                     Notification.creerEtEnvoyer(conn, userId, pubOwner,
                         nomSource + " a reagit " + reactionLib + " a votre publication",
                         Notification.TYPE_PUB_REACTION, lien);

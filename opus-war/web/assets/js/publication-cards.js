@@ -78,6 +78,19 @@ function openMediaZoom(src) {
     document.addEventListener('keydown', function esc(e){ if(e.key==='Escape'){ document.body.removeChild(overlay); document.removeEventListener('keydown',esc); } });
     document.body.appendChild(overlay);
 }
+function openVideoZoom(src) {
+    var overlay = document.createElement('div');
+    overlay.className = 'fa-media-overlay';
+    overlay.style.cursor = 'default';
+    var vid = document.createElement('video');
+    vid.src = src; vid.controls = true; vid.autoplay = true;
+    vid.style.maxWidth = '92vw'; vid.style.maxHeight = '92vh'; vid.style.borderRadius = '4px';
+    vid.addEventListener('click', function(e){ e.stopPropagation(); });
+    overlay.appendChild(vid);
+    overlay.addEventListener('click', function(){ vid.pause(); document.body.removeChild(overlay); });
+    document.addEventListener('keydown', function esc(e){ if(e.key==='Escape'){ vid.pause(); document.body.removeChild(overlay); document.removeEventListener('keydown',esc); } });
+    document.body.appendChild(overlay);
+}
 
 // ========== REACTION BAR (clic) ==========
 function closeAllReactionBars() {
@@ -228,6 +241,16 @@ function chargerCommentaires(idpub, _callback) {
                 var html = '';
                 html += '<div id="comm-' + c.id + '" class="fa-comment-item' + replyClass + '">';
                 html += '<div class="fa-comment-inner">';
+
+                if (c.banned) {
+                    // Utilisateur banni — avatar generique, pas de lien
+                    html += '<div class="fa-avatar fa-avatar--xs" style="background:#ccc;color:#888;cursor:default;"><i class="bi bi-person-slash" style="font-size:0.8em;"></i></div>';
+                    html += '<div class="fa-comment-content">';
+                    html += '<div class="fa-comment-bubble">';
+                    html += '<span class="fa-comment-author" style="color:#888;cursor:default;"><i class="bi bi-person-slash"></i> ' + escHtml(c.auteur) + '</span>';
+                    html += '<span class="fa-comment-text">' + formatMentions(c.description) + '</span>';
+                    html += '</div>';
+                } else {
                 var profileUrl;
                 if (c.idutilisateur === data.refuser) {
                     profileUrl = CTX + '/pages/module.jsp?but=profil/voir.jsp';
@@ -260,6 +283,7 @@ function chargerCommentaires(idpub, _callback) {
                 }
                 html += '<span class="fa-comment-text">' + formatMentions(c.description) + '</span>';
                 html += '</div>';
+                } // fin else (non banni)
 
                 var totalCReact = 0;
                 var myCommReactLib = '';

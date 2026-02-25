@@ -627,6 +627,12 @@ INSERT INTO typepublication (idtypepublication, libelle)
 VALUES ('TPB000002', 'Stage');
 INSERT INTO typepublication (idtypepublication, libelle)
 VALUES ('TPB000003', 'Evenement');
+INSERT INTO typepublication (idtypepublication, libelle)
+VALUES ('TPB000004', 'Projet');
+INSERT INTO typepublication (idtypepublication, libelle)
+VALUES ('TPB000005', 'Recherche d''opportunite');
+INSERT INTO typepublication (idtypepublication, libelle)
+VALUES ('TPB000006', 'Autre');
 -- Types de media
 INSERT INTO mediatype (idmediatype, libelle)
 VALUES ('MDT000001', 'Image');
@@ -934,12 +940,12 @@ VALUES (
     ),
     (
         'MENDYN000006',
-        'Specialites',
+        'Gestion Specialites',
         'bi-tags-fill',
         'module.jsp?but=specialite/specialite-list.jsp',
         2,
         1,
-        'MENDYN000002'
+        'MENDYN000999'
     );
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
 VALUES (
@@ -1071,7 +1077,6 @@ VALUES ('USRM000001', 'MENDYN000001', '*', 0, 'etu'),
     ('USRM000003', 'MENDYN000003', '*', 0, 'etu'),
     ('USRM000004', 'MENDYN000004', '*', 0, 'etu'),
     ('USRM000005', 'MENDYN000005', '*', 0, 'etu'),
-    ('USRM000006', 'MENDYN000006', '*', 0, 'etu'),
     ('USRM000007', 'MENDYN000007', '*', 0, 'etu'),
     ('USRM000008', 'MENDYN000008', '*', 0, 'etu'),
     ('USRM000009', 'MENDYN000009', '*', 0, 'etu'),
@@ -1104,6 +1109,18 @@ VALUES ('USRM000012', 'MENDYN000001', '*', 0, 'md'),
     ('USRM000032', 'MENDYN000016', '*', 0, 'md'),
     ('USRM000034', 'MENDYN000017', '*', 0, 'md'),
     ('USRM000036', 'MENDYN000018', '*', 0, 'md');
+
+-- Sous-menu Reseau Professionnel sous RESEAU (niveau 1)
+INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
+    ('MENDYN000019', 'Reseau pro', 'bi-diagram-3-fill', 'module.jsp?but=alumni/reseau-professionnel.jsp', 3, 1, 'MENDYN000002');
+
+-- Droits role etu
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
+    ('USRM000045', 'MENDYN000019', '*', 0, 'etu');
+
+-- Droits role md
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
+    ('USRM000046', 'MENDYN000019', '*', 0, 'md');
 -- ╔═══════════════════════════════════════════════════════════════════════════════╗
 -- ║ SECTION 16: MISE A JOUR DES SEQUENCES                                         ║
 -- ╚═══════════════════════════════════════════════════════════════════════════════╝
@@ -1132,3 +1149,54 @@ SELECT 'Sequences crees' AS status,
     COUNT(*) AS nb
 FROM information_schema.sequences
 WHERE sequence_schema = 'public';
+
+-- corrected definitions with varchar identifiers, sequences and helpers
+-- sequence & function for profiltypestatut
+CREATE SEQUENCE IF NOT EXISTS seq_profiltypestatut START 1;
+CREATE OR REPLACE FUNCTION getseqprofiltypestatut() RETURNS varchar LANGUAGE plpgsql AS $$ BEGIN RETURN 'PTS' || lpad(nextval('seq_profiltypestatut')::text, 5, '0');
+END;
+$$;
+CREATE TABLE IF NOT EXISTS profiltypestatut (
+    idprofiltypestatut VARCHAR(12) PRIMARY KEY,
+    libelle VARCHAR(100) NOT NULL,
+    couleur VARCHAR(7) DEFAULT '#000000' -- hex code for display
+);
+-- initial data for profiltypestatut
+INSERT INTO profiltypestatut(idprofiltypestatut, libelle, couleur)
+SELECT getseqprofiltypestatut(),
+    'Open to work',
+    '#28a745'
+WHERE NOT EXISTS (
+        SELECT 1
+        FROM profiltypestatut
+        WHERE libelle = 'Open to work'
+    );
+INSERT INTO profiltypestatut(idprofiltypestatut, libelle, couleur)
+SELECT getseqprofiltypestatut(),
+    'Taken',
+    '#e69a45'
+WHERE NOT EXISTS (
+        SELECT 1
+        FROM profiltypestatut
+        WHERE libelle = 'Taken'
+    );
+INSERT INTO profiltypestatut(idprofiltypestatut, libelle, couleur)
+SELECT getseqprofiltypestatut(),
+    'Neutre',
+    '#0a66c2'
+WHERE NOT EXISTS (
+        SELECT 1
+        FROM profiltypestatut
+        WHERE libelle = 'Neutre'
+    );
+-- sequence & function for profilstatut
+CREATE SEQUENCE IF NOT EXISTS seq_profilstatut START 1;
+CREATE OR REPLACE FUNCTION getseqprofilstatut() RETURNS varchar LANGUAGE plpgsql AS $$ BEGIN RETURN 'PS' || lpad(nextval('seq_profilstatut')::text, 5, '0');
+END;
+$$;
+CREATE TABLE IF NOT EXISTS profilstatut (
+    id VARCHAR(12) PRIMARY KEY,
+    idprofil VARCHAR(50) NOT NULL REFERENCES profil(idprofil),
+    idprofiltypestatut VARCHAR(12) NOT NULL REFERENCES profiltypestatut(idprofiltypestatut),
+    daty TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

@@ -15,7 +15,7 @@
 
     String idpub = request.getParameter("idpublication");
     if (idpub == null || idpub.trim().isEmpty()) {
-        response.sendRedirect(ctx + "/pages/module.jsp?but=alumni/accueil.jsp");
+        response.sendRedirect(ctx + "/pages/module.jsp?but=accueil.jsp");
         return;
     }
 
