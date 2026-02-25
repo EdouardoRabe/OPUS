@@ -26,10 +26,6 @@ INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALU
 ('MENDYN000005', 'Annuaire',    'bi-book-fill', 'module.jsp?but=annuaire/annuaire.jsp',       1, 1, 'MENDYN000002'),
 ('MENDYN000006', 'Specialites', 'bi-tags-fill', 'module.jsp?but=specialite/specialite-list.jsp', 2, 1, 'MENDYN000002');
 
--- Sous-menus de CARRIERE
-INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
-('MENDYN000007', 'Offres d''emploi',  'bi-list-ul',         'module.jsp?but=carriere/offres.jsp',        1, 1, 'MENDYN000003'),
-('MENDYN000008', 'Publier une offre', 'bi-plus-circle-fill', 'module.jsp?but=carriere/publier-offre.jsp', 2, 1, 'MENDYN000003');
 
 -- Sous-menus de MON PROFIL
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere) VALUES
@@ -50,8 +46,6 @@ INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
 ('USRM000004', 'MENDYN000004', '*', 0, 'etu'),
 ('USRM000005', 'MENDYN000005', '*', 0, 'etu'),
 ('USRM000006', 'MENDYN000006', '*', 0, 'etu'),
-('USRM000007', 'MENDYN000007', '*', 0, 'etu'),
-('USRM000008', 'MENDYN000008', '*', 0, 'etu'),
 ('USRM000009', 'MENDYN000009', '*', 0, 'etu'),
 ('USRM000010', 'MENDYN000010', '*', 0, 'etu'),
 ('USRM000011', 'MENDYN000011', '*', 0, 'etu'),
@@ -65,8 +59,6 @@ INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole) VALUES
 ('USRM000015', 'MENDYN000004', '*', 0, 'md'),
 ('USRM000016', 'MENDYN000005', '*', 0, 'md'),
 ('USRM000017', 'MENDYN000006', '*', 0, 'md'),
-('USRM000018', 'MENDYN000007', '*', 0, 'md'),
-('USRM000019', 'MENDYN000008', '*', 0, 'md'),
 ('USRM000020', 'MENDYN000009', '*', 0, 'md'),
 ('USRM000021', 'MENDYN000010', '*', 0, 'md'),
 ('USRM000022', 'MENDYN000011', '*', 0, 'md'),
