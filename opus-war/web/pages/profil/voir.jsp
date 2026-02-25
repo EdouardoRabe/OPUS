@@ -840,12 +840,17 @@
     </div>
 </div>
 <div id="pub-detail-modal">
-    <div class="pub-detail-box">
-        <div class="pub-detail-header">
-            <h3 class="pub-detail-title">Publication</h3>
-            <button class="rdm-close" onclick="closePublicationDetail()">&times;</button>
+    <div class="pub-fb-box" id="pub-fb-box">
+        <button class="pub-fb-close" onclick="closePublicationDetail()">&times;</button>
+        <div class="pub-fb-media" id="pub-fb-media">
+            <div class="pub-fb-media-content" id="pub-fb-media-content"></div>
+            <button class="pub-fb-nav pub-fb-nav-prev" id="pub-fb-prev" onclick="pubFbNavPrev()"><i class="bi bi-chevron-left"></i></button>
+            <button class="pub-fb-nav pub-fb-nav-next" id="pub-fb-next" onclick="pubFbNavNext()"><i class="bi bi-chevron-right"></i></button>
+            <div class="pub-fb-media-counter" id="pub-fb-counter"></div>
         </div>
-        <div class="pub-detail-body" id="pub-detail-content"></div>
+        <div class="pub-fb-details" id="pub-fb-details">
+            <div style="text-align:center;padding:40px;"><div class="fa-feed-spinner"></div></div>
+        </div>
     </div>
 </div>
 

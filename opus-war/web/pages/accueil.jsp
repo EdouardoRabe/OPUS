@@ -2662,6 +2662,7 @@
     // ========== DETAIL PUBLICATION (Facebook-style modal) ==========
     var _pubFbMedias = [];
     var _pubFbIndex = 0;
+    var _pubFbCurrentId = null; // track which pub is open for ID restoration
 
     function onPubCardClick(e, idpub) {
         // Ignore clicks on interactive elements inside the card
@@ -2669,18 +2670,55 @@
         openPublicationDetail(idpub);
     }
 
+    // Temporarily neutralize IDs on the feed card to prevent duplicate-ID conflicts
+    function _neutralizeFeedCardIds(idpub) {
+        var feedCard = document.getElementById('pub-' + idpub);
+        if (!feedCard) return;
+        // Don't neutralize if it's inside the modal
+        if (feedCard.closest('#pub-fb-details')) return;
+        var els = feedCard.querySelectorAll('[id]');
+        for (var i = 0; i < els.length; i++) {
+            els[i].setAttribute('data-feed-id', els[i].id);
+            els[i].id = '_feed_' + els[i].id;
+        }
+        feedCard.setAttribute('data-feed-id', feedCard.id);
+        feedCard.id = '_feed_' + feedCard.id;
+    }
+
+    // Restore IDs on the feed card
+    function _restoreFeedCardIds() {
+        var els = document.querySelectorAll('[data-feed-id]');
+        for (var i = 0; i < els.length; i++) {
+            els[i].id = els[i].getAttribute('data-feed-id');
+            els[i].removeAttribute('data-feed-id');
+        }
+    }
+
     function openPublicationDetail(idpub, mediaIdx) {
         if (!idpub) return;
+
+        // If modal is already open for another pub, close cleanly first
+        if (_pubFbCurrentId) {
+            _restoreFeedCardIds();
+            document.getElementById('pub-fb-details').innerHTML = '';
+            var mc = document.getElementById('pub-fb-media-content');
+            if (mc) { mc.querySelectorAll('video').forEach(function(v){v.pause();}); mc.innerHTML = ''; }
+        }
+
         var modal = document.getElementById('pub-detail-modal');
         var box   = document.getElementById('pub-fb-box');
         var details = document.getElementById('pub-fb-details');
+        _pubFbCurrentId = idpub;
 
-        // Get media data from the card in the feed (if present)
+        // Get media data from the card in the feed (BEFORE neutralizing IDs)
         _pubFbMedias = [];
         var feedCard = document.getElementById('pub-' + idpub);
-        if (feedCard) {
+        if (feedCard && !feedCard.closest('#pub-fb-details')) {
             try { _pubFbMedias = JSON.parse(feedCard.getAttribute('data-medias') || '[]'); } catch(ex){}
         }
+
+        // Neutralize feed card IDs so getElementById will target the modal card
+        _neutralizeFeedCardIds(idpub);
 
         // Setup layout
         if (_pubFbMedias.length > 0) {
@@ -2701,8 +2739,10 @@
             .then(function(html) {
                 details.innerHTML = html;
 
-                // If we had no media from feed card, try from the loaded card
+                // Find the loaded card
                 var loadedCard = details.querySelector('.fa-post-card');
+
+                // If we had no media from feed card, try from the loaded card
                 if (_pubFbMedias.length === 0 && loadedCard) {
                     try { _pubFbMedias = JSON.parse(loadedCard.getAttribute('data-medias') || '[]'); } catch(ex){}
                     if (_pubFbMedias.length > 0) {
@@ -2718,8 +2758,11 @@
                     if (mg) mg.style.display = 'none';
                 }
 
-                // Remove card onclick to prevent nested modal
-                if (loadedCard) loadedCard.removeAttribute('onclick');
+                // Remove card-level onclick to prevent nested modal
+                if (loadedCard) {
+                    loadedCard.removeAttribute('onclick');
+                    loadedCard.style.cursor = 'default';
+                }
 
                 // Auto-open comments section
                 if (loadedCard) {
@@ -2769,6 +2812,9 @@
             mc.innerHTML = '';
         }
         document.getElementById('pub-fb-details').innerHTML = '';
+        // Restore feed card IDs that were neutralized
+        _restoreFeedCardIds();
+        _pubFbCurrentId = null;
     }
 
     // ========== COPIER LIEN PUBLICATION / PROFIL ==========
