@@ -14,6 +14,32 @@
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.regex.Pattern" %>
+<%@ page import="java.util.regex.Matcher" %>
+<%!
+    private static String linkifyDesc(String raw) {
+        if (raw == null || raw.trim().isEmpty()) return "";
+        String s = raw.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+        s = s.replace("\n", "<br>");
+        s = s.replaceAll(
+            "(https?://[A-Za-z0-9._~:/?#\\[\\]@!$&'()*+,;=%-]+)",
+            "<a href=\"$1\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"pub-link\">$1</a>"
+        );
+        s = s.replaceAll(
+            "(?<!href=\\\"|/)(www\\.[A-Za-z0-9._~:/?#\\[\\]@!$&'()*+,;=%-]+)",
+            "<a href=\"http://$1\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"pub-link\">$1</a>"
+        );
+        s = s.replaceAll(
+            "#([A-Za-z0-9_]+)",
+            "<span class=\"pub-hashtag\">#$1</span>"
+        );
+        s = s.replaceAll(
+            "@([A-Za-z\\u00C0-\\u00FF]+(?: [A-Za-z\\u00C0-\\u00FF]+){0,2})",
+            "<span class=\"mention-badge\">@$1</span>"
+        );
+        return s;
+    }
+%>
 <%
     // =========================================================
     // AJAX : Chargement progressif du fil d'actualite (score-based)
@@ -248,13 +274,9 @@
                 if (sbTags.length() > 0) taggedNames = sbTags.toString();
             }
 
-            // Description echappee
+            // Description echappee + linkifiee
             String desc     = pub.getDescritpion();
-            String descSafe = "";
-            if (desc != null) {
-                descSafe = desc.replace("&", "&amp;").replace("<", "&lt;")
-                        .replace(">", "&gt;").replace("\n", "<br>");
-            }
+            String descSafe = linkifyDesc(desc);
 
             // ---- Partage: charger la pub originale si idpuborigine est defini ----
             boolean ffIsShared = pub.getIdpuborigine() != null && !pub.getIdpuborigine().trim().isEmpty();
@@ -266,7 +288,7 @@
                 if (ffOrigPubs != null && ffOrigPubs.length > 0) {
                     Publication ffOrig = ffOrigPubs[0];
                     String ffod = ffOrig.getDescritpion();
-                    ffOrigDesc = ffod != null ? ffod.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;").replace("\n","<br>") : "";
+                    ffOrigDesc = linkifyDesc(ffod);
                     ffOrigDate = (ffOrig.getDaty() != null ? ffOrig.getDaty().toString() : "") + " \u00e0 " + (ffOrig.getHeure() != null ? ffOrig.getHeure() : "");
                     String ffOrigTypePubId = ffOrig.getIdtypepublication() != null ? ffOrig.getIdtypepublication() : "";
                     ffOrigTypePubLib = ffOrigTypePubId;
@@ -440,7 +462,7 @@
         <!-- Partager (non auteur, non partage) -->
         <% if (pub.getIdutilisateur() != refuserConnecte && !ffIsShared) { %>
         <%  String _ffShareAuteurEsc = auteur.replace("'","\\'").replace("\"","\\\"");
-            String _ffShareTexteEsc  = descSafe.isEmpty() ? "" : descSafe.replace("<br>"," ").replace("'","\\'").replace("\"","\\\""); %>
+            String _ffShareTexteEsc  = descSafe.isEmpty() ? "" : descSafe.replaceAll("<[^>]+>"," ").replaceAll("\\s+"," ").trim().replace("'","\\'").replace("\"","\\\""); %>
         <button class="fa-action-btn" onclick="openShareModal('<%= idpub %>','<%= _ffShareAuteurEsc %>','<%= pub.getDaty() %>&nbsp;&agrave;&nbsp;<%= pub.getHeure() != null ? pub.getHeure() : "" %>','<%= _ffShareTexteEsc %>')">
             <i class="bi bi-share"></i>&nbsp;<span>Partager</span>
         </button>

@@ -200,6 +200,14 @@
 /* ---- Mention badge ---- */
 .mention-badge { color: var(--itu-blue,#008BFF); font-weight: 600; background: #e7f3ff; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
 
+/* ---- Liens cliquables dans les publications ---- */
+.pub-link { color: #0a66c2; text-decoration: none; word-break: break-all; }
+.pub-link:hover { text-decoration: underline; color: #004182; }
+
+/* ---- Hashtags dans les publications ---- */
+.pub-hashtag { color: #0a66c2; font-weight: 600; cursor: default; }
+.pub-hashtag:hover { text-decoration: underline; }
+
 /* ---- Infinite scroll loader ---- */
 .fa-feed-spinner { display:inline-block; width:32px; height:32px; border:3px solid #e4e6eb; border-top-color:var(--itu-blue,#008BFF); border-radius:50%; animation:feedSpin .7s linear infinite; }
 @keyframes feedSpin { to { transform:rotate(360deg); } }

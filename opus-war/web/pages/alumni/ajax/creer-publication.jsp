@@ -222,6 +222,79 @@
             }
 
             // --- Visibilite : enregistrer les restrictions ---
+
+            // --- Notifications hashtag : notifier tous les utilisateurs concernes ---
+            {
+                String _nomSource = Notification.getNomUtilisateur(conn, map.getRefuser());
+                String _lienPub = "module.jsp?but=accueil.jsp&scrollTo=pub-" + pub.getIdpublication();
+                // Collecter les utilisateurs a notifier (Set pour eviter les doublons)
+                Set _notifUsers = new HashSet(); // Set<Integer>
+
+                // Requeter les hashtags inseres pour cette publication
+                PreparedStatement _nps = conn.prepareStatement(
+                    "SELECT typetag, idref FROM publicationhashtag WHERE idpublication = ?");
+                _nps.setString(1, pub.getIdpublication());
+                ResultSet _nrs = _nps.executeQuery();
+                while (_nrs.next()) {
+                    String _typetag = _nrs.getString("typetag");
+                    String _idref   = _nrs.getString("idref");
+                    if ("SPECIALITE".equals(_typetag)) {
+                        // Tous les utilisateurs ayant cette specialite
+                        PreparedStatement _ups = conn.prepareStatement(
+                            "SELECT DISTINCT p.idutilisateur FROM specialiteprofil sp "
+                            + "JOIN profil p ON sp.idprofil = p.idprofil "
+                            + "WHERE sp.idspecialite = ? AND sp.etat = 1");
+                        _ups.setString(1, _idref);
+                        ResultSet _urs = _ups.executeQuery();
+                        while (_urs.next()) _notifUsers.add(new Integer(_urs.getInt("idutilisateur")));
+                        _urs.close(); _ups.close();
+                    } else if ("PROMOTION".equals(_typetag)) {
+                        // Tous les utilisateurs de cette promotion
+                        PreparedStatement _ups = conn.prepareStatement(
+                            "SELECT DISTINCT idutilisateur FROM profil WHERE idpromotion = ?");
+                        _ups.setString(1, _idref);
+                        ResultSet _urs = _ups.executeQuery();
+                        while (_urs.next()) _notifUsers.add(new Integer(_urs.getInt("idutilisateur")));
+                        _urs.close(); _ups.close();
+                    } else if ("PARCOURS".equals(_typetag)) {
+                        // Tous les utilisateurs de ce parcours
+                        PreparedStatement _ups = conn.prepareStatement(
+                            "SELECT DISTINCT idutilisateur FROM profil WHERE idparcours = ?");
+                        _ups.setString(1, _idref);
+                        ResultSet _urs = _ups.executeQuery();
+                        while (_urs.next()) _notifUsers.add(new Integer(_urs.getInt("idutilisateur")));
+                        _urs.close(); _ups.close();
+                    }
+                }
+                _nrs.close(); _nps.close();
+
+                // Exclure l'auteur de la publication
+                _notifUsers.remove(new Integer(map.getRefuser()));
+
+                // Construire les hashtags pour le message
+                PreparedStatement _hps2 = conn.prepareStatement(
+                    "SELECT hashtag FROM publicationhashtag WHERE idpublication = ?");
+                _hps2.setString(1, pub.getIdpublication());
+                ResultSet _hrs2 = _hps2.executeQuery();
+                StringBuilder _tagList = new StringBuilder();
+                while (_hrs2.next()) {
+                    if (_tagList.length() > 0) _tagList.append(" ");
+                    _tagList.append(_hrs2.getString("hashtag"));
+                }
+                _hrs2.close(); _hps2.close();
+                String _tagsStr = _tagList.toString();
+
+                // Envoyer les notifications
+                java.util.Iterator _it = _notifUsers.iterator();
+                while (_it.hasNext()) {
+                    int _targetUser = ((Integer) _it.next()).intValue();
+                    String _objet = _nomSource + " a publie une offre qui vous concerne " + _tagsStr;
+                    Notification.creerEtEnvoyer(conn, userId, _targetUser,
+                        _objet, Notification.TYPE_HASHTAG, _lienPub);
+                }
+            }
+
+            // --- Visibilite (suite) ---
             if (visSpec != null && !visSpec.trim().isEmpty()) {
                 String[] _vs = visSpec.split(",");
                 for (int _vi = 0; _vi < _vs.length; _vi++) {
