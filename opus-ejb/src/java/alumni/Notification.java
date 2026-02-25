@@ -21,6 +21,7 @@ public class Notification extends ClassMAPTable {
     public static final String TYPE_MENTION = "MENTION";
     public static final String TYPE_IDENTIFICATION = "IDENTIFICATION";
     public static final String TYPE_EVENEMENT = "EVENEMENT";
+    public static final String TYPE_HASHTAG = "HASHTAG";
 
     private String idnotification;
     private String objet;
