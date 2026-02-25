@@ -818,11 +818,10 @@ function pvUploadPhoto(inputId, typeVal, apresOk) {
 // ========== PUBLICATIONS DU PROFIL ==========
 function pvLoadPubs(idutilisateur, idprofil, cursorId) {
     var container = document.getElementById('pvPublications');
-    var loadBtn = event && event.target && event.target.classList.contains('ppub-load-more-btn') ? event.target : null;
     if (cursorId === '') {
         container.innerHTML = '<em style="color:#aaa;font-size:13px;">Chargement...</em>';
     }
-    var url = ctx + '/pages/alumni/ajax/publications-profil.jsp?'
+    var url = CTX + '/pages/alumni/ajax/publications-profil.jsp?'
         + 'idutilisateur=' + encodeURIComponent(idutilisateur)
         + '&idprofil=' + encodeURIComponent(idprofil)
         + (cursorId ? '&cursor_id=' + encodeURIComponent(cursorId) : '');
@@ -845,7 +844,7 @@ function pvLoadPubs(idutilisateur, idprofil, cursorId) {
 function ppubLoadMore(btn, iduser, idprofil, cursorId) {
     btn.disabled = true; btn.textContent = 'Chargement...';
     var container = document.getElementById('pvPublications');
-    var url = ctx + '/pages/alumni/ajax/publications-profil.jsp?'
+    var url = CTX + '/pages/alumni/ajax/publications-profil.jsp?'
         + 'idutilisateur=' + encodeURIComponent(iduser)
         + '&idprofil=' + encodeURIComponent(idprofil)
         + '&cursor_id=' + encodeURIComponent(cursorId);
