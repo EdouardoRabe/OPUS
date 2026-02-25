@@ -380,7 +380,7 @@
    ════════════════════════════════ */
 :root {
   --itu-blue: #008BFF;
-  --itu-dark: #362F4F;
+  --itu-dark: #1c1e29;
   --itu-violet: #5B23FF;
   --pvl-border: #e2e6ea;
   --pvl-card-bg: #fff;

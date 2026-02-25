@@ -1115,6 +1115,26 @@ VALUES ('USRM000045', 'MENDYN000019', '*', 0, 'etu');
 -- Droits role md
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000046', 'MENDYN000019', '*', 0, 'md');
+
+INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
+VALUES (
+           'MENDYN000020',
+           'Carte',
+           'bi-globe-americas',
+           'module.jsp?but=map/cart.jsp',
+           2,
+           1,
+           'MENDYN000002YN000002'
+       );
+
+-- Droits role etu pour la Carte
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
+VALUES ('USRM000047', 'MENDYN000020', '*', 0, 'etu');
+
+-- Droits role md pour la Carte
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
+VALUES ('USRM000048', 'MENDYN000020', '*', 0, 'md');
+
 -- ╔═══════════════════════════════════════════════════════════════════════════════╗
 -- ║ SECTION 16: MISE A JOUR DES SEQUENCES                                         ║
 -- ╚═══════════════════════════════════════════════════════════════════════════════╝
