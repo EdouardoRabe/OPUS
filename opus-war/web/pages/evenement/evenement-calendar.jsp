@@ -346,10 +346,19 @@
     transition: transform .12s, box-shadow .12s !important;
     margin-bottom: 2px !important;
     line-height: 1.5 !important;
+    background: linear-gradient(135deg, #008BFF 0%, #0056b3 100%) !important;
+    color: #fff !important;
+}
+#fullCalendar .fc-event-inner {
+    background: transparent !important;
+    color: #fff !important;
+}
+#fullCalendar .fc-event.fc-bg {
+    background: rgba(0, 139, 255, 0.08) !important;
 }
 #fullCalendar .fc-event:hover {
     transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    box-shadow: 0 3px 10px rgba(0, 139, 255, 0.3);
 }
 #fullCalendar .fc-day-grid-event .fc-content {
     white-space: nowrap;
@@ -509,16 +518,16 @@
 
         var $list = $('#upcomingList');
         if (upcoming.length === 0) {
-            $list.html('<div class="cal-upcoming-empty"><i class="fa fa-calendar-o" style="font-size:1.5rem;display:block;margin-bottom:0.5rem;opacity:.4;"></i>Aucun \u00e9v\u00e9nement \u00e0 venir</div>');
+            $list.html('<div class="cal-upcoming-empty"><i class="fa fa-calendar-o" style="font-size:1.5rem;display:block;margin-bottom:0.5rem;opacity:.4;"></i>Aucun événement à venir</div>');
         } else {
             var html = '';
             upcoming.forEach(function(evt) {
                 html += '<div class="cal-upcoming-item" data-id="' + evt.id + '">'
-                      + '<div class="cal-upcoming-dot" style="background:' + evt.color + ';"></div>'
+                      + '<div class="cal-upcoming-dot" style="background:#008BFF;"></div>'
                       + '<div class="cal-upcoming-info">'
                       + '<div class="cal-upcoming-title">' + evt.title + '</div>'
                       + '<div class="cal-upcoming-date"><i class="fa fa-calendar-o" style="margin-right:4px;"></i>' + fmtDate(evt.start)
-                      + (evt.end ? ' \u2192 ' + fmtDate(evt.end) : '') + '</div>'
+                      + (evt.end ? ' → ' + fmtDate(evt.end) : '') + '</div>'
                       + '</div></div>';
             });
             $list.html(html);
@@ -632,7 +641,7 @@
         }
 
         if (evt.color) {
-            $('#evtModalBanner').css('background', 'linear-gradient(135deg, ' + evt.color + ' 0%, ' + adjustColor(evt.color, 40) + ' 100%)');
+            $('#evtModalBanner').css('background', 'linear-gradient(135deg, #008BFF 0%, #0056b3 100%)');
         }
         $modal.fadeIn(200);
     }

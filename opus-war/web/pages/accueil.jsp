@@ -14,7 +14,14 @@
 <%@ page import="alumni.ProfilLib" %>
 <%@ page import="alumni.Evenement" %>
 <%@ page import="alumni.Identification" %>
+<%@ page import="alumni.Specialite" %>
+<%@ page import="alumni.Promotion" %>
+<%@ page import="alumni.Parcours" %>
 <%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.Statement" %>
+<%@ page import="java.sql.ResultSet" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
 <%
@@ -23,12 +30,6 @@
     int refuserConnecte = mapFil.getRefuser();
     String nomConnecte = mapFil.getNomuser() != null ? mapFil.getNomuser() : "";
     String ctx = request.getContextPath();
-    // --- Feed seed (variation d'ordre a chaque nouvelle session de navigation) ---
-    Integer feedSeed = (Integer) session.getAttribute("feedSeed");
-    if (feedSeed == null) {
-        feedSeed = new java.util.Random().nextInt(10000);
-        session.setAttribute("feedSeed", feedSeed);
-    }
     // Initiales du user connecte
     String[] _partsConn = nomConnecte.trim().split("\\s+");
     String initialConnecte = (_partsConn.length > 0 && _partsConn[0].length() > 0)
@@ -46,6 +47,14 @@
     Typepublication[] typesPub = (Typepublication[]) CGenUtil.rechercher(
             new Typepublication(), null, null, " order by idtypepublication");
     if (typesPub == null) typesPub = new Typepublication[0];
+
+    // --- Charger specialites et promotions (hashtag / filtre / visibilite) ---
+    Specialite[] allSpecialites = (Specialite[]) CGenUtil.rechercher(new Specialite(), null, null, " order by libelle");
+    if (allSpecialites == null) allSpecialites = new Specialite[0];
+    Promotion[] allPromotions = (Promotion[]) CGenUtil.rechercher(new Promotion(), null, null, " order by annee desc");
+    if (allPromotions == null) allPromotions = new Promotion[0];
+    Parcours[] allParcours = (Parcours[]) CGenUtil.rechercher(new Parcours(), null, null, " order by libelle");
+    if (allParcours == null) allParcours = new Parcours[0];
 
     // Charger photo profil/couverture du connecte + 3 evenements a venir
     String _connPhotoUrl = "";
@@ -107,6 +116,23 @@
         <script>document.addEventListener('DOMContentLoaded',function(){Swal.fire({icon:'error',title:'Erreur',text:'<%= msgErreur.replace("'","\\'").replace("<","&lt;") %>',confirmButtonColor:'var(--itu-blue)'});});</script>
         <% } %>
 
+        <!-- ===== FILTRE DU FIL ===== -->
+        <!-- Datalists pour le filtre -->
+        <datalist id="dl-f-spec"><% for (int _fi=0;_fi<allSpecialites.length;_fi++){%><option value="<%= allSpecialites[_fi].getLibelle() %>"><% } %></datalist>
+        <datalist id="dl-f-parc"><% for (int _fi=0;_fi<allParcours.length;_fi++){%><option value="<%= allParcours[_fi].getLibelle() %>"><% } %></datalist>
+        <datalist id="dl-f-typepub"><% for (int _fi=0;_fi<typesPub.length;_fi++){%><option value="<%= typesPub[_fi].getLibelle() %>"><% } %></datalist>
+        <div class="fa-filter-bar" id="feed-filter-bar">
+            <input list="dl-f-spec" id="filter-spec-input" class="fa-filter-input" placeholder="Sp&eacute;cialit&eacute;..." autocomplete="off">
+            <input list="dl-f-parc" id="filter-parc-input" class="fa-filter-input" placeholder="Parcours..." autocomplete="off">
+            <input id="filter-promo-input" class="fa-filter-input" placeholder="Ann&eacute;e ex: 2023+" maxlength="6" autocomplete="off">
+            <input list="dl-f-typepub" id="filter-typepub-input" class="fa-filter-input" placeholder="Type de publication..." autocomplete="off">
+            <label class="fa-filter-lier-label" title="Relier les crit&egrave;res (ET)">
+                <input type="checkbox" id="filter-lier">&nbsp;Lier
+            </label>
+            <button type="button" class="fa-filter-apply" onclick="appliquerFiltre()"><i class="bi bi-sliders"></i>&nbsp;Filtrer</button>
+            <button type="button" class="fa-filter-reset" onclick="reinitialiserFiltre()" id="filter-reset-btn" style="display:none"><i class="bi bi-x-lg"></i></button>
+        </div>
+
         <!-- ===== COMPOSER ===== -->
         <div class="fa-composer-card" id="composer-card">
             <div class="fa-composer-trigger" id="composer-trigger" onclick="openComposer()">
@@ -157,6 +183,55 @@
                         </div>
                         <input type="hidden" name="identifications" id="pub-identifications" value="">
                     </div>
+                    <!-- Zone visibilite -->
+                    <div class="fa-vis-section" id="vis-section">
+                        <div class="fa-vis-header" onclick="toggleVisSection()">
+                            <i class="bi bi-globe2" id="vis-icon"></i>
+                            <span id="vis-summary">Visible par tous</span>
+                            <i class="bi bi-chevron-down" id="vis-chevron" style="margin-left:auto;font-size:12px;"></i>
+                        </div>
+                        <!-- Datalists visibilite -->
+                        <datalist id="dl-vis-spec"><% for(int _vi=0;_vi<allSpecialites.length;_vi++){%><option value="<%= allSpecialites[_vi].getLibelle() %>"><% } %></datalist>
+                        <datalist id="dl-vis-parc"><% for(int _vi=0;_vi<allParcours.length;_vi++){%><option value="<%= allParcours[_vi].getLibelle() %>"><% } %></datalist>
+                        <div class="fa-vis-body" id="vis-body" style="display:none;">
+                            <div class="fa-vis-group">
+                                <div class="fa-vis-label">Sp&eacute;cialit&eacute;s</div>
+                                <div class="fa-vis-tag-row">
+                                    <input list="dl-vis-spec" id="vis-spec-input" class="fa-vis-tag-input" placeholder="Ajouter une sp&eacute;cialit&eacute;..." autocomplete="off" oninput="" onkeydown="onVisTagKey(event,'spec')">
+                                    <button type="button" class="fa-vis-tag-add" onclick="addVisTagFromInput('spec')"><i class="bi bi-plus"></i></button>
+                                </div>
+                                <div class="fa-vis-chips" id="vis-spec-chips"></div>
+                            </div>
+                            <div class="fa-vis-group">
+                                <div class="fa-vis-label">Parcours</div>
+                                <div class="fa-vis-tag-row">
+                                    <input list="dl-vis-parc" id="vis-parc-input" class="fa-vis-tag-input" placeholder="Ajouter un parcours..." autocomplete="off" onkeydown="onVisTagKey(event,'parc')">
+                                    <button type="button" class="fa-vis-tag-add" onclick="addVisTagFromInput('parc')"><i class="bi bi-plus"></i></button>
+                                </div>
+                                <div class="fa-vis-chips" id="vis-parc-chips"></div>
+                            </div>
+                            <div class="fa-vis-group">
+                                <div class="fa-vis-label">Promotion (ann&eacute;e)</div>
+                                <div class="fa-vis-tag-row" style="position:relative;">
+                                    <input id="vis-promo-input" class="fa-vis-tag-input" placeholder="ex: 2023 &rarr; 2023+ ou 2023-" maxlength="5" autocomplete="off"
+                                           oninput="onVisPromoInput()" onkeydown="onVisPromoKey(event)">
+                                    <button type="button" class="fa-vis-tag-add" onclick="addVisPromoFromInput()"><i class="bi bi-plus"></i></button>
+                                    <div class="fa-vis-promo-dd" id="vis-promo-dd" style="display:none;"></div>
+                                </div>
+                                <div class="fa-vis-chips" id="vis-promo-chips"></div>
+                            </div>
+                            <div class="fa-vis-group" id="vis-lier-group">
+                                <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                                    <input type="checkbox" id="vis-lier-check" onchange="updateVisHidden()">
+                                    Lier les crit&egrave;res (ET : toutes les conditions requises)
+                                </label>
+                            </div>
+                            <input type="hidden" name="vis_spec" id="vis-spec-hidden" value="">
+                            <input type="hidden" name="vis_parc" id="vis-parc-hidden" value="">
+                            <input type="hidden" name="vis_promo_annee" id="vis-promo-annee-hidden" value="">
+                            <input type="hidden" name="vis_lier" id="vis-lier-hidden" value="OR">
+                        </div>
+                    </div>
                     <div class="fa-composer-footer">
                         <label class="fa-attach-btn">
                             <i class="bi bi-image"></i>&nbsp;Photo/Vid&eacute;o
@@ -200,14 +275,52 @@
                     }
                 }
 
-                // Charger les 10 premieres publications (cursor-based)
-                int _feedOffset = feedSeed % 6;
-                Publication[] pubs = (Publication[]) CGenUtil.rechercher(
-                        new Publication(), null, null, conn,
-                        " and etat = 1 order by daty desc, heure desc, idpublication desc limit 10 offset " + _feedOffset);
-                if (pubs == null) pubs = new Publication[0];
+                // --- Score feed : interactions + recence - vues (1 requete JDBC, leger) ---
+                // Score = reactions*2 + commentaires*3 - vues_user*4 + bonus_recence
+                String _sE =
+                    "COALESCE((SELECT COUNT(*) FROM publicationreaction pr WHERE pr.idpublication=p.idpublication),0)*2"
+                    + "+COALESCE((SELECT COUNT(*) FROM publicationcommentaire pc WHERE pc.idpublication=p.idpublication AND pc.etat=1),0)*3"
+                    + "-COALESCE((SELECT pv.nbvue FROM publicationvue pv WHERE pv.idpublication=p.idpublication AND pv.idutilisateur=" + refuserConnecte + "),0)*4"
+                    + "+CASE WHEN p.daty::date=CURRENT_DATE THEN 15 WHEN p.daty::date>=CURRENT_DATE-7 THEN 8 WHEN p.daty::date>=CURRENT_DATE-30 THEN 3 ELSE 0 END";
+                // ---- Visibilite : construire sous-requetes ----
+                String _vsSpecSub = "(SELECT sp.idspecialite FROM specialiteprofil sp JOIN profil _pr ON sp.idprofil=_pr.idprofil WHERE _pr.idutilisateur=" + refuserConnecte + ")";
+                String _vsParcSub = "(SELECT _pr.idparcours FROM profil _pr WHERE _pr.idutilisateur=" + refuserConnecte + " LIMIT 1)";
+                String _vsUserAnnee = "(SELECT _pt.annee FROM promotion _pt JOIN profil _pr ON _pt.idpromotion=_pr.idpromotion WHERE _pr.idutilisateur=" + refuserConnecte + " LIMIT 1)";
+                // Condition promo : direction + ou -
+                String _vsPromoCond = "(_pv.typecible='PROMOTION' AND ((_pv.anneedirection='+' AND " + _vsUserAnnee + ">=_pv.anneeref) OR (_pv.anneedirection='-' AND " + _vsUserAnnee + "<=_pv.anneeref)))";
+                String _vsSpecExist  = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE' AND _pv.idref IN " + _vsSpecSub + ")";
+                String _vsPromoExist = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND " + _vsPromoCond + ")";
+                String _vsParcExist  = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PARCOURS' AND _pv.idref=" + _vsParcSub + ")";
+                String _visW =
+                    " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication)"
+                    // OR mode: satisfaire au moins UNE restriction
+                    + " OR (COALESCE(p.logique_visibilite,'OR')='OR' AND ("
+                    + _vsSpecExist + " OR " + _vsPromoExist + " OR " + _vsParcExist
+                    + "))"
+                    // AND mode: satisfaire CHAQUE type de restriction present
+                    + " OR (p.logique_visibilite='AND'"
+                    + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE') OR " + _vsSpecExist + ")"
+                    + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PROMOTION') OR " + _vsPromoExist + ")"
+                    + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PARCOURS') OR " + _vsParcExist + ")))"; 
+                String _initSql = "SELECT p.idpublication,(" + _sE + ") AS score FROM publication p WHERE p.etat=1" + _visW + " ORDER BY score DESC,p.idpublication DESC LIMIT 10";
+                List _pids = new ArrayList(); List _pscores = new ArrayList();
+                Statement _st = null; ResultSet _rs = null;
+                try {
+                    _st = conn.createStatement(); _rs = _st.executeQuery(_initSql);
+                    while (_rs.next()) { _pids.add(_rs.getString("idpublication")); _pscores.add(new Integer(_rs.getInt("score"))); }
+                } finally {
+                    if (_rs != null) try { _rs.close(); } catch (Exception _x) {}
+                    if (_st != null) try { _st.close(); } catch (Exception _x) {}
+                }
+                Publication[] pubs = new Publication[_pids.size()];
+                for (int _i = 0; _i < _pids.size(); _i++) {
+                    Publication[] _pa = (Publication[]) CGenUtil.rechercher(new Publication(), null, null, conn, " and idpublication='" + _pids.get(_i) + "'");
+                    pubs[_i] = (_pa != null && _pa.length > 0) ? _pa[0] : new Publication();
+                }
+                String _lastScore = _pscores.isEmpty() ? "0" : _pscores.get(_pscores.size()-1).toString();
 
                 // Passer les données au composant via request attributes
+                request.setAttribute("_pub_lastScore", _lastScore);
                 request.setAttribute("_pub_pubs", pubs);
                 request.setAttribute("_pub_userNames", userNames);
                 request.setAttribute("_pub_userPhotos", userPhotos);
@@ -391,6 +504,57 @@
     .fa-composer-full { margin-top: 10px; border-top: 1px solid var(--fa-border); padding-top: 12px; }
     .fa-composer-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
     .fa-type-select { margin-left: 6px; padding: 3px 8px; border: 1px solid var(--fa-border); border-radius: 6px; font-size: 13px; background: #f0f2f5; }
+    /* ---- Barre de filtre ---- */
+    .fa-filter-bar { display:flex; align-items:center; gap:8px; background:var(--fa-card-bg); border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.12); padding:10px 14px; flex-wrap:wrap; }
+    .fa-filter-input { padding:5px 10px; border:1px solid var(--fa-border); border-radius:8px; font-size:13px; background:#f0f2f5; color:var(--fa-text); width:130px; outline:none; }
+    .fa-filter-input:focus { border-color:var(--itu-blue,#008BFF); background:#fff; }
+    .fa-filter-lier-label { font-size:13px; color:var(--fa-text-secondary); display:flex; align-items:center; gap:4px; cursor:pointer; white-space:nowrap; }
+    .fa-filter-apply { padding:6px 14px; background:var(--itu-blue,#008BFF); color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:5px; }
+    .fa-filter-apply:hover { background:#0069cc; }
+    .fa-filter-reset { padding:6px 10px; background:#e4e6eb; border:none; border-radius:8px; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; }
+    .fa-filter-reset:hover { background:#d8dadf; }
+    /* ---- Visibilite composer ---- */
+    .fa-vis-section { margin-top:8px; border:1px solid var(--fa-border); border-radius:8px; overflow:hidden; }
+    .fa-vis-header { display:flex; align-items:center; gap:7px; padding:8px 12px; cursor:pointer; background:#f8f9fb; font-size:13px; color:var(--fa-text-secondary); user-select:none; }
+    .fa-vis-header:hover { background:#f0f2f5; }
+    .fa-vis-body { padding:10px 12px; display:flex; flex-direction:column; gap:10px; background:#fff; }
+    .fa-vis-group { display:flex; flex-direction:column; gap:5px; }
+    .fa-vis-label { font-size:12px; font-weight:600; color:var(--fa-text-secondary); text-transform:uppercase; letter-spacing:.4px; }
+    .fa-vis-tag-row { display:flex; gap:5px; align-items:center; }
+    .fa-vis-tag-input { flex:1; padding:5px 8px; border:1px solid var(--fa-border); border-radius:8px; font-size:13px; background:#f0f2f5; outline:none; }
+    .fa-vis-tag-input:focus { border-color:var(--itu-blue,#008BFF); background:#fff; }
+    .fa-vis-tag-add { padding:5px 9px; background:var(--itu-blue,#008BFF); color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:14px; line-height:1; }
+    .fa-vis-chips { display:flex; flex-wrap:wrap; gap:5px; margin-top:4px; min-height:4px; }
+    .fa-vis-chip { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; background:#e7f3ff; color:var(--itu-blue,#008BFF); border:1px solid #b8dbff; border-radius:12px; font-size:12px; }
+    .fa-vis-chip-del { background:none; border:none; color:inherit; cursor:pointer; padding:0 0 0 2px; font-size:13px; line-height:1; opacity:.7; }
+    .fa-vis-chip-del:hover { opacity:1; }
+    .fa-vis-promo-dd { position:absolute; top:100%; left:0; z-index:200; background:#fff; border:1px solid #dde3ec; border-radius:8px; box-shadow:0 4px 14px rgba(0,0,0,.13); min-width:160px; }
+    .fa-vis-promo-dd-item { padding:8px 12px; cursor:pointer; font-size:13px; }
+    .fa-vis-promo-dd-item:hover { background:#e7f3ff; }
+    /* ---- Hashtag autocomplete ---- */
+    .fa-hashtag-dd { display:none; position:absolute; bottom:calc(100% + 4px); left:0; z-index:300; background:#fff; border:1px solid #dde3ec; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,.14); min-width:220px; max-height:200px; overflow-y:auto; }
+    .fa-hashtag-item { padding:8px 12px; cursor:pointer; font-size:13px; border-bottom:1px solid #f0f2f5; }
+    .fa-hashtag-item:hover { background:#e7f3ff; }
+    .fa-hashtag-item:last-child { border-bottom:none; }
+    /* ---- Modale detail reactions ---- */
+    #react-detail-modal { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.45); align-items:center; justify-content:center; }
+    .react-detail-box { background:#fff; border-radius:14px; width:min(420px,95vw); max-height:80vh; display:flex; flex-direction:column; box-shadow:0 10px 40px rgba(0,0,0,.25); overflow:hidden; }
+    .rdm-header { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--fa-border); }
+    .rdm-title { margin:0; font-size:16px; font-weight:700; color:var(--fa-text); }
+    .rdm-close { background:none; border:none; font-size:24px; cursor:pointer; color:var(--fa-text-secondary); line-height:1; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+    .rdm-close:hover { background:#f0f2f5; }
+    .rdm-tabs { display:flex; gap:2px; padding:6px 12px 0; border-bottom:1px solid var(--fa-border); flex-wrap:wrap; }
+    .rdm-tab { background:none; border:none; border-bottom:3px solid transparent; margin-bottom:-1px; padding:8px 14px; font-size:14px; cursor:pointer; color:var(--fa-text-secondary); font-weight:500; display:flex; align-items:center; gap:4px; border-radius:4px 4px 0 0; }
+    .rdm-tab:hover { background:#f0f2f5; }
+    .rdm-tab--active { color:var(--itu-blue,#008BFF); border-bottom-color:var(--itu-blue,#008BFF); }
+    .rdm-tab-count { font-size:12px; }
+    #react-detail-content { overflow-y:auto; flex:1; min-height:60px; }
+    .rdm-panel--hidden { display:none; }
+    .rdm-user-row { display:flex; align-items:center; gap:10px; padding:10px 16px; text-decoration:none; color:var(--fa-text); transition:background .15s; }
+    .rdm-user-row:hover { background:#f0f2f5; }
+    .rdm-avatar { width:40px; height:40px; border-radius:50%; background:var(--itu-blue,#008BFF); color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; flex-shrink:0; overflow:hidden; }
+    .rdm-user-name { flex:1; font-size:14px; font-weight:500; }
+    .rdm-reaction-emoji { font-size:20px; }
     .fa-composer-textarea {
         width: 100%; border: none; outline: none; resize: none;
         font-size: 16px; color: var(--fa-text); background: transparent;
@@ -628,13 +792,71 @@
     .fa-feed-spinner { display:inline-block; width:32px; height:32px; border:3px solid #e4e6eb; border-top-color:var(--itu-blue,#008BFF); border-radius:50%; animation:feedSpin .7s linear infinite; }
     @keyframes feedSpin { to { transform:rotate(360deg); } }
     .fa-feed-end { text-align:center; padding:12px 0; color:var(--fa-text-secondary); font-size:13px; }
+    /* ---- Publication partagee : bloc original embedded ---- */
+    .fa-shared-embed { border:1.5px solid var(--fa-border); border-radius:10px; margin:10px 0 4px; padding:12px 14px; background:#f8f9fb; cursor:default; }
+    .fa-shared-embed-header { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:6px; font-size:13px; }
+    .fa-shared-embed-author { font-weight:700; }
+    .fa-shared-embed-date { color:#888; font-size:12px; }
+    .fa-shared-embed-text { font-size:13px; color:var(--fa-text); word-break:break-word; line-height:1.5; max-height:160px; overflow:hidden; }
+    .fa-shared-embed img { max-width:100%; border-radius:8px; margin-top:8px; max-height:200px; object-fit:cover; cursor:pointer; pointer-events:auto; width:100%; }
+    /* ---- Modale partage ---- */
+    #share-modal { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.45); align-items:center; justify-content:center; }
+    .share-box { background:#fff; border-radius:14px; width:min(500px,96vw); max-height:90vh; display:flex; flex-direction:column; box-shadow:0 10px 40px rgba(0,0,0,.25); overflow:hidden; }
+    .share-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--fa-border); }
+    .share-title { margin:0; font-size:16px; font-weight:700; }
+    .share-body { padding:16px 18px; overflow-y:auto; flex:1; }
+    .share-textarea { width:100%; min-height:80px; border:1.5px solid #dde3ec; border-radius:10px; padding:10px 12px; font-size:14px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; }
+    .share-textarea:focus { border-color:var(--itu-blue,#008BFF); }
+    .share-original { border:1.5px solid #dde3ec; border-radius:10px; padding:12px 14px; margin-top:12px; background:#f8f9fb; max-height:220px; overflow:hidden; pointer-events:none; }
+    .share-orig-author { font-weight:700; font-size:13px; margin-bottom:4px; }
+    .share-orig-date { font-size:11px; color:#888; margin-bottom:8px; }
+    .share-orig-text { font-size:13px; color:var(--fa-text); white-space:pre-wrap; word-break:break-word; max-height:120px; overflow:hidden; }
+    .share-footer { display:flex; justify-content:flex-end; gap:10px; padding:12px 18px; border-top:1px solid var(--fa-border); }
+    .share-cancel-btn { background:transparent; border:1.5px solid var(--fa-border); border-radius:20px; padding:7px 18px; font-size:14px; font-weight:600; cursor:pointer; }
+    .share-cancel-btn:hover { background:#f0f2f5; }
+    .share-submit-btn { background:var(--itu-blue,#008BFF); color:#fff; border:none; border-radius:20px; padding:7px 18px; font-size:14px; font-weight:700; cursor:pointer; }
+    .share-submit-btn:hover { opacity:.88; }
+    .share-submit-btn:disabled { opacity:.5; cursor:default; }
 </style>
+
+<!-- ==================== MODALE REACTIONS ==================== -->
+<div id="react-detail-modal">
+    <div class="react-detail-box">
+        <div id="react-detail-content"></div>
+    </div>
+</div>
+
+<!-- ==================== MODALE PARTAGE ==================== -->
+<div id="share-modal">
+    <div class="share-box">
+        <div class="share-header">
+            <h3 class="share-title">Partager la publication</h3>
+            <button class="rdm-close" onclick="closeShareModal()">&times;</button>
+        </div>
+        <div class="share-body">
+            <textarea id="share-description" class="share-textarea" placeholder="Dites quelque chose... (optionnel)"></textarea>
+            <div class="share-original" id="share-original-preview">
+                <div class="share-orig-author" id="share-orig-author"></div>
+                <div class="share-orig-date" id="share-orig-date"></div>
+                <div class="share-orig-text" id="share-orig-text"></div>
+            </div>
+        </div>
+        <div class="share-footer">
+            <button class="share-cancel-btn" onclick="closeShareModal()">Annuler</button>
+            <button class="share-submit-btn" id="share-submit-btn" onclick="submitShare()"><i class="bi bi-send-fill"></i>&nbsp;Partager</button>
+        </div>
+    </div>
+</div>
 
 <!-- ==================== JAVASCRIPT ==================== -->
 <script>
     var CTX = '<%= ctx %>';
     var CURRENT_USER_ID = '<%= refuserConnecte %>';
     var CONN_PHOTO = '<%= _connPhotoUrl %>';
+    // ---- Maps libelle -> idref pour les filtres ----
+    var _SPEC_MAP = {<% for(int _mi=0;_mi<allSpecialites.length;_mi++){if(_mi>0)out.print(","); out.print("\"" + allSpecialites[_mi].getLibelle().replace("\\","\\\\").replace("\"","\\\"") + "\":\"" + allSpecialites[_mi].getIdspecialite() + "\""); } %>};
+    var _PARC_MAP = {<% for(int _mi=0;_mi<allParcours.length;_mi++){if(_mi>0)out.print(","); out.print("\"" + allParcours[_mi].getLibelle().replace("\\","\\\\").replace("\"","\\\"") + "\":\"" + allParcours[_mi].getIdparcours() + "\""); } %>};
+    var _TYPEPUB_MAP = {<% for(int _mi=0;_mi<typesPub.length;_mi++){if(_mi>0)out.print(","); out.print("\"" + typesPub[_mi].getLibelle().replace("\\","\\\\").replace("\"","\\\"") + "\":\"" + typesPub[_mi].getIdtypepublication() + "\""); } %>};
 
     // ========== DONNEES TEMPORAIRES MENTIONS ==========
     var mentionData = {}; // { idpub: { suggestions: [], selectedIndex: 0, mentionIds: [], searchStart: -1 } }
@@ -923,7 +1145,10 @@
             .then(function(body) {
                 try { var data = JSON.parse(body); } catch(e) { alert('Erreur serveur (reaction): ' + body.substring(0, 200)); return; }
                 if (data.success) {
-                    location.reload();
+                    // Recharger en scrollant sur la publication
+                    var url = new URL(window.location.href);
+                    url.searchParams.set('scrollTo', 'pub-' + idpub);
+                    window.location.href = url.toString();
                 } else {
                     alert('Erreur reaction: ' + (data.error || 'Inconnue'));
                 }
@@ -978,7 +1203,7 @@
         }
     }
 
-    function chargerCommentaires(idpub) {
+    function chargerCommentaires(idpub, _callback) {
         var listeDiv = document.getElementById('liste-comm-' + idpub);
         listeDiv.innerHTML = '<em>Chargement...</em>';
 
@@ -1156,6 +1381,7 @@
                 }
 
                 listeDiv.innerHTML = html;
+                if (_callback) setTimeout(_callback, 60);
             })
             .catch(function(e) { listeDiv.innerHTML = '<span style="color:red;">Erreur: ' + e + '</span>'; });
     }
@@ -1203,7 +1429,11 @@
                     input.value = '';
                     state.mentionIds = [];
                     document.getElementById('comm-mentions-' + idpub).value = '';
-                    chargerCommentaires(idpub);
+                    chargerCommentaires(idpub, function() {
+                        var _liste = document.getElementById('liste-comm-' + idpub);
+                        if (_liste && _liste.lastElementChild)
+                            _liste.lastElementChild.scrollIntoView({behavior:'smooth', block:'nearest'});
+                    });
                     var nbSpan = document.getElementById('nb-comm-' + idpub);
                     nbSpan.textContent = parseInt(nbSpan.textContent) + 1;
                 } else {
@@ -1357,7 +1587,10 @@
                 if (data.success) {
                     input.value = '';
                     state.mentionIds = [];
-                    chargerCommentaires(idpub);
+                    chargerCommentaires(idpub, function() {
+                        var _el = document.getElementById('comm-' + idparent);
+                        if (_el) _el.scrollIntoView({behavior:'smooth', block:'nearest'});
+                    });
                     var nbSpan = document.getElementById('nb-comm-' + idpub);
                     nbSpan.textContent = parseInt(nbSpan.textContent) + 1;
                 } else {
@@ -1377,7 +1610,10 @@
             .then(function(body) {
                 try { var data = JSON.parse(body); } catch(e) { alert('Erreur serveur (reaction comm): ' + body.substring(0, 200)); return; }
                 if (data.success) {
-                    chargerCommentaires(idpub);
+                    chargerCommentaires(idpub, function() {
+                        var _el = document.getElementById('comm-' + idcomm);
+                        if (_el) _el.scrollIntoView({behavior:'smooth', block:'nearest'});
+                    });
                 } else {
                     alert('Erreur reaction commentaire: ' + (data.error || 'Inconnue'));
                 }
@@ -1497,17 +1733,27 @@
                 if (attempts > 20) clearInterval(scrollInterval); // max 10 secondes
             }, 500);
         } else if (scrollTo.startsWith('pub-')) {
-            // Notification de type publication
-            setTimeout(function() {
+            // Publication ciblée (like, notification...) — on tente en boucle
+            // pour couvrir le cas où la publication est chargée en lazy
+            var _pubAttempts = 0;
+            var _pubInterval = setInterval(function() {
+                _pubAttempts++;
                 var el = document.getElementById(scrollTo);
                 if (el) {
+                    clearInterval(_pubInterval);
                     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    el.style.background = '#fff9c4';
+                    el.style.background = '#fffde7';
                     el.style.borderLeft = '4px solid #f9a825';
-                    el.style.transition = 'background 2s';
+                    el.style.transition = 'background 0.3s';
                     setTimeout(function() { el.style.background = ''; el.style.borderLeft = ''; }, 4000);
                 }
-            }, 300);
+                // Après 5 tentatives (~2.5s), déclencher le chargement suivant
+                if (_pubAttempts === 5) {
+                    var sentinel = document.getElementById('feed-sentinel');
+                    if (sentinel) sentinel.scrollIntoView();
+                }
+                if (_pubAttempts > 20) clearInterval(_pubInterval);
+            }, 500);
         }
     });
 
@@ -1573,67 +1819,51 @@
         document.body.appendChild(overlay);
     }
 
-    // ========== INFINITE SCROLL (cursor-based pagination) ==========
+    // ========== INFINITE SCROLL (score-based + filtre) ==========
     (function() {
-        var loading   = false;
-        var cursor    = document.getElementById('feed-cursor');
-        var sentinel  = document.getElementById('feed-sentinel');
-        var loader    = document.getElementById('feed-loader');
-        var feed      = document.querySelector('.fa-feed-center');
+        var loading  = false;
+        var cursor   = document.getElementById('feed-cursor');
+        var sentinel = document.getElementById('feed-sentinel');
+        var loader   = document.getElementById('feed-loader');
+        var feed     = document.querySelector('.fa-feed-center');
         if (!cursor || !sentinel || !feed) return;
 
-        var observer = new IntersectionObserver(function(entries) {
-            if (!entries[0].isIntersecting) return;
-            if (loading) return;
-            if (cursor.getAttribute('data-has-more') !== 'true') {
-                observer.disconnect();
-                return;
-            }
-
-            var daty  = cursor.getAttribute('data-daty');
-            var heure = cursor.getAttribute('data-heure');
-            var id    = cursor.getAttribute('data-id');
-            if (!id) return;
-
+        function doFetch(score, id) {
             loading = true;
             loader.style.display = 'block';
-
+            var fs  = cursor.getAttribute('data-filter-spec')    || '';
+            var fpa = cursor.getAttribute('data-filter-parc')   || '';
+            var fp  = cursor.getAttribute('data-filter-promo')  || '';
+            var ft  = cursor.getAttribute('data-filter-typepub')|| '';
+            var fl  = cursor.getAttribute('data-filter-lier')   || '';
             var url = CTX + '/pages/alumni/ajax/charger-feed.jsp'
-                + '?cursor_daty='  + encodeURIComponent(daty)
-                + '&cursor_heure=' + encodeURIComponent(heure)
-                + '&cursor_id='    + encodeURIComponent(id);
-
+                + '?cursor_score='    + encodeURIComponent(score)
+                + '&cursor_id='       + encodeURIComponent(id)
+                + '&filter_spec='     + encodeURIComponent(fs)
+                + '&filter_parc='     + encodeURIComponent(fpa)
+                + '&filter_promo='    + encodeURIComponent(fp)
+                + '&filter_typepub='  + encodeURIComponent(ft)
+                + '&filter_lier='     + encodeURIComponent(fl);
             fetch(url)
                 .then(function(r) { return r.text(); })
                 .then(function(html) {
                     loader.style.display = 'none';
                     loading = false;
-
                     var tmp = document.createElement('div');
                     tmp.innerHTML = html;
-
-                    // Lire le meta (curseur suivant)
                     var meta = tmp.querySelector('#feed-meta-new');
                     if (meta) {
-                        cursor.setAttribute('data-daty',     meta.getAttribute('data-daty')     || '');
-                        cursor.setAttribute('data-heure',    meta.getAttribute('data-heure')    || '');
+                        cursor.setAttribute('data-score',    meta.getAttribute('data-score')    || '0');
                         cursor.setAttribute('data-id',       meta.getAttribute('data-id')       || '');
                         cursor.setAttribute('data-has-more', meta.getAttribute('data-has-more') || 'false');
                         meta.parentNode.removeChild(meta);
                     } else {
                         cursor.setAttribute('data-has-more', 'false');
                     }
-
-                    // Injecter les nouvelles cartes avant le sentinel
                     var cards = tmp.querySelectorAll('.fa-post-card');
-                    if (cards.length === 0) {
-                        cursor.setAttribute('data-has-more', 'false');
-                    }
-                    cards.forEach(function(card) {
-                        feed.insertBefore(card, sentinel);
-                    });
-
-                    // Plus rien a charger
+                    if (cards.length === 0) cursor.setAttribute('data-has-more', 'false');
+                    cards.forEach(function(card) { feed.insertBefore(card, sentinel); });
+                    observeViewCards(feed);
                     if (cursor.getAttribute('data-has-more') !== 'true') {
                         observer.disconnect();
                         sentinel.style.display = 'none';
@@ -1648,8 +1878,403 @@
                     loading = false;
                     console.error('Feed load error:', e);
                 });
-        }, { rootMargin: '300px' });
+        }
 
+        var observer = new IntersectionObserver(function(entries) {
+            if (!entries[0].isIntersecting || loading) return;
+            if (cursor.getAttribute('data-has-more') !== 'true') { observer.disconnect(); return; }
+            var score = cursor.getAttribute('data-score');
+            var id    = cursor.getAttribute('data-id');
+            if (!id) return;
+            doFetch(score, id);
+        }, { rootMargin: '300px' });
         observer.observe(sentinel);
+
+        // Expose pour le filtre
+        window.triggerFeedLoad = function() {
+            if (!loading && cursor.getAttribute('data-has-more') === 'true') {
+                doFetch(cursor.getAttribute('data-score'), cursor.getAttribute('data-id'));
+            }
+        };
+
+        // --- Suivi des vues ---
+        var vued = {};
+        function observeViewCards(container) {
+            var vueObs = new IntersectionObserver(function(entries) {
+                entries.forEach(function(e) {
+                    if (!e.isIntersecting) return;
+                    var pid = e.target.id ? e.target.id.replace('pub-', '') : null;
+                    if (!pid || vued[pid]) return;
+                    vued[pid] = true;
+                    vueObs.unobserve(e.target);
+                    fetch(CTX + '/pages/alumni/ajax/marquer-vue.jsp', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: 'idpublication=' + encodeURIComponent(pid)
+                    });
+                });
+            }, {threshold: 0.5});
+            (container || document).querySelectorAll('.fa-post-card:not([data-vue-ok])').forEach(function(c) {
+                c.setAttribute('data-vue-ok', '1');
+                vueObs.observe(c);
+            });
+        }
+        window.observeViewCards = observeViewCards;
+        observeViewCards();
     })();
+
+    // ========== FILTRE DU FIL ==========
+    function _resolveFilterId(inputId, map) {
+        var txt = document.getElementById(inputId).value.trim();
+        if (!txt) return '';
+        return map[txt] || '';
+    }
+    function appliquerFiltre() {
+        var spec    = _resolveFilterId('filter-spec-input',    _SPEC_MAP);
+        var parc    = _resolveFilterId('filter-parc-input',    _PARC_MAP);
+        var typepub = _resolveFilterId('filter-typepub-input', _TYPEPUB_MAP);
+        // Promo: accepte format 'yyyy+' ou 'yyyy-' directement
+        var promoRaw = document.getElementById('filter-promo-input').value.trim();
+        var promo = /^\d{4}[+-]$/.test(promoRaw) ? promoRaw : '';
+        var lier  = document.getElementById('filter-lier').checked ? '1' : '';
+        var cursor  = document.getElementById('feed-cursor');
+        var feed    = document.querySelector('.fa-feed-center');
+        var sentinel= document.getElementById('feed-sentinel');
+        if (!cursor || !feed) return;
+        cursor.setAttribute('data-filter-spec',    spec);
+        cursor.setAttribute('data-filter-parc',    parc);
+        cursor.setAttribute('data-filter-promo',   promo);
+        cursor.setAttribute('data-filter-typepub', typepub);
+        cursor.setAttribute('data-filter-lier',    lier);
+        cursor.setAttribute('data-score',    '9999999');
+        cursor.setAttribute('data-id',       'ZZZZZZZZZZZZZZZZZZZ');
+        cursor.setAttribute('data-has-more', 'true');
+        feed.querySelectorAll('.fa-post-card, .fa-feed-end').forEach(function(el){ el.remove(); });
+        if (sentinel) sentinel.style.display = 'block';
+        document.getElementById('filter-reset-btn').style.display = (spec||parc||promo||typepub) ? 'inline-flex' : 'none';
+        if (window.triggerFeedLoad) window.triggerFeedLoad();
+    }
+    function reinitialiserFiltre() {
+        ['filter-spec-input','filter-parc-input','filter-promo-input','filter-typepub-input'].forEach(function(id){
+            document.getElementById(id).value = '';
+        });
+        document.getElementById('filter-lier').checked = false;
+        appliquerFiltre();
+    }
+
+    // ========== VISIBILITE FORM ==========
+    // Etat des tags de visibilite
+    var _visTags = { spec: [], parc: [], promo: null }; // spec/parc: [{id,label}], promo: 'yyyy+' ou 'yyyy-' ou null
+
+    function toggleVisSection() {
+        var body = document.getElementById('vis-body');
+        var chev = document.getElementById('vis-chevron');
+        var open = body.style.display !== 'none';
+        body.style.display = open ? 'none' : 'block';
+        chev.className = open ? 'bi bi-chevron-down' : 'bi bi-chevron-up';
+    }
+
+    // Ajouter un tag spec ou parc via le bouton +
+    function addVisTagFromInput(type) {
+        var inputId = 'vis-' + type + '-input';
+        var mapObj  = (type === 'spec') ? _SPEC_MAP : _PARC_MAP;
+        var inp = document.getElementById(inputId);
+        var txt = inp.value.trim();
+        if (!txt) return;
+        var id  = mapObj[txt];
+        if (!id) return; // doit correspondre exactement
+        var arr = _visTags[type];
+        if (arr.find(function(t){ return t.id===id; })) { inp.value=''; return; }
+        arr.push({id:id, label:txt});
+        inp.value = '';
+        renderVisTags(type);
+        updateVisHidden();
+    }
+    function onVisTagKey(e, type) {
+        if (e.key === 'Enter') { e.preventDefault(); addVisTagFromInput(type); }
+    }
+    function removeVisTag(type, id) {
+        _visTags[type] = _visTags[type].filter(function(t){ return t.id!==id; });
+        renderVisTags(type);
+        updateVisHidden();
+    }
+    function renderVisTags(type) {
+        var container = document.getElementById('vis-' + type + '-chips');
+        container.innerHTML = '';
+        _visTags[type].forEach(function(t) {
+            var chip = document.createElement('span');
+            chip.className = 'fa-vis-chip';
+            chip.innerHTML = escHtml(t.label) + '<button type="button" class="fa-vis-chip-del" onclick="removeVisTag(\'' + type + '\',\'' + t.id + '\')">\u00d7</button>';
+            container.appendChild(chip);
+        });
+    }
+
+    // Promo: input annee (ex: 2023) -> suggestions 2023+ / 2023-
+    function onVisPromoInput() {
+        var inp = document.getElementById('vis-promo-input');
+        var dd  = document.getElementById('vis-promo-dd');
+        var val = inp.value.trim();
+        if (/^\d{4}$/.test(val)) {
+            dd.innerHTML = '<div class="fa-vis-promo-dd-item" onmousedown="selectVisPromo(\'' + val + '+\')">'
+                + val + '+ <small style="color:#888">('+val+' et ann&eacute;es plus r&eacute;centes)</small></div>'
+                + '<div class="fa-vis-promo-dd-item" onmousedown="selectVisPromo(\'' + val + '-\')">'
+                + val + '- <small style="color:#888">('+val+' et ann&eacute;es plus anciennes)</small></div>';
+            dd.style.display = 'block';
+        } else {
+            dd.style.display = 'none';
+        }
+    }
+    function onVisPromoKey(e) {
+        if (e.key === 'Enter') { e.preventDefault(); addVisPromoFromInput(); }
+        if (e.key === 'Escape') document.getElementById('vis-promo-dd').style.display='none';
+    }
+    function selectVisPromo(expr) {
+        document.getElementById('vis-promo-dd').style.display='none';
+        document.getElementById('vis-promo-input').value = expr;
+        addVisPromoFromInput();
+    }
+    function addVisPromoFromInput() {
+        var val = document.getElementById('vis-promo-input').value.trim();
+        if (!/^\d{4}[+-]$/.test(val)) return;
+        _visTags.promo = val;
+        document.getElementById('vis-promo-input').value = '';
+        document.getElementById('vis-promo-dd').style.display='none';
+        renderVisPromo();
+        updateVisHidden();
+    }
+    function removeVisPromo() {
+        _visTags.promo = null;
+        renderVisPromo();
+        updateVisHidden();
+    }
+    function renderVisPromo() {
+        var container = document.getElementById('vis-promo-chips');
+        container.innerHTML = '';
+        if (_visTags.promo) {
+            var chip = document.createElement('span');
+            chip.className = 'fa-vis-chip';
+            chip.innerHTML = escHtml(_visTags.promo) + '<button type="button" class="fa-vis-chip-del" onclick="removeVisPromo()">\u00d7</button>';
+            container.appendChild(chip);
+        }
+    }
+
+    function updateVisHidden() {
+        // Lier
+        var lierChk = document.getElementById('vis-lier-check');
+        var lier = (lierChk && lierChk.checked) ? 'AND' : 'OR';
+        document.getElementById('vis-lier-hidden').value = lier;
+        // Spec
+        document.getElementById('vis-spec-hidden').value = _visTags.spec.map(function(t){return t.id;}).join(',');
+        // Parc
+        document.getElementById('vis-parc-hidden').value = _visTags.parc.map(function(t){return t.id;}).join(',');
+        // Promo
+        document.getElementById('vis-promo-annee-hidden').value = _visTags.promo || '';
+        // Resume dans l'entete
+        var hasSpec  = _visTags.spec.length > 0;
+        var hasParc  = _visTags.parc.length > 0;
+        var hasPromo = !!_visTags.promo;
+        var icon = document.getElementById('vis-icon');
+        var summ = document.getElementById('vis-summary');
+        if (!hasSpec && !hasParc && !hasPromo) {
+            if (icon) icon.className = 'bi bi-globe2';
+            if (summ) summ.textContent = 'Visible par tous';
+        } else {
+            var parts = [];
+            _visTags.spec.forEach(function(t){ parts.push(t.label); });
+            _visTags.parc.forEach(function(t){ parts.push(t.label); });
+            if (_visTags.promo) parts.push('Promo ' + _visTags.promo);
+            if (icon) icon.className = 'bi bi-lock-fill';
+            if (summ) summ.textContent = parts.join(lier === 'AND' ? ' ET ' : ' OU ');
+        }
+    }
+
+    // Fermer le dropdown promo si clic ailleurs
+    document.addEventListener('click', function(e){
+        var dd = document.getElementById('vis-promo-dd');
+        if (dd && !dd.contains(e.target) && e.target.id !== 'vis-promo-input') dd.style.display='none';
+    });
+
+    // ========== HASHTAG AUTOCOMPLETE ==========
+    function setupHashtagAutocomplete(ta) {
+        var dd = document.createElement('div');
+        dd.className = 'fa-hashtag-dd';
+        var wrap = ta.parentNode;
+        if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+        wrap.appendChild(dd);
+        var _lq = null, _tm = null;
+        ta.addEventListener('input', function() {
+            clearTimeout(_tm);
+            _tm = setTimeout(function() {
+                var pos = ta.selectionStart;
+                var m = ta.value.substring(0, pos).match(/#([A-Za-z0-9]{1,})$/);
+                if (!m) { dd.style.display = 'none'; return; }
+                var q = m[1];
+                if (q === _lq) return;
+                _lq = q;
+                fetch(CTX + '/pages/alumni/ajax/hashtag-suggest.jsp?q=' + encodeURIComponent(q))
+                    .then(function(r){ return r.json(); })
+                    .then(function(items) {
+                        if (!items || !items.length) { dd.style.display = 'none'; return; }
+                        dd.innerHTML = '';
+                        items.forEach(function(it) {
+                            var d = document.createElement('div');
+                            d.className = 'fa-hashtag-item';
+                            d.innerHTML = '<strong>' + it.tag + '</strong>&nbsp;<span style="color:#888;font-size:12px;">' + escHtml(it.label) + '</span>';
+                            d.addEventListener('mousedown', function(e) {
+                                e.preventDefault();
+                                var p = ta.selectionStart;
+                                var bef = ta.value.substring(0, p).replace(/#([A-Za-z0-9]*)$/, it.tag + ' ');
+                                ta.value = bef + ta.value.substring(p);
+                                ta.selectionStart = ta.selectionEnd = bef.length;
+                                dd.style.display = 'none';
+                                _lq = null;
+                                ta.focus();
+                            });
+                            dd.appendChild(d);
+                        });
+                        dd.style.display = 'block';
+                    }).catch(function(){}); 
+            }, 220);
+        });
+        ta.addEventListener('blur', function(){ setTimeout(function(){ dd.style.display='none'; }, 180); });
+        ta.addEventListener('keydown', function(e){ if(e.key==='Escape') dd.style.display='none'; });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        var ta = document.querySelector('.fa-composer-textarea');
+        if (ta) setupHashtagAutocomplete(ta);
+    });
+
+    // ========== MODALE DETAIL REACTIONS ==========
+    function openReactionDetails(idpub) {
+        var modal   = document.getElementById('react-detail-modal');
+        var content = document.getElementById('react-detail-content');
+        modal.style.display = 'flex';
+        content.innerHTML = '<div style="text-align:center;padding:40px;"><div class="fa-feed-spinner"></div></div>';
+        fetch(CTX + '/pages/alumni/ajax/detail-reactions.jsp?idpublication=' + encodeURIComponent(idpub))
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (!data.success) { content.innerHTML = '<p style="color:red;padding:20px;">' + escHtml(data.error || 'Erreur') + '</p>'; return; }
+                if (!data.reactions || data.reactions.length === 0) {
+                    content.innerHTML = '<p style="text-align:center;color:#888;padding:30px;">Aucune r\u00e9action</p>';
+                    return;
+                }
+                var html = '<div class="rdm-header">';
+                html += '<h3 class="rdm-title">R\u00e9actions</h3>';
+                html += '<button class="rdm-close" onclick="closeReactionDetails()">&times;</button>';
+                html += '</div>';
+                // Tabs
+                html += '<div class="rdm-tabs">';
+                html += '<button class="rdm-tab rdm-tab--active" onclick="rdmShowTab(this,\'all\')">Tout&nbsp;<span class="rdm-tab-count">' + data.total + '</span></button>';
+                for (var i = 0; i < data.reactions.length; i++) {
+                    var rt = data.reactions[i];
+                    html += '<button class="rdm-tab" onclick="rdmShowTab(this,\'' + rt.id + '\')">'
+                          + rt.emoji + '&nbsp;<span class="rdm-tab-count">' + rt.count + '</span></button>';
+                }
+                html += '</div>';
+                // Panel "Tout"
+                html += '<div class="rdm-panel" id="rdm-panel-all">';
+                for (var i = 0; i < data.reactions.length; i++) {
+                    for (var j = 0; j < data.reactions[i].users.length; j++)
+                        html += rdmUserRow(data.reactions[i].users[j], data.reactions[i].emoji, data.myId);
+                }
+                html += '</div>';
+                // Panels par type
+                for (var i = 0; i < data.reactions.length; i++) {
+                    var rt = data.reactions[i];
+                    html += '<div class="rdm-panel rdm-panel--hidden" id="rdm-panel-' + rt.id + '">';
+                    for (var j = 0; j < rt.users.length; j++)
+                        html += rdmUserRow(rt.users[j], rt.emoji, data.myId);
+                    html += '</div>';
+                }
+                content.innerHTML = html;
+            })
+            .catch(function(e) { content.innerHTML = '<p style="color:red;padding:20px;">Erreur r\u00e9seau: ' + e + '</p>'; });
+    }
+    function rdmUserRow(u, emoji, myId) {
+        var profileUrl;
+        if (String(u.idutilisateur) === String(myId)) {
+            profileUrl = CTX + '/pages/module.jsp?but=profil/voir.jsp';
+        } else if (u.idprofil) {
+            profileUrl = CTX + '/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp?idprofil=' + encodeURIComponent(u.idprofil);
+        } else {
+            profileUrl = null;
+        }
+        var initials = getInitials(u.nom);
+        var wrap = profileUrl ? '<a href="' + profileUrl + '" class="rdm-user-row">' : '<div class="rdm-user-row">';
+        var wrapEnd = profileUrl ? '</a>' : '</div>';
+        var avatarInner = u.photo
+            ? '<img src="' + escHtml(u.photo) + '" alt="" style="width:100%;height:100%;object-fit:cover;">'
+            : escHtml(initials);
+        return wrap
+            + '<div class="rdm-avatar">' + avatarInner + '</div>'
+            + '<div class="rdm-user-name">' + escHtml(u.nom) + '</div>'
+            + '<span class="rdm-reaction-emoji">' + emoji + '</span>'
+            + wrapEnd;
+    }
+    function rdmShowTab(btn, panelId) {
+        var modal = document.getElementById('react-detail-modal');
+        modal.querySelectorAll('.rdm-tab').forEach(function(t) { t.classList.remove('rdm-tab--active'); });
+        btn.classList.add('rdm-tab--active');
+        modal.querySelectorAll('.rdm-panel').forEach(function(p) { p.classList.add('rdm-panel--hidden'); });
+        var panel = document.getElementById('rdm-panel-' + panelId);
+        if (panel) panel.classList.remove('rdm-panel--hidden');
+    }
+    function closeReactionDetails() {
+        document.getElementById('react-detail-modal').style.display = 'none';
+    }
+    // Fermer la modale en cliquant sur le fond
+    document.addEventListener('click', function(e) {
+        var modal = document.getElementById('react-detail-modal');
+        if (modal && e.target === modal) closeReactionDetails();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') { closeReactionDetails(); closeShareModal(); }
+    });
+
+    // ========== PARTAGE PUBLICATION ==========
+    var _shareIdPub = null;
+    function openShareModal(idpub, auteur, datepub, texte) {
+        _shareIdPub = idpub;
+        document.getElementById('share-description').value = '';
+        document.getElementById('share-orig-author').textContent = auteur || '';
+        document.getElementById('share-orig-date').textContent = datepub || '';
+        document.getElementById('share-orig-text').textContent = texte || '';
+        document.getElementById('share-submit-btn').disabled = false;
+        document.getElementById('share-modal').style.display = 'flex';
+        document.getElementById('share-description').focus();
+    }
+    function closeShareModal() {
+        document.getElementById('share-modal').style.display = 'none';
+        _shareIdPub = null;
+    }
+    function submitShare() {
+        if (!_shareIdPub) return;
+        var btn = document.getElementById('share-submit-btn');
+        var desc = document.getElementById('share-description').value.trim();
+        btn.disabled = true;
+        fetch(CTX + '/pages/alumni/ajax/partager-publication.jsp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'idpublication=' + encodeURIComponent(_shareIdPub)
+                + '&description=' + encodeURIComponent(desc)
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                closeShareModal();
+                var url = new URL(window.location.href);
+                url.searchParams.set('scrollTo', 'pub-' + data.idpublication);
+                window.location.href = url.toString();
+            } else {
+                btn.disabled = false;
+                alert('Erreur lors du partage: ' + (data.error || 'Inconnue'));
+            }
+        })
+        .catch(function(e) { btn.disabled = false; alert('Erreur réseau: ' + e); });
+    }
+    // Fermer modale partage en cliquant le fond
+    document.addEventListener('click', function(e) {
+        var sm = document.getElementById('share-modal');
+        if (sm && e.target === sm) closeShareModal();
+    });
 </script>

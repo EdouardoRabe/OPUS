@@ -53,7 +53,10 @@
     if (_pubCtx == null) _pubCtx = request.getContextPath();
 
     // Variables curseur pour infinite scroll
-    String _lastDaty = "", _lastHeure = "", _lastId = "";
+    String _lastId = "";
+    String _pubLastScore = "0";
+    Object _lsAttr = request.getAttribute("_pub_lastScore");
+    if (_lsAttr != null) _pubLastScore = _lsAttr.toString();
 
     if (_pubPubs.length == 0) {
 %>
@@ -67,9 +70,7 @@
     for (int p = 0; p < _pubPubs.length; p++) {
         Publication pub = _pubPubs[p];
         // Mise a jour curseur
-        _lastDaty  = pub.getDaty()  != null ? pub.getDaty().toString() : _lastDaty;
-        _lastHeure = pub.getHeure() != null ? pub.getHeure()           : _lastHeure;
-        _lastId    = pub.getIdpublication() != null ? pub.getIdpublication() : _lastId;
+        _lastId = pub.getIdpublication() != null ? pub.getIdpublication() : _lastId;
         String idpub = pub.getIdpublication();
         String auteur = (String) _pubUserNames.get(new Integer(pub.getIdutilisateur()));
         if (auteur == null) auteur = "Utilisateur";
@@ -152,6 +153,38 @@
                     .replace(">", "&gt;").replace("\n", "<br>");
         }
 
+        // ---- Publication partagee : charger la pub originale ----
+        boolean isSharedPost = pub.getIdpuborigine() != null && !pub.getIdpuborigine().trim().isEmpty();
+        String origDesc = "", origAuteur = "", origDate = "", origMediaUrl = "", origTypePubLib2 = "";
+        String origIdpuborigine = isSharedPost ? pub.getIdpuborigine().trim() : "";
+        if (isSharedPost) {
+            Publication[] origPubs = (Publication[]) CGenUtil.rechercher(
+                new Publication(), null, null, _pubConn, " and idpublication = '" + origIdpuborigine + "'");
+            if (origPubs != null && origPubs.length > 0) {
+                Publication orig = origPubs[0];
+                String od = orig.getDescritpion();
+                origDesc = od != null ? od.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;").replace("\n","<br>") : "";
+                origDate = (orig.getDaty() != null ? orig.getDaty().toString() : "") + " \u00e0 " + (orig.getHeure() != null ? orig.getHeure() : "");
+                String origTypePubId2 = orig.getIdtypepublication() != null ? orig.getIdtypepublication() : "";
+                origTypePubLib2 = origTypePubId2;
+                for (int t2 = 0; t2 < _pubTypesPub.length; t2++) {
+                    if (_pubTypesPub[t2].getIdtypepublication().equals(origTypePubId2)) { origTypePubLib2 = _pubTypesPub[t2].getLibelle(); break; }
+                }
+                String oAuteur = (String) _pubUserNames.get(new Integer(orig.getIdutilisateur()));
+                if (oAuteur == null) {
+                    alumni.ProfilLib[] op2 = (alumni.ProfilLib[]) CGenUtil.rechercher(
+                        new alumni.ProfilLib(), null, null, _pubConn, " and refuser = " + orig.getIdutilisateur());
+                    if (op2 != null && op2.length > 0) { oAuteur = (op2[0].getNom() != null ? op2[0].getNom() : "") + (op2[0].getPrenom() != null ? " " + op2[0].getPrenom() : ""); }
+                }
+                origAuteur = oAuteur != null ? oAuteur.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;") : "Utilisateur";
+                Media[] om2 = (Media[]) CGenUtil.rechercher(new Media(), null, null, _pubConn, " and idpublication = '" + origIdpuborigine + "'");
+                if (om2 != null && om2.length > 0 && om2[0].getMediaurl() != null) {
+                    String omu = om2[0].getMediaurl();
+                    origMediaUrl = omu.startsWith("http") ? omu : _pubCtx + "/UploadDownloadFileServlet?fileName=" + java.net.URLEncoder.encode(omu, "UTF-8");
+                }
+            } else { isSharedPost = false; } // pub originale supprimee
+        }
+
         // Libelle type publication
         String typePubLib = pub.getIdtypepublication() != null ? pub.getIdtypepublication() : "";
         for (int t = 0; t < _pubTypesPub.length; t++) {
@@ -182,7 +215,7 @@
     <!-- EN-TETE -->
     <div class="fa-post-header">
         <a href="<%= profileUrl %>" style="text-decoration:none;cursor:pointer;">
-            <div class="fa-avatar fa-avatar--md" style="cursor:pointer;"<%= _authorPhoto != null ? " style=\"background:transparent;cursor:pointer;\"" : "style=\"cursor:pointer;\"" %>><% if (_authorPhoto != null) { %><img src="<%= _authorPhoto %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;cursor:pointer;"><% } else { %><%= initA %><% } %></div>
+            <div class="fa-avatar fa-avatar--md" style="<%= _authorPhoto != null ? "background:transparent;" : "" %>cursor:pointer;"><% if (_authorPhoto != null) { %><img src="<%= _authorPhoto %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initA %><% } %></div>
         </a>
         <div class="fa-post-meta">
             <!-- Menu 3 points -->
@@ -227,12 +260,25 @@
             <img src="<%= mUrl %>" class="fa-post-img" alt="media" onclick="openMediaZoom(this.src)">
         </div>
         <% } %>
+
+        <% if (isSharedPost) { %>
+        <!-- Publication originale embarquee -->
+        <div class="fa-shared-embed">
+            <div class="fa-shared-embed-header">
+                <span class="fa-shared-embed-author"><%= origAuteur %></span>
+                <span class="fa-shared-embed-date">&nbsp;&middot;&nbsp;<%= origDate %></span>
+                <% if (!origTypePubLib2.isEmpty()) { %><span class="fa-type-badge"><%= origTypePubLib2 %></span><% } %>
+            </div>
+            <% if (!origDesc.isEmpty()) { %><div class="fa-shared-embed-text"><%= origDesc %></div><% } %>
+            <% if (!origMediaUrl.isEmpty()) { %><img src="<%= origMediaUrl %>" alt="" onclick="openMediaZoom(this.src)"><% } %>
+        </div>
+        <% } %>
     </div>
 
     <!-- COMPTEURS -->
     <div class="fa-post-counters">
         <% if (reactPairs.size() > 0) { %>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;cursor:pointer;" title="Voir les r&eacute;actions" onclick="openReactionDetails('<%= idpub %>')">
                 <% for (int rpi = 0; rpi < reactPairs.size(); rpi++) {
                     Object[] pair = (Object[]) reactPairs.get(rpi);
                     String rtId = (String) pair[0];
@@ -302,10 +348,21 @@
             <i class="bi bi-chat-left-text"></i>&nbsp;<span>Commenter</span>
         </button>
 
-        <!-- Identifier -->
+        <!-- Identifier (seulement pour l'auteur) -->
+        <% if (pub.getIdutilisateur() == _pubRefuser) { %>
         <button class="fa-action-btn" onclick="toggleIdentifier('<%= idpub %>')">
             <i class="bi bi-tag"></i>&nbsp;<span>Identifier</span>
         </button>
+        <% } %>
+
+        <!-- Partager (seulement pour les pubs d'autres personnes, pas un partage deja) -->
+        <% if (pub.getIdutilisateur() != _pubRefuser && !isSharedPost) { %>
+        <%  String _shareAuteurEsc = auteur.replace("'","\\'").replace("\"","\\\"");
+            String _shareTexteEsc  = descSafe.isEmpty() ? "" : descSafe.replace("<br>"," ").replace("'","\\'").replace("\"","\\\""); %>
+        <button class="fa-action-btn" onclick="openShareModal('<%= idpub %>','<%= _shareAuteurEsc %>','<%= pub.getDaty() %>&nbsp;&agrave;&nbsp;<%= pub.getHeure() != null ? pub.getHeure() : "" %>','<%= _shareTexteEsc %>')">
+            <i class="bi bi-share"></i>&nbsp;<span>Partager</span>
+        </button>
+        <% } %>
     </div>
 
     <!-- ZONE IDENTIFIER -->
@@ -346,8 +403,7 @@
     boolean _hasMore = (_pubPubs.length == 10);
 %>
 <span id="feed-cursor" style="display:none"
-      data-daty="<%= _lastDaty %>"
-      data-heure="<%= _lastHeure %>"
+      data-score="<%= _pubLastScore %>"
       data-id="<%= _lastId %>"
       data-has-more="<%= _hasMore %>"></span>
 <div id="feed-sentinel" style="height:4px;margin:4px 0;"></div>

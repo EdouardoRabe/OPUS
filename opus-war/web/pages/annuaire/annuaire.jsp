@@ -156,7 +156,7 @@
         if (hasGenre) {
             where.append(" and idgenre='").append(qGenre.trim().replace("'","''")).append("'");
         }
-        where.append(" order by nom, prenom");
+        where.append(" order by (select count(*) from publication pub where pub.idutilisateur = profillib.refuser and pub.idtypepublication = 'TPB000001') desc, nom, prenom");
 
         ProfilLib[] allProfils = (ProfilLib[]) CGenUtil.rechercher(new ProfilLib(), null, null, conn, where.toString());
         if (allProfils == null) allProfils = new ProfilLib[0];
@@ -604,6 +604,8 @@
             String parcLib   = (vParcours && p.getParcoursLib() != null) ? p.getParcoursLib() : "";
             String genreLib  = (vGenre && p.getGenrelib() != null) ? p.getGenrelib() : "";
             String genreId   = (vGenre && p.getIdgenre() != null)  ? p.getIdgenre()  : "";
+            
+            int contribution = p.getContribution();
 
             // Si nom cache -> afficher loginuser
             String displayName;
@@ -662,6 +664,7 @@
                     <div class="an-card-headline"><%= h(headline) %></div>
                     <div class="an-card-meta">
                         <% if (!genreLib.isEmpty()) { %><span class="an-card-tag" style="background:#f3e8ff;color:#7c3aed;"><i class="bi <%= "GEN000001".equals(genreId) ? "bi-gender-male" : "bi-gender-female" %>"></i> <%= h(genreLib) %></span><% } %>
+                        <span class="an-card-tag" style="background:#fff8e1;color:#f57f17;" title="Contribution (publications)"><i class="bi bi-award-fill"></i> <%= contribution %></span>
                         <% if (!promoLib.isEmpty()) { %><span class="an-card-tag promo"><%= h(promoLib) %><%= promoAn > 0 ? " " + promoAn : "" %></span><% } %>
                         <% if (!parcLib.isEmpty()) { %><span class="an-card-tag"><%= h(parcLib) %></span><% } %>
                         <% for (int s = 0; s < specsArr.length && s < 2; s++) { %><span class="an-card-tag spec"><%= h(specsArr[s]) %></span><% } %>
