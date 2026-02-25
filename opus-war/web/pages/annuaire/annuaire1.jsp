@@ -132,17 +132,21 @@
         StringBuilder where = new StringBuilder();
         where.append(" and nom IS NOT NULL and estactif = 1");
 
-        if (hasNom) {
-            String safe = qNom.trim().replace("'", "''").toLowerCase();
-            where.append(" and LOWER(nom) LIKE '%").append(safe).append("%'");
-        }
-        if (hasPrenom) {
-            String safe = qPrenom.trim().replace("'", "''").toLowerCase();
-            where.append(" and LOWER(prenom) LIKE '%").append(safe).append("%'");
-        }
-        if (hasRefuser) {
-            String safe = qRefuser.trim().replace("'", "''").toLowerCase();
-            where.append(" and LOWER(loginuser) LIKE '%").append(safe).append("%'");
+        if (hasNom || hasPrenom || hasRefuser) {
+            String n = hasNom ? qNom.trim().toLowerCase().replace("'", "''") : "";
+            String p = hasPrenom ? qPrenom.trim().toLowerCase().replace("'", "''") : "";
+            String r = hasRefuser ? qRefuser.trim().toLowerCase().replace("'", "''") : "";
+            
+            if (hasNom && !hasPrenom) {
+                where.append(" and (LOWER(COALESCE(nom,'') || ' ' || COALESCE(prenom,'')) LIKE '%").append(n).append("%' OR LOWER(COALESCE(prenom,'') || ' ' || COALESCE(nom,'')) LIKE '%").append(n).append("%')");
+            } else if (hasNom && hasPrenom) {
+                 where.append(" and (LOWER(nom) LIKE '%").append(n).append("%' AND LOWER(prenom) LIKE '%").append(p).append("%')");
+            } else if (hasPrenom) {
+                 where.append(" and LOWER(prenom) LIKE '%").append(p).append("%'");
+            }
+            if (hasRefuser) {
+                where.append(" and LOWER(loginuser) LIKE '%").append(r).append("%'");
+            }
         }
         if (hasPromotion) {
             where.append(" and idpromotion='").append(qPromotion.trim().replace("'","''")).append("'");

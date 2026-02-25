@@ -131,15 +131,10 @@
         where.append(" and nom IS NOT NULL and estactif = 1");
 
         if (hasSearch) {
-            // Recherche multi-mots : chaque mot est recherche dans nom, prenom ou loginuser (OR)
-            // Plusieurs mots sont combines en AND pour affiner
-            String[] words = qSearch.trim().toLowerCase().split("\\s+");
-            for (int w = 0; w < words.length; w++) {
-                String safe = words[w].replace("'", "''");
-                where.append(" and (LOWER(nom) LIKE '%").append(safe).append("%'")
-                     .append(" or LOWER(prenom) LIKE '%").append(safe).append("%'")
-                     .append(" or LOWER(loginuser) LIKE '%").append(safe).append("%')");
-            }
+            String safe = qSearch.trim().toLowerCase().replace("'", "''");
+            where.append(" and (LOWER(COALESCE(nom,'') || ' ' || COALESCE(prenom,'')) LIKE '%").append(safe).append("%'")
+                 .append(" or LOWER(COALESCE(prenom,'') || ' ' || COALESCE(nom,'')) LIKE '%").append(safe).append("%'")
+                 .append(" or LOWER(loginuser) LIKE '%").append(safe).append("%')");
         }
         if (hasPromotion) {
             where.append(" and idpromotion='").append(qPromotion.trim().replace("'","''")).append("'");

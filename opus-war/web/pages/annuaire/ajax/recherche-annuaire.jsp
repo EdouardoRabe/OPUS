@@ -45,8 +45,8 @@
 
         if (qNom != null && !qNom.trim().isEmpty()) {
             String safe = qNom.trim().replace("'", "''").toLowerCase();
-            where.append(" and (LOWER(nom) LIKE '%").append(safe).append("%'")
-                 .append(" OR LOWER(prenom) LIKE '%").append(safe).append("%')");
+            where.append(" and (LOWER(COALESCE(nom,'') || ' ' || COALESCE(prenom,'')) LIKE '%").append(safe).append("%'")
+                 .append(" OR LOWER(COALESCE(prenom,'') || ' ' || COALESCE(nom,'')) LIKE '%").append(safe).append("%')");
         }
 
         if (qPromotion != null && !qPromotion.trim().isEmpty()) {
