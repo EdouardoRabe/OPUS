@@ -4,13 +4,13 @@
 <%@ page import="utilitaire.UtilDB" %>
 <%@ page import="bean.CGenUtil" %>
 <%@ page import="user.UserEJB" %>
-<%@ page import="historique.MapUtilisateur" %>
 <%@ page import="alumni.ProfilLib" %>
 <%@ page import="alumni.Publication" %>
 <%@ page import="alumni.Historique" %>
 <%@ page import="alumni.Specialite" %>
 <%@ page import="alumni.Specialiteprofil" %>
 <%@ page import="alumni.Publicationhashtag" %>
+<%@ page import="alumni.Signalementpublication" %>
 
 <%
     UserEJB uEJB = (UserEJB) session.getAttribute("u");
@@ -23,9 +23,10 @@
     int totalAlumni = 0;
     int totalPubs = 0;
     int totalContribs = 0;
+    int totalSignalements = 0;
     
     List<Map<String, Object>> dailyLogins = new ArrayList<Map<String, Object>>();
-    List<Map<String, Object>> recentActions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> reportedUsers = new ArrayList<Map<String, Object>>();
 
     try {
         conn = new UtilDB().GetConn();
@@ -115,11 +116,11 @@
                 }
             });
             
-            Specialite sTmp = new Specialite();
+            Specialite sTmp2 = new Specialite();
             int j = 0;
             for (Map.Entry<String, Integer> entry : demandList) {
                 if (j++ >= 5) break;
-                Specialite[] sArr = (Specialite[]) CGenUtil.rechercher(sTmp, null, null, conn, " and idspecialite = '" + entry.getKey() + "'");
+                Specialite[] sArr = (Specialite[]) CGenUtil.rechercher(sTmp2, null, null, conn, " and idspecialite = '" + entry.getKey() + "'");
                 if (sArr != null && sArr.length > 0) {
                     Map<String, Object> dm = new HashMap<String, Object>();
                     dm.put("libelle", sArr[0].getLibelle());
@@ -129,6 +130,58 @@
             }
         }
         request.setAttribute("demandedSpecs", demandedSpecs);
+
+        // 6. Signalements - Users with most reported publications
+        Signalementpublication[] signalements = (Signalementpublication[]) CGenUtil.rechercher(
+            new Signalementpublication(), null, null, conn, "");
+        if (signalements != null) {
+            totalSignalements = signalements.length;
+            // Group signalements by idpublication
+            Map<String, Integer> pubReportCounts = new HashMap<String, Integer>();
+            for (Signalementpublication sig : signalements) {
+                if (sig.getIdpublication() != null) {
+                    pubReportCounts.put(sig.getIdpublication(), pubReportCounts.getOrDefault(sig.getIdpublication(), 0) + 1);
+                }
+            }
+            // For each reported publication, find the author and accumulate reports per user
+            Map<Integer, Integer> userReportCounts = new HashMap<Integer, Integer>();
+            for (Map.Entry<String, Integer> e : pubReportCounts.entrySet()) {
+                Publication pTmp = new Publication();
+                Publication[] pArr = (Publication[]) CGenUtil.rechercher(pTmp, null, null, conn, " and idpublication = '" + e.getKey() + "'");
+                if (pArr != null && pArr.length > 0) {
+                    int authorId = pArr[0].getIdutilisateur();
+                    userReportCounts.put(authorId, userReportCounts.getOrDefault(authorId, 0) + e.getValue());
+                }
+            }
+            // Sort by report count desc
+            List<Map.Entry<Integer, Integer>> userList = new ArrayList<Map.Entry<Integer, Integer>>(userReportCounts.entrySet());
+            Collections.sort(userList, new Comparator<Map.Entry<Integer, Integer>>() {
+                public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
+                    return o2.getValue().compareTo(o1.getValue());
+                }
+            });
+            // Top 5 with user names
+            int rk = 0;
+            for (Map.Entry<Integer, Integer> ue2 : userList) {
+                if (rk++ >= 5) break;
+                String uName = "Utilisateur #" + ue2.getKey();
+                String idProfil = "";
+                try {
+                    ProfilLib[] pLib = (ProfilLib[]) CGenUtil.rechercher(new ProfilLib(), null, null, conn, " and refuser = " + ue2.getKey());
+                    if (pLib != null && pLib.length > 0) {
+                        uName = pLib[0].getNom() + " " + pLib[0].getPrenom();
+                        if (pLib[0].getIdprofil() != null) idProfil = pLib[0].getIdprofil();
+                    }
+                } catch(Exception ignored) {}
+                Map<String, Object> rm = new HashMap<String, Object>();
+                rm.put("name", uName);
+                rm.put("count", ue2.getValue());
+                rm.put("userId", ue2.getKey());
+                rm.put("idprofil", idProfil);
+                reportedUsers.add(rm);
+            }
+        }
+        request.setAttribute("reportedUsers", reportedUsers);
 
     } catch (Exception e) {
         e.printStackTrace();
@@ -283,11 +336,110 @@
         }
     }
 
+    /* Section Headers */
+    .dash-section {
+        margin-bottom: 32px;
+    }
+
+    .dash-section-title {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--dash-text-light);
+        margin: 0 0 16px 0;
+        padding-left: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .dash-section-title::before {
+        content: '';
+        display: inline-block;
+        width: 3px;
+        height: 16px;
+        background: var(--dash-primary);
+        border-radius: 2px;
+    }
+
     /* Chart Wrapper */
     .chart-wrapper {
         position: relative;
-        height: 350px;
+        height: 320px;
         width: 100%;
+    }
+
+    /* Ranked Table */
+    .ranked-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+    }
+
+    .ranked-table th {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--dash-text-light);
+        padding: 0 16px 8px;
+        text-align: left;
+        border-bottom: 1px solid var(--dash-border);
+    }
+
+    .ranked-table td {
+        padding: 12px 16px;
+        font-size: 14px;
+        background: #FFFBEB;
+        color: #92400E;
+    }
+
+    .ranked-table tr td:first-child {
+        border-radius: 8px 0 0 8px;
+        font-weight: 700;
+        width: 40px;
+        text-align: center;
+    }
+
+    .ranked-table tr td:last-child {
+        border-radius: 0 8px 8px 0;
+        font-weight: 700;
+        text-align: center;
+        width: 80px;
+    }
+
+    .rank-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #FDE68A;
+        color: #92400E;
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+    .report-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        background: #FEF3C7;
+        color: #B45309;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .no-data-msg {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--dash-text-light);
+        font-size: 14px;
+        font-style: italic;
     }
 </style>
 
@@ -299,51 +451,95 @@
         <div class="dash-date"><%= new java.text.SimpleDateFormat("EEE, d MMM yyyy").format(new java.util.Date()) %></div>
     </div>
 
-    <!-- Quick Stats -->
-    <div class="dash-stats-grid">
-        <div class="dash-stat-card">
-            <div class="dash-stat-icon"><i class="bi bi-people-fill"></i></div>
-            <div class="dash-stat-label">Total Alumni</div>
-            <div class="dash-stat-value"><%= totalAlumni %></div>
-        </div>
-        <div class="dash-stat-card">
-            <div class="dash-stat-icon"><i class="bi bi-newspaper"></i></div>
-            <div class="dash-stat-label">Publications</div>
-            <div class="dash-stat-value"><%= totalPubs %></div>
-        </div>
-        <div class="dash-stat-card">
-            <div class="dash-stat-icon"><i class="bi bi-graph-up-arrow"></i></div>
-            <div class="dash-stat-label">Connexions (7j)</div>
-            <%
-                int logins7j = 0;
-                for(Map m : dailyLogins) logins7j += (Integer)m.get("count");
-            %>
-            <div class="dash-stat-value"><%= logins7j %></div>
+    <!-- ═══════════════════ SECTION: KPIs ═══════════════════ -->
+    <div class="dash-section">
+        <h3 class="dash-section-title">Vue d'ensemble</h3>
+        <div class="dash-stats-grid">
+            <div class="dash-stat-card">
+                <div class="dash-stat-icon"><i class="bi bi-people-fill"></i></div>
+                <div class="dash-stat-label">Total Alumni</div>
+                <div class="dash-stat-value"><%= totalAlumni %></div>
+            </div>
+            <div class="dash-stat-card">
+                <div class="dash-stat-icon"><i class="bi bi-newspaper"></i></div>
+                <div class="dash-stat-label">Publications</div>
+                <div class="dash-stat-value"><%= totalPubs %></div>
+            </div>
+            <div class="dash-stat-card">
+                <div class="dash-stat-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                <div class="dash-stat-label">Connexions (7j)</div>
+                <%
+                    int logins7j = 0;
+                    for(Map m : dailyLogins) logins7j += (Integer)m.get("count");
+                %>
+                <div class="dash-stat-value"><%= logins7j %></div>
+            </div>
+            <div class="dash-stat-card">
+                <div class="dash-stat-icon" style="background:#FEF3C7;color:#B45309;"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                <div class="dash-stat-label">Signalements</div>
+                <div class="dash-stat-value"><%= totalSignalements %></div>
+            </div>
         </div>
     </div>
 
-    <div class="dash-main-grid">
-        <!-- Connections Chart -->
-        <div class="dash-card">
+    <!-- ═══════════════════ SECTION: ACTIVITE ═══════════════════ -->
+    <div class="dash-section">
+        <h3 class="dash-section-title">Activit&eacute;</h3>
+        <!-- Frequentation: full width -->
+        <div class="dash-card" style="margin-bottom:24px;">
             <h2 class="dash-card-title"><i class="bi bi-activity"></i>Fr&eacute;quentation (Connexions/Jour)</h2>
             <div class="chart-wrapper">
                 <canvas id="loginChart"></canvas>
             </div>
         </div>
-        <div class="dash-card">
-            <h2 class="dash-card-title"><i class="bi bi-pie-chart-fill"></i>R&eacute;partition des Sp&eacute;cialit&eacute;s</h2>
-            <div class="chart-wrapper">
-                <canvas id="specChart"></canvas>
+        <div class="dash-main-grid">
+            <div class="dash-card">
+                <h2 class="dash-card-title"><i class="bi bi-pie-chart-fill"></i>R&eacute;partition des Sp&eacute;cialit&eacute;s</h2>
+                <div class="chart-wrapper">
+                    <canvas id="specChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Second Row -->
-    <div class="dash-full-grid">
-        <div class="dash-card">
-            <h2 class="dash-card-title"><i class="bi bi-bar-chart-fill"></i>Sp&eacute;cialit&eacute;s les plus demand&eacute;es (Hashtags)</h2>
-            <div class="chart-wrapper">
-                <canvas id="demandChart"></canvas>
+    <!-- ═══════════════════ SECTION: SPECIALITES ═══════════════════ -->
+    <div class="dash-section">
+        <h3 class="dash-section-title">Sp&eacute;cialit&eacute;s &amp; Tendances</h3>
+        <div class="dash-main-grid">
+            <div class="dash-card">
+                <h2 class="dash-card-title"><i class="bi bi-bar-chart-fill"></i>Sp&eacute;cialit&eacute;s les plus demand&eacute;es (Hashtags)</h2>
+                <div class="chart-wrapper">
+                    <canvas id="demandChart"></canvas>
+                </div>
+            </div>
+            <!-- ═══════════ MODERATION ═══════════ -->
+            <div class="dash-card">
+                <h2 class="dash-card-title" style="color:#B45309;"><i class="bi bi-shield-exclamation" style="color:#B45309;"></i>Utilisateurs les plus signal&eacute;s</h2>
+                <% if (reportedUsers != null && !reportedUsers.isEmpty()) { %>
+                <table class="ranked-table">
+                    <thead>
+                        <tr><th>#</th><th>Utilisateur</th><th>Signalements</th></tr>
+                    </thead>
+                    <tbody>
+                    <% int rank = 1;
+                       String ctx = request.getContextPath();
+                       for (Map ru : reportedUsers) {
+                           String profLink = ctx + "/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp&idprofil=" + ru.get("idprofil");
+                    %>
+                        <tr style="cursor:pointer;" onclick="window.location.href='<%= profLink %>'">
+                            <td><span class="rank-badge"><%= rank++ %></span></td>
+                            <td><a href="<%= profLink %>" style="color:#92400E;text-decoration:none;font-weight:600;"><%= ru.get("name") %></a></td>
+                            <td><span class="report-count"><i class="bi bi-flag-fill"></i> <%= ru.get("count") %></span></td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+                <% } else { %>
+                <div class="no-data-msg">
+                    <i class="bi bi-check-circle" style="font-size:24px;color:var(--dash-success);display:block;margin-bottom:8px;"></i>
+                    Aucun signalement enregistr&eacute;.
+                </div>
+                <% } %>
             </div>
         </div>
     </div>
@@ -356,13 +552,13 @@
     
     StringBuilder labels = new StringBuilder();
     StringBuilder data = new StringBuilder();
-    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM");
+    java.text.SimpleDateFormat sdf2 = new java.text.SimpleDateFormat("dd/MM");
     
-    for(int i=0; i<displayLogins.size(); i++) {
-        Map m = displayLogins.get(i);
-        labels.append("'").append(sdf.format((java.util.Date)m.get("date"))).append("'");
+    for(int ii=0; ii<displayLogins.size(); ii++) {
+        Map m = displayLogins.get(ii);
+        labels.append("'").append(sdf2.format((java.util.Date)m.get("date"))).append("'");
         data.append(m.get("count"));
-        if(i < displayLogins.size()-1) {
+        if(ii < displayLogins.size()-1) {
             labels.append(",");
             data.append(",");
         }
@@ -439,11 +635,11 @@ $(function() {
         StringBuilder sLabels = new StringBuilder();
         StringBuilder sData = new StringBuilder();
         if (tSpecs != null) {
-            for (int j = 0; j < tSpecs.size(); j++) {
-                Map m = tSpecs.get(j);
+            for (int jj = 0; jj < tSpecs.size(); jj++) {
+                Map m = tSpecs.get(jj);
                 sLabels.append("'").append(((String)m.get("libelle")).replace("'", "\\'")).append("'");
                 sData.append(m.get("count"));
-                if (j < tSpecs.size() - 1) {
+                if (jj < tSpecs.size() - 1) {
                     sLabels.append(",");
                     sData.append(",");
                 }
