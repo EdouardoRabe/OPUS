@@ -18,11 +18,93 @@
     MapUtilisateur mapEnr = uEnr.getUser();
     int refuserConnecte = mapEnr.getRefuser();
     String ctx = request.getContextPath();
+    // Profil connecté — nom, initiales, photos sidebar
+    String nomConnecte = mapEnr.getNomuser() != null ? mapEnr.getNomuser() : "";
+    String[] _partsConn = nomConnecte.trim().split("\\s+");
+    String initialConnecte = (_partsConn.length > 0 && _partsConn[0].length() > 0)
+        ? String.valueOf(Character.toUpperCase(_partsConn[0].charAt(0))) : "U";
+    if (_partsConn.length > 1 && _partsConn[_partsConn.length-1].length() > 0)
+        initialConnecte += Character.toUpperCase(_partsConn[_partsConn.length-1].charAt(0));
+    String _connPhotoUrl = "";
+    String _connCoverUrl = "";
+    try {
+        Connection connSide = new UtilDB().GetConn();
+        try {
+            ProfilLib[] _myProfils = (ProfilLib[]) CGenUtil.rechercher(
+                new ProfilLib(), null, null, connSide, " and refuser=" + refuserConnecte);
+            if (_myProfils != null && _myProfils.length > 0) {
+                if (_myProfils[0].getPhotoProfil() != null && !_myProfils[0].getPhotoProfil().trim().isEmpty())
+                    _connPhotoUrl = ctx + "/" + _myProfils[0].getPhotoProfil().trim();
+                if (_myProfils[0].getPhotoCouverture() != null && !_myProfils[0].getPhotoCouverture().trim().isEmpty())
+                    _connCoverUrl = ctx + "/" + _myProfils[0].getPhotoCouverture().trim();
+            }
+        } finally { connSide.close(); }
+    } catch (Exception _eSide) { /* ignore */ }
 %>
 
 <style>
+    :root {
+        --fa-bg: #f0f2f5;
+        --fa-card-bg: #ffffff;
+        --fa-border: #e4e6eb;
+        --fa-text: #050505;
+        --fa-text-secondary: #65676b;
+        --itu-blue: #008BFF;
+        --itu-dark: #1c1e29;
+        --itu-violet: #5B23FF;
+    }
+    .fa-layout { display: grid; grid-template-columns: 220px minmax(0,1fr); gap: 16px; padding: 0; align-items: start; }
+    @media(max-width:768px) { .fa-layout { grid-template-columns: 1fr; } .fa-sidebar-left { display: none; } }
+    .fa-sidebar-left {
+        position: sticky; top: 80px;
+        height: calc(100vh - 96px); overflow-y: auto; overflow-x: hidden;
+        overscroll-behavior: contain; padding-right: 6px;
+        scrollbar-width: thin; scrollbar-color: rgba(96,110,122,.31) transparent;
+    }
+    .fa-sidebar-left::-webkit-scrollbar { width: 5px; }
+    .fa-sidebar-left::-webkit-scrollbar-track {
+        background: rgba(0,0,0,.04);
+        border-radius: 999px;
+        margin: 8px 0;
+    }
+    .fa-sidebar-left::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--itu-blue,#008BFF) 0%, var(--itu-violet,#5B23FF) 100%);
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.6);
+        box-shadow: 0 0 4px rgba(0,139,255,.25);
+        transition: opacity .2s;
+        opacity: .6;
+    }
+    .fa-sidebar-left::-webkit-scrollbar-thumb:hover {
+        opacity: 1;
+        box-shadow: 0 0 8px rgba(0,139,255,.45);
+    }
+    .fa-feed-center { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+    .fa-profile-card { background: var(--fa-card-bg); border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.12); overflow: hidden; }
+    .fa-profile-cover { height: 72px; background: linear-gradient(135deg, var(--itu-dark,#362F4F) 0%, var(--itu-violet,#5B23FF) 100%); }
+    .fa-profile-body { padding: 0 16px 16px; }
+    .fa-profile-avatar-wrap { margin-top: -36px; margin-bottom: 8px; }
+    .fa-avatar {
+        display: inline-flex; align-items: center; justify-content: center;
+        border-radius: 50%; font-weight: 700; color: #fff; flex-shrink: 0;
+        user-select: none;
+        background: linear-gradient(135deg, var(--itu-dark,#362F4F) 0%, var(--itu-blue,#008BFF) 100%);
+    }
+    .fa-avatar--xs { width: 28px; height: 28px; font-size: 10px; }
+    .fa-avatar--sm { width: 36px; height: 36px; font-size: 13px; }
+    .fa-avatar--md { width: 44px; height: 44px; font-size: 16px; }
+    .fa-avatar--lg { width: 72px; height: 72px; font-size: 26px; }
+    .fa-profile-name { font-weight: 700; font-size: 16px; color: var(--fa-text); margin-bottom: 12px; }
+    .fa-divider { border: none; border-top: 1px solid var(--fa-border); margin: 10px 0; }
+    .fa-profile-nav { display: flex; flex-direction: column; gap: 2px; }
+    .fa-nav-link { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; color: var(--fa-text); text-decoration: none; font-size: 15px; transition: background .15s; }
+    .fa-nav-link:hover { background: #f0f2f5; color: var(--itu-blue,#008BFF); }
+    .fa-nav-link--active { background: #e7f3ff; color: var(--itu-blue,#008BFF); font-weight: 600; }
+    .fa-nav-link i { font-size: 16px; }
+</style>
+<style>
     /* ===== SAVED PAGE - Facebook-style ===== */
-    .saved-container { max-width: 750px; margin: 0 auto; padding: 0 10px; }
+    .saved-container { max-width: unset; margin: 0; padding: 0; }
 
     .saved-header {
         display: flex; align-items: center; gap: 14px;
@@ -148,10 +230,39 @@
     }
 </style>
 
+<div class="fa-layout">
+
+    <!-- ===== COLONNE GAUCHE : Profil ===== -->
+    <aside class="fa-sidebar-left">
+        <div class="fa-profile-card">
+            <div class="fa-profile-cover"<%= !_connCoverUrl.isEmpty() ? " style=\"background:none;\"" : "" %>><% if (!_connCoverUrl.isEmpty()) { %><img src="<%= _connCoverUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"><% } %></div>
+            <div class="fa-profile-body">
+                <div class="fa-profile-avatar-wrap">
+                    <div class="fa-avatar fa-avatar--lg"<%= !_connPhotoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>><% if (!_connPhotoUrl.isEmpty()) { %><img src="<%= _connPhotoUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initialConnecte %><% } %></div>
+                </div>
+                <div class="fa-profile-name"><%= nomConnecte %></div>
+                <hr class="fa-divider">
+                <nav class="fa-profile-nav">
+                    <a href="<%= ctx %>/pages/module.jsp?but=profil/voir.jsp&currentMenu=MENDYN000009" class="fa-nav-link">
+                        <i class="bi bi-person-fill"></i>&nbsp;Mon profil
+                    </a>
+                    <a href="<%= ctx %>/pages/module.jsp?but=accueil.jsp" class="fa-nav-link">
+                        <i class="bi bi-newspaper"></i>&nbsp;Fil d&apos;actualit&eacute;
+                    </a>
+                    <a href="<%= ctx %>/pages/module.jsp?but=alumni/notifications.jsp" class="fa-nav-link">
+                        <i class="bi bi-bell-fill"></i>&nbsp;Notifications
+                    </a>
+                    <a href="<%= ctx %>/pages/module.jsp?but=alumni/publications-enregistrees.jsp" class="fa-nav-link fa-nav-link--active">
+                        <i class="bi bi-bookmarks-fill"></i>&nbsp;Enregistrements
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ===== CONTENU PRINCIPAL ===== -->
+    <main class="fa-feed-center">
 <div class="saved-container">
-    <a href="<%= ctx %>/pages/module.jsp?but=accueil.jsp" class="saved-back-link">
-        <i class="bi bi-arrow-left"></i> Retour au fil d'actualit&eacute;
-    </a>
 
     <%
         Connection conn = null;
@@ -309,6 +420,8 @@
             if (conn != null) try { conn.close(); } catch (Exception _x) {}
         }
     %>
+</div>
+    </main>
 </div>
 
 <script>

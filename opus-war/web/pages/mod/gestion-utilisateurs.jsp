@@ -1,3 +1,4 @@
+<%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
 <%@page import="affichage.PageRecherche"%>
 <%@ page import="alumni.ProfilLib" %>
 <%@ page import="historique.MapUtilisateur" %>
@@ -29,6 +30,10 @@
             actionErr = ex.getMessage();
         }
     }
+
+    // --- Filtre par état ---
+    String etatParam = request.getParameter("etat");
+    if (etatParam == null) etatParam = "";
 
     ProfilLib t = new ProfilLib();
     String listeCrt[] = {"nom", "loginuser", "email", "promotionlib", "parcourslib", "idrole"};
@@ -119,17 +124,21 @@
 </div>
 <% } %>
 
-<!-- ═══ STATS CARDS ═══ -->
+<!-- ═══ STATS CARDS + FILTRE ÉTAT ═══ -->
 <div style="display:flex;gap:15px;margin-bottom:20px;">
-    <div class="custom-card no-hover" style="flex:1;text-align:center;padding:15px 20px;">
+    <a href="<%= lienBase %>?but=<%= pr.getApres() %>" class="custom-card no-hover" style="flex:1;text-align:center;padding:15px 20px;text-decoration:none;border:<%= etatParam.isEmpty() ? "2px solid var(--itu-blue,#008BFF)" : "1px solid #dde3ec" %>;cursor:pointer;">
+        <div style="font-size:1.8em;font-weight:700;color:#2c3e50;"><%= allUsers.length %></div>
+        <div style="font-size:0.85em;color:#888;">Tous</div>
+    </a>
+    <a href="<%= lienBase %>?but=<%= pr.getApres() %>&etat=100" class="custom-card no-hover" style="flex:1;text-align:center;padding:15px 20px;text-decoration:none;border:<%= "100".equals(etatParam) ? "2px solid #27ae60" : "1px solid #dde3ec" %>;cursor:pointer;">
         <div style="font-size:1.8em;font-weight:700;color:#27ae60;"><%= totalActifs %></div>
         <div style="font-size:0.85em;color:#888;">Actifs / Valid&eacute;s</div>
-    </div>
-    <div class="custom-card no-hover" style="flex:1;text-align:center;padding:15px 20px;">
+    </a>
+    <a href="<%= lienBase %>?but=<%= pr.getApres() %>&etat=1" class="custom-card no-hover" style="flex:1;text-align:center;padding:15px 20px;text-decoration:none;border:<%= "1".equals(etatParam) ? "2px solid #f59e0b" : "1px solid #dde3ec" %>;cursor:pointer;">
         <div style="font-size:1.8em;font-weight:700;color:#f59e0b;"><%= totalCrees %></div>
         <div style="font-size:0.85em;color:#888;">En attente</div>
-    </div>
-    <div class="custom-card no-hover" style="flex:1;text-align:center;padding:15px 20px;">
+    </a>
+    <a href="<%= lienBase %>?but=<%= pr.getApres() %>&etat=0" class="custom-card no-hover" style="flex:1;text-align:center;padding:15px 20px;text-decoration:none;border:<%= "0".equals(etatParam) ? "2px solid #e74c3c" : "1px solid #dde3ec" %>;cursor:pointer;">
         <div style="font-size:1.8em;font-weight:700;color:#e74c3c;"><%= totalBannis %></div>
         <div style="font-size:0.85em;color:#888;">Bannis</div>
     </div>
@@ -142,6 +151,7 @@
 <!-- ═══ SEARCH & FILTER (APJ Standard) ═══ -->
 <div class="custom-card no-hover" style="margin-bottom:20px;padding:1.25rem 1.5rem;">
     <form action="<%= pr.getLien() %>?but=<%= pr.getApres() %>" method="post" name="recherche" id="recherche">
+        <input type="hidden" name="etat" value="<%= etatParam %>"/>
         <%= pr.getFormu().getHtmlEnsemble() %>
     </form>
 </div>
@@ -229,6 +239,8 @@
 .pub-menu-btn:hover { color:var(--itu-blue,#008BFF); }
 .pub-menu-dropdown .pub-menu-item { display:flex; align-items:center; gap:6px; }
 .pub-menu-dropdown .pub-menu-item i { width:14px; }
+
+
 </style>
 
 <!-- ═══ USERS GRID ═══ -->
@@ -236,13 +248,8 @@
 <%
     for (int i = 0; i < allUsers.length; i++) {
         ProfilLib p = allUsers[i];
-        int idx = i % 8;
         String nomP = p.getNom() != null ? p.getNom() : "";
         String prenomP = p.getPrenom() != null ? p.getPrenom() : "";
-        String initials = "";
-        if (prenomP.length() > 0) initials += Character.toUpperCase(prenomP.charAt(0));
-        if (nomP.length() > 0) initials += Character.toUpperCase(nomP.charAt(0));
-        if (initials.isEmpty()) initials = "?";
         int etatDetail = p.getEtatdetail();
         String loginP = p.getLoginuser() != null ? p.getLoginuser() : "";
         String emailP = p.getEmail() != null ? p.getEmail() : "";
@@ -267,28 +274,46 @@
                 <% if (!isSelf) { %>
                     <% if (etatDetail == ConstantEtatUser.etatUtilisateurCreer) { %>
                     <!-- Utilisateur créé → Valider -->
-                    <form method="post" style="margin:0;" onsubmit="return confirm('Valider cet utilisateur ?');">
+                    <form method="post" action="<%= pr.getLien() %>?but=<%= pr.getApres() %>" style="margin:0;" onsubmit="return confirm('Valider cet utilisateur ?');">
                         <input type="hidden" name="action" value="valider"/>
                         <input type="hidden" name="refuser" value="<%= ref %>"/>
+                        <input type="hidden" name="numPag" value="<%= pr.getNumPage() %>"/>
+                        <input type="hidden" name="recap" value="<%= pr.getFormu().getRecapcheck() %>"/>
+                        <input type="hidden" name="premier" value="<%= pr.getPremier() %>"/>
+                        <input type="hidden" name="etat" value="<%= etatParam %>"/>
+                        <%= pr.getFormu().getListeCritereStringCheckbox(pr) %>
+
                         <button type="submit" class="usr-action-link">
                             <i class="fa fa-check-circle"></i> Valider
                         </button>
                     </form>
                     <% } else if (etatDetail == ConstantEtatUser.etatUtilisateurBanis) { %>
                     <!-- Utilisateur banni → Activer -->
-                    <form method="post" style="margin:0;" onsubmit="return confirm('R\u00e9activer cet utilisateur ?');">
+                    <form method="post" action="<%= pr.getLien() %>?but=<%= pr.getApres() %>" style="margin:0;" onsubmit="return confirm('R\u00e9activer cet utilisateur ?');">
                         <input type="hidden" name="action" value="activer"/>
                         <input type="hidden" name="refuser" value="<%= ref %>"/>
+                        <input type="hidden" name="numPag" value="<%= pr.getNumPage() %>"/>
+                        <input type="hidden" name="recap" value="<%= pr.getFormu().getRecapcheck() %>"/>
+                        <input type="hidden" name="premier" value="<%= pr.getPremier() %>"/>
+                        <input type="hidden" name="etat" value="<%= etatParam %>"/>
+                        <%= pr.getFormu().getListeCritereStringCheckbox(pr) %>
+
                         <button type="submit" class="usr-action-link">
                             <i class="fa fa-play-circle"></i> Activer
                         </button>
                     </form>
                     <% } else { %>
                     <!-- Utilisateur validé ou actif → Bannir -->
-                    <form method="post" style="margin:0;" onsubmit="return promptDesactivation(this);">
+                    <form method="post" action="<%= pr.getLien() %>?but=<%= pr.getApres() %>" style="margin:0;" onsubmit="return promptDesactivation(this);">
                         <input type="hidden" name="action" value="desactiver"/>
                         <input type="hidden" name="refuser" value="<%= ref %>"/>
                         <input type="hidden" name="description" value=""/>
+                        <input type="hidden" name="numPag" value="<%= pr.getNumPage() %>"/>
+                        <input type="hidden" name="recap" value="<%= pr.getFormu().getRecapcheck() %>"/>
+                        <input type="hidden" name="premier" value="<%= pr.getPremier() %>"/>
+                        <input type="hidden" name="etat" value="<%= etatParam %>"/>
+                        <%= pr.getFormu().getListeCritereStringCheckbox(pr) %>
+
                         <button type="submit" class="usr-action-link">
                             <i class="fa fa-ban"></i> Bannir
                         </button>
@@ -299,12 +324,13 @@
         </div>
 
         <!-- Avatar / Photo -->
-        <div class="speciality-icon" style="<%= hasPhoto ? "background:var(--gray-100);" : avatarGradients[idx] %>">
+        <div class="speciality-icon" style="background:<%= hasPhoto ? "var(--gray-100)" : "#d0dce7" %>;">
             <% if (hasPhoto) { %>
                 <img src="<%= request.getContextPath() %>/uploads/<%= photoProfil %>" alt="Photo"
                      style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>
             <% } else { %>
-                <span style="font-size:1.4rem;font-weight:700;<%= avatarTextColors[idx] %>"><%= initials %></span>
+                <img src="<%= request.getContextPath() %>/dist/img/no-profile.png" alt="Aucune photo"
+                     style="width:55%;height:55%;object-fit:contain;"/>
             <% } %>
         </div>
 

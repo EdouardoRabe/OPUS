@@ -5,6 +5,7 @@
 <%@ page import="affichage.*" %>
 <%@ page import="alumni.Publication" %>
 <%@ page import="alumni.Typepublication" %>
+<%@ page import="alumni.ProfilLib" %>
 <%
     String lien     = (String) session.getValue("lien");
     String id       = "";
@@ -72,171 +73,341 @@
     }
 %>
 
-<!-- ═══ PAGE HEADER ═══ -->
-<div class="page-header-top">
-    <h1 class="page-title-lg">
-        <a href="<%= lien %>?but=<%= apres %>"
-           style="color:var(--gray-400);margin-right:10px;font-size:1rem;vertical-align:middle;"
-           title="Retour">
+<style>
+    /* ── Facebook-style variables (cohérent accueil.jsp) ── */
+    .pm-page {
+        --fa-bg: #f0f2f5;
+        --fa-card-bg: #ffffff;
+        --fa-border: #e4e6eb;
+        --fa-text: #050505;
+        --fa-text-secondary: #65676b;
+    }
+    .pm-page {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 0 0 40px;
+    }
+
+    /* ── Header card (Facebook "Créer une publication" style) ── */
+    .pm-header-card {
+        background: var(--fa-card-bg);
+        border-radius: 12px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.12);
+        padding: 14px 18px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .pm-back-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        background: #f0f2f5;
+        color: var(--fa-text-secondary);
+        font-size: 16px;
+        text-decoration: none;
+        transition: background .15s, color .15s;
+        flex-shrink: 0;
+    }
+    .pm-back-btn:hover { background: #e4e6eb; color: var(--fa-text); }
+    .pm-header-title {
+        font-weight: 700;
+        font-size: 20px;
+        color: var(--fa-text);
+        margin: 0;
+        line-height: 1.3;
+    }
+    .pm-header-subtitle {
+        font-size: 13px;
+        color: var(--fa-text-secondary);
+        margin-top: 2px;
+    }
+
+    /* ── Form card (Facebook post-card style) ── */
+    .pm-form-card {
+        background: var(--fa-card-bg);
+        border-radius: 12px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.12);
+        overflow: hidden;
+    }
+    .pm-form-body {
+        padding: 16px 18px 0;
+    }
+
+    /* ── Type select (Facebook-style compact badge dropdown) ── */
+    .pm-type-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--fa-border);
+    }
+    .pm-type-avatar {
+        width: 44px; height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--itu-dark,#1c1e29) 0%, var(--itu-blue,#008BFF) 100%);
+        color: #fff;
+        font-weight: 700;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        user-select: none;
+        overflow: hidden;
+    }
+    .pm-type-avatar img {
+        width: 100%; height: 100%;
+        object-fit: cover; border-radius: 50%;
+    }
+    .pm-type-info { flex: 1; min-width: 0; }
+    .pm-type-name {
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--fa-text);
+        margin-bottom: 4px;
+    }
+    .pm-type-select {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        background: #e4e6eb;
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--fa-text);
+        cursor: pointer;
+        transition: background .15s;
+        font-family: inherit;
+        -webkit-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2365676b'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        padding-right: 24px;
+    }
+    .pm-type-select:hover { background: #d8dadf; }
+    .pm-type-select:focus {
+        outline: none;
+        background: #d8dadf;
+        box-shadow: 0 0 0 2px rgba(0,139,255,.2);
+    }
+
+    /* ── Textarea (Facebook composer style — borderless, immersive) ── */
+    .pm-textarea-wrap {
+        padding: 4px 0 16px;
+    }
+    .pm-textarea {
+        width: 100%;
+        min-height: 160px;
+        border: none;
+        outline: none;
+        resize: none;
+        font-size: 16px;
+        line-height: 1.5;
+        color: var(--fa-text);
+        background: transparent;
+        font-family: inherit;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    .pm-textarea::placeholder {
+        color: var(--fa-text-secondary);
+    }
+    .pm-textarea:focus {
+        outline: none;
+    }
+    /* Subtle bottom hint line on focus */
+    .pm-textarea-wrap--focus {
+        border-bottom: 2px solid var(--itu-blue, #008BFF);
+    }
+
+    /* ── Footer buttons (Facebook style) ── */
+    .pm-form-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 18px;
+        border-top: 1px solid var(--fa-border);
+        gap: 10px;
+    }
+    .pm-footer-hint {
+        font-size: 13px;
+        color: var(--fa-text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .pm-footer-actions {
+        display: flex;
+        gap: 8px;
+        margin-left: auto;
+    }
+    .pm-btn-cancel {
+        padding: 8px 16px;
+        background: #e4e6eb;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fa-text);
+        cursor: pointer;
+        transition: background .15s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+    .pm-btn-cancel:hover { background: #d8dadf; color: var(--fa-text); }
+    .pm-btn-submit {
+        padding: 8px 20px;
+        background: var(--itu-blue, #008BFF);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background .15s, opacity .15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .pm-btn-submit:hover { background: #0069cc; }
+    .pm-btn-submit:disabled { opacity: .5; cursor: default; }
+
+    /* ── Spinner (same as accueil.jsp) ── */
+    .pm-spinner {
+        display: inline-block;
+        width: 16px; height: 16px;
+        border: 2px solid rgba(255,255,255,.4);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: pmSpin .7s linear infinite;
+    }
+    @keyframes pmSpin { to { transform: rotate(360deg); } }
+
+    /* ── Hide APJ-generated chrome ── */
+    #formModif .box,
+    #formModif .box-body,
+    #formModif .box-header { all: unset; display: block; }
+    #formModif .box-footer { display: none !important; }
+    #uploadBox { display: none !important; }
+    #formModif .form-group { margin-bottom: 0; }
+</style>
+
+<div class="pm-page">
+
+    <!-- ═══ HEADER CARD ═══ -->
+    <div class="pm-header-card">
+        <a href="<%= lien %>?but=<%= apres %>" class="pm-back-btn" title="Retour">
             <i class="fa fa-arrow-left"></i>
         </a>
-        <i class="fa fa-pencil" style="color:var(--itu-blue);font-size:1.1rem;margin-right:8px;"></i>
-        Modifier la publication
-    </h1>
-</div>
+        <div>
+            <h1 class="pm-header-title">Modifier la publication</h1>
+            <div class="pm-header-subtitle">Modifiez le type ou la description de votre publication</div>
+        </div>
+    </div>
 
-<!-- ═══ FORM CARD ═══ -->
-<div style="max-width:680px;margin:0 auto;">
-    <div class="custom-card no-hover">
-
+    <!-- ═══ FORM CARD ═══ -->
+    <div class="pm-form-card">
         <form id="formModif">
             <input type="hidden" name="idpublication" value="<%= id %>">
 
-            <style>
-                /* ── Scope APJ-generated fields to alumni theme ── */
-                #formModif .form-group label,
-                #formModif label {
-                    font-size: 0.78rem;
-                    font-weight: 700;
-                    color: var(--itu-dark);
-                    margin-bottom: 0.4rem;
-                    letter-spacing: 0.04em;
-                    text-transform: uppercase;
-                    display: block;
-                }
-                #formModif input[type=text],
-                #formModif textarea,
-                #formModif select {
-                    width: 100%;
-                    padding: 0.72rem 1rem;
-                    border: 1.5px solid var(--gray-200);
-                    border-radius: var(--radius-md);
-                    font-family: var(--font-sans);
-                    font-size: 0.92rem;
-                    outline: none;
-                    background: var(--white);
-                    color: var(--itu-dark);
-                    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-                    box-sizing: border-box;
-                }
-                #formModif input[type=text]:focus,
-                #formModif textarea:focus,
-                #formModif select:focus {
-                    border-color: var(--itu-blue);
-                    box-shadow: 0 0 0 3px rgba(0,139,255,0.1);
-                }
-                #formModif .form-group {
-                    margin-bottom: 1.25rem;
-                }
-                #formModif .box,
-                #formModif .box-body,
-                #formModif .box-header { all: unset; display: block; }
-                #formModif .box-footer {
-                    all: unset;
-                    display: flex !important;
-                    justify-content: flex-end;
-                    align-items: center;
-                    gap: 0.75rem;
-                    margin-top: 1.75rem;
-                    padding-top: 1.25rem;
-                }
-                #formModif .box-footer .btn { float: none !important; margin: 0 !important; }
-                #uploadBox { display: none !important; }
-                /* Type publication custom select */
-                .type-pub-group {
-                    margin-bottom: 1.25rem;
-                }
-                .type-pub-group label {
-                    font-size: 0.78rem;
-                    font-weight: 700;
-                    color: var(--itu-dark);
-                    margin-bottom: 0.4rem;
-                    letter-spacing: 0.04em;
-                    text-transform: uppercase;
-                    display: block;
-                }
-                .type-pub-group select {
-                    width: 100%;
-                    padding: 0.72rem 1rem;
-                    border: 1.5px solid var(--gray-200);
-                    border-radius: var(--radius-md);
-                    font-family: var(--font-sans);
-                    font-size: 0.92rem;
-                    outline: none;
-                    background: var(--white);
-                    color: var(--itu-dark);
-                }
-                /* Description custom textarea */
-                .desc-group {
-                    margin-bottom: 1.25rem;
-                }
-                .desc-group label {
-                    font-size: 0.78rem;
-                    font-weight: 700;
-                    color: var(--itu-dark);
-                    margin-bottom: 0.4rem;
-                    letter-spacing: 0.04em;
-                    text-transform: uppercase;
-                    display: block;
-                }
-                .desc-group textarea {
-                    width: 100%;
-                    min-height: 150px;
-                    padding: 0.72rem 1rem;
-                    border: 1.5px solid var(--gray-200);
-                    border-radius: var(--radius-md);
-                    font-family: var(--font-sans);
-                    font-size: 0.92rem;
-                    outline: none;
-                    background: var(--white);
-                    color: var(--itu-dark);
-                    resize: vertical;
-                }
-                .desc-group textarea:focus {
-                    border-color: var(--itu-blue);
-                    box-shadow: 0 0 0 3px rgba(0,139,255,0.1);
-                }
-            </style>
+            <div class="pm-form-body">
+                <!-- User avatar + Type select (Facebook composer header) -->
+                <div class="pm-type-section">
+                    <div class="pm-type-avatar">
+                        <%
+                            // Photo profil connecté (même pattern que accueil.jsp)
+                            String _pmPhoto = "";
+                            String _pmInitiale = "";
+                            try {
+                                ProfilLib[] _pmProfils = (ProfilLib[]) CGenUtil.rechercher(new ProfilLib(), null, null, " and refuser=" + refModif);
+                                if (_pmProfils != null && _pmProfils.length > 0) {
+                                    if (_pmProfils[0].getPhotoProfil() != null && !_pmProfils[0].getPhotoProfil().trim().isEmpty())
+                                        _pmPhoto = request.getContextPath() + "/" + _pmProfils[0].getPhotoProfil().trim();
+                                }
+                            } catch(Exception _ex) {}
+                            String _pmNom = uModif.getUser().getNomuser();
+                            if (_pmNom == null) _pmNom = "";
+                            if (!_pmNom.isEmpty()) _pmInitiale = _pmNom.substring(0,1).toUpperCase();
+                        %>
+                        <% if (!_pmPhoto.isEmpty()) { %>
+                            <img src="<%= _pmPhoto %>" alt="">
+                        <% } else { %>
+                            <%= _pmInitiale %>
+                        <% } %>
+                    </div>
+                    <div class="pm-type-info">
+                        <div class="pm-type-name"><%= _pmNom %></div>
+                        <select name="idtypepublication" id="idtypepublication" class="pm-type-select">
+                            <% for (int tp = 0; tp < typesPub.length; tp++) { %>
+                            <option value="<%= typesPub[tp].getIdtypepublication() %>"
+                                    <%= typeActuel.equals(typesPub[tp].getIdtypepublication()) ? "selected" : "" %>>
+                                <%= typesPub[tp].getLibelle() %>
+                            </option>
+                            <% } %>
+                        </select>
+                    </div>
+                </div>
 
-            <!-- Type de publication -->
-            <div class="type-pub-group">
-                <label for="idtypepublication">Type de publication</label>
-                <select name="idtypepublication" id="idtypepublication">
-                    <% for (int tp = 0; tp < typesPub.length; tp++) { %>
-                    <option value="<%= typesPub[tp].getIdtypepublication() %>"
-                            <%= typeActuel.equals(typesPub[tp].getIdtypepublication()) ? "selected" : "" %>>
-                        <%= typesPub[tp].getLibelle() %>
-                    </option>
-                    <% } %>
-                </select>
+                <!-- Textarea (Facebook composer — borderless, immersive) -->
+                <div class="pm-textarea-wrap" id="pmTextareaWrap">
+                    <textarea name="descritpion" id="descritpion" class="pm-textarea"
+                              placeholder="Qu'avez-vous en t&ecirc;te ?"><%= descActuelle %></textarea>
+                </div>
             </div>
 
-            <!-- Description -->
-            <div class="desc-group">
-                <label for="descritpion">Description</label>
-                <textarea name="descritpion" id="descritpion"><%= descActuelle %></textarea>
-            </div>
-
-            <!-- Boutons -->
-            <div style="display:flex;justify-content:flex-end;align-items:center;gap:0.75rem;margin-top:1.75rem;padding-top:1.25rem;">
-                <a href="<%= lien %>?but=<%= apres %>" class="btn btn-ghost">Annuler</a>
-                <button type="submit" id="btnSubmit" class="btn btn-primary"
-                        style="display:inline-flex;align-items:center;gap:6px;">
-                    <i class="fa fa-check"></i> Enregistrer
-                </button>
+            <!-- Footer buttons -->
+            <div class="pm-form-footer">
+                <span class="pm-footer-hint">
+                    <i class="fa fa-pencil" style="color:var(--itu-blue,#008BFF);"></i>
+                    &Eacute;dition
+                </span>
+                <div class="pm-footer-actions">
+                    <a href="<%= lien %>?but=<%= apres %>" class="pm-btn-cancel">Annuler</a>
+                    <button type="submit" id="btnSubmit" class="pm-btn-submit">
+                        <i class="fa fa-check"></i> Enregistrer
+                    </button>
+                </div>
             </div>
         </form>
-
     </div>
+
 </div>
 
 <script>
 (function () {
+    // Textarea focus effect (subtle bottom accent line)
+    var ta = document.getElementById("descritpion");
+    var wrap = document.getElementById("pmTextareaWrap");
+    if (ta && wrap) {
+        ta.addEventListener("focus", function() { wrap.classList.add("pm-textarea-wrap--focus"); });
+        ta.addEventListener("blur",  function() { wrap.classList.remove("pm-textarea-wrap--focus"); });
+    }
+
+    // Auto-resize textarea
+    if (ta) {
+        function autoResize() {
+            ta.style.height = "auto";
+            ta.style.height = Math.max(160, ta.scrollHeight) + "px";
+        }
+        ta.addEventListener("input", autoResize);
+        autoResize();
+    }
+
+    // Form submit
     document.getElementById("formModif").addEventListener("submit", function(e) {
         e.preventDefault();
         var btn = document.getElementById("btnSubmit");
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa fa-spinner fa-spin" style="margin-right:5px;"></i>Enregistrement...';
+        btn.innerHTML = '<span class="pm-spinner"></span> Enregistrement...';
 
         fetch("<%= request.getContextPath() %>/pages/publication/ajax/traitement-update.jsp", {
             method: "POST",
@@ -250,13 +421,13 @@
             } else {
                 alert("Erreur : " + data.error);
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa fa-check" style="margin-right:5px;"></i>Enregistrer';
+                btn.innerHTML = '<i class="fa fa-check"></i> Enregistrer';
             }
         })
         .catch(function(err) {
             alert("Erreur r\u00e9seau : " + err);
             btn.disabled = false;
-            btn.innerHTML = '<i class="fa fa-check" style="margin-right:5px;"></i>Enregistrer';
+            btn.innerHTML = '<i class="fa fa-check"></i> Enregistrer';
         });
     });
 })();
