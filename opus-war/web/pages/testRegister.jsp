@@ -16,10 +16,16 @@
     String nom = request.getParameter("nom");
     String dtn = request.getParameter("dtn");
     String telephone = request.getParameter("telephone");
+    String typerole = request.getParameter("typerole");
+    // Valider le role choisi (etu ou alu), defaut etu
+    if(typerole == null || (!"+etu".equals("+" + typerole) && !"+alu".equals("+" + typerole))){
+        typerole = "etu";
+    }
 
     // Validation basique des champs obligatoires
     if(etu == null || etu.trim().isEmpty() || password == null || password.trim().isEmpty()){
         session.setAttribute("errorInscription", "Identifiant et mot de passe requis.");
+        session.setAttribute("reg_typerole", typerole);
         response.sendRedirect("inscription.jsp");
         return;
     }
@@ -37,6 +43,7 @@
         session.setAttribute("reg_nom", nom);
         session.setAttribute("reg_dtn", dtn);
         session.setAttribute("reg_telephone", telephone);
+        session.setAttribute("reg_typerole", typerole);
         response.sendRedirect("detailsInscription.jsp");
         return;
     }
@@ -57,6 +64,7 @@
             session.setAttribute("reg_nom", nom);
             session.setAttribute("reg_dtn", dtn);
             session.setAttribute("reg_telephone", telephone);
+            session.setAttribute("reg_typerole", typerole);
             response.sendRedirect("detailsInscription.jsp");
             return;
         }
@@ -68,7 +76,7 @@
     String nomuser = prenom.trim() + " " + nom.trim();
     String adruser = email.trim();
     String teluser = (telephone != null ? telephone.trim() : "");
-    String idrole = "etu"; 
+    String idrole = typerole; 
 
     try {
         // Construire le profil
@@ -101,6 +109,7 @@
             session.setAttribute("reg_nom", nom);
             session.setAttribute("reg_dtn", dtn);
             session.setAttribute("reg_telephone", telephone);
+            session.setAttribute("reg_typerole", typerole);
             response.sendRedirect("detailsInscription.jsp");
             return;
         }
@@ -141,6 +150,7 @@
         session.setAttribute("reg_nom", nom);
         session.setAttribute("reg_dtn", dtn);
         session.setAttribute("reg_telephone", telephone);
+        session.setAttribute("reg_typerole", typerole);
         response.sendRedirect("detailsInscription.jsp");
         return;
     }

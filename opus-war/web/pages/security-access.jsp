@@ -74,7 +74,7 @@
                         // vérifier si c'est une page admin/mod et si l'utilisateur a le bon rôle
                         if (pageDemandee.startsWith("mod/") || pageDemandee.contains("/mod/")) {
                             // Seuls les modérateurs (md) peuvent accéder aux pages mod/
-                            accesAutorise = "md".equals(idrole) || "admin".equals(idrole) || "dg".equals(idrole);
+                            accesAutorise = "md".equals(idrole) || "admin".equals(idrole) || "dg".equals(idrole);  
                         } else if (pageDemandee.startsWith("admin/") || pageDemandee.contains("/admin/")) {
                             // Seuls les admins peuvent accéder aux pages admin/
                             accesAutorise = "admin".equals(idrole) || "dg".equals(idrole);
