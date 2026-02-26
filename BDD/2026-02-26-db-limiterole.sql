@@ -3,30 +3,43 @@
 -- Date: 2026-02-26
 -- Description:
 --   - Creer la table limiterole pour definir le nombre max de publications/jour par role
---   - Inserer les limites : etu=0 (ne peut pas publier), alu=3
---   - Roles absents de limiterole = pas de limite (ex: md)
---   - Mettre a jour ETU000002 en role 'alu' pour les tests
+--   - Chaque changement de limite = nouvelle ligne avec date
+--   - La limite en vigueur = la plus recente par role
+--   - Inserer les limites : etu=0 (ne peut pas publier), alu=3, md=100
+--   - Roles absents de limiterole = pas de limite
+--   - Mettre a jour ETU000002, ETU000014, ETU000015 en role 'alu' pour les tests
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 -- ╔═══════════════════════════════════════════════════════════════════════════════╗
 -- ║ TABLE: limiterole                                                             ║
 -- ╚═══════════════════════════════════════════════════════════════════════════════╝
-CREATE TABLE IF NOT EXISTS limiterole (
-    idrole VARCHAR(20) PRIMARY KEY,
-    maxpublicationparjour INTEGER NOT NULL DEFAULT 0
+DROP TABLE IF EXISTS limiterole;
+
+CREATE TABLE limiterole (
+    idlimiterole VARCHAR(20) PRIMARY KEY,
+    idrole VARCHAR(20) NOT NULL,
+    maxpublicationparjour INTEGER NOT NULL DEFAULT 0,
+    daty DATE NOT NULL DEFAULT CURRENT_DATE
 );
 
--- Donnees : limites par role
-INSERT INTO limiterole (idrole, maxpublicationparjour) VALUES ('etu', 0)
-ON CONFLICT (idrole) DO UPDATE SET maxpublicationparjour = EXCLUDED.maxpublicationparjour;
+-- Sequence pour generer les PK
+CREATE SEQUENCE IF NOT EXISTS seq_limiterole START 1;
 
-INSERT INTO limiterole (idrole, maxpublicationparjour) VALUES ('alu', 3)
-ON CONFLICT (idrole) DO UPDATE SET maxpublicationparjour = EXCLUDED.maxpublicationparjour;
+CREATE OR REPLACE FUNCTION get_seq_limiterole() RETURNS VARCHAR AS $$
+    SELECT NEXTVAL('seq_limiterole')::VARCHAR;
+$$ LANGUAGE SQL;
 
-INSERT INTO limiterole (idrole, maxpublicationparjour) VALUES ('md', 100)
-ON CONFLICT (idrole) DO UPDATE SET maxpublicationparjour = EXCLUDED.maxpublicationparjour;
+-- Donnees initiales
+INSERT INTO limiterole (idlimiterole, idrole, maxpublicationparjour, daty) VALUES ('LMR001', 'etu', 0, CURRENT_DATE);
+INSERT INTO limiterole (idlimiterole, idrole, maxpublicationparjour, daty) VALUES ('LMR002', 'alu', 3, CURRENT_DATE);
+INSERT INTO limiterole (idlimiterole, idrole, maxpublicationparjour, daty) VALUES ('LMR003', 'md', 100, CURRENT_DATE);
+SELECT SETVAL('seq_limiterole', 3);
 
--- Les roles NON presents dans limiterole (ex: md, admin, dg) n'ont PAS de limite
+-- Vue pour obtenir la limite la plus recente par role
+CREATE OR REPLACE VIEW v_limiterole_actuel AS
+SELECT DISTINCT ON (idrole) idrole, maxpublicationparjour, daty
+FROM limiterole
+ORDER BY idrole, daty DESC;
 
 -- ╔═══════════════════════════════════════════════════════════════════════════════╗
 -- ║ MISE A JOUR UTILISATEURS : passer certains en role 'alu'                      ║

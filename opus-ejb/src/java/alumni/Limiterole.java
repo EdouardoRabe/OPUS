@@ -3,12 +3,15 @@ package alumni;
 import bean.ClassMAPTable;
 import bean.CGenUtil;
 import java.sql.Connection;
+import java.sql.Date;
 
 
 public class Limiterole extends ClassMAPTable {
 
+    private String idlimiterole;
     private String idrole;
     private int maxpublicationparjour;
+    private Date daty;
 
     public Limiterole() {
         setNomTable("limiterole");
@@ -16,19 +19,29 @@ public class Limiterole extends ClassMAPTable {
 
     @Override
     public String getTuppleID() {
-        return getIdrole();
+        return getIdlimiterole();
     }
 
     @Override
     public String getAttributIDName() {
-        return "idrole";
+        return "idlimiterole";
     }
 
     @Override
     public void construirePK(Connection c) throws Exception {
-        // Pas de sequence, idrole est la PK directe
+        this.preparePk("LMR", "get_seq_limiterole");
+        this.setIdlimiterole(makePK(c));
     }
 
+    // --- Getters / Setters ---
+
+    public String getIdlimiterole() {
+        return idlimiterole;
+    }
+
+    public void setIdlimiterole(String idlimiterole) {
+        this.idlimiterole = idlimiterole;
+    }
 
     public String getIdrole() {
         return idrole;
@@ -46,14 +59,27 @@ public class Limiterole extends ClassMAPTable {
         this.maxpublicationparjour = maxpublicationparjour;
     }
 
-  
+    public Date getDaty() {
+        return daty;
+    }
+
+    public void setDaty(Date daty) {
+        this.daty = daty;
+    }
+
+    // --- Methodes utilitaires (APJ) ---
+
+    /**
+     * Retourne la limite actuelle pour un role (via la vue v_limiterole_actuel).
+     * @return -1 si le role n'a pas de limite (absent de la table), 0 si interdit, >0 si limite
+     */
     public static int getMaxParJour(Connection conn, String idrole) throws Exception {
-        Limiterole[] results = (Limiterole[]) CGenUtil.rechercher(
-            new Limiterole(), null, null, conn, " and idrole = '" + idrole + "'");
+        LimiteroleActuel[] results = (LimiteroleActuel[]) CGenUtil.rechercher(
+            new LimiteroleActuel(), null, null, conn, " and idrole = '" + idrole + "'");
         if (results != null && results.length > 0) {
             return results[0].getMaxpublicationparjour();
         }
-        return -1; 
+        return -1; // role absent = pas de limite
     }
 
     public static int countPublicationsDuJour(Connection conn, int refuser) throws Exception {
@@ -80,17 +106,15 @@ public class Limiterole extends ClassMAPTable {
         return null;
     }
 
-    
     public static boolean peutPublier(Connection conn, String idrole) throws Exception {
         int max = getMaxParJour(conn, idrole);
         return max != 0;
     }
 
-   
     public static int publicationsRestantes(Connection conn, String idrole, int refuser) throws Exception {
         int max = getMaxParJour(conn, idrole);
-        if (max < 0) return -1; 
-        if (max == 0) return 0;  
+        if (max < 0) return -1;
+        if (max == 0) return 0;
         int count = countPublicationsDuJour(conn, refuser);
         return Math.max(0, max - count);
     }
