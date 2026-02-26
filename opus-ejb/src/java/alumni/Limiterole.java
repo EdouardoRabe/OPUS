@@ -53,7 +53,7 @@ public class Limiterole extends ClassMAPTable {
         if (results != null && results.length > 0) {
             return results[0].getMaxpublicationparjour();
         }
-        return -1; // role absent de limiterole = pas de limite
+        return -1; 
     }
 
     public static int countPublicationsDuJour(Connection conn, int refuser) throws Exception {
