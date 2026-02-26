@@ -878,8 +878,6 @@ DELETE FROM USERMENU
 WHERE idmenu LIKE 'MENDYN%';
 DELETE FROM MENUDYNAMIQUE
 WHERE id LIKE 'MENDYN%';
-
-
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
 VALUES (
            'MENDYN000001',
@@ -936,7 +934,25 @@ VALUES (
            1,
            'MENDYN000999'
        );
-
+INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
+VALUES (
+           'MENDYN000007',
+           'Offres d''emploi',
+           'bi-list-ul',
+           'module.jsp?but=carriere/offres.jsp',
+           1,
+           1,
+           'MENDYN000003'
+       ),
+       (
+           'MENDYN000008',
+           'Publier une offre',
+           'bi-plus-circle-fill',
+           'module.jsp?but=carriere/publier-offre.jsp',
+           2,
+           1,
+           'MENDYN000003'
+       );
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
 VALUES (
            'MENDYN000009',
@@ -1055,6 +1071,8 @@ VALUES ('USRM000001', 'MENDYN000001', '*', 0, 'etu'),
        ('USRM000025', 'MENDYN000024', '*', 1, 'etu'),
        ('USRM000027', 'MENDYN000014', '*', 0, 'etu'),
        ('USRM000029', 'MENDYN000015', '*', 0, 'etu'),
+       ('USRM000031', 'MENDYN000016', '*', 0, 'etu'),
+       ('USRM000033', 'MENDYN000017', '*', 0, 'etu'),
        ('USRM000035', 'MENDYN000018', '*', 0, 'etu');
 -- Droits role md
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
@@ -1114,7 +1132,30 @@ VALUES ('USRM000047', 'MENDYN000020', '*', 0, 'etu');
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000048', 'MENDYN000020', '*', 0, 'md');
 
+-- Sous-menu Dashboard et Historique sous Administration (niveau 1)
+INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
+VALUES (
+           'MENDYN000026',
+           'Dashboard',
+           'bi-column-gap',
+           'module.jsp?but=dashboard/dashboard.jsp',
+           1,
+           1,
+           'MENDYN000999'
+       ),
+       (
+           'MENDYN000027',
+           'Historique',
+           'bi-clock-history',
+           'module.jsp?but=dashboard/historique-list.jsp',
+           2,
+           1,
+           'MENDYN000999'
+       );
 
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
+VALUES ('USRM000049', 'MENDYN000027', '*', 0, 'md'),
+       ('USRM000050', 'MENDYN000026', '*', 0, 'md');
 -- ╔═══════════════════════════════════════════════════════════════════════════════╗
 -- ║ SECTION 16: MISE A JOUR DES SEQUENCES                                         ║
 -- ╚═══════════════════════════════════════════════════════════════════════════════╝

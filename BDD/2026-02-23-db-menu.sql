@@ -255,3 +255,28 @@ VALUES ('USRM000047', 'MENDYN000020', '*', 0, 'etu');
 -- Droits role md pour la Carte
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000048', 'MENDYN000020', '*', 0, 'md');
+
+-- Sous-menu Dashboard et Historique sous Administration (niveau 1)
+INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
+VALUES (
+           'MENDYN000026',
+           'Dashboard',
+           'bi-column-gap',
+           'module.jsp?but=dashboard/dashboard.jsp',
+           1,
+           1,
+           'MENDYN000999'
+       ),
+       (
+           'MENDYN000027',
+           'Historique',
+           'bi-clock-history',
+           'module.jsp?but=dashboard/historique-list.jsp',
+           2,
+           1,
+           'MENDYN000999'
+       );
+
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
+VALUES ('USRM000049', 'MENDYN000027', '*', 0, 'md'),
+       ('USRM000050', 'MENDYN000026', '*', 0, 'md');
