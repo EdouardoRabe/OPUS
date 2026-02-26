@@ -3,8 +3,6 @@ package alumni;
 import bean.ClassMAPTable;
 import bean.CGenUtil;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
 
 public class Limiterole extends ClassMAPTable {
@@ -50,31 +48,19 @@ public class Limiterole extends ClassMAPTable {
 
   
     public static int getMaxParJour(Connection conn, String idrole) throws Exception {
-        int max = -1;
-        PreparedStatement ps = conn.prepareStatement(
-            "SELECT maxpublicationparjour FROM limiterole WHERE idrole = ?");
-        ps.setString(1, idrole);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            max = rs.getInt(1);
+        Limiterole[] results = (Limiterole[]) CGenUtil.rechercher(
+            new Limiterole(), null, null, conn, " and idrole = '" + idrole + "'");
+        if (results != null && results.length > 0) {
+            return results[0].getMaxpublicationparjour();
         }
-        rs.close();
-        ps.close();
-        return max;
+        return -1; // role absent de limiterole = pas de limite
     }
 
     public static int countPublicationsDuJour(Connection conn, int refuser) throws Exception {
-        int count = 0;
-        PreparedStatement ps = conn.prepareStatement(
-            "SELECT COUNT(*) FROM publication WHERE idutilisateur = ? AND daty = CURRENT_DATE AND etat = 1");
-        ps.setInt(1, refuser);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            count = rs.getInt(1);
-        }
-        rs.close();
-        ps.close();
-        return count;
+        Publication[] results = (Publication[]) CGenUtil.rechercher(
+            new Publication(), null, null, conn,
+            " and idutilisateur = " + refuser + " AND daty = CURRENT_DATE AND etat = 1");
+        return (results != null) ? results.length : 0;
     }
 
     public static String verifierDroitPublication(Connection conn, String idrole, int refuser) throws Exception {
