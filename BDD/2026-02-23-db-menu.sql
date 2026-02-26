@@ -189,18 +189,18 @@ VALUES ('USRM000001', 'MENDYN000001', '*', 0, 'etu'),
 
 -- Droits role alu
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
-VALUES ('USRM000001', 'MENDYN000001', '*', 0, 'alu'),
-       ('USRM000002', 'MENDYN000002', '*', 0, 'alu'),
-       ('USRM000004', 'MENDYN000004', '*', 0, 'alu'),
-       ('USRM000005', 'MENDYN000005', '*', 0, 'alu'),
-       ('USRM000007', 'MENDYN000007', '*', 0, 'alu'),
-       ('USRM000008', 'MENDYN000008', '*', 0, 'alu'),
-       ('USRM000009', 'MENDYN000009', '*', 0, 'alu'),
-       ('USRM000011', 'MENDYN000011', '*', 0, 'alu'),
-       ('USRM000025', 'MENDYN000024', '*', 1, 'alu'),
-       ('USRM000027', 'MENDYN000014', '*', 0, 'alu'),
-       ('USRM000029', 'MENDYN000015', '*', 0, 'alu'),
-       ('USRM000035', 'MENDYN000018', '*', 0, 'alu');
+VALUES ('USRM000101', 'MENDYN000001', '*', 0, 'alu'),
+       ('USRM000102', 'MENDYN000002', '*', 0, 'alu'),
+       ('USRM000104', 'MENDYN000004', '*', 0, 'alu'),
+       ('USRM000105', 'MENDYN000005', '*', 0, 'alu'),
+       ('USRM000107', 'MENDYN000007', '*', 0, 'alu'),
+       ('USRM000108', 'MENDYN000008', '*', 0, 'alu'),
+       ('USRM000109', 'MENDYN000009', '*', 0, 'alu'),
+       ('USRM000111', 'MENDYN000011', '*', 0, 'alu'),
+       ('USRM000125', 'MENDYN000024', '*', 1, 'alu'),
+       ('USRM000127', 'MENDYN000014', '*', 0, 'alu'),
+       ('USRM000129', 'MENDYN000015', '*', 0, 'alu'),
+       ('USRM000135', 'MENDYN000018', '*', 0, 'alu');
 -- Droits role md
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000012', 'MENDYN000001', '*', 0, 'md'),
@@ -234,6 +234,11 @@ VALUES (
 -- Droits role etu
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000045', 'MENDYN000019', '*', 0, 'etu');
+
+-- Droits role etu
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
+VALUES ('USRM000145', 'MENDYN000019', '*', 0, 'alu');
+
 -- Droits role md
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000046', 'MENDYN000019', '*', 0, 'md');
@@ -253,6 +258,10 @@ VALUES (
 -- Droits role etu pour la Carte
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000047', 'MENDYN000020', '*', 0, 'etu');
+
+-- Droits role etu pour la Carte
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
+VALUES ('USRM000147', 'MENDYN000020', '*', 0, 'etu');
 
 -- Droits role md pour la Carte
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
