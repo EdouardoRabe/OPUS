@@ -19,11 +19,31 @@
     pr.getFormu().getChamp("idspecialite").setLibelle("Id");
     pr.getFormu().getChamp("libelle").setLibelle("Libell&eacute;");
     pr.getFormu().getChamp("description").setLibelle("Description");
-    pr.setNpp(50);
     String[] colSomme = {};
     pr.creerObjetPage(libEntete, colSomme);
 
-    alumni.SpecialiteCpl[] listeAffiche = (alumni.SpecialiteCpl[]) pr.getListe();
+    alumni.SpecialiteCpl[] allSpecialitesTotal = (alumni.SpecialiteCpl[]) pr.getListe();
+    int totalSpecialites = allSpecialitesTotal.length;
+    
+    /* Pagination manuelle */
+    int npp = 12; // nombre par page
+    int currentPage = 1;
+    String pageParam = request.getParameter("page");
+    if (pageParam != null && !pageParam.isEmpty()) {
+        try { currentPage = Integer.parseInt(pageParam); } catch (Exception e) { currentPage = 1; }
+    }
+    if (currentPage < 1) currentPage = 1;
+    int totalPages = (int) Math.ceil((double) totalSpecialites / npp);
+    if (totalPages < 1) totalPages = 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    
+    int startIdx = (currentPage - 1) * npp;
+    int endIdx = Math.min(startIdx + npp, totalSpecialites);
+    java.util.List pageList = new java.util.ArrayList();
+    for (int pi = startIdx; pi < endIdx; pi++) {
+        pageList.add(allSpecialitesTotal[pi]);
+    }
+    alumni.SpecialiteCpl[] listeAffiche = (alumni.SpecialiteCpl[]) pageList.toArray(new alumni.SpecialiteCpl[0]);
 
     String lienBase = (String) session.getValue("lien");
     String lienTableau[] = {lienBase + "?but=specialite/specialite-fiche.jsp"};
@@ -68,7 +88,7 @@
     </h1>
     <div style="display:flex;align-items:center;gap:1rem;">
         <span style="font-size:0.85rem;color:var(--gray-500);">
-            <strong style="color:var(--itu-dark);"><%= pr.getListe().length %></strong> sp&eacute;cialit&eacute;s affich&eacute;es
+            <strong style="color:var(--itu-dark);"><%= totalSpecialites %></strong> sp&eacute;cialit&eacute;s
         </span>
         <a class="btn btn-primary"
            href="<%= lienBase %>?but=specialite/specialite-saisie.jsp"
@@ -213,8 +233,27 @@
 </div>
 
 <!-- ═══ PAGINATION ═══ -->
-<div class="specialite-pagination-wrap">
-    <%= pr.getBasPage() %>
+<div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:20px;flex-wrap:wrap;">
+    <% if (currentPage > 1) { %>
+    <a href="<%= lienBase %>?but=specialite/specialite-list.jsp&page=1" class="btn btn-outline-secondary btn-sm" title="Premi&egrave;re page">&laquo;</a>
+    <a href="<%= lienBase %>?but=specialite/specialite-list.jsp&page=<%= currentPage - 1 %>" class="btn btn-outline-secondary btn-sm">&lsaquo; Pr&eacute;c</a>
+    <% } else { %>
+    <span class="btn btn-outline-secondary btn-sm disabled">&laquo;</span>
+    <span class="btn btn-outline-secondary btn-sm disabled">&lsaquo; Pr&eacute;c</span>
+    <% } %>
+    
+    <span style="padding:0 12px;font-size:0.9em;">
+        Page <strong><%= currentPage %></strong> / <strong><%= totalPages %></strong>
+        &nbsp;(<%= totalSpecialites %> sp&eacute;cialit&eacute;s)
+    </span>
+    
+    <% if (currentPage < totalPages) { %>
+    <a href="<%= lienBase %>?but=specialite/specialite-list.jsp&page=<%= currentPage + 1 %>" class="btn btn-outline-secondary btn-sm">Suiv &rsaquo;</a>
+    <a href="<%= lienBase %>?but=specialite/specialite-list.jsp&page=<%= totalPages %>" class="btn btn-outline-secondary btn-sm" title="Derni&egrave;re page">&raquo;</a>
+    <% } else { %>
+    <span class="btn btn-outline-secondary btn-sm disabled">Suiv &rsaquo;</span>
+    <span class="btn btn-outline-secondary btn-sm disabled">&raquo;</span>
+    <% } %>
 </div>
 
 <script>

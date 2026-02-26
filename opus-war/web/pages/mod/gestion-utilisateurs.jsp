@@ -44,41 +44,59 @@
     pr.setUtilisateur(uEjb);
     pr.setLien((String) session.getValue("lien"));
     pr.setApres("mod/gestion-utilisateurs.jsp");
-    pr.getFormu().getChamp("nom").setLibelle("Nom");
     pr.getFormu().getChamp("loginuser").setLibelle("ETU / Login");
     pr.getFormu().getChamp("email").setLibelle("Email");
     pr.getFormu().getChamp("promotionlib").setLibelle("Promotion");
     pr.getFormu().getChamp("parcourslib").setLibelle("Parcours");
     pr.getFormu().getChamp("idrole").setLibelle("R&ocirc;le");
-    pr.setNpp(50);
-
-    // Appliquer le filtre état sur la requête
-    if ("100".equals(etatParam)) {
-        pr.setAWhere(pr.getAWhere() + " and (estactif=" + ConstantEtatUser.etatUtilisateurActiver + " or estactif=" + ConstantEtatUser.etatUtilisateurValider + ")");
-    } else if ("1".equals(etatParam)) {
-        pr.setAWhere(pr.getAWhere() + " and estactif=" + ConstantEtatUser.etatUtilisateurCreer);
-    } else if ("0".equals(etatParam)) {
-        pr.setAWhere(pr.getAWhere() + " and estactif=" + ConstantEtatUser.etatUtilisateurBanis);
-    }
-    // Conserver le filtre état dans les liens de pagination
-    if (!etatParam.isEmpty()) {
-        pr.setApresLienPage(pr.getApresLienPage() + "&etat=" + etatParam);
-    }
-
     String[] colSomme = {};
     pr.creerObjetPage(libEntete, colSomme);
 
     String lienBase = (String) session.getValue("lien");
 
-    /* Stats */
-    ProfilLib[] allUsers = (ProfilLib[]) pr.getListe();
+    /* Avatar gradient palette */
+    String[] avatarGradients = {
+        "background:linear-gradient(135deg,#008BFF,#0056b3)",
+        "background:linear-gradient(135deg,#5B23FF,#4a1cd9)",
+        "background:linear-gradient(135deg,#ef4444,#dc2626)",
+        "background:linear-gradient(135deg,#10b981,#059669)",
+        "background:linear-gradient(135deg,#f59e0b,#d97706)",
+        "background:linear-gradient(135deg,#8b5cf6,#7c3aed)",
+        "background:linear-gradient(135deg,#06b6d4,#0891b2)",
+        "background:linear-gradient(135deg,#E4FF30,#d4ef1f)"
+    };
+    String[] avatarTextColors = {"color:#fff","color:#fff","color:#fff","color:#fff","color:#fff","color:#fff","color:#fff","color:#362F4F"};
+
+    /* Stats - calculées sur TOUS les utilisateurs */
+    ProfilLib[] allUsersTotal = (ProfilLib[]) pr.getListe();
     int totalActifs = 0, totalInactifs = 0, totalCrees = 0, totalBannis = 0;
-    for (int i = 0; i < allUsers.length; i++) {
-        int etat = allUsers[i].getEtatdetail();
+    for (int i = 0; i < allUsersTotal.length; i++) {
+        int etat = allUsersTotal[i].getEtatdetail();
         if (etat == ConstantEtatUser.etatUtilisateurActiver || etat == ConstantEtatUser.etatUtilisateurValider) totalActifs++;
         else if (etat == ConstantEtatUser.etatUtilisateurCreer) totalCrees++;
         else totalBannis++;
     }
+    int totalUsers = allUsersTotal.length;
+    
+    /* Pagination manuelle */
+    int npp = 12; // nombre par page
+    int currentPage = 1;
+    String pageParam = request.getParameter("page");
+    if (pageParam != null && !pageParam.isEmpty()) {
+        try { currentPage = Integer.parseInt(pageParam); } catch (Exception e) { currentPage = 1; }
+    }
+    if (currentPage < 1) currentPage = 1;
+    int totalPages = (int) Math.ceil((double) totalUsers / npp);
+    if (totalPages < 1) totalPages = 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    
+    int startIdx = (currentPage - 1) * npp;
+    int endIdx = Math.min(startIdx + npp, totalUsers);
+    java.util.List pageList = new java.util.ArrayList();
+    for (int pi = startIdx; pi < endIdx; pi++) {
+        pageList.add(allUsersTotal[pi]);
+    }
+    ProfilLib[] allUsers = (ProfilLib[]) pageList.toArray(new ProfilLib[0]);
 %>
 
 <!-- ═══ PAGE HEADER ═══ -->
@@ -89,7 +107,7 @@
     </h1>
     <div style="display:flex;align-items:center;gap:1rem;">
         <span style="font-size:0.85rem;color:var(--gray-500);">
-            <strong style="color:var(--itu-dark);"><%= allUsers.length %></strong> utilisateur(s)
+            <strong style="color:var(--itu-dark);"><%= totalUsers %></strong> utilisateur(s)
         </span>
     </div>
 </div>
@@ -123,7 +141,11 @@
     <a href="<%= lienBase %>?but=<%= pr.getApres() %>&etat=0" class="custom-card no-hover" style="flex:1;text-align:center;padding:15px 20px;text-decoration:none;border:<%= "0".equals(etatParam) ? "2px solid #e74c3c" : "1px solid #dde3ec" %>;cursor:pointer;">
         <div style="font-size:1.8em;font-weight:700;color:#e74c3c;"><%= totalBannis %></div>
         <div style="font-size:0.85em;color:#888;">Bannis</div>
-    </a>
+    </div>
+    <div class="custom-card no-hover" style="flex:1;text-align:center;padding:15px 20px;">
+        <div style="font-size:1.8em;font-weight:700;color:#2c3e50;"><%= totalUsers %></div>
+        <div style="font-size:0.85em;color:#888;">Total</div>
+    </div>
 </div>
 
 <!-- ═══ SEARCH & FILTER (APJ Standard) ═══ -->
@@ -358,8 +380,27 @@
 </div>
 
 <!-- ═══ PAGINATION ═══ -->
-<div class="specialite-pagination-wrap">
-    <%= pr.getBasPage() %>
+<div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:20px;flex-wrap:wrap;">
+    <% if (currentPage > 1) { %>
+    <a href="<%= lienBase %>?but=mod/gestion-utilisateurs.jsp&page=1" class="btn btn-outline-secondary btn-sm" title="Premi&egrave;re page">&laquo;</a>
+    <a href="<%= lienBase %>?but=mod/gestion-utilisateurs.jsp&page=<%= currentPage - 1 %>" class="btn btn-outline-secondary btn-sm">&lsaquo; Pr&eacute;c</a>
+    <% } else { %>
+    <span class="btn btn-outline-secondary btn-sm disabled">&laquo;</span>
+    <span class="btn btn-outline-secondary btn-sm disabled">&lsaquo; Pr&eacute;c</span>
+    <% } %>
+    
+    <span style="padding:0 12px;font-size:0.9em;">
+        Page <strong><%= currentPage %></strong> / <strong><%= totalPages %></strong>
+        &nbsp;(<%= totalUsers %> utilisateurs)
+    </span>
+    
+    <% if (currentPage < totalPages) { %>
+    <a href="<%= lienBase %>?but=mod/gestion-utilisateurs.jsp&page=<%= currentPage + 1 %>" class="btn btn-outline-secondary btn-sm">Suiv &rsaquo;</a>
+    <a href="<%= lienBase %>?but=mod/gestion-utilisateurs.jsp&page=<%= totalPages %>" class="btn btn-outline-secondary btn-sm" title="Derni&egrave;re page">&raquo;</a>
+    <% } else { %>
+    <span class="btn btn-outline-secondary btn-sm disabled">Suiv &rsaquo;</span>
+    <span class="btn btn-outline-secondary btn-sm disabled">&raquo;</span>
+    <% } %>
 </div>
 
 <script>
