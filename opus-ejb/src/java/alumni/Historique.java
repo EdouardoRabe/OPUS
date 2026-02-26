@@ -11,7 +11,7 @@ public class Historique extends ClassMAPTable {
     private String heure;
     private String objet;
     private String action;
-    private int idutilisateur;
+    private String idutilisateur;
     private String refobjet;
 
     public Historique() {
@@ -74,11 +74,11 @@ public class Historique extends ClassMAPTable {
         this.action = action;
     }
 
-    public int getIdutilisateur() {
+    public String getIdutilisateur() {
         return idutilisateur;
     }
 
-    public void setIdutilisateur(int idutilisateur) {
+    public void setIdutilisateur(String idutilisateur) {
         this.idutilisateur = idutilisateur;
     }
 

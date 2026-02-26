@@ -171,7 +171,7 @@
                 <td class="td-heure"><i class="fa fa-clock-o" style="margin-right:4px;opacity:.5;"></i><%= heureVal %></td>
                 <td><span class="histo-badge <%= badgeClass %>"><%= actionVal.isEmpty() ? "&mdash;" : actionVal %></span></td>
                 <td><%= objetVal.isEmpty() ? "<span style='color:#cbd5e1;'>—</span>" : objetVal %></td>
-                <td><%= h.getIdutilisateur() > 0 ? h.getIdutilisateur() : "<span style='color:#cbd5e1;'>—</span>" %></td>
+                <td><%= (h.getIdutilisateur() != null && !h.getIdutilisateur().isEmpty()) ? h.getIdutilisateur() : "<span style='color:#cbd5e1;'>—</span>" %></td>
                 <td class="td-ref" title="<%= refVal %>"><%= refVal.isEmpty() ? "<span style='color:#cbd5e1;'>—</span>" : refVal %></td>
             </tr>
         <% } %>
