@@ -363,6 +363,9 @@
                     <a href="<%= ctx %>/pages/module.jsp?but=alumni/notifications.jsp" class="fa-nav-link fa-nav-link--active">
                         <i class="bi bi-bell-fill"></i>&nbsp;Notifications
                     </a>
+                    <a href="<%= ctx %>/pages/module.jsp?but=alumni/publications-enregistrees.jsp" class="fa-nav-link">
+                        <i class="bi bi-bookmarks-fill"></i>&nbsp;Enregistrements
+                    </a>
                 </nav>
             </div>
         </div>

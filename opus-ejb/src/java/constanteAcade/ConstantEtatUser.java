@@ -11,13 +11,13 @@ public class ConstantEtatUser extends ConstanteEtat {
     public static String etatToChaine(int etat) {
         switch (etat) {
             case etatUtilisateurCreer:
-                return "<span class=\"usr-badge usr-badge-cree\">Créé</span>";
+                return "<span class=\"usr-badge usr-badge-cree\">Cr\u00e9\u00e9</span>";
             case etatUtilisateurValider:
-                return "<span class=\"usr-badge usr-badge-valide\">Validé</span>";
+                return "<span class=\"usr-badge usr-badge-valide\">Valid\u00e9</span>";
             case etatUtilisateurBanis:
                 return "<span class=\"usr-badge usr-badge-banni\">Banni</span>";
             case etatUtilisateurActiver:
-                return "<span class=\"usr-badge usr-badge-actif\">Activé</span>";
+                return "<span class=\"usr-badge usr-badge-actif\">Activ\u00e9</span>";
             default:
                 return "<span class=\"usr-badge\">Inconnu</span>";
         }

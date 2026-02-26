@@ -39,7 +39,7 @@
     position: relative;
     overflow: hidden;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
-    margin: 0 0 2rem 0;
+    margin: 0;
     border: 1px solid rgba(100,180,255,0.12);
     transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
@@ -127,60 +127,185 @@
     letter-spacing: 2px;
     font-weight: 600;
 }
-#reseau-controls {
-    display: flex;
-    gap: 24px;
-    align-items: center;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(59,130,246,0.03) 100%);
-    border: 1px solid rgba(100,180,255,0.15);
-    border-radius: 14px;
-    padding: 16px 22px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.05);
+/* ===== VARIABLES GLOBALES (cohérence avec voir.jsp) ===== */
+:root {
+    --itu-blue: #008BFF;
+    --itu-dark: #1c1e29;
+    --itu-violet: #5B23FF;
+    --pvl-border: #dce0e4;
+    --pvl-card-bg: #fff;
+    --pvl-text: #1c1e21;
+    --pvl-text-sec: #65676b;
+    --fa-card-bg: #ffffff;
+    --fa-border: #e4e6eb;
+    --fa-text: #050505;
 }
-#reseau-controls label {
-    color: #334155;
-    font-size: 14px;
-    font-weight: 600;
+
+/* ===== LAYOUT GRILLE 2 COLONNES ===== */
+.rp-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 22px;
+    align-items: start;
+}
+@media (max-width: 1000px) {
+    .rp-layout { grid-template-columns: 1fr; }
+    .rp-controls-col { position: static !important; }
+}
+.rp-canvas-col { min-width: 0; }
+.rp-controls-col {
+    position: sticky;
+    top: 80px;
+}
+
+/* ===== PANEL CONTROLS — CARD BLANCHE (style voir.jsp) ===== */
+.rp-ctrl-panel {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid var(--pvl-border, #dce0e4);
+    box-shadow: 0 1px 4px rgba(0,0,0,.10), 0 4px 20px rgba(0,139,255,0.06);
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.rp-ctrl-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--fa-border, #e4e6eb);
     display: flex;
     align-items: center;
     gap: 10px;
-    cursor: pointer;
-    transition: color 0.2s ease;
+    background: linear-gradient(135deg, #f8faff 0%, #eef5ff 100%);
 }
-#reseau-controls label:hover {
-    color: #0a66c2;
+.rp-ctrl-header h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--pvl-text, #1c1e21);
+    letter-spacing: -0.2px;
 }
-#reseau-controls input[type=range] {
-    accent-color: #3b82f6;
-    width: 140px;
-    height: 6px;
+.rp-ctrl-header-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--itu-blue,#008BFF) 0%, var(--itu-violet,#5B23FF) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+.rp-ctrl-body {
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+.rp-ctrl-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--pvl-text-sec, #65676b);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.rp-ctrl-label i { color: var(--itu-blue,#008BFF); font-size: 13px; }
+.rp-ctrl-divider {
+    border: none;
+    border-top: 1px solid var(--fa-border, #e4e6eb);
+    margin: 0;
+}
+.rp-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.rp-slider-row input[type=range] {
+    flex: 1;
+    accent-color: var(--itu-blue,#008BFF);
+    height: 5px;
     border-radius: 3px;
-    transition: all 0.2s ease;
     cursor: pointer;
 }
-#reseau-controls input[type=range]:hover {
-    accent-color: #0a66c2;
-}
-#reseau-controls input[type=checkbox] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    accent-color: #0a66c2;
-    transition: all 0.2s ease;
-}
-#reseau-controls input[type=checkbox]:hover {
-    transform: scale(1.1);
-}
-#seuil-val {
-    color: #0a66c2;
-    font-weight: 800;
-    min-width: 35px;
-    display: inline-block;
+.rp-seuil-val {
+    min-width: 40px;
+    text-align: right;
     font-size: 15px;
-    transition: color 0.2s ease;
+    font-weight: 800;
+    color: var(--itu-blue,#008BFF);
 }
+.rp-check-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 13px;
+    background: #f7f9fc;
+    border-radius: 10px;
+    border: 1px solid var(--fa-border,#e4e6eb);
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+}
+.rp-check-row:hover { background: #e8f3ff; border-color: rgba(0,139,255,0.3); }
+.rp-check-row label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--pvl-text, #1c1e21);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    flex: 1;
+}
+.rp-check-row label i { color: var(--itu-blue,#008BFF); font-size: 14px; }
+.rp-check-row input[type=checkbox] {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--itu-blue,#008BFF);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.rp-zoom-btns {
+    display: flex;
+    gap: 8px;
+}
+.rp-zoom-btn {
+    flex: 1;
+    padding: 9px 0;
+    border-radius: 10px;
+    border: 1.5px solid var(--pvl-border,#dce0e4);
+    background: #fff;
+    color: var(--pvl-text,#1c1e21);
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .15s;
+    line-height: 1;
+}
+.rp-zoom-btn:hover {
+    background: #f0f7ff;
+    border-color: var(--itu-blue,#008BFF);
+    color: var(--itu-blue,#008BFF);
+    transform: translateY(-1px);
+}
+.rp-zoom-btn--reset { font-size: 13px; color: var(--itu-blue,#008BFF); }
+.rp-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 12.5px;
+    color: #4a5568;
+    line-height: 1.4;
+}
+.rp-legend-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+/* Cacher le seuil-val inline (remplacé par .rp-seuil-val) */
+#seuil-val { display: none; }
 #reseau-zoom-btns {
     position: absolute;
     top: 18px;
@@ -231,44 +356,133 @@
         <small>Visualisation dynamique de compatibilit&eacute;</small>
     </section>
     <section class="content">
+        <div class="rp-layout">
 
-        <!-- Controles -->
-        <div id="reseau-controls">
-            <label>Seuil de connexion :
-                <input type="range" id="seuil-slider" min="0" max="80" value="20" step="5"
-                       oninput="document.getElementById('seuil-val').textContent=this.value+'%'; appliquerSeuil(parseInt(this.value));">
-                <span id="seuil-val">20%</span>
-            </label>
-            <label style="margin-left:20px;">
-                <input type="checkbox" id="chk-labels" checked
-                       onchange="afficherLabels=this.checked;">
-                Noms
-            </label>
-            <label style="margin-left:20px;">
-                <input type="checkbox" id="chk-float" checked
-                       onchange="flotterActif=this.checked;">
-                Animation flottante
-            </label>
-        </div>
-
-        <!-- Canvas -->
-        <div id="reseau-container">
-            <canvas id="reseau-canvas"></canvas>
-            <div id="reseau-tooltip"></div>
-            <div id="reseau-loading">Chargement du r&eacute;seau&hellip;</div>
-            <div id="reseau-legend">
-                <div><span>Taille &amp; distance</span> = score de compatibilit&eacute;</div>
-                <div><span>Plus proche du centre</span> = plus compatible</div>
-                <div><span>Couleur</span> = parcours / fili&egrave;re</div>
-                <div style="margin-top:4px;color:rgba(140,180,220,0.5);font-size:10px;">Molette / pincer pour zoomer &bull; Glisser pour naviguer</div>
+            <!-- ═══════ COLONNE GAUCHE : Canvas réseau ═══════ -->
+            <div class="rp-canvas-col">
+                <div id="reseau-container">
+                    <canvas id="reseau-canvas"></canvas>
+                    <div id="reseau-tooltip"></div>
+                    <div id="reseau-loading">Chargement du r&eacute;seau&hellip;</div>
+                    <div id="reseau-legend">
+                        <div><span>Taille &amp; distance</span> = score de compatibilit&eacute;</div>
+                        <div><span>Plus proche du centre</span> = plus compatible</div>
+                        <div><span>Couleur</span> = parcours / fili&egrave;re</div>
+                        <div style="margin-top:4px;color:rgba(140,180,220,0.5);font-size:10px;">Molette / pincer pour zoomer &bull; Glisser pour naviguer</div>
+                    </div>
+                    <div id="reseau-zoom-btns">
+                        <button id="btn-zoom-in"  title="Zoom +">+</button>
+                        <button id="btn-zoom-out" title="Zoom -">&minus;</button>
+                        <button id="btn-zoom-reset" class="btn-reset" title="R&eacute;initialiser">&#8635;</button>
+                    </div>
+                </div>
             </div>
-            <div id="reseau-zoom-btns">
-                <button id="btn-zoom-in"  title="Zoom +">+</button>
-                <button id="btn-zoom-out" title="Zoom -">&minus;</button>
-                <button id="btn-zoom-reset" class="btn-reset" title="R&eacute;initialiser">&#8635;</button>
-            </div>
-        </div>
 
+            <!-- ═══════ COLONNE DROITE : Panneau de contrôles ═══════ -->
+            <aside class="rp-controls-col">
+                <div class="rp-ctrl-panel">
+
+                    <!-- En-tête card -->
+                    <div class="rp-ctrl-header">
+                        <div class="rp-ctrl-header-icon">
+                            <i class="bi bi-sliders"></i>
+                        </div>
+                        <h3>Filtres &amp; Affichage</h3>
+                    </div>
+
+                    <div class="rp-ctrl-body">
+
+                        <!-- ── Seuil de connexion ── -->
+                        <div class="rp-ctrl-section">
+                            <div class="rp-ctrl-label">
+                                <i class="bi bi-bar-chart-fill"></i>
+                                Seuil de connexion
+                            </div>
+                            <div class="rp-slider-row">
+                                <input type="range" id="seuil-slider" min="0" max="80" value="20" step="5"
+                                       oninput="document.getElementById('seuil-val-display').textContent=this.value+'%'; appliquerSeuil(parseInt(this.value));">
+                                <span id="seuil-val-display" class="rp-seuil-val">20%</span>
+                                <span id="seuil-val" style="display:none;">20%</span>
+                            </div>
+                            <div style="margin-top:7px;font-size:11px;color:#94a3b8;line-height:1.4;">N'affiche que les connexions dont le score d&eacute;passe ce seuil.</div>
+                        </div>
+
+                        <hr class="rp-ctrl-divider">
+
+                        <!-- ── Affichage ── -->
+                        <div class="rp-ctrl-section">
+                            <div class="rp-ctrl-label">
+                                <i class="bi bi-eye-fill"></i>
+                                Affichage
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:8px;">
+                                <div class="rp-check-row">
+                                    <label for="chk-labels">
+                                        <i class="bi bi-person-badge-fill"></i>
+                                        Afficher les noms
+                                    </label>
+                                    <input type="checkbox" id="chk-labels" checked
+                                           onchange="afficherLabels=this.checked;">
+                                </div>
+                                <div class="rp-check-row">
+                                    <label for="chk-float">
+                                        <i class="bi bi-stars"></i>
+                                        Animation flottante
+                                    </label>
+                                    <input type="checkbox" id="chk-float" checked
+                                           onchange="flotterActif=this.checked;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="rp-ctrl-divider">
+
+                        <!-- ── Zoom ── -->
+                        <div class="rp-ctrl-section">
+                            <div class="rp-ctrl-label">
+                                <i class="bi bi-search"></i>
+                                Zoom
+                            </div>
+                            <div class="rp-zoom-btns">
+                                <button class="rp-zoom-btn" onclick="document.getElementById('btn-zoom-in').click()" title="Zoom +">+</button>
+                                <button class="rp-zoom-btn" onclick="document.getElementById('btn-zoom-out').click()" title="Zoom -">&minus;</button>
+                                <button class="rp-zoom-btn rp-zoom-btn--reset" onclick="document.getElementById('btn-zoom-reset').click()" title="R&eacute;initialiser">&#8635; Reset</button>
+                            </div>
+                        </div>
+
+                        <hr class="rp-ctrl-divider">
+
+                        <!-- ── Légende ── -->
+                        <div class="rp-ctrl-section">
+                            <div class="rp-ctrl-label">
+                                <i class="bi bi-info-circle-fill"></i>
+                                L&eacute;gende
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:8px;">
+                                <div class="rp-legend-item">
+                                    <span class="rp-legend-dot" style="background:linear-gradient(135deg,#7dd3fc,#1d4ed8);"></span>
+                                    <span>Taille &amp; distance = score de compatibilit&eacute;</span>
+                                </div>
+                                <div class="rp-legend-item">
+                                    <span class="rp-legend-dot" style="background:linear-gradient(135deg,#4ade80,#059669);"></span>
+                                    <span>Couleur = parcours / fili&egrave;re</span>
+                                </div>
+                                <div class="rp-legend-item">
+                                    <i class="bi bi-arrows-move" style="color:var(--itu-blue,#008BFF);flex-shrink:0;font-size:13px;"></i>
+                                    <span>Glisser pour naviguer</span>
+                                </div>
+                                <div class="rp-legend-item">
+                                    <i class="bi bi-zoom-in" style="color:var(--itu-blue,#008BFF);flex-shrink:0;font-size:13px;"></i>
+                                    <span>Molette / pincer pour zoomer</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div><!-- /.rp-ctrl-body -->
+                </div><!-- /.rp-ctrl-panel -->
+            </aside><!-- /.rp-controls-col -->
+
+        </div><!-- /.rp-layout -->
     </section>
 </div>
 
