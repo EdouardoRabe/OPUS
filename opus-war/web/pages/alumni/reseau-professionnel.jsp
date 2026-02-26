@@ -9,43 +9,67 @@
 
 <style>
 /* ===== RESEAU PROFESSIONNEL — Styles UI/UX Pro Max ===== */
-.content-wrapper {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-.content-header {
-    margin-bottom: 2rem;
+.rp-page-wrapper {
+    width: 100%;
     padding: 0;
 }
-.content-header h1 {
-    font-size: 2rem;
+.rp-page-title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 20px 24px;
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid var(--fa-border, #e4e6eb);
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.rp-page-title-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--itu-blue, #283a97) 0%, var(--itu-violet, #536ae4) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 22px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(40,58,151,0.25);
+}
+.rp-page-title-text h1 {
+    font-size: 1.5rem;
     font-weight: 800;
-    color: #1e293b;
-    margin: 0 0 0.5rem;
-    letter-spacing: -0.5px;
+    color: #1c1e29;
+    margin: 0 0 4px;
+    letter-spacing: -0.3px;
 }
-.content-header small {
-    font-size: 1rem;
-    color: #64748b;
+.rp-page-title-text p {
+    font-size: 0.9rem;
+    color: #536ae4;
     font-weight: 500;
+    margin: 0;
 }
-.content {
+.rp-content {
     padding: 0;
+}
+/* Override parent container width for this page */
+.alumni-page-wide:has(.rp-page-wrapper) {
+    max-width: 1400px;
 }
 #reseau-container {
-    background: radial-gradient(ellipse at 50% 40%, #0d1b2a 0%, #050d14 100%);
+    background: radial-gradient(ellipse at 50% 40%, #1c1e29 0%, #1c1e21 100%);
     border-radius: 16px;
     position: relative;
     overflow: hidden;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
     margin: 0;
-    border: 1px solid rgba(100,180,255,0.12);
+    border: 1px solid rgba(40,58,151,0.12);
     transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 #reseau-container:hover {
-    box-shadow: 0 25px 70px rgba(0,139,255,0.15), inset 0 1px 0 rgba(255,255,255,0.1);
-    border-color: rgba(100,180,255,0.2);
+    box-shadow: 0 25px 70px rgba(40,58,151,0.15), inset 0 1px 0 rgba(255,255,255,0.1);
+    border-color: rgba(40,58,151,0.2);
 }
 #reseau-canvas {
     display: block;
@@ -56,14 +80,14 @@
 #reseau-tooltip {
     position: absolute;
     pointer-events: none;
-    background: rgba(10,20,35,0.98);
-    border: 1.5px solid rgba(100,180,255,0.5);
+    background: rgba(28,30,41,0.98);
+    border: 1.5px solid rgba(40,58,151,0.5);
     border-radius: 14px;
     padding: 14px 18px;
-    color: #e0f0ff;
+    color: #d0dce7;
     font-size: 13px;
     max-width: 240px;
-    box-shadow: 0 12px 40px rgba(0,100,200,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+    box-shadow: 0 12px 40px rgba(40,58,151,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
     display: none;
     z-index: 100;
     line-height: 1.6;
@@ -74,71 +98,74 @@
     from { opacity: 0; transform: translateY(-4px); }
     to { opacity: 1; transform: translateY(0); }
 }
-#reseau-tooltip .tt-name  { font-weight: 800; font-size: 16px; color: #7dd3fc; margin-bottom: 6px; }
-#reseau-tooltip .tt-score { font-size: 13px; color: #cbd5e1; margin-top: 6px; margin-bottom: 8px; }
+#reseau-tooltip .tt-name  { font-weight: 800; font-size: 16px; color: #b2d235; margin-bottom: 6px; }
+#reseau-tooltip .tt-score { font-size: 13px; color: #d0dce7; margin-top: 6px; margin-bottom: 8px; }
 #reseau-tooltip .tt-bar   {
-    width: 100%; height: 8px; background: #1e3a5f;
+    width: 100%; height: 8px; background: #1c1e29;
     border-radius: 4px; margin: 8px 0;
     overflow: hidden;
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
 }
 #reseau-tooltip .tt-bar-fill {
     height: 100%; border-radius: 4px;
-    background: linear-gradient(90deg, #3b82f6, #06b6d4);
+    background: linear-gradient(90deg, #283a97, #536ae4);
     transition: width 0.4s ease;
-    box-shadow: 0 0 10px rgba(59,182,254,0.6);
+    box-shadow: 0 0 10px rgba(40,58,151,0.6);
 }
-#reseau-tooltip .tt-tags  { font-size: 12px; color: #94a3b8; margin-top: 8px; }
+#reseau-tooltip .tt-tags  { font-size: 12px; color: #d0dce7; margin-top: 8px; }
 #reseau-tooltip .tt-tag   {
     display: inline-block;
-    background: rgba(59,130,246,0.25);
-    border: 1px solid rgba(59,130,246,0.5);
+    background: rgba(40,58,151,0.25);
+    border: 1px solid rgba(83,106,228,0.5);
     border-radius: 6px;
     padding: 3px 8px;
     margin: 3px 4px 0 0;
-    color: #93c5fd;
+    color: #536ae4;
     font-weight: 500;
     transition: all 0.2s ease;
 }
 #reseau-tooltip .tt-tag:hover {
-    background: rgba(59,130,246,0.4);
-    border-color: rgba(59,130,246,0.7);
+    background: rgba(40,58,151,0.4);
+    border-color: rgba(83,106,228,0.7);
 }
 #reseau-legend {
     position: absolute;
     bottom: 18px;
     left: 22px;
     font-size: 12px;
-    color: rgba(180,210,255,0.65);
+    color: rgba(208,220,231,0.65);
     line-height: 1.9;
-    background: rgba(10,20,40,0.5);
+    background: rgba(28,30,41,0.5);
     padding: 12px 16px;
     border-radius: 10px;
-    border: 1px solid rgba(100,180,255,0.15);
+    border: 1px solid rgba(40,58,151,0.15);
     backdrop-filter: blur(4px);
 }
-#reseau-legend span { color: rgba(180,210,255,0.95); font-weight: 700; }
+#reseau-legend span { color: rgba(208,220,231,0.95); font-weight: 700; }
 #reseau-loading {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%,-50%);
-    color: #7dd3fc;
+    color: #b2d235;
     font-size: 16px;
     letter-spacing: 2px;
     font-weight: 600;
 }
 /* ===== VARIABLES GLOBALES (cohérence avec voir.jsp) ===== */
 :root {
-    --itu-blue: #008BFF;
+    --itu-blue: #283a97;
     --itu-dark: #1c1e29;
-    --itu-violet: #5B23FF;
-    --pvl-border: #dce0e4;
+    --itu-violet: #536ae4;
+    --itu-lime: #b2d235;
+    --itu-rose: #e46a91;
+    --itu-rouge: #fd3022;
+    --pvl-border: #d0dce7;
     --pvl-card-bg: #fff;
     --pvl-text: #1c1e21;
     --pvl-text-sec: #65676b;
     --fa-card-bg: #ffffff;
-    --fa-border: #e4e6eb;
-    --fa-text: #050505;
+    --fa-border: #d0dce7;
+    --fa-text: #1c1e21;
 }
 
 /* ===== LAYOUT GRILLE 2 COLONNES ===== */
@@ -163,7 +190,7 @@
     background: #fff;
     border-radius: 14px;
     border: 1px solid var(--pvl-border, #dce0e4);
-    box-shadow: 0 1px 4px rgba(0,0,0,.10), 0 4px 20px rgba(0,139,255,0.06);
+    box-shadow: 0 1px 4px rgba(0,0,0,.10), 0 4px 20px rgba(40,58,151,0.06);
     overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
@@ -247,7 +274,7 @@
     cursor: pointer;
     transition: background .15s, border-color .15s;
 }
-.rp-check-row:hover { background: #e8f3ff; border-color: rgba(0,139,255,0.3); }
+.rp-check-row:hover { background: #eaecf8; border-color: rgba(40,58,151,0.3); }
 .rp-check-row label {
     font-size: 13px;
     font-weight: 500;
@@ -319,9 +346,9 @@
     width: 38px;
     height: 38px;
     border-radius: 10px;
-    border: 1.5px solid rgba(100,180,255,0.35);
-    background: rgba(10,20,40,0.75);
-    color: #7dd3fc;
+    border: 1.5px solid rgba(40,58,151,0.35);
+    background: rgba(28,30,41,0.75);
+    color: #b2d235;
     font-size: 18px;
     line-height: 1;
     cursor: pointer;
@@ -332,14 +359,14 @@
     padding: 0;
     font-weight: 700;
     backdrop-filter: blur(4px);
-    box-shadow: 0 4px 16px rgba(0,100,200,0.15);
+    box-shadow: 0 4px 16px rgba(40,58,151,0.15);
 }
 #reseau-zoom-btns button:hover {
-    background: rgba(59,130,246,0.2);
-    border-color: rgba(100,180,255,0.6);
-    color: #e0f0ff;
+    background: rgba(40,58,151,0.2);
+    border-color: rgba(83,106,228,0.6);
+    color: #d0dce7;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,139,255,0.3);
+    box-shadow: 0 6px 20px rgba(40,58,151,0.3);
 }
 #reseau-zoom-btns button:active {
     transform: translateY(0);
@@ -350,12 +377,17 @@
 }
 </style>
 
-<div class="content-wrapper">
-    <section class="content-header">
-        <h1>R&eacute;seau Professionnel</h1>
-        <small>Visualisation dynamique de compatibilit&eacute;</small>
-    </section>
-    <section class="content">
+<div class="rp-page-wrapper">
+    <div class="rp-page-title">
+        <div class="rp-page-title-icon">
+            <i class="bi bi-diagram-3-fill"></i>
+        </div>
+        <div class="rp-page-title-text">
+            <h1>R&eacute;seau Professionnel</h1>
+            <p>Visualisation dynamique de compatibilit&eacute; avec vos pairs</p>
+        </div>
+    </div>
+    <section class="rp-content">
         <div class="rp-layout">
 
             <!-- ═══════ COLONNE GAUCHE : Canvas réseau ═══════ -->
@@ -368,7 +400,7 @@
                         <div><span>Taille &amp; distance</span> = score de compatibilit&eacute;</div>
                         <div><span>Plus proche du centre</span> = plus compatible</div>
                         <div><span>Couleur</span> = parcours / fili&egrave;re</div>
-                        <div style="margin-top:4px;color:rgba(140,180,220,0.5);font-size:10px;">Molette / pincer pour zoomer &bull; Glisser pour naviguer</div>
+                        <div style="margin-top:4px;color:rgba(208,220,231,0.5);font-size:10px;">Molette / pincer pour zoomer &bull; Glisser pour naviguer</div>
                     </div>
                     <div id="reseau-zoom-btns">
                         <button id="btn-zoom-in"  title="Zoom +">+</button>
@@ -460,11 +492,11 @@
                             </div>
                             <div style="display:flex;flex-direction:column;gap:8px;">
                                 <div class="rp-legend-item">
-                                    <span class="rp-legend-dot" style="background:linear-gradient(135deg,#7dd3fc,#1d4ed8);"></span>
+                                    <span class="rp-legend-dot" style="background:linear-gradient(135deg,#b2d235,#283a97);"></span>
                                     <span>Taille &amp; distance = score de compatibilit&eacute;</span>
                                 </div>
                                 <div class="rp-legend-item">
-                                    <span class="rp-legend-dot" style="background:linear-gradient(135deg,#4ade80,#059669);"></span>
+                                    <span class="rp-legend-dot" style="background:linear-gradient(135deg,#536ae4,#283a97);"></span>
                                     <span>Couleur = parcours / fili&egrave;re</span>
                                 </div>
                                 <div class="rp-legend-item">
@@ -484,7 +516,7 @@
 
         </div><!-- /.rp-layout -->
     </section>
-</div>
+</div><!-- /.rp-page-wrapper -->
 
 <script>
 (function() {
@@ -600,8 +632,8 @@ function render() {
 
     // Fond dégradé
     var grad = ctx.createRadialGradient(W/2, H*0.4, 0, W/2, H/2, Math.max(W,H)*0.7);
-    grad.addColorStop(0, "#0d1b2a");
-    grad.addColorStop(1, "#050d14");
+    grad.addColorStop(0, "#1c1e29");
+    grad.addColorStop(1, "#1c1e21");
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
@@ -634,13 +666,13 @@ function render() {
         ctx.save();
         ctx.beginPath();
         ctx.arc(0, 0, r, 0, Math.PI * 2);
-        ctx.strokeStyle = "rgba(59,130,246,0.10)";
+        ctx.strokeStyle = "rgba(40,58,151,0.10)";
         ctx.lineWidth = 1 / viewScale;
         ctx.setLineDash([5 / viewScale, 10 / viewScale]);
         ctx.stroke();
         ctx.setLineDash([]);
         if (viewScale > 0.35) {
-            ctx.fillStyle = "rgba(100,160,255,0.28)";
+            ctx.fillStyle = "rgba(83,106,228,0.28)";
             ctx.font = (10 / viewScale) + "px Arial";
             ctx.textAlign = "left";
             ctx.textBaseline = "middle";
@@ -661,9 +693,9 @@ function render() {
         ctx.beginPath();
         ctx.moveTo(nA.dx, nA.dy);
         ctx.lineTo(nB.dx, nB.dy);
-        ctx.strokeStyle = isHov ? "rgba(125,211,252," + alpha + ")" : "rgba(59,130,246," + alpha + ")";
+        ctx.strokeStyle = isHov ? "rgba(178,210,53," + alpha + ")" : "rgba(40,58,151," + alpha + ")";
         ctx.lineWidth = (isHov ? 2.5 : Math.max(0.8, e.score / 100 * 2.0)) / viewScale;
-        if (isHov) { ctx.shadowColor = "#7dd3fc"; ctx.shadowBlur = 8; }
+        if (isHov) { ctx.shadowColor = "#b2d235"; ctx.shadowBlur = 8; }
         ctx.stroke();
         ctx.restore();
     });
@@ -687,14 +719,14 @@ function render() {
             var pulseR = r + 12 + Math.sin(pulseT * 2) * 6;
             ctx.beginPath();
             ctx.arc(x, y, pulseR, 0, Math.PI * 2);
-            ctx.strokeStyle = "rgba(125,211,252," + (0.15 + 0.1 * Math.sin(pulseT * 2)) + ")";
+            ctx.strokeStyle = "rgba(178,210,53," + (0.15 + 0.1 * Math.sin(pulseT * 2)) + ")";
             ctx.lineWidth = 2 / viewScale;
             ctx.stroke();
 
             var pulseR2 = r + 22 + Math.sin(pulseT * 1.3 + 1) * 8;
             ctx.beginPath();
             ctx.arc(x, y, pulseR2, 0, Math.PI * 2);
-            ctx.strokeStyle = "rgba(125,211,252," + (0.06 + 0.04 * Math.sin(pulseT * 1.3)) + ")";
+            ctx.strokeStyle = "rgba(178,210,53," + (0.06 + 0.04 * Math.sin(pulseT * 1.3)) + ")";
             ctx.lineWidth = 1.5 / viewScale;
             ctx.stroke();
         } else if (isHov || n.score >= 60) {
@@ -707,8 +739,8 @@ function render() {
         ctx.arc(x, y, r, 0, Math.PI * 2);
         if (n.isSelf) {
             var g = ctx.createRadialGradient(x - r*0.3, y - r*0.3, 0, x, y, r);
-            g.addColorStop(0, "#7dd3fc");
-            g.addColorStop(1, "#1d4ed8");
+            g.addColorStop(0, "#b2d235");
+            g.addColorStop(1, "#283a97");
             ctx.fillStyle = g;
         } else {
             var g2 = ctx.createRadialGradient(x - r*0.3, y - r*0.3, 0, x, y, r);
@@ -720,7 +752,7 @@ function render() {
 
         // Bordure
         ctx.strokeStyle = n.isSelf
-            ? "rgba(125,211,252,0.85)"
+            ? "rgba(178,210,53,0.85)"
             : "rgba(255,255,255," + (isHov ? 0.75 : 0.28) + ")";
         ctx.lineWidth = (n.isSelf ? 2 : (isHov ? 1.8 : 1)) / viewScale;
         ctx.stroke();
@@ -749,7 +781,7 @@ function render() {
             ctx.font = (isHov ? "bold " : "") + Math.max(9, Math.min(13, 9 + n.score / 20)) + "px Arial";
             ctx.textAlign = "center";
             ctx.textBaseline = "top";
-            ctx.fillStyle = isHov ? "#e0f0ff" : (n.isSelf ? "#7dd3fc" : "rgba(180,210,255,0.75)");
+            ctx.fillStyle = isHov ? "#d0dce7" : (n.isSelf ? "#b2d235" : "rgba(208,220,231,0.75)");
             ctx.shadowColor = "#000";
             ctx.shadowBlur  = 4;
             var lbl = n.isSelf
@@ -901,7 +933,7 @@ function afficherTooltip(n, cx, cy) {
     if (tx + 240 > container.clientWidth) tx = cx - contRect.left - 240;
     if (ty < 0) ty = cy - contRect.top + 20;
 
-    var scoreColor = n.score >= 70 ? "#4ade80" : (n.score >= 40 ? "#facc15" : "#f87171");
+    var scoreColor = n.score >= 70 ? "#b2d235" : (n.score >= 40 ? "#facc15" : "#fd3022");
     var tagsHtml = n.tags && n.tags.length
         ? n.tags.slice(0, 5).map(function(t) {
             return "<span class='tt-tag'>" + escHtml(t) + "</span>";

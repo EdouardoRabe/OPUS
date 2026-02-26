@@ -298,39 +298,63 @@ public class UserEJBBean implements UserEJB, UserEJBRemote, SessionBean {
             if (niveau == 0) niveau = -5;
             String passCrypt = Utilitaire.cryptWord(pwduser.toLowerCase(), niveau, sens == 0);
 
-            // 5. Inserer l'utilisateur
+            // 5. Generer la reference utilisateur via la connexion transactionnelle
             String refUser = (u != null ? u.getTuppleID() : "0");
-            MapUtilisateur newUser = new MapUtilisateur(loginuser, passCrypt, nomuser, adrDirection, teluser, idrole);
+            int newRefUser = Utilitaire.getMaxSeq("getsequtilisateur", c);
+            if (newRefUser <= 0) {
+                throw new Exception("Impossible de generer l'identifiant utilisateur (sequence getsequtilisateur)");
+            }
+
+            // 6. Inserer l'utilisateur avec la ref generee
+            MapUtilisateur newUser = new MapUtilisateur(newRefUser, loginuser, passCrypt, nomuser, adrDirection, teluser, idrole);
             newUser.createObject(refUser, c);
 
-            // 6. Inserer le CNAPSUser
-            CNAPSUser cnapsUser = new CNAPSUser(idrole, "1", "1", "1", loginuser, "1", newUser.getTuppleID());
-            // cnapsUser.createObject(refUser, c);
+            // Verifier que le refuser est correct apres insertion
+            String newUserRef = newUser.getTuppleID();
+            if (newUserRef == null || newUserRef.isEmpty() || newUserRef.equals("0")) {
+                throw new Exception("Echec de la creation de l'utilisateur : reference invalide");
+            }
 
             // 7. Inserer les parametres de cryptage
-            historique.ParamCrypt pc = new historique.ParamCrypt(niveau, sens, newUser.getTuppleID());
+            historique.ParamCrypt pc = new historique.ParamCrypt(niveau, sens, newUserRef);
             pc.createObject(refUser, c);
 
             // 8. Inserer le profil si fourni (dans la meme transaction)
             if (profil != null) {
-                profil.setIdutilisateur(Integer.parseInt(newUser.getTuppleID()));
+                profil.setIdutilisateur(Integer.parseInt(newUserRef));
                 profil.createObject(refUser, c);
+
+                // Verifier que le profil a bien ete cree
+                if (profil.getTuppleID() == null || profil.getTuppleID().isEmpty()) {
+                    throw new Exception("Echec de la creation du profil");
+                }
             }
 
             // 9. Inserer historiqueActif avec etat = creer
             UtilisateurAcade uaNew = new UtilisateurAcade();
-            uaNew.setRefuser(newUser.getTuppleID());
+            uaNew.setRefuser(newUserRef);
             uaNew.setEstActif(ConstantEtatUser.etatUtilisateurCreer);
             HistoriqueActifLib histCreer = uaNew.genererHistoriqueActif();
             histCreer.setDescription("Creation de l'utilisateur");
             histCreer.createObject(refUser, c);
 
             c.commit();
-            System.out.println("Utilisateur cree avec ref : " + newUser.getTuppleID());
-            return newUser.getTuppleID();
+
+            // 10. Verification post-commit : l'utilisateur existe bien en base
+            MapUtilisateur verifCrit = new MapUtilisateur();
+            verifCrit.setNomTable("utilisateur");
+            verifCrit.setLoginuser(loginuser);
+            MapUtilisateur[] verifResult = (MapUtilisateur[]) CGenUtil.rechercher(verifCrit, null, null, "");
+            if (verifResult == null || verifResult.length == 0) {
+                throw new Exception("L'utilisateur a ete cree mais n'est pas retrouve en base. Verifiez la base de donnees.");
+            }
+
+            System.out.println("Utilisateur cree avec ref : " + newUserRef);
+            return newUserRef;
 
         } catch (Exception e) {
             if (c != null) { try { c.rollback(); } catch (Exception ignored) {} }
+            System.err.println("ERREUR createUtilisateurs: " + e.getMessage());
             e.printStackTrace();
             throw new Exception("Erreur lors de la creation de l'utilisateur : " + e.getMessage());
         } finally {

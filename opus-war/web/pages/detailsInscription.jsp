@@ -2,9 +2,17 @@
 <%@ page import="bean.CGenUtil, alumni.Parcours, alumni.Promotion, alumni.Genre" %>
 
 <%
-    // retrieve previous step values
+    // retrieve previous step values (from POST params or session fallback after error)
     String etu = request.getParameter("etu");
     String password = request.getParameter("password");
+    if(etu == null || etu.isEmpty()){
+        etu = (String) session.getAttribute("reg_etu");
+        if(etu != null) session.removeAttribute("reg_etu");
+    }
+    if(password == null || password.isEmpty()){
+        password = (String) session.getAttribute("reg_password");
+        if(password != null) session.removeAttribute("reg_password");
+    }
 
     // load parcours list for select
     alumni.Parcours pCriteria = new alumni.Parcours();
@@ -18,6 +26,29 @@
     String selectedParcours = request.getParameter("idparcours");
     // keep track of genre selection too
     String selectedGenre = request.getParameter("idgenre");
+    // Restaurer les valeurs du formulaire depuis la session (apres erreur)
+    String savedEmail = null, savedPrenom = null, savedNom = null, savedDtn = null, savedTel = null, savedPromo = null;
+    if(selectedParcours == null || selectedParcours.isEmpty()){
+        selectedParcours = (String) session.getAttribute("reg_idparcours");
+        if(selectedParcours != null) session.removeAttribute("reg_idparcours");
+    }
+    if(selectedGenre == null || selectedGenre.isEmpty()){
+        selectedGenre = (String) session.getAttribute("reg_idgenre");
+        if(selectedGenre != null) session.removeAttribute("reg_idgenre");
+    }
+    savedEmail = (String) session.getAttribute("reg_email");
+    if(savedEmail != null) session.removeAttribute("reg_email");
+    savedPrenom = (String) session.getAttribute("reg_prenom");
+    if(savedPrenom != null) session.removeAttribute("reg_prenom");
+    savedNom = (String) session.getAttribute("reg_nom");
+    if(savedNom != null) session.removeAttribute("reg_nom");
+    savedDtn = (String) session.getAttribute("reg_dtn");
+    if(savedDtn != null) session.removeAttribute("reg_dtn");
+    savedTel = (String) session.getAttribute("reg_telephone");
+    if(savedTel != null) session.removeAttribute("reg_telephone");
+    savedPromo = (String) session.getAttribute("reg_idpromotion");
+    if(savedPromo != null) session.removeAttribute("reg_idpromotion");
+
     alumni.Promotion[] promoList = new alumni.Promotion[0];
     if(selectedParcours != null && !selectedParcours.isEmpty()){
         alumni.Promotion promoCrit = new alumni.Promotion();
@@ -112,7 +143,7 @@
                       <option value="">-- d'abord --</option>
                       <% if(promoList != null && promoList.length > 0) {
                           for(alumni.Promotion promo : promoList){ %>
-                        <option value="<%=promo.getIdpromotion()%>"><%=promo.getLibelle()%></option>
+                        <option value="<%=promo.getIdpromotion()%>" <%= (savedPromo != null && savedPromo.equals(promo.getIdpromotion())) ? "selected" : "" %>><%=promo.getLibelle()%></option>
                       <% } } %>
                     </select>
                   </div>
@@ -125,14 +156,14 @@
                   <label class="field-label">Prénom <span style="color:red">*</span></label>
                   <div class="input-icon-wrap">
                     <span class="glyphicon glyphicon-user input-icon"></span>
-                    <input type="text" name="prenom" class="form-control-custom with-icon" placeholder="Jean" required />
+                    <input type="text" name="prenom" class="form-control-custom with-icon" placeholder="Jean" value="<%= savedPrenom != null ? savedPrenom : "" %>" required />
                   </div>
                 </div>
                 <div class="col-xs-6 form-group">
                   <label class="field-label">Nom <span style="color:red">*</span></label>
                   <div class="input-icon-wrap">
                     <span class="glyphicon glyphicon-user input-icon"></span>
-                    <input type="text" name="nom" class="form-control-custom with-icon" placeholder="Dupont" required />
+                    <input type="text" name="nom" class="form-control-custom with-icon" placeholder="Dupont" value="<%= savedNom != null ? savedNom : "" %>" required />
                   </div>
                 </div>
               </div>
@@ -142,7 +173,7 @@
                 <label class="field-label">E-mail <span style="color:red">*</span></label>
                 <div class="input-icon-wrap">
                   <span class="glyphicon glyphicon-envelope input-icon"></span>
-                  <input type="email" name="email" class="form-control-custom with-icon" placeholder="jean.dupont@opus.edu" required />
+                  <input type="email" name="email" class="form-control-custom with-icon" placeholder="jean.dupont@opus.edu" value="<%= savedEmail != null ? savedEmail : "" %>" required />
                 </div>
               </div>
 
@@ -152,7 +183,7 @@
                   <label class="field-label">Date de naissance <span style="color:red">*</span></label>
                   <div class="input-icon-wrap">
                     <span class="glyphicon glyphicon-gift input-icon"></span>
-                    <input type="date" name="dtn" class="form-control-custom with-icon" required />
+                    <input type="date" name="dtn" class="form-control-custom with-icon" value="<%= savedDtn != null ? savedDtn : "" %>" required />
                   </div>
                 </div>
                 <div class="col-xs-5 form-group">
@@ -174,7 +205,7 @@
                 <label class="field-label">Téléphone <span style="color:red">*</span></label>
                 <div class="input-icon-wrap">
                   <span class="glyphicon glyphicon-phone input-icon"></span>
-                  <input type="tel" name="telephone" class="form-control-custom with-icon" placeholder="06 12 34 56 78" required />
+                  <input type="tel" name="telephone" class="form-control-custom with-icon" placeholder="06 12 34 56 78" value="<%= savedTel != null ? savedTel : "" %>" required />
                 </div>
               </div>
 
