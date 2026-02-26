@@ -261,7 +261,7 @@ INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
 VALUES (
            'MENDYN000026',
            'Dashboard',
-           'bi-column-gap',
+           'bi-clipboard-data',
            'module.jsp?but=dashboard/dashboard.jsp',
            1,
            1,
