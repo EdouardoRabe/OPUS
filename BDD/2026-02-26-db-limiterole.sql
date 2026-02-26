@@ -33,3 +33,5 @@ ON CONFLICT (idrole) DO UPDATE SET maxpublicationparjour = EXCLUDED.maxpublicati
 -- ╚═══════════════════════════════════════════════════════════════════════════════╝
 -- ETU000002 (refuser=101) : obligatoire pour les tests
 UPDATE utilisateur SET idrole = 'alu' WHERE id = 'ETU000002';
+UPDATE utilisateur SET idrole = 'alu' WHERE id = 'ETU000014';
+UPDATE utilisateur SET idrole = 'alu' WHERE id = 'ETU000015';
