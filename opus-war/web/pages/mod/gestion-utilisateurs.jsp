@@ -301,7 +301,7 @@
         <!-- Avatar / Photo -->
         <div class="speciality-icon" style="<%= hasPhoto ? "background:var(--gray-100);" : avatarGradients[idx] %>">
             <% if (hasPhoto) { %>
-            <img src="<%= request.getContextPath() %>/uploads/<%= photoProfil %>" alt="Photo"
+            <img src="<%= request.getContextPath() %>/<%= photoProfil %>" alt="Photo"
                  style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>
             <% } else { %>
             <span style="font-size:1.4rem;font-weight:700;<%= avatarTextColors[idx] %>"><%= initials %></span>
