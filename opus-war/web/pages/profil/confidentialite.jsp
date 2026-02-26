@@ -78,52 +78,71 @@ alert("ERREUR: <%= erreur.replace("\"", "'").replace("\n", " ").replace("\r", ""
 
 <style>
 .cf-wrap {
-  max-width: 620px; margin: 24px auto 40px;
+  max-width: 900px;
+  margin: 32px auto 48px;
+  padding: 0 20px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: #191919;
 }
 .cf-card {
-  background: #fff; border-radius: 12px;
+  background: #fff;
+  border-radius: 16px;
   border: 1px solid #dce0e4;
-  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  box-shadow: 0 2px 12px rgba(0,0,0,.07);
   overflow: hidden;
 }
 .cf-header {
   background: linear-gradient(135deg, #003366 0%, #0a66c2 60%, #378fe9 100%);
-  padding: 24px 28px 20px;
+  padding: 28px 36px 24px;
   color: #fff;
-  display: flex; align-items: center; gap: 14px;
+  display: flex; align-items: center; gap: 16px;
 }
-.cf-header i { font-size: 28px; opacity: .9; }
-.cf-header-text h2 { margin: 0; font-size: 19px; font-weight: 700; }
-.cf-header-text p { margin: 4px 0 0; font-size: 13px; opacity: .85; }
+.cf-header i { font-size: 32px; opacity: .9; }
+.cf-header-text h2 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -.2px; }
+.cf-header-text p  { margin: 5px 0 0; font-size: 13px; opacity: .82; }
 
-.cf-alerts { padding: 0 24px; }
+.cf-alerts { padding: 0 36px; }
 .cf-alert {
-  margin-top: 16px; padding: 10px 16px;
-  border-radius: 8px; font-size: 13px; font-weight: 500;
+  margin-top: 16px; padding: 11px 16px;
+  border-radius: 10px; font-size: 13px; font-weight: 500;
+  display: flex; align-items: center; gap: 8px;
 }
-.cf-alert.err  { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
-.cf-alert.ok   { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+.cf-alert.err { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+.cf-alert.ok  { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
 
-.cf-body { padding: 20px 28px 8px; }
+.cf-body { padding: 24px 36px 12px; }
 .cf-hint {
-  font-size: 13px; color: #666;
-  margin-bottom: 20px; line-height: 1.5;
-  padding: 12px 16px; background: #f8f9fa;
-  border-radius: 8px; border-left: 3px solid #0a66c2;
+  font-size: 13px; color: #555;
+  margin-bottom: 24px; line-height: 1.6;
+  padding: 12px 16px; background: #f0f5ff;
+  border-radius: 10px; border-left: 4px solid #0a66c2;
+  display: flex; align-items: flex-start; gap: 10px;
 }
+.cf-hint i { flex-shrink: 0; margin-top: 1px; color: #0a66c2; }
+
+/* ── 2-column grid ── */
+.cf-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 24px;
+}
+@media (max-width: 640px) { .cf-grid { grid-template-columns: 1fr; } }
 
 .cf-item {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 0; border-bottom: 1px solid #f0f0f0;
+  padding: 14px 18px;
+  border: 1px solid #eef0f4;
+  border-radius: 12px;
+  background: #fafbfc;
+  transition: box-shadow .15s, border-color .15s;
 }
-.cf-item:last-child { border-bottom: none; }
+.cf-item:hover { box-shadow: 0 2px 8px rgba(10,102,194,.08); border-color: #c5d8f5; }
+
 .cf-item-left { display: flex; align-items: center; gap: 12px; }
 .cf-item-icon {
-  width: 36px; height: 36px; border-radius: 10px;
+  width: 38px; height: 38px; border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 16px; flex-shrink: 0;
+  font-size: 17px; flex-shrink: 0;
 }
 .cf-item-icon.blue   { background: #e3f2fd; color: #0a66c2; }
 .cf-item-icon.green  { background: #e8f5e9; color: #2e7d32; }
@@ -131,38 +150,39 @@ alert("ERREUR: <%= erreur.replace("\"", "'").replace("\n", " ").replace("\r", ""
 .cf-item-icon.purple { background: #f3e5f5; color: #7b1fa2; }
 .cf-item-icon.red    { background: #fce4ec; color: #c62828; }
 .cf-item-icon.teal   { background: #e0f2f1; color: #00695c; }
-.cf-item-label { font-size: 14px; font-weight: 600; }
-.cf-item-desc  { font-size: 11px; color: #888; margin-top: 1px; }
+.cf-item-label { font-size: 13px; font-weight: 600; }
+.cf-item-desc  { font-size: 11px; color: #999; margin-top: 2px; }
 
 /* Toggle switch */
 .cf-toggle { position: relative; display: inline-block; width: 48px; height: 26px; flex-shrink: 0; }
 .cf-toggle input { opacity: 0; width: 0; height: 0; }
 .cf-toggle .slider {
   position: absolute; cursor: pointer; inset: 0;
-  background: #ccc; border-radius: 26px; transition: .25s;
+  background: #d0d5dd; border-radius: 26px; transition: .25s;
 }
 .cf-toggle .slider:before {
   content: ""; position: absolute;
   height: 20px; width: 20px; left: 3px; bottom: 3px;
   background: #fff; border-radius: 50%; transition: .25s;
-  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  box-shadow: 0 1px 4px rgba(0,0,0,.22);
 }
 .cf-toggle input:checked + .slider { background: #0a66c2; }
 .cf-toggle input:checked + .slider:before { transform: translateX(22px); }
 
 .cf-footer {
-  padding: 16px 28px 24px;
+  padding: 18px 36px 26px;
   display: flex; justify-content: space-between; align-items: center;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #eef0f4;
+  margin-top: 20px;
 }
 .cf-btn {
-  padding: 9px 24px; border-radius: 22px; font-size: 13px;
+  padding: 9px 26px; border-radius: 24px; font-size: 13px;
   font-weight: 600; cursor: pointer; border: none; transition: all .15s;
-  text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 7px;
 }
-.cf-btn-back { background: #f0f0f0; color: #555; }
-.cf-btn-back:hover { background: #e0e0e0; color: #333; }
-.cf-btn-save { background: #0a66c2; color: #fff; }
+.cf-btn-back { background: #f0f2f5; color: #555; }
+.cf-btn-back:hover { background: #e2e5eb; color: #222; }
+.cf-btn-save { background: #0a66c2; color: #fff; box-shadow: 0 2px 8px rgba(10,102,194,.25); }
 .cf-btn-save:hover { background: #004182; }
 </style>
 
@@ -187,9 +207,10 @@ alert("ERREUR: <%= erreur.replace("\"", "'").replace("\n", " ").replace("\r", ""
       <div class="cf-body">
         <div class="cf-hint">
           <i class="bi bi-info-circle-fill"></i>
-          Activez ou d&eacute;sactivez la visibilit&eacute; de chaque champ. Les champs d&eacute;sactiv&eacute;s seront masqu&eacute;s dans l'annuaire et votre fiche publique.
+          <span>Activez ou d&eacute;sactivez la visibilit&eacute; de chaque champ. Les champs d&eacute;sactiv&eacute;s seront masqu&eacute;s dans l'annuaire et votre fiche publique.</span>
         </div>
 
+        <div class="cf-grid">
         <!-- Nom -->
         <div class="cf-item">
           <div class="cf-item-left">
@@ -297,6 +318,7 @@ alert("ERREUR: <%= erreur.replace("\"", "'").replace("\n", " ").replace("\r", ""
           </div>
           <label class="cf-toggle"><input type="checkbox" name="status_localisation" value="1" <%= visLocalisation == 1 ? "checked" : "" %>><span class="slider"></span></label>
         </div>
+        </div><!-- /cf-grid -->
       </div>
 
       <div class="cf-footer">

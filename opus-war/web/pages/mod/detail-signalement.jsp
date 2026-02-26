@@ -62,10 +62,14 @@
                 " and idsignalement = '" + idsignalement + "'");
         if (sigs == null || sigs.length == 0) {
 %>
-<div class="custom-card no-hover" style="padding:30px;text-align:center;color:#999;">
-    <i class="fa fa-exclamation-triangle" style="font-size:2em;color:#dc3545;"></i>
-    <p style="margin-top:10px;">Signalement introuvable (ID: <%= idsignalement %>)</p>
-    <a href="<%= lienBase %>?but=mod/gestion-signalements.jsp" class="btn btn-primary" style="margin-top:10px;">
+<div style="max-width:460px;margin:40px auto;text-align:center;padding:40px 30px;background:#fff;border-radius:16px;border:1px solid #e9eef6;box-shadow:0 1px 8px rgba(15,23,42,.08);">
+    <div style="width:56px;height:56px;border-radius:14px;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <i class="fa fa-exclamation-triangle" style="font-size:1.5rem;color:#dc3545;"></i>
+    </div>
+    <div style="font-size:1rem;font-weight:700;color:#1e293b;margin-bottom:6px;">Signalement introuvable</div>
+    <div style="font-size:0.85rem;color:#94a3b8;margin-bottom:20px;">ID : <%= idsignalement %></div>
+    <a href="<%= lienBase %>?but=mod/gestion-signalements.jsp"
+       style="display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:8px;background:#dc3545;color:#fff;font-size:0.85rem;font-weight:600;text-decoration:none;">
         <i class="fa fa-arrow-left"></i> Retour &agrave; la liste
     </a>
 </div>
@@ -119,82 +123,207 @@
         }
 %>
 
+<!-- ═══ STYLES PAGE ═══ -->
+<style>
+.dsig-page { max-width: 820px; margin: 0 auto; }
+.dsig-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.dsig-header-left { display: flex; align-items: center; gap: 14px; }
+.dsig-flag-icon {
+    width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+    background: linear-gradient(135deg,#dc3545,#c82333);
+    display: flex; align-items: center; justify-content: center;
+}
+.dsig-flag-icon i { color: #fff; font-size: 1.3rem; }
+.dsig-header-title { font-size: 1.15rem; font-weight: 700; color: #1e293b; line-height: 1.2; }
+.dsig-header-sub { font-size: 0.8rem; color: #94a3b8; margin-top: 2px; }
+.dsig-back-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 7px 16px; border-radius: 8px;
+    border: 1px solid #dde3ec; background: #fff;
+    font-size: 0.84rem; font-weight: 600; color: #374151;
+    text-decoration: none; transition: background .15s, border-color .15s;
+}
+.dsig-back-btn:hover { background: #f8fafc; border-color: #b0b8c8; color: #111; text-decoration: none; }
+/* Flash */
+.dsig-flash {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; border-radius: 10px;
+    font-size: 0.88rem; font-weight: 500; margin-bottom: 18px;
+}
+.dsig-flash-ok  { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+.dsig-flash-err { background: #fff1f2; border: 1px solid #fecdd3; color: #991b1b; }
+/* Info card */
+.dsig-info-card {
+    background: #fff; border-radius: 14px;
+    border: 1px solid #e9eef6;
+    box-shadow: 0 1px 6px rgba(15,23,42,.07);
+    margin-bottom: 22px; overflow: hidden;
+}
+.dsig-card-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 20px; border-bottom: 1px solid #f1f5f9;
+    background: #fafbfc;
+}
+.dsig-card-head-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: #fee2e2; color: #dc3545;
+    display: flex; align-items: center; justify-content: center; font-size: .9rem;
+}
+.dsig-card-head-title { font-size: 0.92rem; font-weight: 700; color: #374151; }
+.dsig-info-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 0;
+}
+@media (max-width: 540px) { .dsig-info-grid { grid-template-columns: 1fr; } }
+.dsig-info-row {
+    display: flex; flex-direction: column; gap: 3px;
+    padding: 14px 20px; border-bottom: 1px solid #f1f5f9;
+    border-right: 1px solid #f1f5f9;
+}
+.dsig-info-row:nth-child(even) { border-right: none; }
+.dsig-info-row:nth-last-child(-n+2) { border-bottom: none; }
+.dsig-info-label {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: .05em;
+    text-transform: uppercase; color: #94a3b8;
+}
+.dsig-info-value { font-size: 0.9rem; font-weight: 500; color: #1e293b; }
+.dsig-motif-badge {
+    display: inline-block; padding: 3px 11px; border-radius: 10px;
+    background: #fee2e2; color: #991b1b; font-size: 0.82em; font-weight: 700;
+}
+/* Section publication */
+.dsig-pub-card {
+    background: #fff; border-radius: 14px;
+    border: 1px solid #e9eef6;
+    box-shadow: 0 1px 6px rgba(15,23,42,.07);
+    overflow: hidden; margin-bottom: 22px;
+}
+.dsig-pub-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 20px; border-bottom: 1px solid #f1f5f9;
+    background: #fafbfc;
+}
+.dsig-pub-head-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: #e0e7ff; color: #4f46e5;
+    display: flex; align-items: center; justify-content: center; font-size: .9rem;
+}
+.dsig-pub-head-title { font-size: 0.92rem; font-weight: 700; color: #374151; }
+.dsig-pub-body { padding: 20px; }
+.dsig-danger-zone {
+    margin-top: 16px; padding: 14px 16px;
+    background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.dsig-danger-zone-msg { font-size: 0.85rem; color: #991b1b; font-weight: 500; }
+.dsig-deleted-notice {
+    margin-top: 16px; padding: 12px 16px;
+    background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px;
+    font-size: 0.85rem; color: #92400e; font-weight: 500;
+    display: flex; align-items: center; gap: 8px;
+}
+.dsig-pub-missing {
+    padding: 40px 20px; text-align: center; color: #94a3b8;
+}
+.dsig-pub-missing i { font-size: 2rem; display: block; margin-bottom: 10px; opacity: .5; }
+.dsig-pub-missing p { font-size: 0.9rem; margin: 0; }
+</style>
+
+<div class="dsig-page">
+
 <!-- ═══ MESSAGES FLASH ═══ -->
 <% if (actionMsg != null) { %>
-<div class="alert alert-success" style="margin-bottom:15px;border-radius:8px;">
-    <i class="fa fa-check-circle" style="margin-right:6px;"></i><%= actionMsg %>
+<div class="dsig-flash dsig-flash-ok">
+    <i class="fa fa-check-circle"></i><%= actionMsg %>
 </div>
 <% } %>
 <% if (actionErr != null) { %>
-<div class="alert alert-danger" style="margin-bottom:15px;border-radius:8px;">
-    <i class="fa fa-exclamation-triangle" style="margin-right:6px;"></i><%= actionErr %>
+<div class="dsig-flash dsig-flash-err">
+    <i class="fa fa-exclamation-triangle"></i><%= actionErr %>
 </div>
 <% } %>
 
 <!-- ═══ PAGE HEADER ═══ -->
-<div class="page-header-top">
-    <h1 class="page-title-lg">
-        <i class="fa fa-flag" style="color:#dc3545;font-size:1.1rem;margin-right:10px;"></i>
-        D&eacute;tail du signalement #<%= sig.getIdsignalement() %>
-    </h1>
-    <div>
-        <a href="<%= lienBase %>?but=mod/gestion-signalements.jsp" class="btn btn-secondary btn-sm">
-            <i class="fa fa-arrow-left"></i> Retour &agrave; la liste
-        </a>
+<div class="dsig-header">
+    <div class="dsig-header-left">
+        <div class="dsig-flag-icon"><i class="fa fa-flag"></i></div>
+        <div>
+            <div class="dsig-header-title">D&eacute;tail du signalement</div>
+            <div class="dsig-header-sub">#<%= sig.getIdsignalement() %> &mdash; <%= sig.getDaty() != null ? sig.getDaty() : "" %></div>
+        </div>
     </div>
+    <a href="<%= lienBase %>?but=mod/gestion-signalements.jsp" class="dsig-back-btn">
+        <i class="fa fa-arrow-left"></i> Retour &agrave; la liste
+    </a>
 </div>
 
 <!-- ═══ INFORMATIONS DU SIGNALEMENT ═══ -->
-<div class="custom-card no-hover" style="margin-bottom:20px;padding:1.5rem;">
-    <h4 style="margin-bottom:15px;color:#333;font-weight:600;">
-        <i class="fa fa-info-circle" style="color:#007bff;margin-right:8px;"></i>Informations du signalement
-    </h4>
-    <table class="table table-bordered" style="margin-bottom:0;">
-        <tbody>
-            <tr>
-                <td style="font-weight:600;width:180px;background:#f8f9fa;">ID Signalement</td>
-                <td><%= sig.getIdsignalement() %></td>
-            </tr>
-            <tr>
-                <td style="font-weight:600;background:#f8f9fa;">Signalant</td>
-                <td><%= sig.getNomsignalant() != null ? sig.getNomsignalant() : "-" %></td>
-            </tr>
-            <tr>
-                <td style="font-weight:600;background:#f8f9fa;">Signal&eacute;</td>
-                <td><%= sig.getNomsignale() != null ? sig.getNomsignale() : "-" %></td>
-            </tr>
-            <tr>
-                <td style="font-weight:600;background:#f8f9fa;">Motif</td>
-                <td><span style="background:#dc3545;color:#fff;padding:2px 10px;border-radius:12px;font-size:0.85em;"><%= sig.getMotiflibelle() != null ? sig.getMotiflibelle() : "-" %></span></td>
-            </tr>
-            <tr>
-                <td style="font-weight:600;background:#f8f9fa;">Description</td>
-                <td><%= sig.getMotifdesc() != null && !sig.getMotifdesc().isEmpty() ? sig.getMotifdesc() : "<em style='color:#999;'>Aucune description</em>" %></td>
-            </tr>
-            <tr>
-                <td style="font-weight:600;background:#f8f9fa;">Date</td>
-                <td><%= sig.getDaty() != null ? sig.getDaty() : "-" %> &agrave; <%= sig.getHeure() != null ? sig.getHeure() : "-" %></td>
-            </tr>
-            <tr>
-                <td style="font-weight:600;background:#f8f9fa;">ID Publication</td>
-                <td><%= sig.getIdpublication() != null ? sig.getIdpublication() : "-" %></td>
-            </tr>
-        </tbody>
-    </table>
+<div class="dsig-info-card">
+    <div class="dsig-card-head">
+        <div class="dsig-card-head-icon"><i class="fa fa-info-circle"></i></div>
+        <span class="dsig-card-head-title">Informations du signalement</span>
+    </div>
+    <div class="dsig-info-grid">
+        <div class="dsig-info-row">
+            <span class="dsig-info-label">ID</span>
+            <span class="dsig-info-value">#<%= sig.getIdsignalement() %></span>
+        </div>
+        <div class="dsig-info-row">
+            <span class="dsig-info-label">Motif</span>
+            <span class="dsig-info-value">
+                <span class="dsig-motif-badge"><%= sig.getMotiflibelle() != null ? sig.getMotiflibelle() : "&mdash;" %></span>
+            </span>
+        </div>
+        <div class="dsig-info-row">
+            <span class="dsig-info-label">Signalant</span>
+            <span class="dsig-info-value"><%= sig.getNomsignalant() != null ? sig.getNomsignalant() : "&mdash;" %></span>
+        </div>
+        <div class="dsig-info-row">
+            <span class="dsig-info-label">Signal&eacute;</span>
+            <span class="dsig-info-value"><%= sig.getNomsignale() != null ? sig.getNomsignale() : "&mdash;" %></span>
+        </div>
+        <div class="dsig-info-row">
+            <span class="dsig-info-label">Date</span>
+            <span class="dsig-info-value">
+                <i class="fa fa-calendar" style="margin-right:5px;color:#94a3b8;"></i><%= sig.getDaty() != null ? sig.getDaty() : "&mdash;" %>
+                <% if (sig.getHeure() != null && !sig.getHeure().isEmpty()) { %>
+                &ensp;<i class="fa fa-clock-o" style="margin-right:3px;color:#94a3b8;"></i><%= sig.getHeure() %>
+                <% } %>
+            </span>
+        </div>
+        <div class="dsig-info-row">
+            <span class="dsig-info-label">ID Publication</span>
+            <span class="dsig-info-value"><%= sig.getIdpublication() != null ? sig.getIdpublication() : "&mdash;" %></span>
+        </div>
+        <% String descVal = sig.getMotifdesc(); if (descVal != null && !descVal.isEmpty()) { %>
+        <div class="dsig-info-row" style="grid-column:1/-1;">
+            <span class="dsig-info-label">Description</span>
+            <span class="dsig-info-value" style="color:#374151;font-style:italic;"><%= descVal %></span>
+        </div>
+        <% } %>
+    </div>
 </div>
 
 <!-- ═══ PUBLICATION SIGNALEE ═══ -->
-<div style="margin-bottom:20px;">
-    <h4 style="margin-bottom:15px;color:#333;font-weight:600;">
-        <i class="fa fa-newspaper-o" style="color:#007bff;margin-right:8px;"></i>Publication signal&eacute;e
-    </h4>
+<div class="dsig-pub-card">
+    <div class="dsig-pub-head">
+        <div class="dsig-pub-head-icon"><i class="fa fa-newspaper-o"></i></div>
+        <span class="dsig-pub-head-title">Publication signal&eacute;e</span>
+    </div>
+    <div class="dsig-pub-body">
     <% if (pubs == null || pubs.length == 0) { %>
-    <div class="custom-card no-hover" style="padding:30px;text-align:center;color:#999;">
-        <i class="fa fa-ban" style="font-size:1.5em;"></i>
-        <p style="margin-top:8px;">Cette publication n&apos;existe plus ou a &eacute;t&eacute; supprim&eacute;e.</p>
+    <div class="dsig-pub-missing">
+        <i class="fa fa-ban"></i>
+        <p>Cette publication n&apos;existe plus ou a &eacute;t&eacute; supprim&eacute;e.</p>
     </div>
     <% } else {
-        // Passer les données au composant publication.jsp
         request.setAttribute("_pub_pubs", pubs);
         request.setAttribute("_pub_userNames", userNames);
         request.setAttribute("_pub_userPhotos", userPhotos);
@@ -208,35 +337,42 @@
         request.setAttribute("_pub_ctx", ctx);
         request.setAttribute("_pub_conn", conn);
     %>
-    <div style="max-width:680px;">
+    <div style="max-width:640px;">
         <jsp:include page="../publication.jsp" />
     </div>
     <% if (isMod && pubs[0].getEtat() != 0) { %>
-    <div style="margin-top:15px;">
-        <form method="post" style="display:inline;" onsubmit="return confirm('\u00cates-vous s\u00fbr de vouloir supprimer cette publication ? Cette action est irr\u00e9versible.');">
+    <div class="dsig-danger-zone">
+        <div class="dsig-danger-zone-msg">
+            <i class="fa fa-exclamation-triangle" style="margin-right:6px;"></i>
+            Supprimer cette publication ? Cette action est <strong>irr&eacute;versible</strong>.
+        </div>
+        <form method="post" style="margin:0;" onsubmit="return confirm('\u00cates-vous s\u00fbr de vouloir supprimer cette publication ?');">
             <input type="hidden" name="action" value="supprimerPublication"/>
             <input type="hidden" name="idpublication" value="<%= sig.getIdpublication() %>"/>
             <input type="hidden" name="idsignalement" value="<%= sig.getIdsignalement() %>"/>
-            <button type="submit" class="btn btn-danger" style="border-radius:8px;">
-                <i class="fa fa-trash" style="margin-right:6px;"></i>Supprimer la publication
+            <button type="submit" class="btn btn-danger btn-sm" style="border-radius:8px;white-space:nowrap;">
+                <i class="fa fa-trash" style="margin-right:5px;"></i>Supprimer la publication
             </button>
         </form>
     </div>
     <% } else if (isMod && pubs[0].getEtat() == 0) { %>
-    <div class="alert alert-warning" style="margin-top:15px;border-radius:8px;">
-        <i class="fa fa-info-circle" style="margin-right:6px;"></i>Cette publication a d&eacute;j&agrave; &eacute;t&eacute; supprim&eacute;e.
+    <div class="dsig-deleted-notice">
+        <i class="fa fa-info-circle"></i> Cette publication a d&eacute;j&agrave; &eacute;t&eacute; supprim&eacute;e.
     </div>
     <% } %>
     <% } %>
+    </div>
+</div>
+
 </div>
 
 <%
     } catch (Exception e) {
         e.printStackTrace();
 %>
-<div class="custom-card no-hover" style="padding:20px;text-align:center;">
-    <i class="fa fa-exclamation-triangle" style="color:#dc3545;font-size:1.5em;"></i>
-    <p style="margin-top:8px;color:#dc3545;">Erreur : <%= e.getMessage() %></p>
+<div style="max-width:460px;margin:40px auto;text-align:center;padding:32px 24px;background:#fff1f2;border-radius:14px;border:1px solid #fecdd3;">
+    <i class="fa fa-exclamation-triangle" style="color:#dc3545;font-size:1.6rem;margin-bottom:10px;display:block;"></i>
+    <div style="font-size:0.9rem;color:#991b1b;font-weight:600;">Erreur : <%= e.getMessage() %></div>
 </div>
 <%
     } finally {

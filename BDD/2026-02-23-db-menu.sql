@@ -88,15 +88,6 @@ VALUES (
            'MENDYN000004'
        ),
        (
-           'MENDYN000010',
-           'Modifier le profil',
-           'bi-pencil-square',
-           'module.jsp?but=profil/modifier.jsp',
-           2,
-           1,
-           'MENDYN000004'
-       ),
-       (
            'MENDYN000011',
            'Deconnexion',
            'bi-box-arrow-right',
@@ -190,13 +181,10 @@ VALUES ('USRM000001', 'MENDYN000001', '*', 0, 'etu'),
        ('USRM000007', 'MENDYN000007', '*', 0, 'etu'),
        ('USRM000008', 'MENDYN000008', '*', 0, 'etu'),
        ('USRM000009', 'MENDYN000009', '*', 0, 'etu'),
-       ('USRM000010', 'MENDYN000010', '*', 0, 'etu'),
        ('USRM000011', 'MENDYN000011', '*', 0, 'etu'),
        ('USRM000025', 'MENDYN000024', '*', 1, 'etu'),
        ('USRM000027', 'MENDYN000014', '*', 0, 'etu'),
        ('USRM000029', 'MENDYN000015', '*', 0, 'etu'),
-       ('USRM000031', 'MENDYN000016', '*', 0, 'etu'),
-       ('USRM000033', 'MENDYN000017', '*', 0, 'etu'),
        ('USRM000035', 'MENDYN000018', '*', 0, 'etu');
 -- Droits role md
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
@@ -208,7 +196,6 @@ VALUES ('USRM000012', 'MENDYN000001', '*', 0, 'md'),
        ('USRM000018', 'MENDYN000007', '*', 0, 'md'),
        ('USRM000019', 'MENDYN000008', '*', 0, 'md'),
        ('USRM000020', 'MENDYN000009', '*', 0, 'md'),
-       ('USRM000021', 'MENDYN000010', '*', 0, 'md'),
        ('USRM000022', 'MENDYN000011', '*', 0, 'md'),
        ('USRM000099', 'MENDYN000999', '*', 0, 'md'),
        ('USRM000023', 'MENDYN000023', '*', 0, 'md'),

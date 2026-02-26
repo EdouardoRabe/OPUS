@@ -166,6 +166,9 @@
     background: #f0f4ff;
     color: var(--itu-blue, #008BFF);
 }
+    .mots-cless{
+        display: none !important;
+    }
 </style>
 
 <!-- ═══ SPECIALITES GRID ═══ -->

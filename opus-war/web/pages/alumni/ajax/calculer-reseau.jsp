@@ -243,6 +243,7 @@
             // --- Noeud self ---
             jNodes.append("{");
             jNodes.append("\"id\":").append(refuserConnecte);
+            jNodes.append(",\"idprofil\":\"").append(ej(idprofilSelf != null ? idprofilSelf : "")).append("\"");
             jNodes.append(",\"nom\":\"").append(ej(nomSelf)).append("\"");
             jNodes.append(",\"prenom\":\"").append(ej(prenomSelf)).append("\"");
             jNodes.append(",\"idparcours\":\"").append(ej(idparcoursSelf != null ? idparcoursSelf : "")).append("\"");
@@ -277,6 +278,7 @@
 
                 jNodes.append(",{");
                 jNodes.append("\"id\":").append(idU);
+                jNodes.append(",\"idprofil\":\"").append(ej(pid)).append("\"");
                 jNodes.append(",\"nom\":\"").append(ej(oNom.get(i))).append("\"");
                 jNodes.append(",\"prenom\":\"").append(ej(oPrenom.get(i))).append("\"");
                 jNodes.append(",\"idparcours\":\"").append(ej(pidParc != null ? pidParc : "")).append("\"");

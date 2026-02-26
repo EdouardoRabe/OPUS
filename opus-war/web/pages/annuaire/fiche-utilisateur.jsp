@@ -59,6 +59,7 @@
     ProfilSocialMedia[] socialMedias = null;
     Map champVis = new HashMap(); // champ -> status
     List specLabels = new ArrayList(); // specialite libelles
+    List specPhotos = new ArrayList(); // specialite photos
     String _erreur = null;
     
     // Statut du profil
@@ -124,8 +125,10 @@
                         Specialite spec = new Specialite();
                         spec.setIdspecialite(spArr[i].getIdspecialite());
                         Specialite[] sRes = (Specialite[]) CGenUtil.rechercher(spec, null, null, conn, "");
-                        if (sRes != null && sRes.length > 0 && sRes[0].getLibelle() != null)
+                        if (sRes != null && sRes.length > 0 && sRes[0].getLibelle() != null) {
                             specLabels.add(sRes[0].getLibelle());
+                            specPhotos.add(sRes[0].getPhoto() != null ? sRes[0].getPhoto() : "");
+                        }
                     }
                 }
             }
@@ -411,8 +414,13 @@
         <div class="fu-section">
             <h2><i class="bi bi-star-fill"></i> Sp&eacute;cialit&eacute;s</h2>
             <div class="fu-tags">
-                <% for (int i = 0; i < specLabels.size(); i++) { %>
-                <span class="fu-tag green"><%= h((String) specLabels.get(i)) %></span>
+                <% for (int i = 0; i < specLabels.size(); i++) {
+                    String _specPhoto = (String) specPhotos.get(i);
+                %>
+                <span class="fu-tag green" style="display:inline-flex;align-items:center;gap:6px;">
+                    <% if (_specPhoto != null && !_specPhoto.isEmpty()) { %><img src="<%= request.getContextPath() + "/" + _specPhoto %>" alt="" style="width:22px;height:22px;border-radius:50%;object-fit:cover;"><% } %>
+                    <%= h((String) specLabels.get(i)) %>
+                </span>
                 <% } %>
             </div>
         </div>

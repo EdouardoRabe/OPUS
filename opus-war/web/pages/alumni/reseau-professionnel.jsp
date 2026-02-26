@@ -400,7 +400,7 @@
                         <div><span>Taille &amp; distance</span> = score de compatibilit&eacute;</div>
                         <div><span>Plus proche du centre</span> = plus compatible</div>
                         <div><span>Couleur</span> = parcours / fili&egrave;re</div>
-                        <div style="margin-top:4px;color:rgba(208,220,231,0.5);font-size:10px;">Molette / pincer pour zoomer &bull; Glisser pour naviguer</div>
+                        <div style="margin-top:4px;color:rgba(208,220,231,0.5);font-size:10px;">Molette / pincer pour zoomer &bull; Glisser pour naviguer &bull; Cliquer sur un profil pour le consulter</div>
                     </div>
                     <div id="reseau-zoom-btns">
                         <button id="btn-zoom-in"  title="Zoom +">+</button>
@@ -454,7 +454,7 @@
                                         Afficher les noms
                                     </label>
                                     <input type="checkbox" id="chk-labels" checked
-                                           onchange="afficherLabels=this.checked;">
+                                           onchange="setAfficherLabels(this.checked);">
                                 </div>
                                 <div class="rp-check-row">
                                     <label for="chk-float">
@@ -462,7 +462,7 @@
                                         Animation flottante
                                     </label>
                                     <input type="checkbox" id="chk-float" checked
-                                           onchange="flotterActif=this.checked;">
+                                           onchange="setFlotterActif(this.checked);">
                                 </div>
                             </div>
                         </div>
@@ -686,6 +686,9 @@ function render() {
         if (e.score < seuilActif) return;
         var nA = nodesById[e.from], nB = nodesById[e.to];
         if (!nA || !nB || nA.dx === undefined || nB.dx === undefined) return;
+        // Masquer l'arête si l'un des nœuds est filtré par le seuil
+        if (!nA.isSelf && nA.score < seuilActif) return;
+        if (!nB.isSelf && nB.score < seuilActif) return;
         var isHov = hoveredNode && (hoveredNode.id === nA.id || hoveredNode.id === nB.id);
         var alpha = Math.max(0.15, Math.min(0.78, 0.15 + e.score / 100 * 0.63));
         if (isHov) alpha = Math.min(0.95, alpha * 3);
@@ -703,6 +706,8 @@ function render() {
     // --- 2. Nœuds ---
     nodes.forEach(function(n) {
         if (n.dx === undefined) return;
+        // Masquer les nœuds dont le score est en dessous du seuil (sauf self)
+        if (!n.isSelf && n.score < seuilActif) return;
         var x = n.dx, y = n.dy;
         var isHov = (hoveredNode && hoveredNode.id === n.id);
 
@@ -825,6 +830,8 @@ function hitTest(mx, my) {
     var bestD = Infinity, best = null;
     nodes.forEach(function(n) {
         if (n.dx === undefined) return;
+        // Ignorer les nœuds filtrés par le seuil
+        if (!n.isSelf && n.score < seuilActif) return;
         var r = n.isSelf ? 28 : Math.max(9, 9 + (n.score / 100) * 22);
         var d = Math.sqrt((w.x - n.dx)*(w.x - n.dx) + (w.y - n.dy)*(w.y - n.dy));
         if (d < r + 10 && d < bestD) { bestD = d; best = n; }
@@ -837,10 +844,15 @@ function hitTest(mx, my) {
 // -----------------------------------------------------------------------
 canvas.style.cursor = "grab";
 
+// --- Click-to-profile: track drag distance to distinguish click from pan ---
+var dragStartPos = null;
+var DRAG_THRESHOLD = 5; // px — below this threshold, treat as click
+
 canvas.addEventListener("mousedown", function(e) {
     if (e.button !== 0) return;
     isPanning = true;
     panStart = {x: e.clientX - panX, y: e.clientY - panY};
+    dragStartPos = {x: e.clientX, y: e.clientY};
     canvas.style.cursor = "grabbing";
     tooltip.style.display = "none";
 });
@@ -861,8 +873,26 @@ window.addEventListener("mousemove", function(e) {
     hoveredNode ? afficherTooltip(hoveredNode, e.clientX, e.clientY) : (tooltip.style.display = "none");
 });
 
-window.addEventListener("mouseup", function() {
-    if (isPanning) { isPanning = false; canvas.style.cursor = "grab"; }
+window.addEventListener("mouseup", function(e) {
+    if (isPanning) {
+        isPanning = false;
+        canvas.style.cursor = "grab";
+        // Detect click (not drag) on a node → navigate to profile
+        if (dragStartPos) {
+            var dxDrag = e.clientX - dragStartPos.x;
+            var dyDrag = e.clientY - dragStartPos.y;
+            if (Math.sqrt(dxDrag * dxDrag + dyDrag * dyDrag) < DRAG_THRESHOLD) {
+                var rect = canvas.getBoundingClientRect();
+                var clickedNode = hitTest(e.clientX - rect.left, e.clientY - rect.top);
+                if (clickedNode && !clickedNode.isSelf && clickedNode.idprofil) {
+                    window.location.href = "<%= ctx %>/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp&idprofil=" + encodeURIComponent(clickedNode.idprofil);
+                } else if (clickedNode && clickedNode.isSelf) {
+                    window.location.href = "<%= ctx %>/pages/module.jsp?but=profil/voir.jsp&currentMenu=MENDYN000009";
+                }
+            }
+            dragStartPos = null;
+        }
+    }
 });
 
 canvas.addEventListener("mouseleave", function() {
@@ -881,6 +911,7 @@ canvas.addEventListener("touchstart", function(e) {
     if (e.touches.length === 1) {
         isPanning = true;
         panStart = {x: e.touches[0].clientX - panX, y: e.touches[0].clientY - panY};
+        dragStartPos = {x: e.touches[0].clientX, y: e.touches[0].clientY};
     } else if (e.touches.length === 2) {
         isPanning = false;
         var dx = e.touches[0].clientX - e.touches[1].clientX;
@@ -911,7 +942,25 @@ canvas.addEventListener("touchmove", function(e) {
     e.preventDefault();
 }, {passive: false});
 
-canvas.addEventListener("touchend", function() { isPanning = false; touches0 = null; });
+canvas.addEventListener("touchend", function(e) {
+    if (isPanning && dragStartPos && e.changedTouches.length === 1) {
+        var touch = e.changedTouches[0];
+        var dxT = touch.clientX - dragStartPos.x;
+        var dyT = touch.clientY - dragStartPos.y;
+        if (Math.sqrt(dxT * dxT + dyT * dyT) < DRAG_THRESHOLD) {
+            var rect = canvas.getBoundingClientRect();
+            var tappedNode = hitTest(touch.clientX - rect.left, touch.clientY - rect.top);
+            if (tappedNode && !tappedNode.isSelf && tappedNode.idprofil) {
+                window.location.href = "<%= ctx %>/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp&idprofil=" + encodeURIComponent(tappedNode.idprofil);
+            } else if (tappedNode && tappedNode.isSelf) {
+                window.location.href = "<%= ctx %>/pages/module.jsp?but=profil/voir.jsp&currentMenu=MENDYN000009";
+            }
+        }
+    }
+    isPanning = false;
+    touches0 = null;
+    dragStartPos = null;
+});
 
 // Boutons overlay zoom
 document.getElementById("btn-zoom-in").onclick = function() {
@@ -944,7 +993,8 @@ function afficherTooltip(n, cx, cy) {
         "<div class='tt-name'>" + escHtml((n.prenom || "") + " " + (n.nom || "")) + "</div>" +
         "<div class='tt-score'>Compatibilit&eacute; : <b style='color:" + scoreColor + "'>" + n.score + "%</b></div>" +
         "<div class='tt-bar'><div class='tt-bar-fill' style='width:" + n.score + "%'></div></div>" +
-        "<div class='tt-tags'><b>Tags communs :</b><br>" + tagsHtml + "</div>";
+        "<div class='tt-tags'><b>Tags communs :</b><br>" + tagsHtml + "</div>" +
+        (!n.isSelf ? "<div style='margin-top:10px;text-align:center;font-size:12px;color:#536ae4;font-weight:600;'><i class='bi bi-box-arrow-up-right' style='margin-right:4px;'></i>Cliquer pour voir le profil</div>" : "");
 
     tooltip.style.left    = tx + "px";
     tooltip.style.top     = ty + "px";
@@ -1006,6 +1056,7 @@ function initialiserReseau(data) {
     data.nodes.forEach(function(n) {
         var node = {
             id:        n.id,
+            idprofil:  n.idprofil || "",
             nom:       n.nom,
             prenom:    n.prenom,
             idparcours:n.idparcours,
@@ -1039,6 +1090,8 @@ function initialiserReseau(data) {
 // Init
 // -----------------------------------------------------------------------
 window.appliquerSeuil = function(s) { seuilActif = s; };
+window.setAfficherLabels = function(v) { afficherLabels = v; };
+window.setFlotterActif   = function(v) { flotterActif = v; };
 
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);

@@ -32,6 +32,13 @@
             pagesProtegees.add("mod/gestion-signalements.jsp");
             pagesProtegees.add("admin/");
             pagesProtegees.add("mod/");
+            pagesProtegees.add("dashboard/");
+            pagesProtegees.add("specialite/");
+            pagesProtegees.add("menu/");
+            pagesProtegees.add("evenement/evenement-saisie.jsp");
+            pagesProtegees.add("evenement/evenement-list.jsp");
+            pagesProtegees.add("evenement/evenement-modif.jsp");
+            pagesProtegees.add("evenement/evenement-fiche.jsp");
 
             // Vérifier si la page demandée est protégée
             boolean pageProtegee = false;
@@ -71,6 +78,18 @@
                         } else if (pageDemandee.startsWith("admin/") || pageDemandee.contains("/admin/")) {
                             // Seuls les admins peuvent accéder aux pages admin/
                             accesAutorise = "admin".equals(idrole) || "dg".equals(idrole);
+                        } else if (pageDemandee.startsWith("dashboard/") || pageDemandee.contains("/dashboard/")) {
+                            // Seuls les modérateurs/admins peuvent accéder au dashboard
+                            accesAutorise = "md".equals(idrole) || "admin".equals(idrole) || "dg".equals(idrole);
+                        } else if (pageDemandee.startsWith("specialite/") || pageDemandee.contains("/specialite/")) {
+                            // Seuls les modérateurs/admins peuvent gérer les spécialités
+                            accesAutorise = "md".equals(idrole) || "admin".equals(idrole) || "dg".equals(idrole);
+                        } else if (pageDemandee.startsWith("menu/") || pageDemandee.contains("/menu/")) {
+                            // Seuls les admins peuvent gérer les menus dynamiques
+                            accesAutorise = "admin".equals(idrole) || "dg".equals(idrole);
+                        } else if (pageDemandee.startsWith("evenement/") || pageDemandee.contains("/evenement/")) {
+                            // Seuls les modérateurs/admins peuvent gérer les événements (saisie, list, modif, fiche)
+                            accesAutorise = "md".equals(idrole) || "admin".equals(idrole) || "dg".equals(idrole);
                         }
                     }
                 } catch (Exception e) {

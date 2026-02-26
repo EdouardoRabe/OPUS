@@ -1,3 +1,4 @@
+<%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
 <%@page import="affichage.PageRecherche"%>
 <%@ page import="alumni.ProfilLib" %>
 <%@ page import="historique.MapUtilisateur" %>
@@ -39,6 +40,7 @@
     pr.setUtilisateur(uEjb);
     pr.setLien((String) session.getValue("lien"));
     pr.setApres("mod/gestion-utilisateurs.jsp");
+    pr.getFormu().getChamp("nom").setVisible(false);
     pr.getFormu().getChamp("loginuser").setLibelle("ETU / Login");
     pr.getFormu().getChamp("email").setLibelle("Email");
     pr.getFormu().getChamp("promotionlib").setLibelle("Promotion");
@@ -154,68 +156,134 @@
         right: 12px;
         z-index: 10;
     }
+
+    /* ── Bouton trois points ── */
     .usr-menu-btn {
-        background: transparent;
-        border: 1px solid #dde3ec;
-        border-radius: 6px;
-        width: 32px;
-        height: 32px;
+        background: rgba(255,255,255,0.85);
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        width: 34px;
+        height: 34px;
         cursor: pointer;
-        font-size: 1.2rem;
+        font-size: 1.25rem;
         line-height: 1;
-        color: #6b7280;
+        color: #64748b;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: background .15s, border-color .15s;
+        transition: background .18s, border-color .18s, color .18s, box-shadow .18s;
         padding: 0;
+        backdrop-filter: blur(4px);
     }
-    .usr-menu-btn:hover {
-        background: #f0f4ff;
-        border-color: var(--itu-blue, #008BFF);
-        color: var(--itu-blue, #008BFF);
+    .usr-menu-btn:hover,
+    .usr-menu-btn.active {
+        background: #eff6ff;
+        border-color: #3b82f6;
+        color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(59,130,246,.15);
     }
+
+    /* ── Dropdown container ── */
     .usr-menu-dropdown {
         display: none;
         position: absolute;
-        top: calc(100% + 4px);
+        top: calc(100% + 6px);
         right: 0;
-        min-width: 180px;
-        background: #fff;
-        border: 1px solid #dde3ec;
-        border-radius: 8px;
-        box-shadow: 0 6px 20px rgba(0,0,0,.12);
+        min-width: 200px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 10px 28px rgba(15,23,42,.14), 0 2px 8px rgba(15,23,42,.08);
         overflow: hidden;
         z-index: 100;
+        transform-origin: top right;
+        animation: usrMenuIn .15s ease forwards;
+    }
+    @keyframes usrMenuIn {
+        from { opacity: 0; transform: scale(.95) translateY(-4px); }
+        to   { opacity: 1; transform: scale(1)  translateY(0); }
     }
     .usr-menu-dropdown.open {
         display: block;
     }
+
+    /* ── En-tête léger du dropdown ── */
+    .usr-menu-header {
+        padding: 10px 14px 8px;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: #94a3b8;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    /* ── Séparateur ── */
+    .usr-menu-sep {
+        height: 1px;
+        background: #f1f5f9;
+        margin: 4px 0;
+    }
+
+    /* ── Items du dropdown ── */
     .usr-menu-dropdown a,
     .usr-menu-dropdown button.usr-action-link {
         display: flex;
         align-items: center;
-        gap: 8px;
-        padding: 9px 14px;
-        font-size: .85rem;
-        color: #374151;
+        gap: 10px;
+        padding: 10px 16px;
+        font-size: .84rem;
+        font-weight: 500;
+        color: #334155;
         text-decoration: none;
-        transition: background .12s;
+        transition: background .13s, color .13s;
         border: none;
         background: transparent;
         width: 100%;
         cursor: pointer;
         text-align: left;
         font-family: inherit;
+        line-height: 1.3;
     }
+    .usr-menu-dropdown a .fa,
+    .usr-menu-dropdown button.usr-action-link .fa {
+        width: 16px;
+        text-align: center;
+        font-size: .88rem;
+        opacity: .75;
+        flex-shrink: 0;
+    }
+
+    /* Hover général */
     .usr-menu-dropdown a:hover,
     .usr-menu-dropdown button.usr-action-link:hover {
-        background: #f0f4ff;
-        color: var(--itu-blue, #008BFF);
+        background: #eff6ff;
+        color: #2563eb;
     }
+    .usr-menu-dropdown a:hover .fa,
+    .usr-menu-dropdown button.usr-action-link:hover .fa {
+        opacity: 1;
+    }
+
+    /* Variante success (valider / activer) */
+    .usr-menu-dropdown button.usr-action-success:hover {
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+    .usr-menu-dropdown button.usr-action-success:hover .fa {
+        color: #16a34a;
+    }
+
+    /* Variante danger (bannir) */
     .usr-menu-dropdown button.usr-action-danger:hover {
-        background: #fef2f2;
+        background: #fff1f2;
         color: #dc2626;
+    }
+    .usr-menu-dropdown button.usr-action-danger:hover .fa {
+        color: #dc2626;
+    }
+    .mots-cless{
+        display: none !important;
     }
     .usr-badge { display:inline-block; padding:2px 10px; border-radius:12px; font-size:0.75em; font-weight:600; }
     .usr-badge-actif { background:#d4edda; color:#155724; }
@@ -261,17 +329,21 @@
         <div class="usr-card-menu">
             <button class="usr-menu-btn" onclick="toggleUsrMenu(this, event)" title="Options">&#8942;</button>
             <div class="usr-menu-dropdown" id="usr-dd-<%= i %>">
+                <div class="usr-menu-header">Actions</div>
+
                 <a href="<%= lienBase %>?but=annuaire/fiche-utilisateur.jsp&amp;idprofil=<%= p.getIdprofil() %>">
-                    <i class="fa fa-eye"></i> Voir profil
+                    <i class="fa fa-eye"></i> Voir le profil
                 </a>
+
                 <% if (!isSelf) { %>
+                <div class="usr-menu-sep"></div>
                 <% if (etatDetail == ConstantEtatUser.etatUtilisateurCreer) { %>
                 <!-- Utilisateur créé → Valider -->
                 <form method="post" style="margin:0;" onsubmit="return confirm('Valider cet utilisateur ?');">
                     <input type="hidden" name="action" value="valider"/>
                     <input type="hidden" name="refuser" value="<%= ref %>"/>
-                    <button type="submit" class="usr-action-link">
-                        <i class="fa fa-check-circle"></i> Valider
+                    <button type="submit" class="usr-action-link usr-action-success">
+                        <i class="fa fa-check-circle" style="color:#16a34a;"></i> Valider
                     </button>
                 </form>
                 <% } else if (etatDetail == ConstantEtatUser.etatUtilisateurBanis) { %>
@@ -279,8 +351,8 @@
                 <form method="post" style="margin:0;" onsubmit="return confirm('R\u00e9activer cet utilisateur ?');">
                     <input type="hidden" name="action" value="activer"/>
                     <input type="hidden" name="refuser" value="<%= ref %>"/>
-                    <button type="submit" class="usr-action-link">
-                        <i class="fa fa-play-circle"></i> Activer
+                    <button type="submit" class="usr-action-link usr-action-success">
+                        <i class="fa fa-play-circle" style="color:#16a34a;"></i> R&eacute;activer
                     </button>
                 </form>
                 <% } else { %>
@@ -289,8 +361,8 @@
                     <input type="hidden" name="action" value="desactiver"/>
                     <input type="hidden" name="refuser" value="<%= ref %>"/>
                     <input type="hidden" name="description" value=""/>
-                    <button type="submit" class="usr-action-link">
-                        <i class="fa fa-ban"></i> Bannir
+                    <button type="submit" class="usr-action-link usr-action-danger">
+                        <i class="fa fa-ban" style="color:#dc2626;"></i> Bannir
                     </button>
                 </form>
                 <% } %>
@@ -388,14 +460,24 @@
         e.stopPropagation();
         var dd = btn.nextElementSibling;
         var isOpen = dd.classList.contains('open');
+        // Fermer tous les menus ouverts et désactiver tous les boutons
         document.querySelectorAll('.usr-menu-dropdown.open').forEach(function(el) {
             el.classList.remove('open');
         });
-        if (!isOpen) dd.classList.add('open');
+        document.querySelectorAll('.usr-menu-btn.active').forEach(function(el) {
+            el.classList.remove('active');
+        });
+        if (!isOpen) {
+            dd.classList.add('open');
+            btn.classList.add('active');
+        }
     }
     document.addEventListener('click', function() {
         document.querySelectorAll('.usr-menu-dropdown.open').forEach(function(el) {
             el.classList.remove('open');
+        });
+        document.querySelectorAll('.usr-menu-btn.active').forEach(function(el) {
+            el.classList.remove('active');
         });
     });
 </script>

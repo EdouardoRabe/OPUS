@@ -309,7 +309,7 @@
 .pv-spec-item button:hover { color: #c62828; }
 
 /* ---- Publications du profil ---- */
-.ppub-card { background:#fff; border:1px solid #dde3ec; border-radius:12px; padding:16px; margin-bottom:14px; cursor:pointer; transition:box-shadow .15s; }
+.ppub-card { background:#fff; border:1px solid #dde3ec; border-radius:12px; padding:20px; margin-bottom:20px; cursor:pointer; transition:box-shadow .15s; }
 .ppub-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.10); }
 .ppub-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
 .ppub-avatar { width:38px; height:38px; border-radius:50%; background:#0a66c2; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex-shrink:0; overflow:hidden; }
@@ -593,7 +593,7 @@
         </button>
         <a href="<%= _lien %>?but=profil/confidentialite.jsp"
            style="padding:6px 16px;background:#fff;color:#0a66c2;border:1px solid #0a66c2;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block">
-          <i class="fa fa-lock"></i> Confidentialité
+          <i class="bi bi-shield-lock-fill"></i> Confidentialité
         </a>
       </div>
     </div>
