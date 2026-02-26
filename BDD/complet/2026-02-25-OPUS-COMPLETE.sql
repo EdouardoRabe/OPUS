@@ -1210,7 +1210,7 @@ WHERE NOT EXISTS (
             AND v.champvisibilite = 'localisation'
             AND v.status = 0
     );
-DROP TABLE IF EXISTS publicationenregistrement;
+-- DROP TABLE IF EXISTS publicationenregistrement;
 -- 2) Recreer avec PK VARCHAR(20) comme les autres beans APJ
 CREATE TABLE publicationenregistrement (
     idpublicationenregistrement VARCHAR(20) PRIMARY KEY,
