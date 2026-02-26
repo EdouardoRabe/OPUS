@@ -245,7 +245,22 @@
     }
     if (headline.isEmpty() && !parcLib.isEmpty()) headline = parcLib;
     if (headline.isEmpty()) headline = "Alumni";
+
+    // CV
+    String cvPath = profil.getCv() != null ? profil.getCv().trim() : "";
+    String cvUrl = !cvPath.isEmpty() ? (ctx + "/" + cvPath) : "";
 %>
+
+<!-- Font Awesome 6 (for social icons) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+<style>
+/* Fix FA6 icon fonts - ensure proper rendering */
+.fab, .fa-brands { font-family: "Font Awesome 6 Brands" !important; font-weight: 400 !important; }
+.fas, .fa-solid, .fa { font-family: "Font Awesome 6 Free" !important; font-weight: 900 !important; }
+.far, .fa-regular { font-family: "Font Awesome 6 Free" !important; font-weight: 400 !important; }
+/* Minimum icon size */
+.fu-social-icon { font-size: 16px !important; display: inline-block; width: 20px; text-align: center; }
+</style>
 
 <style>
 /* ═══════════════════════════════════════
@@ -375,6 +390,7 @@
             <div class="fu-actions">
                 <% if (!email.isEmpty()) { %><a class="fu-btn fu-btn-primary" href="mailto:<%= h(email) %>"><i class="bi bi-envelope-fill"></i> Contacter</a><% } %>
                 <a class="fu-btn fu-btn-outline" href="<%= _lien %>?but=annuaire/annuaire.jsp"><i class="bi bi-people-fill"></i> Annuaire</a>
+                <button class="fu-btn fu-btn-outline" onclick="fuCopyProfileLink()"><i class="bi bi-link-45deg"></i> Copier le lien</button>
             </div>
         </div>
 
@@ -412,15 +428,27 @@
                     for (int ii = 0; ii < socialMedias.length; ii++) {
                         ProfilSocialMedia sm = socialMedias[ii];
                         String lib = "";
+                        String urlPattern = "";
+                        String icone = "bi bi-link-45deg";
+                        String couleur = "#6c757d";
                         for (int ri = 0; ri < allReseaux.length; ri++) {
                             if (allReseaux[ri].getIdReseauSocial() != null &&
                                 allReseaux[ri].getIdReseauSocial().equals(sm.getIdReseauSocial())) {
                                 lib = allReseaux[ri].getLibelle() != null ? allReseaux[ri].getLibelle() : "";
+                                urlPattern = allReseaux[ri].getUrlPattern() != null ? allReseaux[ri].getUrlPattern() : "";
+                                if (allReseaux[ri].getIconeClass() != null) icone = allReseaux[ri].getIconeClass();
+                                if (allReseaux[ri].getCouleurHex() != null) couleur = allReseaux[ri].getCouleurHex();
                                 break;
                             }
                         }
+                        String valeur = sm.getValeur() != null ? sm.getValeur() : "";
+                        String smUrl = urlPattern.replace("{value}", valeur);
+                        if (smUrl.isEmpty()) smUrl = valeur;
                 %>
-                    <span class="fu-tag grey"><%= h(lib + ": " + (sm.getValeur()!=null?sm.getValeur():"")) %></span>
+                    <a href="<%= h(smUrl) %>" target="_blank" rel="noopener noreferrer" class="fu-tag grey" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+                        <i class="<%= icone %> fu-social-icon" style="color:<%= couleur %>;font-size:18px;"></i>
+                        <span><%= h(lib) %>: <%= h(valeur) %></span>
+                    </a>
                 <% } } %>
             </div>
         </div>
@@ -505,6 +533,21 @@
             <% } } %>
         </div>
 
+        <!-- CV -->
+        <% if (!cvUrl.isEmpty()) { %>
+        <div class="fu-section">
+            <h2><i class="bi bi-file-earmark-text-fill"></i> Curriculum Vitae</h2>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <a href="<%= h(cvUrl) %>" target="_blank" class="fu-btn fu-btn-primary" download>
+                    <i class="bi bi-download"></i> T&eacute;l&eacute;charger le CV
+                </a>
+                <a href="<%= h(cvUrl) %>" target="_blank" class="fu-btn fu-btn-outline">
+                    <i class="bi bi-eye"></i> Voir le CV
+                </a>
+            </div>
+        </div>
+        <% } %>
+
         <!-- Publications -->
         <div class="fu-section" id="fuPubSection" style="border-top:1px solid #dce0e4;margin-top:6px;">
             <h2><i class="bi bi-newspaper"></i> Publications</h2>
@@ -542,18 +585,42 @@
     </div>
 </div>
 <div id="pub-detail-modal">
-    <div class="pub-detail-box">
-        <div class="pub-detail-header">
-            <h3 class="pub-detail-title">Publication</h3>
-            <button class="rdm-close" onclick="closePublicationDetail()">&times;</button>
+    <div class="pub-fb-box" id="pub-fb-box">
+        <button class="pub-fb-close" onclick="closePublicationDetail()">&times;</button>
+        <div class="pub-fb-media" id="pub-fb-media">
+            <div class="pub-fb-media-content" id="pub-fb-media-content"></div>
+            <button class="pub-fb-nav pub-fb-nav-prev" id="pub-fb-prev" onclick="pubFbNavPrev()"><i class="bi bi-chevron-left"></i></button>
+            <button class="pub-fb-nav pub-fb-nav-next" id="pub-fb-next" onclick="pubFbNavNext()"><i class="bi bi-chevron-right"></i></button>
+            <div class="pub-fb-media-counter" id="pub-fb-counter"></div>
         </div>
-        <div class="pub-detail-body" id="pub-detail-content"></div>
+        <div class="pub-fb-details" id="pub-fb-details">
+            <div style="text-align:center;padding:40px;"><div class="fa-feed-spinner"></div></div>
+        </div>
     </div>
 </div>
 
 <script>
 var CTX = '<%= ctx %>';
 var CURRENT_USER_ID = '<%= myRefuser %>';
+
+/* ── Copier le lien du profil ── */
+function fuCopyProfileLink() {
+    var url = window.location.origin + '<%= request.getContextPath() %>/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp?idprofil=' + encodeURIComponent('<%= h(idprofil) %>');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function() {
+            if (typeof Swal !== 'undefined') Swal.fire({toast:true,position:'top-end',icon:'success',title:'Lien du profil copi\u00e9 !',timer:2000,showConfirmButton:false});
+            else alert('Lien copi\u00e9 !');
+        }).catch(function() { _fuFallbackCopy(url); });
+    } else { _fuFallbackCopy(url); }
+}
+function _fuFallbackCopy(txt) {
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); alert('Lien du profil copi\u00e9 !'); } catch(e) { alert('Impossible de copier'); }
+    document.body.removeChild(ta);
+}
+
 (function() {
     var ctx = '<%= request.getContextPath() %>';
     var fuIdprofil = '<%= h(idprofil) %>';

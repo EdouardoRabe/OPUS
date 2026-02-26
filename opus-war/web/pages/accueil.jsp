@@ -602,13 +602,37 @@
     .share-submit-btn { background:var(--itu-blue,#008BFF); color:#fff; border:none; border-radius:20px; padding:7px 18px; font-size:14px; font-weight:700; cursor:pointer; }
     .share-submit-btn:hover { opacity:.88; }
     .share-submit-btn:disabled { opacity:.5; cursor:default; }
-    /* ---- Modale detail publication (clic sur partage) ---- */
-    #pub-detail-modal { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.55); align-items:center; justify-content:center; }
-    #pub-detail-modal .pub-detail-box { background:#f0f2f5; border-radius:14px; width:min(620px,96vw); max-height:92vh; display:flex; flex-direction:column; box-shadow:0 10px 40px rgba(0,0,0,.3); overflow:hidden; }
-    #pub-detail-modal .pub-detail-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; background:#fff; border-bottom:1px solid var(--fa-border); }
-    #pub-detail-modal .pub-detail-title { margin:0; font-size:16px; font-weight:700; }
-    #pub-detail-modal .pub-detail-body { padding:16px; overflow-y:auto; flex:1; }
-    #pub-detail-modal .pub-detail-body .fa-post-card { margin:0; }
+    /* ---- Facebook-style publication detail modal ---- */
+    #pub-detail-modal { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.85); align-items:center; justify-content:center; }
+    .pub-fb-box { display:flex; width:min(95vw,1200px); height:min(92vh,800px); border-radius:12px; overflow:hidden; box-shadow:0 10px 50px rgba(0,0,0,.5); position:relative; }
+    .pub-fb-close { position:absolute; top:10px; right:10px; z-index:10; background:rgba(255,255,255,.15); border:none; color:#fff; font-size:26px; width:38px; height:38px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .2s; line-height:1; }
+    .pub-fb-close:hover { background:rgba(255,255,255,.3); }
+    .pub-fb-media { flex:1; background:#1c1c1c; display:flex; align-items:center; justify-content:center; position:relative; min-width:0; overflow:hidden; }
+    .pub-fb-media-content { width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; }
+    .pub-fb-media-content img { max-width:100%; max-height:100%; object-fit:contain; border-radius:4px; user-select:none; }
+    .pub-fb-media-content video { max-width:100%; max-height:100%; object-fit:contain; border-radius:4px; }
+    .pub-fb-nav { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,.12); border:none; color:#fff; font-size:22px; width:44px; height:44px; border-radius:50%; cursor:pointer; display:none; align-items:center; justify-content:center; transition:background .2s; z-index:5; }
+    .pub-fb-nav:hover { background:rgba(255,255,255,.3); }
+    .pub-fb-nav--visible { display:flex !important; }
+    .pub-fb-nav-prev { left:14px; }
+    .pub-fb-nav-next { right:14px; }
+    .pub-fb-media-counter { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.55); color:#fff; padding:4px 16px; border-radius:16px; font-size:13px; font-weight:600; display:none; }
+    .pub-fb-details { width:420px; min-width:420px; max-width:420px; background:#fff; overflow-y:auto; display:flex; flex-direction:column; }
+    .pub-fb-details .fa-post-card { border-radius:0; box-shadow:none; cursor:default; }
+    .pub-fb-details .fa-post-card:hover { box-shadow:none; }
+    .pub-fb-box--no-media { width:min(620px,96vw); height:auto; max-height:92vh; }
+    .pub-fb-box--no-media .pub-fb-media { display:none; }
+    .pub-fb-box--no-media .pub-fb-details { width:100%; min-width:0; max-width:none; }
+    .pub-fb-box--no-media .pub-fb-close { color:#333; background:rgba(0,0,0,.06); }
+    .pub-fb-box--no-media .pub-fb-close:hover { background:rgba(0,0,0,.12); }
+    @media(max-width:900px) {
+        .pub-fb-box { flex-direction:column; width:96vw; height:auto; max-height:95vh; }
+        .pub-fb-media { max-height:50vh; flex:none; }
+        .pub-fb-details { width:100%; min-width:0; max-width:none; }
+    }
+    /* Copy link toast */
+    .fa-post-card { cursor:pointer; transition:box-shadow .2s; }
+    .fa-post-card:hover { box-shadow:0 2px 8px rgba(0,0,0,.18); }
 </style>
 
 <div class="fa-layout">
@@ -744,7 +768,8 @@
             <!-- Formulaire complet (masqué par défaut) -->
             <div class="fa-composer-full" id="composer-full" style="display:none;">
                 <form method="POST" enctype="multipart/form-data" id="form-pub"
-                      action="<%= ctx %>/pages/alumni/ajax/creer-publication.jsp">
+                      action="<%= ctx %>/pages/alumni/ajax/creer-publication.jsp"
+                      onsubmit="return validatePubFormSize()">
                     <div class="fa-composer-header">
                         <div class="fa-avatar fa-avatar--md"<%= !_connPhotoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>><% if (!_connPhotoUrl.isEmpty()) { %><img src="<%= _connPhotoUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initialConnecte %><% } %></div>
                         <div>
@@ -886,7 +911,8 @@
                 String _vsPromoExist = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND " + _vsPromoCond + ")";
                 String _vsParcExist  = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PARCOURS' AND _pv.idref=" + _vsParcSub + ")";
                 String _visW =
-                    " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication)"
+                    " AND (p.idutilisateur=" + refuserConnecte
+                    + " OR NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication)"
                     // OR mode: satisfaire au moins UNE restriction
                     + " OR (COALESCE(p.logique_visibilite,'OR')='OR' AND ("
                     + _vsSpecExist + " OR " + _vsPromoExist + " OR " + _vsParcExist
@@ -1024,14 +1050,17 @@
     </div>
 </div>
 
-<!-- ==================== MODALE DETAIL PUBLICATION ==================== -->
+<!-- ==================== MODALE DETAIL PUBLICATION (Facebook-style) ==================== -->
 <div id="pub-detail-modal">
-    <div class="pub-detail-box">
-        <div class="pub-detail-header">
-            <h3 class="pub-detail-title">Publication</h3>
-            <button class="rdm-close" onclick="closePublicationDetail()">&times;</button>
+    <div class="pub-fb-box" id="pub-fb-box">
+        <button class="pub-fb-close" onclick="closePublicationDetail()">&times;</button>
+        <div class="pub-fb-media" id="pub-fb-media">
+            <div class="pub-fb-media-content" id="pub-fb-media-content"></div>
+            <button class="pub-fb-nav pub-fb-nav-prev" id="pub-fb-prev" onclick="pubFbNavPrev()"><i class="bi bi-chevron-left"></i></button>
+            <button class="pub-fb-nav pub-fb-nav-next" id="pub-fb-next" onclick="pubFbNavNext()"><i class="bi bi-chevron-right"></i></button>
+            <div class="pub-fb-media-counter" id="pub-fb-counter"></div>
         </div>
-        <div class="pub-detail-body" id="pub-detail-content">
+        <div class="pub-fb-details" id="pub-fb-details">
             <div style="text-align:center;padding:40px;"><div class="fa-feed-spinner"></div></div>
         </div>
     </div>
@@ -1324,6 +1353,35 @@
         toggleReactionComm(commId, idreactiontype, idpub);
     }
 
+    // ========== RAFRAICHIR CARTE PUBLICATION (sans recharger la page) ==========
+    function _refreshPublicationCard(idpub) {
+        fetch(CTX + '/pages/alumni/ajax/voir-publication.jsp?idpublication=' + encodeURIComponent(idpub))
+            .then(function(r) { return r.text(); })
+            .then(function(html) {
+                var card = document.getElementById('pub-' + idpub);
+                if (!card) return;
+                var commDiv = document.getElementById('commentaires-' + idpub);
+                var wasCommOpen = commDiv && commDiv.style.display !== 'none';
+                var isInModal = !!card.closest('#pub-fb-details');
+                var temp = document.createElement('div');
+                temp.innerHTML = html;
+                var newCard = temp.querySelector('.fa-post-card');
+                if (!newCard) return;
+                card.parentNode.replaceChild(newCard, card);
+                if (wasCommOpen) {
+                    var nc = document.getElementById('commentaires-' + idpub);
+                    if (nc) { nc.style.display = 'block'; chargerCommentaires(idpub); }
+                }
+                if (isInModal) {
+                    var mg = newCard.querySelector('.fa-media-grid');
+                    if (mg) mg.style.display = 'none';
+                    newCard.removeAttribute('onclick');
+                    newCard.style.cursor = 'default';
+                }
+            })
+            .catch(function(e) { console.error('Erreur refresh card:', e); });
+    }
+
     // ========== REACTIONS PUBLICATION ==========
     function toggleReaction(idpub, idreactiontype) {
         fetch(CTX + '/pages/alumni/ajax/reagir-publication.jsp?idpublication=' + encodeURIComponent(idpub) + '&idreactiontype=' + encodeURIComponent(idreactiontype))
@@ -1334,10 +1392,7 @@
             .then(function(body) {
                 try { var data = JSON.parse(body); } catch(e) { alert('Erreur serveur (reaction): ' + body.substring(0, 200)); return; }
                 if (data.success) {
-                    // Recharger en scrollant sur la publication
-                    var url = new URL(window.location.href);
-                    url.searchParams.set('scrollTo', 'pub-' + idpub);
-                    window.location.href = url.toString();
+                    _refreshPublicationCard(idpub);
                 } else {
                     alert('Erreur reaction: ' + (data.error || 'Inconnue'));
                 }
@@ -1975,15 +2030,26 @@
     }
     // ========== COMPOSER MULTI-MEDIA PREVIEW ==========
     var _composerFiles = []; // {file, url, type}
+    var _MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 Mo
     function previewComposerMedia(input) {
         if (!input.files || input.files.length === 0) return;
+        var rejected = [];
         for (var i = 0; i < input.files.length; i++) {
             var f = input.files[i];
+            if (f.size > _MAX_FILE_SIZE) {
+                var sizeMB = (f.size / (1024 * 1024)).toFixed(1);
+                rejected.push(f.name + ' (' + sizeMB + ' Mo)');
+                continue;
+            }
             var isVideo = f.type && f.type.startsWith('video/');
             _composerFiles.push({file: f, url: URL.createObjectURL(f), type: isVideo ? 'video' : 'image'});
         }
+        if (rejected.length > 0) {
+            Swal.fire({icon:'error', title:'Fichier trop volumineux',
+                html:'La taille maximale autoris\u00e9e est de 50 Mo.<br>' + rejected.join('<br>'),
+                confirmButtonColor:'#1877f2'});
+        }
         renderComposerMediaGrid();
-        // Rebuild the file input's files from _composerFiles
         syncComposerFileInput();
     }
     function renderComposerMediaGrid() {
@@ -2045,6 +2111,26 @@
         if (inp) inp.value = '';
         document.getElementById('composer-img-preview').style.display = 'none';
         document.getElementById('composer-media-grid').innerHTML = '';
+    }
+    // ========== VALIDATION TAILLE FICHIER ==========
+    function validatePubFormSize() {
+        var totalSize = 0;
+        for (var i = 0; i < _composerFiles.length; i++) {
+            if (_composerFiles[i].file.size > _MAX_FILE_SIZE) {
+                Swal.fire({icon:'error', title:'Fichier trop volumineux',
+                    text:_composerFiles[i].file.name + ' d\u00e9passe la limite de 50 Mo.',
+                    confirmButtonColor:'#1877f2'});
+                return false;
+            }
+            totalSize += _composerFiles[i].file.size;
+        }
+        if (totalSize > _MAX_FILE_SIZE) {
+            Swal.fire({icon:'error', title:'Fichiers trop volumineux',
+                text:'La taille totale (' + (totalSize / (1024*1024)).toFixed(1) + ' Mo) d\u00e9passe la limite de 50 Mo.',
+                confirmButtonColor:'#1877f2'});
+            return false;
+        }
+        return true;
     }
     // ========== MENU PUBLICATION (3 points) ==========
     function togglePubMenu(btn, e) {
@@ -2577,6 +2663,10 @@
     });
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') { closeReactionDetails(); closeShareModal(); closePublicationDetail(); }
+        if (document.getElementById('pub-detail-modal').style.display === 'flex') {
+            if (e.key === 'ArrowLeft') { e.preventDefault(); pubFbNavPrev(); }
+            if (e.key === 'ArrowRight') { e.preventDefault(); pubFbNavNext(); }
+        }
     });
 
     // ========== PARTAGE PUBLICATION ==========
@@ -2610,9 +2700,8 @@
         .then(function(data) {
             if (data.success) {
                 closeShareModal();
-                var url = new URL(window.location.href);
-                url.searchParams.set('scrollTo', 'pub-' + data.idpublication);
-                window.location.href = url.toString();
+                if (typeof Swal !== 'undefined') Swal.fire({toast:true,position:'top-end',icon:'success',title:'Publication partag\u00e9e !',timer:2500,showConfirmButton:false});
+                else alert('Publication partagée !');
             } else {
                 btn.disabled = false;
                 alert('Erreur lors du partage: ' + (data.error || 'Inconnue'));
@@ -2628,24 +2717,186 @@
         if (pdm && e.target === pdm) closePublicationDetail();
     });
 
-    // ========== DETAIL PUBLICATION (clic sur partage embarque) ==========
-    function openPublicationDetail(idpub) {
+    // ========== DETAIL PUBLICATION (Facebook-style modal) ==========
+    var _pubFbMedias = [];
+    var _pubFbIndex = 0;
+    var _pubFbCurrentId = null; // track which pub is open for ID restoration
+
+    function onPubCardClick(e, idpub) {
+        // Ignore clicks on interactive elements inside the card
+        if (e.target.closest('button, a, input, textarea, select, .fa-post-actions, .fa-comments-zone, .pub-menu, .fa-reaction-bar, .fa-tag-zone, .fa-shared-embed, .fa-media-grid-item, .fa-post-counters')) return;
+        openPublicationDetail(idpub);
+    }
+
+    // Temporarily neutralize IDs on the feed card to prevent duplicate-ID conflicts
+    function _neutralizeFeedCardIds(idpub) {
+        var feedCard = document.getElementById('pub-' + idpub);
+        if (!feedCard) return;
+        // Don't neutralize if it's inside the modal
+        if (feedCard.closest('#pub-fb-details')) return;
+        var els = feedCard.querySelectorAll('[id]');
+        for (var i = 0; i < els.length; i++) {
+            els[i].setAttribute('data-feed-id', els[i].id);
+            els[i].id = '_feed_' + els[i].id;
+        }
+        feedCard.setAttribute('data-feed-id', feedCard.id);
+        feedCard.id = '_feed_' + feedCard.id;
+    }
+
+    // Restore IDs on the feed card
+    function _restoreFeedCardIds() {
+        var els = document.querySelectorAll('[data-feed-id]');
+        for (var i = 0; i < els.length; i++) {
+            els[i].id = els[i].getAttribute('data-feed-id');
+            els[i].removeAttribute('data-feed-id');
+        }
+    }
+
+    function openPublicationDetail(idpub, mediaIdx) {
         if (!idpub) return;
+
+        // If modal is already open for another pub, close cleanly first
+        if (_pubFbCurrentId) {
+            _restoreFeedCardIds();
+            document.getElementById('pub-fb-details').innerHTML = '';
+            var mc = document.getElementById('pub-fb-media-content');
+            if (mc) { mc.querySelectorAll('video').forEach(function(v){v.pause();}); mc.innerHTML = ''; }
+        }
+
         var modal = document.getElementById('pub-detail-modal');
-        var content = document.getElementById('pub-detail-content');
-        content.innerHTML = '<div style="text-align:center;padding:40px;"><div class="fa-feed-spinner"></div></div>';
+        var box   = document.getElementById('pub-fb-box');
+        var details = document.getElementById('pub-fb-details');
+        _pubFbCurrentId = idpub;
+
+        // Get media data from the card in the feed (BEFORE neutralizing IDs)
+        _pubFbMedias = [];
+        var feedCard = document.getElementById('pub-' + idpub);
+        if (feedCard && !feedCard.closest('#pub-fb-details')) {
+            try { _pubFbMedias = JSON.parse(feedCard.getAttribute('data-medias') || '[]'); } catch(ex){}
+        }
+
+        // Neutralize feed card IDs so getElementById will target the modal card
+        _neutralizeFeedCardIds(idpub);
+
+        // Setup layout
+        if (_pubFbMedias.length > 0) {
+            box.classList.remove('pub-fb-box--no-media');
+            _pubFbIndex = (typeof mediaIdx === 'number' && mediaIdx >= 0 && mediaIdx < _pubFbMedias.length) ? mediaIdx : 0;
+            renderPubFbMedia();
+        } else {
+            box.classList.add('pub-fb-box--no-media');
+        }
+
+        // Show modal with spinner
+        details.innerHTML = '<div style="text-align:center;padding:40px;"><div class="fa-feed-spinner"></div></div>';
         modal.style.display = 'flex';
+
+        // Load publication card via AJAX
         fetch(CTX + '/pages/alumni/ajax/voir-publication.jsp?idpublication=' + encodeURIComponent(idpub))
             .then(function(r) { return r.text(); })
             .then(function(html) {
-                content.innerHTML = html;
+                details.innerHTML = html;
+
+                // Find the loaded card
+                var loadedCard = details.querySelector('.fa-post-card');
+
+                // If we had no media from feed card, try from the loaded card
+                if (_pubFbMedias.length === 0 && loadedCard) {
+                    try { _pubFbMedias = JSON.parse(loadedCard.getAttribute('data-medias') || '[]'); } catch(ex){}
+                    if (_pubFbMedias.length > 0) {
+                        box.classList.remove('pub-fb-box--no-media');
+                        _pubFbIndex = (typeof mediaIdx === 'number' && mediaIdx >= 0 && mediaIdx < _pubFbMedias.length) ? mediaIdx : 0;
+                        renderPubFbMedia();
+                    }
+                }
+
+                // Hide the media grid in the detail card (shown on the left side)
+                if (_pubFbMedias.length > 0) {
+                    var mg = details.querySelector('.fa-media-grid');
+                    if (mg) mg.style.display = 'none';
+                }
+
+                // Remove card-level onclick to prevent nested modal
+                if (loadedCard) {
+                    loadedCard.removeAttribute('onclick');
+                    loadedCard.style.cursor = 'default';
+                }
+
+                // Auto-open comments section
+                if (loadedCard) {
+                    var pid = loadedCard.id ? loadedCard.id.replace('pub-','') : idpub;
+                    var commDiv = document.getElementById('commentaires-' + pid);
+                    if (commDiv && commDiv.style.display === 'none') {
+                        commDiv.style.display = 'block';
+                        if (typeof chargerCommentaires === 'function') chargerCommentaires(pid);
+                    }
+                }
             })
             .catch(function(e) {
-                content.innerHTML = '<p style="color:red;padding:20px;text-align:center;">Erreur: ' + e + '</p>';
+                details.innerHTML = '<p style="color:red;padding:20px;text-align:center;">Erreur: ' + e + '</p>';
             });
     }
+
+    function renderPubFbMedia() {
+        var content = document.getElementById('pub-fb-media-content');
+        var counter = document.getElementById('pub-fb-counter');
+        var prevBtn = document.getElementById('pub-fb-prev');
+        var nextBtn = document.getElementById('pub-fb-next');
+        if (!_pubFbMedias.length) return;
+        var m = _pubFbMedias[_pubFbIndex];
+        if (m.type === 'video') {
+            content.innerHTML = '<video src="' + escHtml(m.url) + '" controls autoplay style="max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;"></video>';
+        } else {
+            content.innerHTML = '<img src="' + escHtml(m.url) + '" alt="Media">';
+        }
+        if (_pubFbMedias.length > 1) {
+            counter.textContent = (_pubFbIndex + 1) + ' / ' + _pubFbMedias.length;
+            counter.style.display = 'block';
+        } else { counter.style.display = 'none'; }
+        prevBtn.classList.toggle('pub-fb-nav--visible', _pubFbIndex > 0);
+        nextBtn.classList.toggle('pub-fb-nav--visible', _pubFbIndex < _pubFbMedias.length - 1);
+    }
+
+    function pubFbNavPrev() { if (_pubFbIndex > 0) { _pubFbIndex--; renderPubFbMedia(); } }
+    function pubFbNavNext() { if (_pubFbIndex < _pubFbMedias.length - 1) { _pubFbIndex++; renderPubFbMedia(); } }
+
     function closePublicationDetail() {
-        document.getElementById('pub-detail-modal').style.display = 'none';
-        document.getElementById('pub-detail-content').innerHTML = '';
+        var modal = document.getElementById('pub-detail-modal');
+        modal.style.display = 'none';
+        var mc = document.getElementById('pub-fb-media-content');
+        if (mc) {
+            var vids = mc.querySelectorAll('video');
+            for (var vi = 0; vi < vids.length; vi++) vids[vi].pause();
+            mc.innerHTML = '';
+        }
+        document.getElementById('pub-fb-details').innerHTML = '';
+        // Restore feed card IDs that were neutralized
+        _restoreFeedCardIds();
+        _pubFbCurrentId = null;
+    }
+
+    // ========== COPIER LIEN PUBLICATION / PROFIL ==========
+    function copyPublicationLink(idpub) {
+        var url = window.location.origin + CTX + '/pages/module.jsp?but=accueil.jsp&highlight=' + encodeURIComponent(idpub);
+        _doCopyText(url, 'Lien de la publication copi\u00e9 !');
+    }
+    function copyProfileLink(idprofil) {
+        var url = window.location.origin + CTX + '/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp?idprofil=' + encodeURIComponent(idprofil);
+        _doCopyText(url, 'Lien du profil copi\u00e9 !');
+    }
+    function _doCopyText(txt, msg) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(txt).then(function() {
+                Swal.fire({toast:true,position:'top-end',icon:'success',title:msg,timer:2000,showConfirmButton:false});
+            }).catch(function() { _fallbackCopy(txt, msg); });
+        } else { _fallbackCopy(txt, msg); }
+    }
+    function _fallbackCopy(txt, msg) {
+        var ta = document.createElement('textarea');
+        ta.value = txt; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); Swal.fire({toast:true,position:'top-end',icon:'success',title:msg,timer:2000,showConfirmButton:false}); }
+        catch(e) { Swal.fire({toast:true,position:'top-end',icon:'error',title:'Impossible de copier',timer:2000,showConfirmButton:false}); }
+        document.body.removeChild(ta);
     }
 </script>
