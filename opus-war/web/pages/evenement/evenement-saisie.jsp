@@ -9,8 +9,8 @@
 <div class="page-header-top">
     <h1 class="page-title-lg">
         <a href="<%= lienSaisie %>?but=evenement/evenement-list.jsp"
-           style="color:var(--gray-400);margin-right:10px;font-size:1rem;vertical-align:middle;"
-           title="Retour &agrave; la liste">
+            style="color:var(--gray-400);margin-right:10px;font-size:1rem;vertical-align:middle;"
+            title="Retour &agrave; la liste">
             <i class="fa fa-arrow-left"></i>
         </a>
         <i class="fa fa-plus-circle" style="color:var(--itu-blue);font-size:1.1rem;margin-right:8px;"></i>
@@ -18,7 +18,7 @@
     </h1>
     <span style="font-size:0.85rem;color:var(--gray-500);">
         <a href="<%= lienSaisie %>?but=evenement/evenement-list.jsp"
-           style="color:var(--gray-500);text-decoration:none;">
+            style="color:var(--gray-500);text-decoration:none;">
             <i class="fa fa-calendar" style="margin-right:4px;"></i>Liste des &eacute;v&eacute;nements
         </a>
     </span>
@@ -76,7 +76,7 @@
                     Description <span class="req">*</span>
                 </label>
                 <textarea class="evt-form-textarea" id="description" name="description"
-                          rows="4" placeholder="D&eacute;crivez l'&eacute;v&eacute;nement..." required></textarea>
+                            rows="4" placeholder="D&eacute;crivez l'&eacute;v&eacute;nement..." required></textarea>
             </div>
 
             <div class="evt-form-row">
@@ -115,6 +115,19 @@
     var btn    = document.getElementById('btnSubmit');
     var errEl  = document.getElementById('formError');
     var errMsg = document.getElementById('formErrorMsg');
+
+    // Valeurs par défaut
+    var today = new Date();
+    var yyyy = today.getFullYear();
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var dd = String(today.getDate()).padStart(2, '0');
+    var todayStr = yyyy + '-' + mm + '-' + dd;
+    document.getElementById('datedebut').value = todayStr;
+    document.getElementById('datedebut').min = todayStr;
+    document.getElementById('datefin').value = todayStr;
+    document.getElementById('datefin').min = todayStr;
+    document.getElementById('description').value = 'Evenement ITU';
+    
 
     function showError(msg) {
         errMsg.textContent = msg;
