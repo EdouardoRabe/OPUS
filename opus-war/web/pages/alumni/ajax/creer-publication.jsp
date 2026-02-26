@@ -13,6 +13,7 @@
 <%@ page import="java.util.HashSet" %>
 <%@ page import="java.util.regex.Pattern" %>
 <%@ page import="java.util.regex.Matcher" %>
+<%@ page import="alumni.Limiterole" %>
 <%@ page import="java.io.File" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.apache.commons.fileupload.FileItem" %>
@@ -35,6 +36,21 @@
         }
         MapUtilisateur map = u.getUser();
         String userId = String.valueOf(map.getRefuser());
+
+        {
+            Connection connLim = new UtilDB().GetConn();
+            try {
+                String erreurLimite = Limiterole.verifierDroitPublication(
+                    connLim, map.getIdrole(), map.getRefuser());
+                if (erreurLimite != null) {
+                    session.setAttribute("pubErreur", erreurLimite);
+                    response.sendRedirect(redirectUrl);
+                    return;
+                }
+            } finally {
+                if (connLim != null) try { connLim.close(); } catch (Exception ex) {}
+            }
+        }
 
         // --- Parse multipart avec Commons FileUpload ---
         String description = null;

@@ -21,7 +21,7 @@
 INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, id, estactif)
 VALUES (100, 'ETU000001', 'paop', 'Rakoto Jean', 'DIR42', 'etu', 'ETU000001', 1) ON CONFLICT DO NOTHING;
 INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, id, estactif)
-VALUES (101, 'ETU000002', 'paop', 'Rasoa Marie', 'DIR42', 'etu', 'ETU000002', 1) ON CONFLICT DO NOTHING;
+VALUES (101, 'ETU000002', 'paop', 'Rasoa Marie', 'DIR42', 'alu', 'ETU000002', 1) ON CONFLICT DO NOTHING;
 INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, id, estactif)
 VALUES (102, 'ETU000003', 'paop', 'Rasolobe Andry', 'DIR42', 'md', 'ETU000003', 1) ON CONFLICT DO NOTHING;
 

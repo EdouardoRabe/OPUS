@@ -13,10 +13,12 @@
 <%@ page import="alumni.Profil" %>
 <%@ page import="alumni.ProfilLib" %>
 <%@ page import="alumni.Evenement" %>
+<%@ page import="alumni.Limiterole" %>
 <%@ page import="alumni.Identification" %>
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="alumni.Limiterole" %>
 <%
     UserEJB uFil = (UserEJB) session.getAttribute("u");
     MapUtilisateur mapFil = uFil.getUser();
@@ -47,10 +49,13 @@
             new Typepublication(), null, null, " order by idtypepublication");
     if (typesPub == null) typesPub = new Typepublication[0];
 
-    // Charger photo profil/couverture du connecte + 3 evenements a venir
+    // Charger photo profil/couverture du connecte + 3 evenements a venir + limite pub
     String _connPhotoUrl = "";
     String _connCoverUrl = "";
     Evenement[] _upEvents = new Evenement[0];
+    int _maxPubParJour = -1; // -1 = pas de limite
+    int _pubRestantes = -1;  // -1 = illimite
+    boolean _aUneLimite = false;
     {
         Connection _c = null;
         try {
@@ -64,9 +69,15 @@
             }
             _upEvents = (Evenement[]) CGenUtil.rechercher(new Evenement(), null, null, _c, " and datedebut >= CURRENT_DATE order by datedebut asc");
             if (_upEvents == null) _upEvents = new Evenement[0];
+
+            // --- Limite de publication par role ---
+            _maxPubParJour = Limiterole.getMaxParJour(_c, mapFil.getIdrole());
+            _aUneLimite = (_maxPubParJour >= 0);
+            _pubRestantes = Limiterole.publicationsRestantes(_c, mapFil.getIdrole(), refuserConnecte);
         } catch (Exception _e) { _e.printStackTrace(); }
         finally { if (_c != null) try { _c.close(); } catch (Exception _x) {} }
     }
+    boolean _peutPublier = (_maxPubParJour < 0) || (_pubRestantes > 0);
 %>
 
 <div class="fa-layout">
@@ -107,12 +118,21 @@
         <script>document.addEventListener('DOMContentLoaded',function(){Swal.fire({icon:'error',title:'Erreur',text:'<%= msgErreur.replace("'","\\'").replace("<","&lt;") %>',confirmButtonColor:'var(--itu-blue)'});});</script>
         <% } %>
 
-        <!-- ===== COMPOSER ===== -->
+        <!-- ===== COMPOSER (masque si le role ne peut pas publier, ex: etu) ===== -->
+        <% if (_maxPubParJour != 0) { %>
         <div class="fa-composer-card" id="composer-card">
+            <% if (!_peutPublier) { %>
+            <div class="fa-composer-trigger" style="opacity:0.5;cursor:not-allowed;">
+                <div class="fa-avatar fa-avatar--sm"<%= !_connPhotoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>><% if (!_connPhotoUrl.isEmpty()) { %><img src="<%= _connPhotoUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initialConnecte %><% } %></div>
+                <div class="fa-composer-placeholder">Limite de <%= _maxPubParJour %> publication(s) par jour atteinte</div>
+            </div>
+            <% } else { %>
             <div class="fa-composer-trigger" id="composer-trigger" onclick="openComposer()">
                 <div class="fa-avatar fa-avatar--sm"<%= !_connPhotoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>><% if (!_connPhotoUrl.isEmpty()) { %><img src="<%= _connPhotoUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initialConnecte %><% } %></div>
-                <div class="fa-composer-placeholder">Quoi de neuf&nbsp;?</div>
+                <div class="fa-composer-placeholder">Quoi de neuf&nbsp;?<% if (_aUneLimite && _maxPubParJour > 0) { %> (<%= _pubRestantes %>/<%= _maxPubParJour %> restante<%= _pubRestantes > 1 ? "s" : "" %>)<% } %></div>
             </div>
+            <% } %>
+            <% if (_peutPublier) { %>
             <div class="fa-composer-quick-actions" id="composer-quick-actions">
                 <button class="fa-quick-action-btn" type="button"
                         onclick="openComposer();setTimeout(function(){document.getElementById('composer-img-input').click();},120)">
@@ -170,7 +190,9 @@
                     </div>
                 </form>
             </div>
+            <% } %><!-- end if _peutPublier (formulaire complet) -->
         </div>
+        <% } %><!-- end if _maxPubParJour != 0 (composer card) -->
 
         <!-- ===== PUBLICATIONS ===== -->
         <%

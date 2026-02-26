@@ -16,7 +16,7 @@ INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, 
 VALUES (100, 'ETU000001', 'paop', 'Rakoto Jean', 'DIR42', 'etu', 'ETU000001', 1);
 
 INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, id, estactif)
-VALUES (101, 'ETU000002', 'paop', 'Rasoa Marie', 'DIR42', 'etu', 'ETU000002', 1);
+VALUES (101, 'ETU000002', 'paop', 'Rasoa Marie', 'DIR42', 'alu', 'ETU000002', 1);
 
 INSERT INTO utilisateur (refuser, loginuser, pwduser, nomuser, adruser, idrole, id, estactif)
 VALUES (102, 'ETU000003', 'paop', 'Rasolobe Andry', 'DIR42', 'md', 'ETU000003', 1);
