@@ -23,6 +23,9 @@ ON CONFLICT (idrole) DO UPDATE SET maxpublicationparjour = EXCLUDED.maxpublicati
 INSERT INTO limiterole (idrole, maxpublicationparjour) VALUES ('alu', 3)
 ON CONFLICT (idrole) DO UPDATE SET maxpublicationparjour = EXCLUDED.maxpublicationparjour;
 
+INSERT INTO limiterole (idrole, maxpublicationparjour) VALUES ('md', 100)
+ON CONFLICT (idrole) DO UPDATE SET maxpublicationparjour = EXCLUDED.maxpublicationparjour;
+
 -- Les roles NON presents dans limiterole (ex: md, admin, dg) n'ont PAS de limite
 
 -- ╔═══════════════════════════════════════════════════════════════════════════════╗

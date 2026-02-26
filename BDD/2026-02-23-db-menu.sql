@@ -291,3 +291,20 @@ VALUES (
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000049', 'MENDYN000027', '*', 0, 'md'),
        ('USRM000050', 'MENDYN000026', '*', 0, 'md');
+
+-- Sous-menu Limites de publication sous Administration (niveau 1)
+INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
+VALUES (
+           'MENDYN000028',
+           'Limites publications',
+           'bi-speedometer2',
+           'module.jsp?but=limiterole/limiterole-list.jsp',
+           3,
+           1,
+           'MENDYN000999'
+       );
+
+-- Droits role md uniquement
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
+VALUES ('USRM000051', 'MENDYN000028', '*', 0, 'md');
+

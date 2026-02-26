@@ -39,6 +39,7 @@
             pagesProtegees.add("evenement/evenement-list.jsp");
             pagesProtegees.add("evenement/evenement-modif.jsp");
             pagesProtegees.add("evenement/evenement-fiche.jsp");
+            pagesProtegees.add("limiterole/");
 
             // Vérifier si la page demandée est protégée
             boolean pageProtegee = false;
@@ -90,6 +91,9 @@
                         } else if (pageDemandee.startsWith("evenement/") || pageDemandee.contains("/evenement/")) {
                             // Seuls les modérateurs/admins peuvent gérer les événements (saisie, list, modif, fiche)
                             accesAutorise = "md".equals(idrole) || "admin".equals(idrole) || "dg".equals(idrole);
+                        } else if (pageDemandee.startsWith("limiterole/") || pageDemandee.contains("/limiterole/")) {
+                            // Seuls les modérateurs peuvent gérer les limites de publication par rôle
+                            accesAutorise = "md".equals(idrole);
                         }
                     }
                 } catch (Exception e) {
