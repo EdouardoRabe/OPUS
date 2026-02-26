@@ -261,7 +261,7 @@ VALUES ('USRM000047', 'MENDYN000020', '*', 0, 'etu');
 
 -- Droits role etu pour la Carte
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
-VALUES ('USRM000147', 'MENDYN000020', '*', 0, 'etu');
+VALUES ('USRM000147', 'MENDYN000020', '*', 0, 'alu');
 
 -- Droits role md pour la Carte
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)

@@ -876,6 +876,8 @@ INSERT INTO poste (idposte, libelle)
 VALUES ('PST000002', 'Chef de Projet Informatique');
 DELETE FROM USERMENU
 WHERE idmenu LIKE 'MENDYN%';
+DELETE FROM USERMENU
+WHERE idmenu LIKE 'MENDYN%';
 DELETE FROM MENUDYNAMIQUE
 WHERE id LIKE 'MENDYN%';
 INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
@@ -960,15 +962,6 @@ VALUES (
            'bi-person-badge-fill',
            'module.jsp?but=profil/voir.jsp',
            1,
-           1,
-           'MENDYN000004'
-       ),
-       (
-           'MENDYN000010',
-           'Modifier le profil',
-           'bi-pencil-square',
-           'module.jsp?but=profil/modifier.jsp',
-           2,
            1,
            'MENDYN000004'
        ),
@@ -1066,14 +1059,26 @@ VALUES ('USRM000001', 'MENDYN000001', '*', 0, 'etu'),
        ('USRM000007', 'MENDYN000007', '*', 0, 'etu'),
        ('USRM000008', 'MENDYN000008', '*', 0, 'etu'),
        ('USRM000009', 'MENDYN000009', '*', 0, 'etu'),
-       ('USRM000010', 'MENDYN000010', '*', 0, 'etu'),
        ('USRM000011', 'MENDYN000011', '*', 0, 'etu'),
        ('USRM000025', 'MENDYN000024', '*', 1, 'etu'),
        ('USRM000027', 'MENDYN000014', '*', 0, 'etu'),
        ('USRM000029', 'MENDYN000015', '*', 0, 'etu'),
-       ('USRM000031', 'MENDYN000016', '*', 0, 'etu'),
-       ('USRM000033', 'MENDYN000017', '*', 0, 'etu'),
        ('USRM000035', 'MENDYN000018', '*', 0, 'etu');
+
+-- Droits role alu
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
+VALUES ('USRM000101', 'MENDYN000001', '*', 0, 'alu'),
+       ('USRM000102', 'MENDYN000002', '*', 0, 'alu'),
+       ('USRM000104', 'MENDYN000004', '*', 0, 'alu'),
+       ('USRM000105', 'MENDYN000005', '*', 0, 'alu'),
+       ('USRM000107', 'MENDYN000007', '*', 0, 'alu'),
+       ('USRM000108', 'MENDYN000008', '*', 0, 'alu'),
+       ('USRM000109', 'MENDYN000009', '*', 0, 'alu'),
+       ('USRM000111', 'MENDYN000011', '*', 0, 'alu'),
+       ('USRM000125', 'MENDYN000024', '*', 1, 'alu'),
+       ('USRM000127', 'MENDYN000014', '*', 0, 'alu'),
+       ('USRM000129', 'MENDYN000015', '*', 0, 'alu'),
+       ('USRM000135', 'MENDYN000018', '*', 0, 'alu');
 -- Droits role md
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000012', 'MENDYN000001', '*', 0, 'md'),
@@ -1084,7 +1089,6 @@ VALUES ('USRM000012', 'MENDYN000001', '*', 0, 'md'),
        ('USRM000018', 'MENDYN000007', '*', 0, 'md'),
        ('USRM000019', 'MENDYN000008', '*', 0, 'md'),
        ('USRM000020', 'MENDYN000009', '*', 0, 'md'),
-       ('USRM000021', 'MENDYN000010', '*', 0, 'md'),
        ('USRM000022', 'MENDYN000011', '*', 0, 'md'),
        ('USRM000099', 'MENDYN000999', '*', 0, 'md'),
        ('USRM000023', 'MENDYN000023', '*', 0, 'md'),
@@ -1108,6 +1112,11 @@ VALUES (
 -- Droits role etu
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000045', 'MENDYN000019', '*', 0, 'etu');
+
+-- Droits role etu
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
+VALUES ('USRM000145', 'MENDYN000019', '*', 0, 'alu');
+
 -- Droits role md
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000046', 'MENDYN000019', '*', 0, 'md');
@@ -1127,6 +1136,10 @@ VALUES (
 -- Droits role etu pour la Carte
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000047', 'MENDYN000020', '*', 0, 'etu');
+
+-- Droits role etu pour la Carte
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
+VALUES ('USRM000147', 'MENDYN000020', '*', 0, 'alu');
 
 -- Droits role md pour la Carte
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
@@ -1156,6 +1169,24 @@ VALUES (
 INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
 VALUES ('USRM000049', 'MENDYN000027', '*', 0, 'md'),
        ('USRM000050', 'MENDYN000026', '*', 0, 'md');
+
+-- Sous-menu Limites de publication sous Administration (niveau 1)
+INSERT INTO MENUDYNAMIQUE (id, libelle, icone, href, rang, niveau, id_pere)
+VALUES (
+           'MENDYN000028',
+           'Limites publications',
+           'bi-speedometer2',
+           'module.jsp?but=limiterole/limiterole-list.jsp',
+           3,
+           1,
+           'MENDYN000999'
+       );
+
+-- Droits role md uniquement
+INSERT INTO USERMENU (id, idmenu, refuser, interdit, idrole)
+VALUES ('USRM000051', 'MENDYN000028', '*', 0, 'md');
+
+
 -- ╔═══════════════════════════════════════════════════════════════════════════════╗
 -- ║ SECTION 16: MISE A JOUR DES SEQUENCES                                         ║
 -- ╚═══════════════════════════════════════════════════════════════════════════════╝
@@ -1277,3 +1308,17 @@ CREATE FUNCTION get_seq_publicationenregistrement() RETURNS INTEGER LANGUAGE plp
 END $$;
 select *
 from publicationenregistrement;
+
+
+CREATE TABLE IF NOT EXISTS limiterole (
+                                          idrole VARCHAR(20) PRIMARY KEY,
+                                          maxpublicationparjour INTEGER NOT NULL DEFAULT 0
+);
+INSERT INTO limiterole (idrole, maxpublicationparjour) VALUES ('etu', 0)
+ON CONFLICT (idrole) DO UPDATE SET maxpublicationparjour = EXCLUDED.maxpublicationparjour;
+
+INSERT INTO limiterole (idrole, maxpublicationparjour) VALUES ('alu', 3)
+ON CONFLICT (idrole) DO UPDATE SET maxpublicationparjour = EXCLUDED.maxpublicationparjour;
+
+INSERT INTO limiterole (idrole, maxpublicationparjour) VALUES ('md', 100)
+ON CONFLICT (idrole) DO UPDATE SET maxpublicationparjour = EXCLUDED.maxpublicationparjour;
