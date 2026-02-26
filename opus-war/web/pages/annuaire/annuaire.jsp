@@ -11,6 +11,8 @@
 <%@ page import="alumni.ProfilLib" %>
 <%@ page import="alumni.ExperienceLib" %>
 <%@ page import="alumni.Visibilite" %>
+<%@ page import="alumni.ProfilStatut" %>
+<%@ page import="alumni.ProfilTypeStatut" %>
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
@@ -103,6 +105,7 @@
     Map expMap   = new HashMap(); // idprofil -> ExperienceLib
     Map specsMap = new HashMap(); // idprofil -> "Spec1|Spec2"
     Map visMap   = new HashMap(); // idprofil -> { champ -> status }
+    Map statutMap = new HashMap(); // idprofil -> {libelle, couleur}
 
     Connection conn = null;
     try {
@@ -267,6 +270,28 @@
                     specsMap.put(pid, sb.toString());
                 }
             } catch (Exception ignored) {}
+
+            // Statut du profil
+            try {
+                ProfilStatut psFiltre = new ProfilStatut();
+                psFiltre.setIdprofil(pid);
+                Object[] psRes = CGenUtil.rechercher(psFiltre, null, null, conn, " order by daty desc limit 1");
+                if (psRes != null && psRes.length > 0) {
+                    ProfilStatut ps = (ProfilStatut) psRes[0];
+                    if (ps.getIdprofiltypestatut() != null) {
+                        ProfilTypeStatut ptsFiltre = new ProfilTypeStatut();
+                        ptsFiltre.setIdprofiltypestatut(ps.getIdprofiltypestatut());
+                        Object[] ptsRes = CGenUtil.rechercher(ptsFiltre, null, null, conn, "");
+                        if (ptsRes != null && ptsRes.length > 0) {
+                            ProfilTypeStatut pts = (ProfilTypeStatut) ptsRes[0];
+                            Map stMap = new HashMap();
+                            stMap.put("libelle", pts.getLibelle() != null ? pts.getLibelle() : "");
+                            stMap.put("couleur", pts.getCouleur() != null ? pts.getCouleur() : "#0a66c2");
+                            statutMap.put(pid, stMap);
+                        }
+                    }
+                }
+            } catch (Exception ignored) {}
         }
 
     } catch (Exception e) {
@@ -293,12 +318,12 @@
     String _baseUrl = baseUrl.toString();
 
     String[] gradients = {
-        "linear-gradient(135deg,#003366 0%,#0a66c2 60%,#378fe9 100%)",
-        "linear-gradient(135deg,#1a237e 0%,#283593 60%,#5c6bc0 100%)",
-        "linear-gradient(135deg,#004d40 0%,#00695c 60%,#26a69a 100%)",
-        "linear-gradient(135deg,#4a148c 0%,#6a1b9a 60%,#ab47bc 100%)",
-        "linear-gradient(135deg,#880e4f 0%,#ad1457 60%,#ec407a 100%)",
-        "linear-gradient(135deg,#e65100 0%,#ef6c00 60%,#ffa726 100%)"
+        "#1E40AF",
+        "#0F766E",
+        "#059669",
+        "#1E3A5F",
+        "#0E7490",
+        "#334155"
     };
 %>
 
@@ -306,10 +331,10 @@
 /* ═══════════════════════════════════════
    ANNUAIRE v3  /ui-ux-pro-max
    ═══════════════════════════════════════ */
-.an-container{max-width:1140px;margin:0 auto;padding:0 16px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#191919;-webkit-font-smoothing:antialiased}
+.an-container{max-width:1280px;margin:0 auto;padding:0 16px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#191919;-webkit-font-smoothing:antialiased}
 
 /* Hero */
-.an-hero{background:linear-gradient(135deg,#003366 0%,#0a66c2 50%,#378fe9 100%);border-radius:14px;padding:36px 32px 28px;margin-bottom:22px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(10,102,194,.22)}
+.an-hero{background:#1E40AF;border-radius:14px;padding:36px 32px 28px;margin-bottom:22px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(10,102,194,.22)}
 .an-hero::before{content:'';position:absolute;top:-40%;right:-8%;width:360px;height:360px;background:rgba(255,255,255,.06);border-radius:50%;pointer-events:none}
 .an-hero::after{content:'';position:absolute;bottom:-30%;left:-4%;width:240px;height:240px;background:rgba(255,255,255,.04);border-radius:50%;pointer-events:none}
 .an-hero-content{position:relative;z-index:1}
@@ -650,7 +675,21 @@
                 <div class="an-card-header">
                     <div class="an-card-cover" style="background:<%= grad %>;"></div>
                     <span class="an-card-refuser"><%= h(!loginuser.isEmpty() ? loginuser : "REF " + refuser) %></span>
-                    <div class="an-card-avatar"<%= !photoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>>
+            <%
+                // Couleur et libelle de statut pour l'anneau et le titre
+                String _avatarRingColor = "#0a66c2";
+                String _avatarStatutLib = "";
+                Map _stInfoAvatar = (Map) statutMap.get(pid);
+                if (_stInfoAvatar != null) {
+                    if (_stInfoAvatar.get("couleur") != null && !((String)_stInfoAvatar.get("couleur")).isEmpty()) {
+                        _avatarRingColor = (String) _stInfoAvatar.get("couleur");
+                    }
+                    if (_stInfoAvatar.get("libelle") != null) {
+                        _avatarStatutLib = (String) _stInfoAvatar.get("libelle");
+                    }
+                }
+            %>
+                    <div class="an-card-avatar" style="box-shadow:0 0 0 3px <%= _avatarRingColor %>, 0 2px 12px rgba(0,0,0,.18);<%= !photoUrl.isEmpty() ? "background:transparent;" : "" %>" title="<%= h(_avatarStatutLib) %>">
                         <% if (!photoUrl.isEmpty()) { %><img src="<%= h(photoUrl) %>" alt="<%= h(displayName) %>"><% } else { %><%= initials %><% } %>
                     </div>
                 </div>
@@ -659,7 +698,7 @@
                     <div class="an-card-headline"><%= h(headline) %></div>
                     <div class="an-card-meta">
                         <% if (!genreLib.isEmpty()) { %><span class="an-card-tag" style="background:#f3e8ff;color:#7c3aed;"><i class="bi <%= "GEN000001".equals(genreId) ? "bi-gender-male" : "bi-gender-female" %>"></i> <%= h(genreLib) %></span><% } %>
-                        <span class="an-card-tag" style="background:#fff8e1;color:#f57f17;" title="Contribution (publications)"><i class="bi bi-award-fill"></i> <%= contribution %></span>
+                         <span class="an-card-tag" style="background:#fff8e1;color:#f57f17;" title="Contribution (publications)"><i class="bi bi-award-fill"></i> <%= contribution %></span>
                         <% if (!promoLib.isEmpty()) { %><span class="an-card-tag promo"><%= h(promoLib) %><%= promoAn > 0 ? " " + promoAn : "" %></span><% } %>
                         <% if (!parcLib.isEmpty()) { %><span class="an-card-tag"><%= h(parcLib) %></span><% } %>
                         <% for (int s = 0; s < specsArr.length && s < 2; s++) { %><span class="an-card-tag spec"><%= h(specsArr[s]) %></span><% } %>

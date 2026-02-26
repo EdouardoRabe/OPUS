@@ -276,7 +276,7 @@
 .fu-card{background:#fff;border:1px solid #dce0e4;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 
 /* Cover */
-.fu-cover{height:200px;background:linear-gradient(135deg,#003366 0%,#0a66c2 60%,#378fe9 100%);position:relative;overflow:hidden}
+.fu-cover{height:200px;background:#1E40AF;position:relative;overflow:hidden}
 .fu-cover img{width:100%;height:100%;object-fit:cover;display:block}
 .fu-refuser-badge{position:absolute;top:12px;right:16px;background:rgba(0,0,0,.4);color:#fff;padding:4px 14px;border-radius:12px;font-size:11px;font-weight:700;letter-spacing:.5px;backdrop-filter:blur(4px)}
 
@@ -379,6 +379,7 @@
         <div class="fu-top">
             <div class="fu-name" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
                 <%= h(displayName) %>
+                <% if (!_statutLibelle.isEmpty()) { %><span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;background:<%= _statutColor %>18;color: <%= _statutColor %>;border:1px solid <%= _statutColor %>33;border-radius:14px;padding:3px 12px;white-space:nowrap;" title="Statut actuel"><i class="bi bi-circle-fill" style="font-size:6px;"></i>&nbsp;<%= h(_statutLibelle) %></span><% } %>
                 <% if (!genreLib.isEmpty()) { %><span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;background:#f3e8ff;color:#7c3aed;border-radius:14px;padding:3px 12px;white-space:nowrap;"><i class="bi <%= "GEN000001".equals(genreId) ? "bi-gender-male" : "bi-gender-female" %>"></i>&nbsp;<%= h(genreLib) %></span><% } %>
                 <span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;background:#fff8e1;color:#f57f17;border-radius:14px;padding:3px 12px;white-space:nowrap;" title="Contribution (publications)"><i class="bi bi-award-fill"></i>&nbsp;<%= contribution %></span>
             </div>
