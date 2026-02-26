@@ -14,6 +14,7 @@
 <%@ page import="alumni.ProfilLib" %>
 <%@ page import="alumni.Evenement" %>
 <%@ page import="alumni.Identification" %>
+<%@ page import="alumni.Limiterole" %>
 <%@ page import="alumni.Specialite" %>
 <%@ page import="alumni.Promotion" %>
 <%@ page import="alumni.Parcours" %>
@@ -56,10 +57,13 @@
     Parcours[] allParcours = (Parcours[]) CGenUtil.rechercher(new Parcours(), null, null, " order by libelle");
     if (allParcours == null) allParcours = new Parcours[0];
 
-    // Charger photo profil/couverture du connecte + 3 evenements a venir
+    // Charger photo profil/couverture du connecte + 3 evenements a venir + limite pub
     String _connPhotoUrl = "";
     String _connCoverUrl = "";
     Evenement[] _upEvents = new Evenement[0];
+    int _maxPubParJour = -1; // -1 = pas de limite
+    int _pubRestantes = -1;  // -1 = illimite
+    boolean _aUneLimite = false;
     {
         Connection _c = null;
         try {
@@ -73,9 +77,15 @@
             }
             _upEvents = (Evenement[]) CGenUtil.rechercher(new Evenement(), null, null, _c, " and datedebut >= CURRENT_DATE order by datedebut asc");
             if (_upEvents == null) _upEvents = new Evenement[0];
+
+            // --- Limite de publication par role ---
+            _maxPubParJour = Limiterole.getMaxParJour(_c, mapFil.getIdrole());
+            _aUneLimite = (_maxPubParJour >= 0);
+            _pubRestantes = Limiterole.publicationsRestantes(_c, mapFil.getIdrole(), refuserConnecte);
         } catch (Exception _e) { _e.printStackTrace(); }
         finally { if (_c != null) try { _c.close(); } catch (Exception _x) {} }
     }
+    boolean _peutPublier = (_maxPubParJour < 0) || (_pubRestantes > 0);
 %>
 
 <!-- ==================== STYLES FIL D'ACTUALITE ==================== -->
@@ -750,10 +760,11 @@
         <% } %>
 
         <!-- ===== COMPOSER ===== -->
-        <div class="fa-composer-card" id="composer-card">
+        <% if (_maxPubParJour != 0) { %>
+        <div class="fa-composer-card" id="composer-card"<%= (!_peutPublier) ? " style=\"opacity:0.5;pointer-events:none;\"" : "" %>>
             <div class="fa-composer-trigger" id="composer-trigger" onclick="openComposer()">
                 <div class="fa-avatar fa-avatar--sm"<%= !_connPhotoUrl.isEmpty() ? " style=\"background:transparent;\"" : "" %>><% if (!_connPhotoUrl.isEmpty()) { %><img src="<%= _connPhotoUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"><% } else { %><%= initialConnecte %><% } %></div>
-                <div class="fa-composer-placeholder">Quoi de neuf&nbsp;?</div>
+                <div class="fa-composer-placeholder">Quoi de neuf&nbsp;?<% if (_aUneLimite && _maxPubParJour > 0) { %> (<%= _pubRestantes %>/<%= _maxPubParJour %> restante<%= _pubRestantes > 1 ? "s" : "" %>)<% } %></div>
             </div>
             <div class="fa-composer-quick-actions" id="composer-quick-actions">
                 <button class="fa-quick-action-btn" type="button"
@@ -862,6 +873,7 @@
                 </form>
             </div>
         </div>
+        <% } %>
 
         <!-- ===== PUBLICATIONS (composant réutilisable) ===== -->
         <%
