@@ -108,7 +108,8 @@
         String _vsPromoExist2= "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND " + _vsPromoCond2 + ")";
         String _vsParcExist2 = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PARCOURS' AND _pv.idref=" + _vsParc2 + ")";
         String _visW2 =
-            " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication)"
+            " AND (p.idutilisateur=" + refuserConnecte
+            + " OR NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication)"
             + " OR (COALESCE(p.logique_visibilite,'OR')='OR' AND ("
             + _vsSpecExist2 + " OR " + _vsPromoExist2 + " OR " + _vsParcExist2
             + "))"

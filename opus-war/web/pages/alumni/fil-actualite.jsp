@@ -97,7 +97,8 @@
             <!-- Formulaire complet (masqué par défaut) -->
             <div class="fa-composer-full" id="composer-full" style="display:none;">
                 <form method="POST" enctype="multipart/form-data" id="form-pub"
-                      action="<%= ctx %>/pages/alumni/ajax/creer-publication.jsp">
+                      action="<%= ctx %>/pages/alumni/ajax/creer-publication.jsp"
+                      onsubmit="return validatePubFormSize()">
                     <div class="fa-composer-header">
                         <div class="fa-avatar fa-avatar--md"><%= initialConnecte %></div>
                         <div>
@@ -1532,14 +1533,38 @@ function closeComposer() {
     var ta = document.querySelector('#composer-full textarea[name="description"]');
     if (ta) ta.value = '';
 }
+var _MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 Mo
 function previewComposerImg(input) {
     if (!input.files || !input.files[0]) return;
+    var f = input.files[0];
+    if (f.size > _MAX_FILE_SIZE) {
+        var sizeMB = (f.size / (1024 * 1024)).toFixed(1);
+        Swal.fire({icon:'error', title:'Fichier trop volumineux',
+            text:f.name + ' (' + sizeMB + ' Mo) d\u00e9passe la limite de 50 Mo.',
+            confirmButtonColor:'#1877f2'});
+        input.value = '';
+        return;
+    }
     var reader = new FileReader();
     reader.onload = function(e) {
         document.getElementById('composer-img-previewImg').src = e.target.result;
         document.getElementById('composer-img-preview').style.display = 'block';
     };
     reader.readAsDataURL(input.files[0]);
+}
+function validatePubFormSize() {
+    var inp = document.getElementById('composer-img-input');
+    if (inp && inp.files) {
+        for (var i = 0; i < inp.files.length; i++) {
+            if (inp.files[i].size > _MAX_FILE_SIZE) {
+                Swal.fire({icon:'error', title:'Fichier trop volumineux',
+                    text:inp.files[i].name + ' d\u00e9passe la limite de 50 Mo.',
+                    confirmButtonColor:'#1877f2'});
+                return false;
+            }
+        }
+    }
+    return true;
 }
 function removeComposerImg() {
     var inp = document.getElementById('composer-img-input');
