@@ -232,9 +232,7 @@
         font-size: 28px;
         font-weight: 700;
         margin: 0;
-        background: linear-gradient(135deg, var(--dash-primary), var(--dash-secondary));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: var(--dash-primary);
     }
 
     .dash-stats-grid {

@@ -28,14 +28,14 @@
 
     /* Color palette for event cards */
     String[] cardGradients = {
-        "linear-gradient(135deg,#008BFF,#0056b3)",
-        "linear-gradient(135deg,#5B23FF,#4a1cd9)",
-        "linear-gradient(135deg,#ef4444,#dc2626)",
-        "linear-gradient(135deg,#10b981,#059669)",
-        "linear-gradient(135deg,#f59e0b,#d97706)",
-        "linear-gradient(135deg,#8b5cf6,#7c3aed)",
-        "linear-gradient(135deg,#06b6d4,#0891b2)",
-        "linear-gradient(135deg,#ec4899,#db2777)"
+        "#1E40AF",
+        "#0F766E",
+        "#059669",
+        "#1E3A5F",
+        "#0E7490",
+        "#166534",
+        "#334155",
+        "#1D4ED8"
     };
     String[] cardIcons = {
         "fa fa-calendar-check-o",

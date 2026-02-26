@@ -28,7 +28,7 @@
      ═══════════════════════════════════════════════════════════════ -->
 <div class="cal-stats-strip">
     <div class="cal-stat-chip">
-        <div class="cal-stat-icon" style="background:linear-gradient(135deg,#008BFF,#0056b3);">
+        <div class="cal-stat-icon" style="background:#1E40AF;">
             <i class="fa fa-calendar-o"></i>
         </div>
         <div class="cal-stat-text">
@@ -37,7 +37,7 @@
         </div>
     </div>
     <div class="cal-stat-chip">
-        <div class="cal-stat-icon" style="background:linear-gradient(135deg,#10b981,#059669);">
+        <div class="cal-stat-icon" style="background:#059669;">
             <i class="fa fa-arrow-up"></i>
         </div>
         <div class="cal-stat-text">
@@ -46,7 +46,7 @@
         </div>
     </div>
     <div class="cal-stat-chip">
-        <div class="cal-stat-icon" style="background:linear-gradient(135deg,#6b7280,#4b5563);">
+        <div class="cal-stat-icon" style="background:#64748B;">
             <i class="fa fa-history"></i>
         </div>
         <div class="cal-stat-text">
@@ -95,7 +95,7 @@
 
             <div class="evt-modal-dates">
                 <div class="evt-modal-date-item">
-                    <div class="evt-modal-date-icon" style="background:rgba(0,139,255,0.1);color:#008BFF;">
+                    <div class="evt-modal-date-icon" style="background:rgba(30,64,175,0.08);color:#1E40AF;">
                         <i class="fa fa-play"></i>
                     </div>
                     <div>
@@ -104,7 +104,7 @@
                     </div>
                 </div>
                 <div class="evt-modal-date-item">
-                    <div class="evt-modal-date-icon" style="background:rgba(239,68,68,0.1);color:#ef4444;">
+                    <div class="evt-modal-date-icon" style="background:rgba(220,38,38,0.08);color:#DC2626;">
                         <i class="fa fa-stop"></i>
                     </div>
                     <div>
@@ -113,7 +113,7 @@
                     </div>
                 </div>
                 <div class="evt-modal-date-item">
-                    <div class="evt-modal-date-icon" style="background:rgba(16,185,129,0.1);color:#10b981;">
+                    <div class="evt-modal-date-icon" style="background:rgba(16,185,129,0.08);color:#059669;">
                         <i class="fa fa-clock-o"></i>
                     </div>
                     <div>
@@ -169,20 +169,20 @@
 }
 .cal-stat-text { display: flex; flex-direction: column; }
 .cal-stat-val { font-size: 1.25rem; font-weight: 800; color: var(--itu-dark); line-height: 1.2; }
-.cal-stat-label { font-size: 0.72rem; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; }
+.cal-stat-label { font-size: 0.72rem; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
 
 /* ── LAYOUT ── */
 .cal-layout {
     display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 1.25rem;
+    grid-template-columns: 1fr 380px;
+    gap: 1.5rem;
     align-items: start;
 }
 @media (max-width: 960px) {
     .cal-layout { grid-template-columns: 1fr; }
 }
 .cal-main-card {
-    padding: 1.5rem !important;
+    padding: 2rem !important;
     overflow: hidden;
 }
 
@@ -218,8 +218,8 @@
     border-left: 3px solid transparent;
 }
 .cal-upcoming-item:hover {
-    background: #f5f8ff;
-    border-left-color: var(--itu-blue);
+    background: #EFF6FF;
+    border-left-color: #1E40AF;
 }
 .cal-upcoming-dot {
     width: 10px; height: 10px;
@@ -273,14 +273,14 @@
     outline: none !important;
 }
 #fullCalendar .fc-button:hover {
-    background: #f0f4ff !important;
-    border-color: var(--itu-blue) !important;
-    color: var(--itu-blue) !important;
+    background: #EFF6FF !important;
+    border-color: #3B82F6 !important;
+    color: #1E40AF !important;
 }
 #fullCalendar .fc-button.fc-state-active,
 #fullCalendar .fc-state-active {
-    background: var(--itu-blue) !important;
-    border-color: var(--itu-blue) !important;
+    background: #1E40AF !important;
+    border-color: #1E40AF !important;
     color: #fff !important;
 }
 #fullCalendar .fc-button-group .fc-button {
@@ -312,7 +312,7 @@
     border-color: var(--gray-100) !important;
 }
 #fullCalendar .fc-today {
-    background: rgba(0,139,255,0.04) !important;
+    background: rgba(30,64,175,0.04) !important;
 }
 #fullCalendar .fc-day-number {
     font-size: 0.85rem;
@@ -321,7 +321,7 @@
     padding: 6px 8px !important;
 }
 #fullCalendar .fc-today .fc-day-number {
-    background: var(--itu-blue);
+    background: #1E40AF;
     color: #fff;
     border-radius: 50%;
     width: 28px;
@@ -346,7 +346,7 @@
     transition: transform .12s, box-shadow .12s !important;
     margin-bottom: 2px !important;
     line-height: 1.5 !important;
-    background: linear-gradient(135deg, #008BFF 0%, #0056b3 100%) !important;
+    background: #1E40AF !important;
     color: #fff !important;
 }
 #fullCalendar .fc-event-inner {
@@ -354,11 +354,11 @@
     color: #fff !important;
 }
 #fullCalendar .fc-event.fc-bg {
-    background: rgba(0, 139, 255, 0.08) !important;
+    background: rgba(30,64,175,0.06) !important;
 }
 #fullCalendar .fc-event:hover {
     transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(0, 139, 255, 0.3);
+    box-shadow: 0 3px 12px rgba(30,64,175,0.25);
 }
 #fullCalendar .fc-day-grid-event .fc-content {
     white-space: nowrap;
@@ -408,7 +408,7 @@
 }
 .evt-modal-banner {
     height: 90px;
-    background: linear-gradient(135deg, #0057b7 0%, #009fd9 60%, #00c6a7 100%);
+    background: #1E40AF;
     position: relative;
     display: flex;
     align-items: center;
@@ -523,7 +523,7 @@
             var html = '';
             upcoming.forEach(function(evt) {
                 html += '<div class="cal-upcoming-item" data-id="' + evt.id + '">'
-                      + '<div class="cal-upcoming-dot" style="background:#008BFF;"></div>'
+                      + '<div class="cal-upcoming-dot" style="background:#3B82F6;"></div>'
                       + '<div class="cal-upcoming-info">'
                       + '<div class="cal-upcoming-title">' + evt.title + '</div>'
                       + '<div class="cal-upcoming-date"><i class="fa fa-calendar-o" style="margin-right:4px;"></i>' + fmtDate(evt.start)
@@ -641,7 +641,7 @@
         }
 
         if (evt.color) {
-            $('#evtModalBanner').css('background', 'linear-gradient(135deg, #008BFF 0%, #0056b3 100%)');
+            $('#evtModalBanner').css('background', '#1E40AF');
         }
         $modal.fadeIn(200);
     }
