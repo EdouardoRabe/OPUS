@@ -49,6 +49,13 @@
     savedPromo = (String) session.getAttribute("reg_idpromotion");
     if(savedPromo != null) session.removeAttribute("reg_idpromotion");
 
+    // Restaurer le type de role (etu ou alu)
+    String selectedTyperole = request.getParameter("typerole");
+    if(selectedTyperole == null || selectedTyperole.isEmpty()){
+        selectedTyperole = (String) session.getAttribute("reg_typerole");
+        if(selectedTyperole != null) session.removeAttribute("reg_typerole");
+    }
+
     alumni.Promotion[] promoList = new alumni.Promotion[0];
     if(selectedParcours != null && !selectedParcours.isEmpty()){
         alumni.Promotion promoCrit = new alumni.Promotion();
@@ -120,6 +127,18 @@
             <form id="detailsForm" action="testRegister.jsp" method="post">
               <input type="hidden" name="etu" value="<%= etu %>" />
               <input type="hidden" name="password" value="<%= password %>" />
+
+              <!-- Type de compte (Étudiant ou Alumni) -->
+              <div class="form-group">
+                <label class="field-label">Type de compte <span style="color:red">*</span></label>
+                <div class="input-icon-wrap">
+                  <span class="glyphicon glyphicon-briefcase input-icon"></span>
+                  <select name="typerole" class="form-control-custom with-icon" required>
+                    <option value="etu" <%= (selectedTyperole == null || "etu".equals(selectedTyperole)) ? "selected" : "" %>>Étudiant</option>
+                    <option value="alu" <%= "alu".equals(selectedTyperole) ? "selected" : "" %>>Alumni</option>
+                  </select>
+                </div>
+              </div>
 
               <!-- Parcours + Promotion sur une ligne -->
               <div class="row">
