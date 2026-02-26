@@ -12,6 +12,7 @@ public class Limiterole extends ClassMAPTable {
     private String idrole;
     private int maxpublicationparjour;
     private Date daty;
+    private String heure;
 
     public Limiterole() {
         setNomTable("limiterole");
@@ -67,6 +68,14 @@ public class Limiterole extends ClassMAPTable {
         this.daty = daty;
     }
 
+    public String getHeure() {
+        return heure;
+    }
+
+    public void setHeure(String heure) {
+        this.heure = heure;
+    }
+
     // --- Methodes utilitaires (APJ) ---
 
     /**
@@ -74,8 +83,9 @@ public class Limiterole extends ClassMAPTable {
      * @return -1 si le role n'a pas de limite (absent de la table), 0 si interdit, >0 si limite
      */
     public static int getMaxParJour(Connection conn, String idrole) throws Exception {
-        LimiteroleActuel[] results = (LimiteroleActuel[]) CGenUtil.rechercher(
-            new LimiteroleActuel(), null, null, conn, " and idrole = '" + idrole + "'");
+        Limiterole[] results = (Limiterole[]) CGenUtil.rechercher(
+            new Limiterole(), null, null, conn,
+            " and idrole = '" + idrole + "' order by daty desc, heure desc");
         if (results != null && results.length > 0) {
             return results[0].getMaxpublicationparjour();
         }

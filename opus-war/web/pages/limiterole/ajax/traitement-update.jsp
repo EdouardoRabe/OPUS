@@ -44,19 +44,13 @@
         conn = new UtilDB().GetConn();
         conn.setAutoCommit(false);
 
-        Limiterole[] arr = (Limiterole[]) CGenUtil.rechercher(
-            new Limiterole(), null, null, conn,
-            " and idrole='" + idrole.trim().replace("'","''") + "'"
-        );
-        if (arr == null || arr.length == 0) {
-            out.print("{\"success\":false,\"error\":\"Limite role introuvable\"}");
-            return;
-        }
-
-        Limiterole lr = arr[0];
+        Limiterole lr = new Limiterole();
+        lr.construirePK(conn);
+        lr.setIdrole(idrole.trim());
         lr.setMaxpublicationparjour(maxpub);
-        lr.setMode("modif");
-        lr.updateToTableWithHisto(userId, conn);
+        lr.setDaty(new java.sql.Date(System.currentTimeMillis()));
+        lr.setHeure(new java.text.SimpleDateFormat("HH:mm:ss").format(new java.util.Date()));
+        lr.insertToTableWithHisto(userId, conn);
         conn.commit();
 
         out.print("{\"success\":true,\"id\":\"" + idrole.trim() + "\"}");

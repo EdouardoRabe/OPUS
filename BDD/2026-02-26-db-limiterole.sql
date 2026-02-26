@@ -14,12 +14,14 @@
 -- ║ TABLE: limiterole                                                             ║
 -- ╚═══════════════════════════════════════════════════════════════════════════════╝
 DROP TABLE IF EXISTS limiterole;
+drop view if exists limiteroleactuel;
 
 CREATE TABLE limiterole (
     idlimiterole VARCHAR(20) PRIMARY KEY,
     idrole VARCHAR(20) NOT NULL,
     maxpublicationparjour INTEGER NOT NULL DEFAULT 0,
-    daty DATE NOT NULL DEFAULT CURRENT_DATE
+    daty DATE NOT NULL DEFAULT CURRENT_DATE,
+    heure VARCHAR(20) NOT NULL DEFAULT TO_CHAR(CURRENT_TIMESTAMP, 'HH24:MI:SS')
 );
 
 -- Sequence pour generer les PK
@@ -30,21 +32,15 @@ CREATE OR REPLACE FUNCTION get_seq_limiterole() RETURNS VARCHAR AS $$
 $$ LANGUAGE SQL;
 
 -- Donnees initiales
-INSERT INTO limiterole (idlimiterole, idrole, maxpublicationparjour, daty) VALUES ('LMR001', 'etu', 0, CURRENT_DATE);
-INSERT INTO limiterole (idlimiterole, idrole, maxpublicationparjour, daty) VALUES ('LMR002', 'alu', 3, CURRENT_DATE);
-INSERT INTO limiterole (idlimiterole, idrole, maxpublicationparjour, daty) VALUES ('LMR003', 'md', 100, CURRENT_DATE);
+INSERT INTO limiterole (idlimiterole, idrole, maxpublicationparjour, daty, heure) VALUES ('LMR001', 'etu', 0, CURRENT_DATE, TO_CHAR(CURRENT_TIMESTAMP, 'HH24:MI:SS'));
+INSERT INTO limiterole (idlimiterole, idrole, maxpublicationparjour, daty, heure) VALUES ('LMR002', 'alu', 3, CURRENT_DATE, TO_CHAR(CURRENT_TIMESTAMP, 'HH24:MI:SS'));
+INSERT INTO limiterole (idlimiterole, idrole, maxpublicationparjour, daty, heure) VALUES ('LMR003', 'md', 100, CURRENT_DATE, TO_CHAR(CURRENT_TIMESTAMP, 'HH24:MI:SS'));
 SELECT SETVAL('seq_limiterole', 3);
 
--- Vue pour obtenir la limite la plus recente par role
-CREATE OR REPLACE VIEW v_limiterole_actuel AS
-SELECT DISTINCT ON (idrole) idrole, maxpublicationparjour, daty
-FROM limiterole
-ORDER BY idrole, daty DESC;
+
+select*from limiterole;
 
 -- ╔═══════════════════════════════════════════════════════════════════════════════╗
 -- ║ MISE A JOUR UTILISATEURS : passer certains en role 'alu'                      ║
--- ╚═══════════════════════════════════════════════════════════════════════════════╝
--- ETU000002 (refuser=101) : obligatoire pour les tests
-UPDATE utilisateur SET idrole = 'alu' WHERE id = 'ETU000002';
-UPDATE utilisateur SET idrole = 'alu' WHERE id = 'ETU000014';
+-- ╚═════
 UPDATE utilisateur SET idrole = 'alu' WHERE id = 'ETU000015';
