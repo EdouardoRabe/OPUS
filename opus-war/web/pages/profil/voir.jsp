@@ -107,6 +107,18 @@
     String _idgenre     = profil != null && profil.getIdgenre()        != null ? profil.getIdgenre()        : "";
     int _contribution   = profil != null ? profil.getContribution() : 0;
     
+    // CV vars
+    String _cv    = profil != null && profil.getCv() != null ? profil.getCv() : "";
+    String _cvUrl = _cv.isEmpty() ? "" : request.getContextPath() + "/" + _cv;
+    String _cvFileName = "";
+    if (!_cv.isEmpty()) {
+        int lastSlash = _cv.lastIndexOf("/");
+        _cvFileName = lastSlash >= 0 ? _cv.substring(lastSlash + 1) : _cv;
+        // Enlever le timestamp prefix (ex: 1740566400000_mon_cv.pdf -> mon_cv.pdf)
+        int underscoreIdx = _cvFileName.indexOf("_");
+        if (underscoreIdx > 0 && underscoreIdx < 15) _cvFileName = _cvFileName.substring(underscoreIdx + 1);
+    }
+    
     // Emplacement vars
     String _empId = emplacement != null ? emplacement.getId() : "";
     double _empLng = emplacement != null ? emplacement.getLongitude() : 0;
@@ -327,54 +339,43 @@
 .ppub-load-more-wrap { text-align:center; margin:8px 0 16px; }
 .ppub-load-more-btn { background:transparent; border:1.5px solid #0a66c2; color:#0a66c2; border-radius:20px; padding:7px 22px; font-size:13px; font-weight:700; cursor:pointer; }
 .ppub-load-more-btn:hover { background:#0a66c2; color:#fff; }
-/* Social Media */
+/* Social Media — tag style (same as fiche-utilisateur) */
 .pv-social-grid {
-  display: flex; flex-wrap: wrap; gap: 12px;
+  display: flex; flex-wrap: wrap; gap: 10px;
 }
 .pv-social-item {
-  display: inline-flex; align-items: center; gap: 10px;
-  background: #f8f9fa; border: 1px solid #e9ecef;
-  border-radius: 12px; padding: 10px 14px;
-  font-size: 13px; font-weight: 500;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #f0f0f0; border: 1px solid #e0e0e0;
+  border-radius: 14px; padding: 7px 16px;
+  font-size: 13px; font-weight: 600; color: #555;
   transition: all .2s ease;
   text-decoration: none;
-  color: #191919;
   position: relative;
 }
 .pv-social-item:hover {
-  border-color: #0a66c2; background: #f0f6ff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,.08);
-  text-decoration: none; color: #191919;
+  background: #e8e8e8; border-color: #ccc;
+  text-decoration: none; color: #333;
 }
 .pv-social-icon {
-  width: 32px; height: 32px;
-  border-radius: 8px; display: flex;
-  align-items: center; justify-content: center;
-  font-size: 16px; color: #fff;
+  font-size: 18px !important;
+  display: inline-block;
+  width: 20px;
+  text-align: center;
   flex-shrink: 0;
 }
-.pv-social-info { display: flex; flex-direction: column; min-width: 0; }
-.pv-social-name { font-weight: 700; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: .3px; }
-.pv-social-val { font-size: 13px; color: #191919; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+.pv-social-info { display: inline; min-width: 0; }
+.pv-social-name { display: none; }
+.pv-social-val { font-size: 13px; color: inherit; }
 .pv-social-del {
-  position: absolute; top: -6px; right: -6px;
-  width: 20px; height: 20px;
-  background: #fff; border: 1px solid #ddd;
+  margin-left: 4px;
+  width: 18px; height: 18px;
+  background: transparent; border: none;
   border-radius: 50%; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; color: #999; line-height: 1;
-  transition: all .15s; opacity: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 14px; color: #bbb; line-height: 1;
+  transition: all .15s;
 }
-.pv-social-item:hover .pv-social-del { opacity: 1; }
-.pv-social-del:hover { background: #ffebee; border-color: #ef5350; color: #c62828; }
-/* ── Fix icône réseau social ── */
-.pv-social-icon i {
-  font-size: 18px !important;
-  line-height: 1;
-  display: block;
-  text-align: center;
-}
+.pv-social-del:hover { color: #c62828; }
 /* ════════════════════════════════
    LAYOUT 2 COLONNES
    ════════════════════════════════ */
@@ -454,32 +455,22 @@
   border-left: 4px solid var(--itu-blue,#008BFF);
 }
 .pv-info-icon { color: var(--itu-blue,#008BFF); margin-right: 6px; }
-/* Social media bigger */
-.pv-social-item { padding: 10px 14px 10px 12px; }
-.pv-social-icon { 
-  width: 38px; height: 38px; 
-  border-radius: 10px; 
-  font-size: 20px; 
-  flex-shrink: 0; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center;
-}
+/* Social icon — colored inline (same as fiche-utilisateur) */
 .pv-social-icon i,
 .pv-social-icon .fa,
 .pv-social-icon .fab,
 .pv-social-icon .fas { 
   display: inline-block !important; 
-  font-size: 20px !important;
+  font-size: 18px !important;
   line-height: 1; 
-  color: #fff !important;
   text-align: center;
 }
 </style>
 <!-- ensure brand/free icons render with FA6 even if FA4 also loaded -->
 <style>
-.fab { font-family: "Font Awesome 6 Brands" !important; }
-.fas, .fa { font-family: "Font Awesome 6 Free" !important; font-weight: 900 !important; }
+.fab, .fa-brands { font-family: "Font Awesome 6 Brands" !important; font-weight: 400 !important; }
+.fas, .fa-solid, .fa { font-family: "Font Awesome 6 Free" !important; font-weight: 900 !important; }
+.far, .fa-regular { font-family: "Font Awesome 6 Free" !important; font-weight: 400 !important; }
 </style>
 <link rel="stylesheet" href="<%= request.getContextPath() %>/pages/elements/libs/leaflet.css">
 <style>
@@ -487,6 +478,58 @@
   .pvl-loc-box { margin-top: 15px; padding: 12px; background: #f0f7ff; border-radius: 10px; border-left: 4px solid #008BFF; }
   .pvl-loc-title { font-size: 11px; font-weight: 700; color: #008BFF; text-transform: uppercase; margin-bottom: 4px; }
   .pvl-loc-val { font-size: 13px; color: #333; display: flex; align-items: center; gap: 5px; }
+
+/* ── CV Card ── */
+.pv-cv-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: #f8fafd;
+  border: 1px solid #e3e9f0;
+  border-radius: 10px;
+  transition: box-shadow .15s;
+}
+.pv-cv-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+.pv-cv-icon {
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, #e53935, #c62828);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.pv-cv-icon i { font-size: 22px; color: #fff; }
+.pv-cv-info { flex: 1; min-width: 0; }
+.pv-cv-name {
+  display: block;
+  font-weight: 700; font-size: 14px; color: #191919;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 280px;
+}
+.pv-cv-size { font-size: 12px; color: #888; margin-top: 2px; display: block; }
+.pv-cv-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.pv-cv-btn {
+  width: 34px; height: 34px;
+  border-radius: 50%; border: 1px solid #dce0e4;
+  background: #fff; color: #555;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 14px;
+  transition: all .15s; text-decoration: none;
+}
+.pv-cv-btn:hover { background: #eef3fb; color: #0a66c2; border-color: #0a66c2; }
+.pv-cv-btn--del:hover { background: #ffebee; color: #c62828; border-color: #ef5350; }
+
+/* ── CV Dropzone ── */
+.pv-cv-dropzone {
+  border: 2px dashed #c5d0dc;
+  border-radius: 12px;
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center;
+  transition: border-color .2s, background .2s;
+}
+.pv-cv-dropzone:hover { border-color: #0a66c2; background: #f0f7ff; }
 </style>
 <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/publication-cards.css">
 
@@ -702,6 +745,49 @@
     </div>
   </div>
 
+  <!-- ── CV / Curriculum Vitae ── -->
+  <div class="pv-section">
+    <div class="pv-section-header">
+      <h2><i class="bi bi-file-earmark-person-fill"></i> Curriculum Vitae</h2>
+      <button class="pv-btn-add" onclick="pvOpenModal('modalCV')"><i class="bi bi-cloud-arrow-up-fill"></i> <%= _cv.isEmpty() ? "Ajouter" : "Modifier" %></button>
+    </div>
+    <div id="pvCvContent" style="padding:4px 0;">
+      <% if (_cv.isEmpty()) { %>
+        <div id="pvCvEmpty" style="text-align:center;padding:24px 16px;">
+          <i class="bi bi-file-earmark-arrow-up" style="font-size:40px;color:#ccc;display:block;margin-bottom:10px;"></i>
+          <p style="font-size:14px;color:#888;margin:0 0 12px;">Aucun CV importé</p>
+          <button class="pv-btn-add" onclick="pvOpenModal('modalCV')" style="gap:6px;">
+            <i class="bi bi-plus-lg"></i> Importer mon CV
+          </button>
+        </div>
+      <% } else { %>
+        <div id="pvCvCard" class="pv-cv-card">
+          <div class="pv-cv-icon">
+            <i class="bi bi-file-earmark-pdf-fill"></i>
+          </div>
+          <div class="pv-cv-info">
+            <span class="pv-cv-name"><%= _cvFileName %></span>
+            <span class="pv-cv-size">Document importé</span>
+          </div>
+          <div class="pv-cv-actions">
+            <a href="<%= _cvUrl %>" target="_blank" class="pv-cv-btn" title="Visualiser">
+              <i class="bi bi-eye-fill"></i>
+            </a>
+            <a href="<%= _cvUrl %>" download class="pv-cv-btn" title="Télécharger">
+              <i class="bi bi-download"></i>
+            </a>
+            <button class="pv-cv-btn pv-cv-btn--edit" onclick="pvOpenModal('modalCV')" title="Remplacer">
+              <i class="bi bi-arrow-repeat"></i>
+            </button>
+            <button class="pv-cv-btn pv-cv-btn--del" onclick="pvDeleteCv()" title="Supprimer">
+              <i class="bi bi-trash-fill"></i>
+            </button>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
   <!-- ── Sécurité ── -->
   <div class="pv-section">
     <div class="pv-section-header">
@@ -749,13 +835,8 @@
         <a class="pv-social-item" id="social-<%= smIdStr %>"
            href="<%= smUrl %>" target="_blank" rel="noopener noreferrer"
            title="<%= smLibelle %>: <%= smValeur %>">
-          <div class="pv-social-icon" style="background:<%= smCouleur %>">
-            <i class="<%= smIcone %>"></i>
-          </div>
-          <div class="pv-social-info">
-            <span class="pv-social-name"><%= smLibelle %></span>
-            <span class="pv-social-val"><%= smValeur %></span>
-          </div>
+          <i class="<%= smIcone %> pv-social-icon" style="color:<%= smCouleur %>;font-size:18px;"></i>
+          <span><%= smLibelle %>: <%= smValeur %></span>
           <button class="pv-social-del" type="button" title="Supprimer"
                   onclick="event.preventDefault();event.stopPropagation();pvDeleteSocial('<%= smIdStr %>')">×</button>
         </a>
@@ -920,6 +1001,78 @@ var CURRENT_USER_ID = '<%= uEJB.getUser().getRefuser() %>';
   if (fiContrib) fiContrib.textContent = p.contribution;
 
 })();
+
+/* ════════════════════════════════════════
+   CV UPLOAD / DELETE
+   ════════════════════════════════════════ */
+var _cvUrl = "<%= request.getContextPath() %>/pages/profil/ajax/traitement-cv.jsp";
+
+function pvUploadCv() {
+  var fileInput = document.getElementById('cvFileInput');
+  if (!fileInput.files || !fileInput.files[0]) {
+    alert('Veuillez sélectionner un fichier CV.');
+    return;
+  }
+  var file = fileInput.files[0];
+  var ext = file.name.split('.').pop().toLowerCase();
+  if (['pdf','doc','docx'].indexOf(ext) === -1) {
+    alert('Format non supporté. Utilisez PDF, DOC ou DOCX.');
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    alert('Le fichier est trop volumineux (max 10 Mo).');
+    return;
+  }
+  var fd = new FormData();
+  fd.append('cv', file);
+  var btn = document.getElementById('cvSaveBtn');
+  btn.disabled = true;
+  btn.textContent = 'Envoi...';
+  fetch(_cvUrl, { method: 'POST', body: fd,
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.success) {
+      pvCloseModal('modalCV');
+      location.reload();
+    } else {
+      alert('Erreur : ' + d.error);
+      btn.disabled = false;
+      btn.textContent = 'Enregistrer';
+    }
+  })
+  .catch(function(e) {
+    alert('Erreur réseau : ' + e);
+    btn.disabled = false;
+    btn.textContent = 'Enregistrer';
+  });
+}
+
+function pvDeleteCv() {
+  if (!confirm('Supprimer le CV ?')) return;
+  var data = new URLSearchParams();
+  data.append('action', 'delete');
+  fetch(_cvUrl.replace('traitement-cv.jsp', 'traitement-cv-delete.jsp'), {
+    method: 'POST', body: data,
+    headers: { 'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8', 'X-Requested-With':'XMLHttpRequest' }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.success) location.reload();
+    else alert('Erreur : ' + d.error);
+  })
+  .catch(function(e) { alert('Erreur réseau : ' + e); });
+}
+
+function pvPreviewCvName() {
+  var fileInput = document.getElementById('cvFileInput');
+  var label = document.getElementById('cvFileLabel');
+  if (fileInput.files && fileInput.files[0]) {
+    label.textContent = fileInput.files[0].name;
+    label.style.color = '#0a66c2';
+  }
+}
 
 /* ════════════════════════════════════════
    EXPERIENCE CRUD
@@ -1575,6 +1728,25 @@ function pvSaveLoc() {
     </div>
   </div>
 </div>
+  </div>
+</div>
+
+<!-- Modal : Importer/Modifier CV -->
+<div class="pv-modal-overlay" id="modalCV">
+  <div class="pv-modal">
+    <h3><i class="bi bi-file-earmark-person-fill" style="color:#0a66c2;margin-right:6px;"></i> Importer un CV</h3>
+    <p style="font-size:13px;color:#666;margin-bottom:16px;">Formats acceptés : <strong>PDF</strong>, <strong>DOC</strong>, <strong>DOCX</strong> — Max 10 Mo</p>
+    
+    <div class="pv-cv-dropzone" onclick="document.getElementById('cvFileInput').click()">
+      <i class="bi bi-cloud-arrow-up" style="font-size:36px;color:#0a66c2;"></i>
+      <span id="cvFileLabel" style="font-size:14px;color:#888;margin-top:8px;">Cliquez pour choisir un fichier</span>
+      <input type="file" id="cvFileInput" accept=".pdf,.doc,.docx" style="display:none" onchange="pvPreviewCvName()">
+    </div>
+    
+    <div class="pv-modal-footer">
+      <button type="button" class="pv-btn-cancel" onclick="pvCloseModal('modalCV')">Annuler</button>
+      <button type="button" class="pv-btn-save" id="cvSaveBtn" onclick="pvUploadCv()">Enregistrer</button>
+    </div>
   </div>
 </div>
 

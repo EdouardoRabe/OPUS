@@ -173,6 +173,8 @@
         if (desc != null) {
             descSafe = desc.replace("&", "&amp;").replace("<", "&lt;")
                     .replace(">", "&gt;").replace("\n", "<br>");
+            // Rendre les liens cliquables
+            descSafe = descSafe.replaceAll("(https?://[^\\s<]+)", "<a href=\"$1\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color:#0a66c2;font-weight:500;\" onclick=\"event.stopPropagation();\">$1</a>");
         }
 
         // ---- Publication partagee : charger la pub originale ----
@@ -191,6 +193,7 @@
                 Publication orig = origPubs[0];
                 String od = orig.getDescritpion();
                 origDesc = od != null ? od.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;").replace("\n","<br>") : "";
+                origDesc = origDesc.replaceAll("(https?://[^\\s<]+)", "<a href=\"$1\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color:#0a66c2;font-weight:500;\" onclick=\"event.stopPropagation();\">$1</a>");
                 origDate = (orig.getDaty() != null ? orig.getDaty().toString() : "") + " \u00e0 " + (orig.getHeure() != null ? orig.getHeure() : "");
                 String origTypePubId2 = orig.getIdtypepublication() != null ? orig.getIdtypepublication() : "";
                 origTypePubLib2 = origTypePubId2;

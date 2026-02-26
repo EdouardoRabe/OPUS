@@ -16,7 +16,6 @@ public class ProfilLib extends Profil {
     private String loginuser;
     private String genrelib;
     private String idprofil;
-    private String cv;
 
     public ProfilLib() {
         setNomTable("profillib");
@@ -145,12 +144,4 @@ public class ProfilLib extends Profil {
         this.idprofil = idprofil;
     }
 
-    /* ── cv ── */
-    public String getCv() {
-        return cv;
-    }
-
-    public void setCv(String cv) {
-        this.cv = cv;
-    }
 }
