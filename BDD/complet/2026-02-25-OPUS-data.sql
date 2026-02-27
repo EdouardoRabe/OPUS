@@ -963,3 +963,76 @@ INSERT INTO historiqueactif (id, idutilisateur, estactif, daty, description) VAL
 (CAST(getseqhistoriqueactif() AS VARCHAR), '247', 100, CURRENT_DATE, 'Activation initiale'),
 (CAST(getseqhistoriqueactif() AS VARCHAR), '248', 100, CURRENT_DATE, 'Activation initiale'),
 (CAST(getseqhistoriqueactif() AS VARCHAR), '249', 100, CURRENT_DATE, 'Activation initiale');
+
+-- ============================================================
+-- LOCALISATION DES PROFILS (profilemplacement)
+-- Coordonnees variees : Madagascar + Monde entier
+-- ============================================================
+
+-- Cluster A (PRF000011-PRF000020) : Web Dev - Madagascar + France
+INSERT INTO profilemplacement (id, idprofil, longitude, latitude) VALUES
+('PEM000001', 'PRF000011', 47.5255, -18.8792),   -- Antananarivo, Madagascar
+('PEM000002', 'PRF000012', 2.3522, 48.8566),     -- Paris, France
+('PEM000003', 'PRF000013', 47.5180, -18.9100),   -- Ankorondrano, Madagascar
+('PEM000004', 'PRF000014', 4.8357, 45.7640),     -- Lyon, France
+('PEM000005', 'PRF000015', 5.3698, 43.2965),     -- Marseille, France
+('PEM000006', 'PRF000016', 47.5400, -18.8600),   -- Andraharo, Madagascar
+('PEM000007', 'PRF000017', 1.4442, 43.6047),     -- Toulouse, France
+('PEM000008', 'PRF000018', 47.5050, -18.9200),   -- Andoharanofotsy, Madagascar
+('PEM000009', 'PRF000019', 7.2620, 43.7102),     -- Nice, France
+('PEM000010', 'PRF000020', 47.4800, -18.9300);   -- Anosizato, Madagascar
+
+- Cluster B (PRF000021-PRF000030) : Data Science - Canada + USA + Madagascar
+INSERT INTO profilemplacement (id, idprofil, longitude, latitude) VALUES
+('PEM000011', 'PRF000021', -73.5673, 45.5017),   -- Montreal, Canada
+('PEM000012', 'PRF000022', -122.4194, 37.7749),  -- San Francisco, USA
+('PEM000013', 'PRF000023', 49.3958, -18.1443),   -- Toamasina, Madagascar
+('PEM000014', 'PRF000024', -74.0060, 40.7128),   -- New York, USA
+('PEM000015', 'PRF000025', -71.2082, 46.8139),   -- Quebec City, Canada
+('PEM000016', 'PRF000026', 47.0340, -19.8659),   -- Antsirabe, Madagascar
+('PEM000017', 'PRF000027', -79.3832, 43.6532),   -- Toronto, Canada
+('PEM000018', 'PRF000028', -118.2437, 34.0522),  -- Los Angeles, USA
+('PEM000019', 'PRF000029', -123.1216, 49.2827),  -- Vancouver, Canada
+('PEM000020', 'PRF000030', 47.0500, -19.8500);   -- Antsirabe Nord, Madagascar
+
+-- Cluster C (PRF000031-PRF000040) : Cybersecurite - Europe + Madagascar
+INSERT INTO profilemplacement (id, idprofil, longitude, latitude) VALUES
+('PEM000021', 'PRF000031', 4.3517, 50.8503),     -- Bruxelles, Belgique
+('PEM000022', 'PRF000032', 6.1432, 46.2044),     -- Geneve, Suisse
+('PEM000023', 'PRF000033', 47.0856, -21.4417),   -- Fianarantsoa, Madagascar
+('PEM000024', 'PRF000034', 8.5417, 47.3769),     -- Zurich, Suisse
+('PEM000025', 'PRF000035', 13.4050, 52.5200),    -- Berlin, Allemagne
+('PEM000026', 'PRF000036', 46.3167, -15.7167),   -- Mahajanga, Madagascar
+('PEM000027', 'PRF000037', -0.1276, 51.5074),    -- Londres, UK
+('PEM000028', 'PRF000038', 12.4964, 41.9028),    -- Rome, Italie
+('PEM000029', 'PRF000039', -3.7038, 40.4168),    -- Madrid, Espagne
+('PEM000030', 'PRF000040', 47.0750, -21.4500);   -- Fianarantsoa Centre, Madagascar
+
+-- Cluster D (PRF000041-PRF000050) : Mobile/IoT - Ocean Indien + Asie + Madagascar
+INSERT INTO profilemplacement (id, idprofil, longitude, latitude) VALUES
+('PEM000031', 'PRF000041', 57.5522, -20.1609),   -- Port-Louis, Maurice
+('PEM000032', 'PRF000042', 55.4550, -21.1151),   -- Saint-Denis, Reunion
+('PEM000033', 'PRF000043', 49.2913, -12.2795),   -- Antsiranana, Madagascar
+('PEM000034', 'PRF000044', 103.8198, 1.3521),    -- Singapour
+('PEM000035', 'PRF000045', 121.4737, 31.2304),   -- Shanghai, Chine
+('PEM000036', 'PRF000046', 43.6667, -23.3500),   -- Toliara, Madagascar
+('PEM000037', 'PRF000047', 139.6917, 35.6895),   -- Tokyo, Japon
+('PEM000038', 'PRF000048', 126.9780, 37.5665),   -- Seoul, Coree du Sud
+('PEM000039', 'PRF000049', 72.8777, 19.0760),    -- Mumbai, Inde
+('PEM000040', 'PRF000050', 55.5364, -4.6796);    -- Victoria, Seychelles
+
+-- Cluster E (PRF000051-PRF000060) : DevOps/Cloud - Mix mondial + Madagascar
+INSERT INTO profilemplacement (id, idprofil, longitude, latitude) VALUES
+('PEM000041', 'PRF000051', 47.5255, -18.8792),   -- Antananarivo, Madagascar
+('PEM000042', 'PRF000052', 151.2093, -33.8688),  -- Sydney, Australie
+('PEM000043', 'PRF000053', 174.7633, -36.8485),  -- Auckland, Nouvelle-Zelande
+('PEM000044', 'PRF000054', 18.4241, -33.9249),   -- Cape Town, Afrique du Sud
+('PEM000045', 'PRF000055', 3.3792, 6.5244),      -- Lagos, Nigeria
+('PEM000046', 'PRF000056', 47.5180, -18.9100),   -- Ankorondrano, Madagascar
+('PEM000047', 'PRF000057', 28.0473, -26.2041),   -- Johannesburg, Afrique du Sud
+('PEM000048', 'PRF000058', -46.6333, -23.5505),  -- Sao Paulo, Bresil
+('PEM000049', 'PRF000059', -58.3816, -34.6037),  -- Buenos Aires, Argentine
+('PEM000050', 'PRF000060', 47.5400, -18.8600);   -- Andraharo, Madagascar
+
+-- Mise a jour de la sequence profilemplacement
+SELECT setval('seq_profilemplacement', 50);
