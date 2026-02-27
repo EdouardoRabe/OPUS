@@ -93,7 +93,7 @@
                     <div class="input-icon-wrap">
                       <span class="glyphicon glyphicon-education input-icon"></span>
                       <input type="text" name="etu" class="form-control-custom with-icon" placeholder="Ex: ETU003356"
-                        required />
+                        value="ETU003356" required />
                     </div>
                   </div>
                   <div class="form-group" style="margin-bottom: 0.75rem;">
@@ -101,7 +101,7 @@
                     <div class="input-icon-wrap">
                       <span class="glyphicon glyphicon-lock input-icon"></span>
                       <input type="password" id="pwd" name="password" class="form-control-custom with-icon"
-                        placeholder="Min. 8 caractères" required style="padding-right:2.8rem;" />
+                        placeholder="Min. 8 caractères" value="password123" required style="padding-right:2.8rem;" />
                       <span onclick="togglePwdEye(this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:#999;font-size:1.1rem;z-index:5;"><i class="fa fa-eye"></i></span>
                     </div>
                     <div class="info-badge"><i class="fa fa-info-circle"></i> Minimum 8 caractères</div>
@@ -111,7 +111,7 @@
                     <div class="input-icon-wrap">
                       <span class="glyphicon glyphicon-lock input-icon"></span>
                       <input type="password" id="pwd-confirm" class="form-control-custom with-icon"
-                        placeholder="Répétez votre mot de passe" required style="padding-right:2.8rem;" />
+                        placeholder="Répétez votre mot de passe" value="password123" required style="padding-right:2.8rem;" />
                       <span onclick="togglePwdEye(this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:#999;font-size:1.1rem;z-index:5;"><i class="fa fa-eye"></i></span>
                     </div>
                     <div id="pwd-feedback"></div>

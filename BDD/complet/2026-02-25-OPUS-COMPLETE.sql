@@ -1,3 +1,4 @@
+-- Active: 1736646695640@@127.0.0.1@5432@opus4
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- SCRIPT COMPLET OPUS ALUMNI
 -- Date: 2026-02-25
@@ -1314,8 +1315,8 @@ CREATE TABLE IF NOT EXISTS limiterole (
                                           idrole VARCHAR(20) PRIMARY KEY,
                                           maxpublicationparjour INTEGER NOT NULL DEFAULT 0
 );
-INSERT INTO limiterole (idrole, maxpublicationparjour) VALUES ('etu', 0)
-ON CONFLICT (idrole) DO UPDATE SET maxpublicationparjour = EXCLUDED.maxpublicationparjour;
+-- INSERT INTO limiterole (idrole, maxpublicationparjour) VALUES ('etu', 0)
+-- ON CONFLICT (idrole) DO UPDATE SET maxpublicationparjour = EXCLUDED.maxpublicationparjour;
 
 INSERT INTO limiterole (idrole, maxpublicationparjour) VALUES ('alu', 3)
 ON CONFLICT (idrole) DO UPDATE SET maxpublicationparjour = EXCLUDED.maxpublicationparjour;

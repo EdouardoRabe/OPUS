@@ -175,14 +175,14 @@
                   <label class="field-label">Prénom <span style="color:red">*</span></label>
                   <div class="input-icon-wrap">
                     <span class="glyphicon glyphicon-user input-icon"></span>
-                    <input type="text" name="prenom" class="form-control-custom with-icon" placeholder="Jean" value="<%= savedPrenom != null ? savedPrenom : "" %>" required />
+                    <input type="text" name="prenom" class="form-control-custom with-icon" placeholder="Jean" value="<%= savedPrenom != null ? savedPrenom : "Jean" %>" required />
                   </div>
                 </div>
                 <div class="col-xs-6 form-group">
                   <label class="field-label">Nom <span style="color:red">*</span></label>
                   <div class="input-icon-wrap">
                     <span class="glyphicon glyphicon-user input-icon"></span>
-                    <input type="text" name="nom" class="form-control-custom with-icon" placeholder="Dupont" value="<%= savedNom != null ? savedNom : "" %>" required />
+                    <input type="text" name="nom" class="form-control-custom with-icon" placeholder="Dupont" value="<%= savedNom != null ? savedNom : "Dupont" %>" required />
                   </div>
                 </div>
               </div>
@@ -192,7 +192,7 @@
                 <label class="field-label">E-mail <span style="color:red">*</span></label>
                 <div class="input-icon-wrap">
                   <span class="glyphicon glyphicon-envelope input-icon"></span>
-                  <input type="email" name="email" class="form-control-custom with-icon" placeholder="jean.dupont@opus.edu" value="<%= savedEmail != null ? savedEmail : "" %>" required />
+                  <input type="email" name="email" class="form-control-custom with-icon" placeholder="jean.dupont@opus.edu" value="<%= savedEmail != null ? savedEmail : "jean.dupont@opus.edu" %>" required />
                 </div>
               </div>
 
@@ -202,7 +202,7 @@
                   <label class="field-label">Date de naissance <span style="color:red">*</span></label>
                   <div class="input-icon-wrap">
                     <span class="glyphicon glyphicon-gift input-icon"></span>
-                    <input type="date" name="dtn" class="form-control-custom with-icon" value="<%= savedDtn != null ? savedDtn : "" %>" required />
+                    <input type="date" name="dtn" class="form-control-custom with-icon" value="<%= savedDtn != null ? savedDtn : "2000-01-15" %>" required />
                   </div>
                 </div>
                 <div class="col-xs-5 form-group">
@@ -224,7 +224,7 @@
                 <label class="field-label">Téléphone <span style="color:red">*</span></label>
                 <div class="input-icon-wrap">
                   <span class="glyphicon glyphicon-phone input-icon"></span>
-                  <input type="tel" name="telephone" class="form-control-custom with-icon" placeholder="06 12 34 56 78" value="<%= savedTel != null ? savedTel : "" %>" required />
+                  <input type="tel" name="telephone" class="form-control-custom with-icon" placeholder="06 12 34 56 78" value="<%= savedTel != null ? savedTel : "034 12 345 67" %>" required />
                 </div>
               </div>
 
