@@ -1,1 +1,0 @@
-INSERT INTO roles (idrole, descrole, rang) VALUES ('alu', 'Alumni', 1);

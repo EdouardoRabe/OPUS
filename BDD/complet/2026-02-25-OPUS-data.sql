@@ -982,7 +982,7 @@ INSERT INTO profilemplacement (id, idprofil, longitude, latitude) VALUES
 ('PEM000009', 'PRF000019', 7.2620, 43.7102),     -- Nice, France
 ('PEM000010', 'PRF000020', 47.4800, -18.9300);   -- Anosizato, Madagascar
 
-- Cluster B (PRF000021-PRF000030) : Data Science - Canada + USA + Madagascar
+-- Cluster B (PRF000021-PRF000030) : Data Science - Canada + USA + Madagascar
 INSERT INTO profilemplacement (id, idprofil, longitude, latitude) VALUES
 ('PEM000011', 'PRF000021', -73.5673, 45.5017),   -- Montreal, Canada
 ('PEM000012', 'PRF000022', -122.4194, 37.7749),  -- San Francisco, USA
@@ -1032,7 +1032,8 @@ INSERT INTO profilemplacement (id, idprofil, longitude, latitude) VALUES
 ('PEM000047', 'PRF000057', 28.0473, -26.2041),   -- Johannesburg, Afrique du Sud
 ('PEM000048', 'PRF000058', -46.6333, -23.5505),  -- Sao Paulo, Bresil
 ('PEM000049', 'PRF000059', -58.3816, -34.6037),  -- Buenos Aires, Argentine
-('PEM000050', 'PRF000060', 47.5400, -18.8600);   -- Andraharo, Madagascar
+('PEM000050', 'PRF000059', 47.5400, -18.8600);   -- Andraharo, Madagascar
 
 -- Mise a jour de la sequence profilemplacement
 SELECT setval('seq_profilemplacement', 50);
+
