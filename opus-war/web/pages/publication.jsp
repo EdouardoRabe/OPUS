@@ -497,7 +497,23 @@
         <!-- Partager (seulement pour les pubs d'autres personnes, pas un partage deja) -->
         <% if (pub.getIdutilisateur() != _pubRefuser && !isSharedPost) { %>
         <%  String _shareAuteurEsc = auteur.replace("'","\\'").replace("\"","\\\"");
-            String _shareTexteEsc  = descSafe.isEmpty() ? "" : descSafe.replace("<br>"," ").replace("'","\\'").replace("\"","\\\""); %>
+            // Utiliser desc (texte brut) au lieu de descSafe (qui contient du HTML <a>)
+            String _shareTexteEsc = "";
+            if (desc != null && !desc.isEmpty()) {
+                _shareTexteEsc = desc
+                    .replace("\\", "\\\\")
+                    .replace("'", "\\'")
+                    .replace("\"", "&quot;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace("\n", " ")
+                    .replace("\r", "");
+                // Limiter la longueur pour eviter les problemes
+                if (_shareTexteEsc.length() > 200) {
+                    _shareTexteEsc = _shareTexteEsc.substring(0, 200) + "...";
+                }
+            }
+        %>
         <button class="fa-action-btn" onclick="openShareModal('<%= idpub %>','<%= _shareAuteurEsc %>','<%= pub.getDaty() %>&nbsp;&agrave;&nbsp;<%= pub.getHeure() != null ? pub.getHeure() : "" %>','<%= _shareTexteEsc %>')">
             <i class="bi bi-share"></i>&nbsp;<span>Partager</span>
         </button>

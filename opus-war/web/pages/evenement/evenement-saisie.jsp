@@ -126,7 +126,7 @@
     document.getElementById('datedebut').min = todayStr;
     document.getElementById('datefin').value = todayStr;
     document.getElementById('datefin').min = todayStr;
-    document.getElementById('description').value = 'Evenement ITU';
+    document.getElementById('description').value = 'GRAND FINAL HACKATON';
     
 
     function showError(msg) {
