@@ -139,7 +139,7 @@ public class CreerPublicationService {
                     ? parcArr[ri].getLibelle().toUpperCase().replaceAll("[^A-Z0-9]", "") : "";
             }
 
-            // ── Inserer les hashtags via APJ (Publicationhashtag) ──
+            // ── Inserer les hashtags (raw SQL : SERIAL PK + ON CONFLICT DO NOTHING) ──
             while (hm.find()) {
                 String tok = hm.group(1).toUpperCase().replaceAll("[^A-Z0-9]", "");
                 if (tok.isEmpty() || htDone.contains(tok)) continue;
@@ -150,7 +150,7 @@ public class CreerPublicationService {
                 // Match specialite
                 for (int xi = 0; xi < sIds.length && !found; xi++) {
                     if (sNorms[xi].equals(tok) || sNorms[xi].startsWith(tok) || tok.startsWith(sNorms[xi])) {
-                        insertHashtagAPJ(conn, userId, pub.getIdpublication(), tag, "SPECIALITE", sIds[xi]);
+                        insertHashtagRaw(conn, pub.getIdpublication(), tag, "SPECIALITE", sIds[xi]);
                         found = true;
                     }
                 }
@@ -158,7 +158,7 @@ public class CreerPublicationService {
                 if (!found) {
                     for (int xi = 0; xi < pIds.length; xi++) {
                         if (pNorms[xi].equals(tok)) {
-                            insertHashtagAPJ(conn, userId, pub.getIdpublication(), tag, "PROMOTION", pIds[xi]);
+                            insertHashtagRaw(conn, pub.getIdpublication(), tag, "PROMOTION", pIds[xi]);
                             found = true; break;
                         }
                     }
@@ -167,7 +167,7 @@ public class CreerPublicationService {
                 if (!found) {
                     for (int xi = 0; xi < rcIds.length; xi++) {
                         if (rcNorms[xi].equals(tok) || rcNorms[xi].startsWith(tok) || tok.startsWith(rcNorms[xi])) {
-                            insertHashtagAPJ(conn, userId, pub.getIdpublication(), tag, "PARCOURS", rcIds[xi]);
+                            insertHashtagRaw(conn, pub.getIdpublication(), tag, "PARCOURS", rcIds[xi]);
                             found = true; break;
                         }
                     }
@@ -290,25 +290,16 @@ public class CreerPublicationService {
     }
 
     /**
-     * Insere un hashtag via le modele APJ Publicationhashtag.
-     * Verifie d'abord si le hashtag existe deja pour cette publication (evite les doublons).
+     * Insere un hashtag via raw SQL (SERIAL PK + ON CONFLICT DO NOTHING).
+     * La table publicationhashtag a une PK SERIAL (integer auto-increment),
+     * incompatible avec construirePK() d'APJ qui genere des VARCHAR.
      */
-    private static void insertHashtagAPJ(Connection conn, String userId,
+    private static void insertHashtagRaw(Connection conn,
             String idpublication, String hashtag, String typetag, String idref) throws Exception {
-
-        // Verifier si ce hashtag existe deja pour cette publication
-        Publicationhashtag[] existing = (Publicationhashtag[]) CGenUtil.rechercher(
-            new Publicationhashtag(), null, null, conn,
-            " and idpublication='" + idpublication + "' and typetag='" + typetag
-            + "' and idref='" + idref + "'");
-        if (existing != null && existing.length > 0) return; // deja insere
-
-        Publicationhashtag ph = new Publicationhashtag();
-        ph.construirePK(conn);
-        ph.setIdpublication(idpublication);
-        ph.setHashtag(hashtag);
-        ph.setTypetag(typetag);
-        ph.setIdref(idref);
-        ph.insertToTableWithHisto(userId, conn);
+        Statement st = conn.createStatement();
+        st.execute("INSERT INTO publicationhashtag(idpublication, hashtag, typetag, idref) "
+            + "VALUES('" + idpublication + "','" + hashtag.replace("'", "''") + "','"
+            + typetag + "','" + idref + "') ON CONFLICT DO NOTHING");
+        st.close();
     }
 }

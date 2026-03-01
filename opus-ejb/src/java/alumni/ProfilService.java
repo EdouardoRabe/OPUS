@@ -2,6 +2,7 @@ package alumni;
 
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.io.File;
@@ -380,10 +381,13 @@ public class ProfilService {
 
             String newPwdCrypt = Utilitaire.cryptWord(newPassword.trim().toLowerCase(), niveau, sens == 0);
 
-            // Mettre a jour le mot de passe via APJ
-            userArr[0].setPwduser(newPwdCrypt);
-            userArr[0].setMode("modif");
-            userArr[0].updateToTable(conn);
+            // Mettre a jour le mot de passe (raw SQL : refuser est INTEGER, APJ met des quotes → erreur de type)
+            PreparedStatement ps = conn.prepareStatement(
+                "UPDATE utilisateur SET pwduser = ? WHERE refuser = ?");
+            ps.setString(1, newPwdCrypt);
+            ps.setInt(2, refuser);
+            ps.executeUpdate();
+            ps.close();
 
             conn.commit();
 
@@ -448,17 +452,21 @@ public class ProfilService {
             conn = new UtilDB().GetConn();
             conn.setAutoCommit(false);
 
-            // Mettre a jour via APJ (UtilisateurPg)
+            // Verifier que l'utilisateur existe
             UtilisateurPg[] userArr = (UtilisateurPg[]) CGenUtil.rechercher(
                 new UtilisateurPg(), null, null, conn,
                 " and refuser=" + refuser);
             if (userArr == null || userArr.length == 0)
                 return "{\"success\":false,\"error\":\"Utilisateur non trouve\"}";
 
-            userArr[0].setNomuser(nomuser);
-            userArr[0].setTeluser(telephone != null ? telephone.trim() : "");
-            userArr[0].setMode("modif");
-            userArr[0].updateToTable(conn);
+            // Mettre a jour (raw SQL : refuser est INTEGER, APJ met des quotes dans WHERE → erreur de type)
+            PreparedStatement ps = conn.prepareStatement(
+                "UPDATE utilisateur SET nomuser = ?, teluser = ? WHERE refuser = ?");
+            ps.setString(1, nomuser);
+            ps.setString(2, telephone != null ? telephone.trim() : "");
+            ps.setInt(3, refuser);
+            ps.executeUpdate();
+            ps.close();
 
             conn.commit();
             return "{\"success\":true}";
