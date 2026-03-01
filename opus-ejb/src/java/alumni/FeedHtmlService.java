@@ -235,7 +235,9 @@ public class FeedHtmlService {
 
         String sql = "SELECT sub.idpublication, sub.score FROM ("
             + "  SELECT p.idpublication,(" + scoreFormula + ") AS score "
-            + "  FROM publication p WHERE p.etat=1" + visW + hashW
+            + "  FROM publication p WHERE p.etat=1"
+            + " AND p.idutilisateur NOT IN (SELECT refuser FROM utilisateur WHERE estactif = 0)"
+            + visW + hashW
             + ") sub WHERE sub.score < " + cursorScore
             + " OR (sub.score = " + cursorScore + " AND sub.idpublication < '" + cursorId + "')"
             + " ORDER BY sub.score DESC, sub.idpublication DESC LIMIT " + PAGE_SIZE;
@@ -484,7 +486,7 @@ public class FeedHtmlService {
         Connection conn = null;
         try {
             conn = new UtilDB().GetConn();
-            Map result = prepareBaseResult(conn, refuser, nomConnecte, ctx, false);
+            Map result = prepareBaseResult(conn, refuser, nomConnecte, ctx, true);
 
             Map userNames  = (Map) result.get("userNames");
             Map userPhotos = (Map) result.get("userPhotos");

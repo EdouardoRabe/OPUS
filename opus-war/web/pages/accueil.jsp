@@ -16,6 +16,7 @@
 <%@ page import="alumni.Identification" %>
 <%@ page import="alumni.Limiterole" %>
 <%@ page import="alumni.Specialite" %>
+<%@ page import="alumni.FeedHtmlService" %>
 <%@ page import="alumni.Promotion" %>
 <%@ page import="alumni.Parcours" %>
 <%@ page import="java.sql.Connection" %>
@@ -877,94 +878,39 @@
 
         <!-- ===== PUBLICATIONS (composant réutilisable) ===== -->
         <%
-            Connection conn = null;
             try {
-                conn = new UtilDB().GetConn();
+                // Appel du service (gere sa propre connexion, pre-charge medias/reactions/etc.)
+                Map data = FeedHtmlService.chargerFeed(refuserConnecte,
+                        nomConnecte != null ? nomConnecte : "", ctx,
+                        Integer.MAX_VALUE, "ZZZZZZZZZZZZZZZZZZZ",
+                        "", "", "", "", "");
 
-                // Charger types de reactions
-                Reactiontype[] reactTypes = (Reactiontype[]) CGenUtil.rechercher(
-                        new Reactiontype(), null, null, conn, " order by idreactiontype");
-                if (reactTypes == null) reactTypes = new Reactiontype[0];
+                Publication[] pubs = (Publication[]) data.get("pubs");
+                String _lastScore = "0";
+                Integer _nextScoreObj = (Integer) data.get("nextScore");
+                if (_nextScoreObj != null) _lastScore = _nextScoreObj.toString();
 
-                // Charger tous les profils pour lookup nom + photo
-                ProfilLib[] allProfils = (ProfilLib[]) CGenUtil.rechercher(
-                        new ProfilLib(), null, null, conn, "");
-                Map userNames = new HashMap();
-                Map userPhotos = new HashMap();
-                Map userProfils = new HashMap();
-                Map userBanned = new HashMap();
-                if (allProfils != null) {
-                    for (int i = 0; i < allProfils.length; i++) {
-                        Integer _key = new Integer(allProfils[i].getIdutilisateur());
-                        userNames.put(_key, allProfils[i].getNom() + " " + allProfils[i].getPrenom());
-                        if (allProfils[i].getPhotoProfil() != null && !allProfils[i].getPhotoProfil().trim().isEmpty())
-                            userPhotos.put(_key, ctx + "/" + allProfils[i].getPhotoProfil().trim());
-                        if (allProfils[i].getIdprofil() != null)
-                            userProfils.put(_key, allProfils[i].getIdprofil());
-                        if (allProfils[i].getEstactif() == 0)
-                            userBanned.put(_key, Boolean.TRUE);
-                    }
-                }
-
-                // --- Score feed : interactions + recence - vues (1 requete JDBC, leger) ---
-                // Score = reactions*2 + commentaires*3 - vues_user*4 + bonus_recence
-                String _sE =
-                    "COALESCE((SELECT COUNT(*) FROM publicationreaction pr WHERE pr.idpublication=p.idpublication),0)*2"
-                    + "+COALESCE((SELECT COUNT(*) FROM publicationcommentaire pc WHERE pc.idpublication=p.idpublication AND pc.etat=1),0)*3"
-                    + "-COALESCE((SELECT pv.nbvue FROM publicationvue pv WHERE pv.idpublication=p.idpublication AND pv.idutilisateur=" + refuserConnecte + "),0)*4"
-                    + "+CASE WHEN p.daty::date=CURRENT_DATE THEN 15 WHEN p.daty::date>=CURRENT_DATE-7 THEN 8 WHEN p.daty::date>=CURRENT_DATE-30 THEN 3 ELSE 0 END";
-                // ---- Visibilite : construire sous-requetes ----
-                String _vsSpecSub = "(SELECT sp.idspecialite FROM specialiteprofil sp JOIN profil _pr ON sp.idprofil=_pr.idprofil WHERE _pr.idutilisateur=" + refuserConnecte + ")";
-                String _vsParcSub = "(SELECT _pr.idparcours FROM profil _pr WHERE _pr.idutilisateur=" + refuserConnecte + " LIMIT 1)";
-                String _vsUserAnnee = "(SELECT _pt.annee FROM promotion _pt JOIN profil _pr ON _pt.idpromotion=_pr.idpromotion WHERE _pr.idutilisateur=" + refuserConnecte + " LIMIT 1)";
-                // Condition promo : direction + ou -
-                String _vsPromoCond = "(_pv.typecible='PROMOTION' AND ((_pv.anneedirection='+' AND " + _vsUserAnnee + ">=_pv.anneeref) OR (_pv.anneedirection='-' AND " + _vsUserAnnee + "<=_pv.anneeref)))";
-                String _vsSpecExist  = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE' AND _pv.idref IN " + _vsSpecSub + ")";
-                String _vsPromoExist = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND " + _vsPromoCond + ")";
-                String _vsParcExist  = "EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PARCOURS' AND _pv.idref=" + _vsParcSub + ")";
-                String _visW =
-                    " AND (p.idutilisateur=" + refuserConnecte
-                    + " OR NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication)"
-                    // OR mode: satisfaire au moins UNE restriction
-                    + " OR (COALESCE(p.logique_visibilite,'OR')='OR' AND ("
-                    + _vsSpecExist + " OR " + _vsPromoExist + " OR " + _vsParcExist
-                    + "))"
-                    // AND mode: satisfaire CHAQUE type de restriction present
-                    + " OR (p.logique_visibilite='AND'"
-                    + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='SPECIALITE') OR " + _vsSpecExist + ")"
-                    + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PROMOTION') OR " + _vsPromoExist + ")"
-                    + " AND (NOT EXISTS (SELECT 1 FROM publicationvisibilite _pv WHERE _pv.idpublication=p.idpublication AND _pv.typecible='PARCOURS') OR " + _vsParcExist + ")))"; 
-                String _initSql = "SELECT p.idpublication,(" + _sE + ") AS score FROM publication p WHERE p.etat=1 AND p.idutilisateur NOT IN (SELECT refuser FROM utilisateur WHERE estactif = 0)" + _visW + " ORDER BY score DESC,p.idpublication DESC LIMIT 10";
-                List _pids = new ArrayList(); List _pscores = new ArrayList();
-                Statement _st = null; ResultSet _rs = null;
-                try {
-                    _st = conn.createStatement(); _rs = _st.executeQuery(_initSql);
-                    while (_rs.next()) { _pids.add(_rs.getString("idpublication")); _pscores.add(new Integer(_rs.getInt("score"))); }
-                } finally {
-                    if (_rs != null) try { _rs.close(); } catch (Exception _x) {}
-                    if (_st != null) try { _st.close(); } catch (Exception _x) {}
-                }
-                Publication[] pubs = new Publication[_pids.size()];
-                for (int _i = 0; _i < _pids.size(); _i++) {
-                    Publication[] _pa = (Publication[]) CGenUtil.rechercher(new Publication(), null, null, conn, " and idpublication='" + _pids.get(_i) + "'");
-                    pubs[_i] = (_pa != null && _pa.length > 0) ? _pa[0] : new Publication();
-                }
-                String _lastScore = _pscores.isEmpty() ? "0" : _pscores.get(_pscores.size()-1).toString();
-
-                // Passer les données au composant via request attributes
+                // Passer les donnees au composant via request attributes
                 request.setAttribute("_pub_lastScore", _lastScore);
                 request.setAttribute("_pub_pubs", pubs);
-                request.setAttribute("_pub_userNames", userNames);
-                request.setAttribute("_pub_userPhotos", userPhotos);
-                request.setAttribute("_pub_userProfils", userProfils);
-                request.setAttribute("_pub_userBanned", userBanned);
-                request.setAttribute("_pub_reactTypes", reactTypes);
-                request.setAttribute("_pub_typesPub", typesPub);
+                request.setAttribute("_pub_userNames", data.get("userNames"));
+                request.setAttribute("_pub_userPhotos", data.get("userPhotos"));
+                request.setAttribute("_pub_userProfils", data.get("userProfils"));
+                request.setAttribute("_pub_userBanned", data.get("userBanned"));
+                request.setAttribute("_pub_reactTypes", data.get("reactTypes"));
+                request.setAttribute("_pub_typesPub", data.get("typesPub"));
                 request.setAttribute("_pub_refuser", new Integer(refuserConnecte));
                 request.setAttribute("_pub_initialConnecte", initialConnecte);
                 request.setAttribute("_pub_connPhotoUrl", _connPhotoUrl);
                 request.setAttribute("_pub_ctx", ctx);
-                request.setAttribute("_pub_conn", conn);
+                // Donnees pre-chargees par publication
+                request.setAttribute("_pub_pubMedias", data.get("pubMedias"));
+                request.setAttribute("_pub_pubReactions", data.get("pubReactions"));
+                request.setAttribute("_pub_pubComments", data.get("pubComments"));
+                request.setAttribute("_pub_pubIdents", data.get("pubIdentifications"));
+                request.setAttribute("_pub_pubSaved", data.get("pubSaved"));
+                request.setAttribute("_pub_origPubs", data.get("origPubs"));
+                request.setAttribute("_pub_origMedias", data.get("origMedias"));
         %>
         <jsp:include page="publication.jsp" />
         <%
@@ -975,8 +921,6 @@
             <i class="bi bi-exclamation-triangle-fill"></i>&nbsp;Erreur publications&nbsp;: <%= e.getMessage() %>
         </div>
         <%
-            } finally {
-                if (conn != null) try { conn.close(); } catch (Exception _x) {}
             }
         %>
 
