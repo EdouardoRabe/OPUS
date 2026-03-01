@@ -69,17 +69,20 @@ public class NotificationAlumniService {
                 conn.commit();
                 return "{\"success\":true,\"action\":\"all\",\"updated\":" + updated + "}";
             } else if (idnotification != null && !idnotification.trim().isEmpty()) {
-                PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE notification SET etat = 1 WHERE idnotification = ? AND idutilisateur = ?");
-                ps.setString(1, idnotification.trim());
-                ps.setInt(2, refuser);
-                int updated = ps.executeUpdate();
-                ps.close();
-                conn.commit();
-                if (updated > 0)
+                // Mise a jour via APJ
+                Notification[] nArr = (Notification[]) CGenUtil.rechercher(
+                    new Notification(), null, null, conn,
+                    " and idnotification='" + idnotification.trim().replace("'","''") + "' and idutilisateur=" + refuser);
+                if (nArr != null && nArr.length > 0) {
+                    nArr[0].setEtat(1);
+                    nArr[0].setMode("modif");
+                    nArr[0].updateToTable(conn);
+                    conn.commit();
                     return "{\"success\":true,\"action\":\"one\",\"id\":\"" + idnotification + "\"}";
-                else
+                } else {
+                    conn.commit();
                     return "{\"success\":false,\"error\":\"Notification introuvable\"}";
+                }
             } else {
                 return "{\"success\":false,\"error\":\"Parametre manquant\"}";
             }

@@ -2,8 +2,6 @@ package alumni;
 
 import java.sql.Connection;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.io.File;
@@ -11,6 +9,7 @@ import java.util.*;
 import bean.CGenUtil;
 import utilitaire.UtilDB;
 import utilitaire.Utilitaire;
+import utilisateurAcade.UtilisateurPg;
 
 /**
  * Service pour le profil utilisateur.
@@ -352,25 +351,26 @@ public class ProfilService {
             conn = new UtilDB().GetConn();
             conn.setAutoCommit(false);
 
-            int niveau = 0, sens = 0;
-            String storedPwd = null;
-
-            PreparedStatement psPC = conn.prepareStatement(
-                "SELECT p.niveau, p.croissante, u.pwduser "
-                + "FROM paramcrypt p JOIN utilisateur u ON CAST(u.refuser AS varchar) = p.idutilisateur "
-                + "WHERE p.idutilisateur = ?");
-            psPC.setString(1, String.valueOf(refuser));
-            ResultSet rsPC = psPC.executeQuery();
-            if (rsPC.next()) {
-                niveau = rsPC.getInt("niveau");
-                sens = rsPC.getInt("croissante");
-                storedPwd = rsPC.getString("pwduser");
-            } else {
-                rsPC.close(); psPC.close();
+            // Charger les parametres de cryptage via APJ
+            Paramcrypt[] pcArr = (Paramcrypt[]) CGenUtil.rechercher(
+                new Paramcrypt(), null, null, conn,
+                " and idutilisateur='" + refuser + "'");
+            if (pcArr == null || pcArr.length == 0) {
                 conn.rollback();
                 return "{\"success\":false,\"error\":\"Parametres de cryptage introuvables\"}";
             }
-            rsPC.close(); psPC.close();
+            int niveau = pcArr[0].getNiveau();
+            int sens = pcArr[0].getCroissante();
+
+            // Charger le mot de passe stocke via APJ (UtilisateurPg)
+            UtilisateurPg[] userArr = (UtilisateurPg[]) CGenUtil.rechercher(
+                new UtilisateurPg(), null, null, conn,
+                " and refuser=" + refuser);
+            if (userArr == null || userArr.length == 0) {
+                conn.rollback();
+                return "{\"success\":false,\"error\":\"Utilisateur non trouve\"}";
+            }
+            String storedPwd = userArr[0].getPwduser();
 
             String oldPwdCrypt = Utilitaire.cryptWord(oldPassword.trim().toLowerCase(), niveau, sens == 0);
             if (storedPwd == null || !storedPwd.equals(oldPwdCrypt)) {
@@ -380,17 +380,10 @@ public class ProfilService {
 
             String newPwdCrypt = Utilitaire.cryptWord(newPassword.trim().toLowerCase(), niveau, sens == 0);
 
-            PreparedStatement psUp = conn.prepareStatement(
-                "UPDATE utilisateur SET pwduser = ? WHERE refuser = ?");
-            psUp.setString(1, newPwdCrypt);
-            psUp.setInt(2, refuser);
-            int updated = psUp.executeUpdate();
-            psUp.close();
-
-            if (updated == 0) {
-                conn.rollback();
-                return "{\"success\":false,\"error\":\"Utilisateur non trouve\"}";
-            }
+            // Mettre a jour le mot de passe via APJ
+            userArr[0].setPwduser(newPwdCrypt);
+            userArr[0].setMode("modif");
+            userArr[0].updateToTable(conn);
 
             conn.commit();
 
@@ -455,13 +448,17 @@ public class ProfilService {
             conn = new UtilDB().GetConn();
             conn.setAutoCommit(false);
 
-            PreparedStatement ps = conn.prepareStatement(
-                "UPDATE utilisateur SET nomuser=?, teluser=? WHERE refuser=?");
-            ps.setString(1, nomuser);
-            ps.setString(2, telephone != null ? telephone.trim() : "");
-            ps.setInt(3, refuser);
-            ps.executeUpdate();
-            ps.close();
+            // Mettre a jour via APJ (UtilisateurPg)
+            UtilisateurPg[] userArr = (UtilisateurPg[]) CGenUtil.rechercher(
+                new UtilisateurPg(), null, null, conn,
+                " and refuser=" + refuser);
+            if (userArr == null || userArr.length == 0)
+                return "{\"success\":false,\"error\":\"Utilisateur non trouve\"}";
+
+            userArr[0].setNomuser(nomuser);
+            userArr[0].setTeluser(telephone != null ? telephone.trim() : "");
+            userArr[0].setMode("modif");
+            userArr[0].updateToTable(conn);
 
             conn.commit();
             return "{\"success\":true}";

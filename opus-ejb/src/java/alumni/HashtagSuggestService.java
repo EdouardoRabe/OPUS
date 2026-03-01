@@ -1,13 +1,12 @@
 package alumni;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import bean.CGenUtil;
 import utilitaire.UtilDB;
 
 /**
  * Service pour l'autocompletion des hashtags (#promotion, #specialite, #parcours).
- * Gere sa propre connexion.
+ * Gere sa propre connexion. Utilise CGenUtil (APJ).
  */
 public class HashtagSuggestService {
 
@@ -22,61 +21,55 @@ public class HashtagSuggestService {
         try {
             conn = new UtilDB().GetConn();
 
-            // --- Promotions ---
-            PreparedStatement ps = conn.prepareStatement(
-                "SELECT idpromotion, libelle, annee FROM promotion "
-                + "WHERE UPPER(REPLACE(libelle,' ','')) LIKE ? ORDER BY annee DESC LIMIT 5");
-            ps.setString(1, "%" + q + "%");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                String tag = "#" + rs.getString("libelle").toUpperCase().replaceAll("[^A-Z0-9]", "");
-                String label = "Promotion " + rs.getString("libelle") + " (" + rs.getInt("annee") + ")";
-                String idref = rs.getString("idpromotion");
-                if (!first) json.append(",");
-                first = false;
-                json.append("{\"tag\":\"").append(tag)
-                    .append("\",\"label\":\"").append(label.replace("\"", "'"))
-                    .append("\",\"type\":\"PROMOTION\",\"idref\":\"").append(idref).append("\"}");
+            // --- Promotions via APJ ---
+            Promotion[] promos = (Promotion[]) CGenUtil.rechercher(
+                new Promotion(), null, null, conn,
+                " and UPPER(REPLACE(libelle,' ','')) LIKE '%" + q + "%' order by annee desc limit 5");
+            if (promos != null) {
+                for (int i = 0; i < promos.length; i++) {
+                    String tag = "#" + promos[i].getLibelle().toUpperCase().replaceAll("[^A-Z0-9]", "");
+                    String label = "Promotion " + promos[i].getLibelle() + " (" + promos[i].getAnnee() + ")";
+                    if (!first) json.append(",");
+                    first = false;
+                    json.append("{\"tag\":\"").append(tag)
+                        .append("\",\"label\":\"").append(label.replace("\"", "'"))
+                        .append("\",\"type\":\"PROMOTION\",\"idref\":\"").append(promos[i].getIdpromotion()).append("\"}");
+                }
             }
-            rs.close(); ps.close();
 
-            // --- Specialites ---
-            ps = conn.prepareStatement(
-                "SELECT idspecialite, libelle FROM specialite "
-                + "WHERE UPPER(REPLACE(libelle,' ','')) LIKE ? ORDER BY libelle LIMIT 5");
-            ps.setString(1, "%" + q + "%");
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                String lib = rs.getString("libelle");
-                String tag = "#" + lib.toUpperCase().replaceAll("[^A-Z0-9]", "");
-                if (tag.length() > 21) tag = tag.substring(0, 21);
-                String idref = rs.getString("idspecialite");
-                if (!first) json.append(",");
-                first = false;
-                json.append("{\"tag\":\"").append(tag)
-                    .append("\",\"label\":\"").append(lib.replace("\"", "'").replace("\\", ""))
-                    .append("\",\"type\":\"SPECIALITE\",\"idref\":\"").append(idref).append("\"}");
+            // --- Specialites via APJ ---
+            Specialite[] specs = (Specialite[]) CGenUtil.rechercher(
+                new Specialite(), null, null, conn,
+                " and UPPER(REPLACE(libelle,' ','')) LIKE '%" + q + "%' order by libelle limit 5");
+            if (specs != null) {
+                for (int i = 0; i < specs.length; i++) {
+                    String lib = specs[i].getLibelle();
+                    String tag = "#" + lib.toUpperCase().replaceAll("[^A-Z0-9]", "");
+                    if (tag.length() > 21) tag = tag.substring(0, 21);
+                    if (!first) json.append(",");
+                    first = false;
+                    json.append("{\"tag\":\"").append(tag)
+                        .append("\",\"label\":\"").append(lib.replace("\"", "'").replace("\\", ""))
+                        .append("\",\"type\":\"SPECIALITE\",\"idref\":\"").append(specs[i].getIdspecialite()).append("\"}");
+                }
             }
-            rs.close(); ps.close();
 
-            // --- Parcours ---
-            ps = conn.prepareStatement(
-                "SELECT idparcours, libelle FROM parcours "
-                + "WHERE UPPER(REPLACE(libelle,' ','')) LIKE ? ORDER BY libelle LIMIT 5");
-            ps.setString(1, "%" + q + "%");
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                String lib = rs.getString("libelle");
-                String tag = "#" + lib.toUpperCase().replaceAll("[^A-Z0-9]", "");
-                if (tag.length() > 21) tag = tag.substring(0, 21);
-                String idref = rs.getString("idparcours");
-                if (!first) json.append(",");
-                first = false;
-                json.append("{\"tag\":\"").append(tag)
-                    .append("\",\"label\":\"").append(lib.replace("\"", "'"))
-                    .append("\",\"type\":\"PARCOURS\",\"idref\":\"").append(idref).append("\"}");
+            // --- Parcours via APJ ---
+            Parcours[] parcs = (Parcours[]) CGenUtil.rechercher(
+                new Parcours(), null, null, conn,
+                " and UPPER(REPLACE(libelle,' ','')) LIKE '%" + q + "%' order by libelle limit 5");
+            if (parcs != null) {
+                for (int i = 0; i < parcs.length; i++) {
+                    String lib = parcs[i].getLibelle();
+                    String tag = "#" + lib.toUpperCase().replaceAll("[^A-Z0-9]", "");
+                    if (tag.length() > 21) tag = tag.substring(0, 21);
+                    if (!first) json.append(",");
+                    first = false;
+                    json.append("{\"tag\":\"").append(tag)
+                        .append("\",\"label\":\"").append(lib.replace("\"", "'"))
+                        .append("\",\"type\":\"PARCOURS\",\"idref\":\"").append(parcs[i].getIdparcours()).append("\"}");
+                }
             }
-            rs.close(); ps.close();
 
         } finally {
             if (conn != null) try { conn.close(); } catch (Exception x) {}

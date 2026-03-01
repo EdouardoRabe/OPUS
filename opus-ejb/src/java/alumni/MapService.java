@@ -1,8 +1,6 @@
 package alumni;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.*;
 import bean.CGenUtil;
 import utilitaire.UtilDB;
@@ -24,19 +22,25 @@ public class MapService {
             alumniList = (VProfilLocalisation[]) CGenUtil.rechercher(
                 new VProfilLocalisation(), null, null, conn, " and estactif = 1");
 
-            // Load specialites per profil
-            PreparedStatement ps = conn.prepareStatement(
-                "SELECT sp.idprofil, s.libelle FROM specialiteprofil sp JOIN specialite s ON s.idspecialite = sp.idspecialite");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                String pid = rs.getString("idprofil");
-                String lib = rs.getString("libelle");
+            // Load specialites per profil via APJ (2 queries au lieu d'un JOIN)
+            Specialite[] specArr = (Specialite[]) CGenUtil.rechercher(
+                new Specialite(), null, null, conn, "");
+            if (specArr == null) specArr = new Specialite[0];
+            Map specIdToLib = new HashMap();
+            for (int si = 0; si < specArr.length; si++)
+                specIdToLib.put(specArr[si].getIdspecialite(), specArr[si].getLibelle());
+
+            Specialiteprofil[] spArr = (Specialiteprofil[]) CGenUtil.rechercher(
+                new Specialiteprofil(), null, null, conn, "");
+            if (spArr == null) spArr = new Specialiteprofil[0];
+            for (int si = 0; si < spArr.length; si++) {
+                String pid = spArr[si].getIdprofil();
+                String lib = (String) specIdToLib.get(spArr[si].getIdspecialite());
+                if (lib == null) continue;
                 List list = (List) specMap.get(pid);
                 if (list == null) { list = new ArrayList(); specMap.put(pid, list); }
                 list.add(lib);
             }
-            rs.close();
-            ps.close();
         } finally {
             if (conn != null) try { conn.close(); } catch (Exception x) {}
         }
