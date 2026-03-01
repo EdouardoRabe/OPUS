@@ -1,0 +1,100 @@
+/* ============================================================
+   NOTIFICATIONS-PAGE.CSS — Styles spécifiques à la page
+   notifications (header, liste, items, badges)
+   NOTE: Les styles fa-layout, fa-sidebar, fa-avatar,
+         fa-widget, fa-event, fa-profile sont dans les
+         fichiers partagés (fa-feed-layout, fa-avatar, etc.)
+   ============================================================ */
+
+.notifications-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(28,30,41,0.06); overflow: hidden; }
+.notifications-header { background: #1c1e29; padding: 22px 24px; }
+.notifications-header h1 { margin: 0; font-size: 20px; display: flex; align-items: center; gap: 10px; color: #fff; }
+.notifications-title-icon { background: #283a97; border-radius: 8px; padding: 6px 10px; display: inline-flex; align-items: center; justify-content: center; }
+.notifications-badge { background: #fd3022; color: #fff; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-left: 4px; }
+.notifications-meta { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px 10px; gap: 12px; font-size: 14px; color: #1c1e29; flex-wrap: wrap; }
+.notifications-unread { color: #fd3022; font-weight: 700; }
+.notifications-mark-all {
+    padding: 7px 16px;
+    background: #283a97;
+    color: #fff;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 6px rgba(40,58,151,0.18);
+    transition: background 0.2s;
+}
+.notifications-mark-all:hover { background: #536ae4; }
+.notifications-list { background: #f4f6fb; padding: 0 0 16px; }
+.notifications-empty {
+    text-align: center;
+    padding: 60px 20px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #d0dce7;
+    margin: 0 16px;
+}
+.notifications-empty span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    background: #1c1e29;
+    border-radius: 50%;
+    margin-bottom: 18px;
+    font-size: 36px;
+    color: #d0dce7;
+}
+.notifications-list-inner {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #d0dce7;
+    margin: 0 16px 16px;
+    overflow: hidden;
+}
+.notifications-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e8edf4;
+    transition: background 0.2s;
+}
+.notifications-item:hover { background: #f0f3fa; }
+.notifications-list-inner .notifications-item:last-child { border-bottom: none; }
+.notification-icon {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid transparent;
+}
+.notification-details { flex: 1; min-width: 0; }
+.notification-title {
+    font-size: 14px;
+    line-height: 1.55;
+    color: #1c1e29;
+    font-weight: 400;
+}
+.notification-title--bold { font-weight: 600; }
+.notification-dot { width: 8px; height: 8px; background: #283a97; border-radius: 50%; display: inline-block; margin-left: 7px; vertical-align: middle; }
+.notification-meta {
+    font-size: 12px;
+    color: #8a95a3;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+.notification-source {
+    margin-left: 2px;
+    font-weight: 600;
+}

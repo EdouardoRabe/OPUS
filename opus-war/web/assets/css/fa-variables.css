@@ -1,0 +1,12 @@
+/* ============================================================
+   FA-VARIABLES.CSS — Variables CSS globales du fil d'actualité
+   Utilisé par : accueil, fil-actualite, notifications,
+                 detail-signalement, publication-modif
+   ============================================================ */
+:root {
+    --fa-bg: #f0f2f5;
+    --fa-card-bg: #ffffff;
+    --fa-border: #e4e6eb;
+    --fa-text: #050505;
+    --fa-text-secondary: #65676b;
+}
