@@ -15,7 +15,8 @@ $(function() {
     }
 
     // Chargement du son
-    const alertSound = new Audio(_CONTEXT_PATH + "/assets/audio/notify.mp3");
+    const contextPath = typeof _CONTEXT_PATH !== 'undefined' ? _CONTEXT_PATH : '/opus';
+    const alertSound = new Audio(contextPath + "/assets/audio/notify.mp3");
 
     // Fonction pour formater le temps
     function formatTime(ms) {

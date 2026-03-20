@@ -9,7 +9,6 @@
     String lienContenu = "index.jsp";
     String menu = "elements/menu/";
     String langue = "";
-	
     if (request.getParameter("langue") != null) {
         session.setAttribute("langue", (String) request.getParameter("langue"));
     }
@@ -52,7 +51,7 @@
     <link href="${pageContext.request.contextPath}/assets/css/alumni-theme.css" rel="stylesheet" type="text/css" />
     <!-- opus-theme.css déjà chargé dans css.jsp — ne pas dupliquer -->
     <script>
-        const _CONTEXT_PATH = '<%= request.getContextPath() %>';
+        var _CONTEXT_PATH = '<%= request.getContextPath() %>';
     </script>
 </head>
 <body>
@@ -102,11 +101,14 @@
     }
 %>
 
+<script src="${pageContext.request.contextPath}/assets/js/messagews.js"></script>
 <script>
     <%
         UserEJB user = (UserEJB)request.getSession().getAttribute("u");
     %>
-    runWScommunication('<%=user.getUser().getTuppleID()%>');
+    if (typeof runWScommunication === 'function') {
+        runWScommunication('<%=user.getUser().getTuppleID()%>');
+    }
 </script>
 <script src="${pageContext.request.contextPath}/apjplugins/champcalcul.js" defer></script>
 <script src="${pageContext.request.contextPath}/apjplugins/champdate.js" defer></script>

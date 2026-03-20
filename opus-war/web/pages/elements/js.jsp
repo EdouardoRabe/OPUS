@@ -63,7 +63,9 @@
 <%--<script src="${pageContext.request.contextPath}/apjplugins/chat.js"></script>--%>
 
 <script type="text/javascript">
-    window.ParsleyValidator.setLocale('fr');
+    if (window.ParsleyValidator) {
+        window.ParsleyValidator.setLocale('fr');
+    }
     $('.datepicker').datepicker({
         format: 'dd/mm/yyyy'
     });

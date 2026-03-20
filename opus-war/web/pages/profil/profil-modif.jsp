@@ -64,7 +64,7 @@
         if (!_nom.isEmpty()) initials.append(Character.toUpperCase(_nom.charAt(0)));
         if (initials.length() > 0) _avatarInitials = initials.toString();
 %>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVJkEZSbVkFvwj6GWGcsA3UbVDA46NmCcc9syThH05yu85Z+I6QILv3GVpnwnbaIPN1zcEvGWxQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 <!-- Profile edit styles extracted to external CSS -->
 <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/pages/profil-edit.css" />
 <div class="pv-profile-layout">

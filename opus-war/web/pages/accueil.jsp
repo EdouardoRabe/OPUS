@@ -685,11 +685,11 @@
 
         if (atIdx < 0) return;
 
-        // Remplacer @query par @NomComplet
+        // Remplacer @query par @NomComplet + \u200B (caractere invisible pour marquer la fin)
         var before = val.substring(0, atIdx);
         var cursorPos = input.selectionStart;
         var after = val.substring(cursorPos);
-        var mention = '@' + user.nomComplet + ' ';
+        var mention = '@' + user.nomComplet + '\u200B ';
         input.value = before + mention + after;
         input.focus();
         var newPos = before.length + mention.length;
@@ -1056,9 +1056,13 @@
     function formatMentions(text) {
         if (!text) return '';
         var safe = escHtml(text);
-        // Remplacer @NomPrenom par un badge colore
-        return safe.replace(/@([A-Za-zÀ-ÿ]+(?: [A-Za-zÀ-ÿ]+){0,2})/g,
+        // 1. Nouveaux commentaires: @NomPrenom\u200B (caractere invisible marque la fin)
+        safe = safe.replace(/@([^\u200B@]+)\u200B/g,
             '<span class="mention-badge">@$1</span>');
+        // 2. Anciens commentaires: @Nom Prenom (max 2 mots, compatibilite)
+        safe = safe.replace(/@([A-Za-zÀ-ÿ]+ [A-Za-zÀ-ÿ]+)(?=\s|$|[.,!?;:])/g,
+            '<span class="mention-badge">@$1</span>');
+        return safe;
     }
 
     function ajouterCommentaire(idpub) {
