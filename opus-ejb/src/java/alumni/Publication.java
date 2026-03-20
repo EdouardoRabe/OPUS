@@ -15,6 +15,7 @@ public class Publication extends ClassMAPTable {
     private String idtypepublication;
     private int idutilisateur;
     private String idpuborigine;
+    private String logique_visibilite;
 
     public Publication() {
         setNomTable("publication");
@@ -106,5 +107,13 @@ public class Publication extends ClassMAPTable {
 
     public void setIdpuborigine(String idpuborigine) {
         this.idpuborigine = idpuborigine;
+    }
+
+    public String getLogique_visibilite() {
+        return logique_visibilite;
+    }
+
+    public void setLogique_visibilite(String logique_visibilite) {
+        this.logique_visibilite = logique_visibilite;
     }
 }

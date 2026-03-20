@@ -1,8 +1,6 @@
 <%@ page pageEncoding="UTF-8" contentType="application/json; charset=UTF-8" buffer="none" %>
 <%@ page import="user.UserEJB" %>
-<%@ page import="alumni.Specialite" %>
-<%@ page import="utilitaire.UtilDB" %>
-<%@ page import="java.sql.Connection" %>
+<%@ page import="alumni.SpecialiteAdminService" %>
 <%@ page import="java.io.File" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.apache.commons.fileupload.FileItem" %>
@@ -16,13 +14,9 @@
             + "/deployments/opus.war/assets/img/specialite/";
     String PHOTO_REL = "assets/img/specialite/";
 
-    Connection conn = null;
     try {
         UserEJB u = (UserEJB) session.getAttribute("u");
-        if (u == null) {
-            out.print("{\"success\":false,\"error\":\"Non connecte\"}");
-            return;
-        }
+        if (u == null) { out.print("{\"success\":false,\"error\":\"Non connecte\"}"); return; }
         String userId = String.valueOf(u.getUser().getRefuser());
 
         String idspecialite  = null;
@@ -74,27 +68,12 @@
             photoPath = PHOTO_REL + safeName;
         }
 
-        // --- Update en base ---
-        conn = new UtilDB().GetConn();
-        conn.setAutoCommit(false);
-
-        Specialite spe = new Specialite();
-        spe.setIdspecialite(idspecialite.trim());
-        spe.setLibelle(libelle.trim());
-        spe.setDescription(description != null ? description.trim() : "");
-        spe.setPhoto(photoPath);
-        spe.setMode("modif");
-        spe.updateToTableWithHisto(userId, conn);
-        conn.commit();
-
-        out.print("{\"success\":true,\"id\":\"" + idspecialite.trim() + "\"}");
+        // --- Update en base via service ---
+        out.print(SpecialiteAdminService.modifier(userId, idspecialite, libelle, description, photoPath));
 
     } catch (Exception e) {
-        if (conn != null) try { conn.rollback(); } catch (Exception rx) {}
         e.printStackTrace();
         String msg = e.getMessage() != null ? e.getMessage().replace("\"", "'").replace("\n", " ") : "Erreur inconnue";
         out.print("{\"success\":false,\"error\":\"" + msg + "\"}");
-    } finally {
-        if (conn != null) try { conn.close(); } catch (Exception ex) {}
     }
 %>

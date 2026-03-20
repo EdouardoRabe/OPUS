@@ -1,23 +1,18 @@
-<%@ page pageEncoding="UTF-8" %>
+﻿<%@ page pageEncoding="UTF-8" %>
 <%@ page import="user.UserEJB" %>
-<%@ page import="alumni.Profil" %>
-<%@ page import="alumni.Visibilite" %>
-<%@ page import="bean.CGenUtil" %>
-<%@ page import="utilitaire.UtilDB" %>
-<%@ page import="java.sql.Connection" %>
-<%@ page import="java.sql.Date" %>
-<%@ page import="java.util.Calendar" %>
+<%@ page import="alumni.ProfilService" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
 <%
     request.setCharacterEncoding("UTF-8");
-    
+
     String contextPath = request.getContextPath();
     boolean isAjax = "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
-    
+
     if (isAjax) {
         response.setContentType("application/json; charset=UTF-8");
     }
 
-    Connection conn = null;
     try {
         UserEJB u = (UserEJB) session.getAttribute("u");
         if (u == null) {
@@ -29,91 +24,39 @@
             return;
         }
         int    refuser = u.getUser().getRefuser();
-        String userId  = String.valueOf(refuser);
-
-        // Récupérer idprofil
         String idprofil = request.getParameter("idprofil");
-        if (idprofil == null || idprofil.trim().isEmpty()) {
-            // Résolution depuis refuser si non fourni
-            conn = new UtilDB().GetConn();
-            Profil profil = Profil.findByRefUser(refuser, conn);
-            if (profil == null) {
-                if (isAjax) {
-                    out.print("{\"success\":false,\"error\":\"Profil introuvable\"}");
-                } else {
-                    response.sendRedirect(contextPath + "/pages/module.jsp?but=profil/confidentialite.jsp&erreur=Profil+introuvable");
-                }
-                return;
-            }
-            idprofil = profil.getIdprofil();
-            conn.close();
-            conn = null;
-        }
-        idprofil = idprofil.trim();
 
-        // Champs à traiter
+        // Construire la map des status
         String[] champs = {"nom", "prenom", "dtn", "experience", "specialite", "promotion", "email", "parcours", "telephone", "genre", "socialmedia", "localisation"};
-
-        conn = new UtilDB().GetConn();
-        conn.setAutoCommit(false);
-
-        Date today = new Date(Calendar.getInstance().getTimeInMillis());
-
+        Map statusMap = new HashMap();
         for (int i = 0; i < champs.length; i++) {
-            String champ     = champs[i];
-            String statusParam = request.getParameter("status_" + champ);
-            // Checkbox: present = 1 (public), absent = 0 (prive)
+            String statusParam = request.getParameter("status_" + champs[i]);
             int status = (statusParam != null && !statusParam.trim().isEmpty()) ? 1 : 0;
-
-            // Chercher si une ligne existe déjà
-            Visibilite[] existing = (Visibilite[]) CGenUtil.rechercher(
-                new Visibilite(), null, null, conn,
-                " and idprofil='" + idprofil + "' and champvisibilite='" + champ + "'"
-            );
-
-            if (existing != null && existing.length > 0) {
-                // UPDATE
-                Visibilite v = existing[0];
-                v.setStatus(status);
-                v.setDaty(today);
-                v.setMode("modif");
-                v.updateToTableWithHisto(userId, conn);
-            } else {
-                // INSERT
-                Visibilite v = new Visibilite();
-                v.construirePK(conn);
-                v.setChampvisibilite(champ);
-                v.setStatus(status);
-                v.setIdprofil(idprofil);
-                v.setDaty(today);
-                v.insertToTableWithHisto(userId, conn);
-            }
+            statusMap.put(champs[i], new Integer(status));
         }
 
-        conn.commit();
-        
+        String result = ProfilService.updateConfidentialite(refuser, idprofil, statusMap);
+
         if (isAjax) {
-            out.print("{\"success\":true}");
+            out.print(result);
         } else {
-            response.sendRedirect(contextPath + "/pages/module.jsp?but=profil/confidentialite.jsp&msg=Parametres+enregistres");
+            if (result.contains("\"success\":true")) {
+                response.sendRedirect(contextPath + "/pages/module.jsp?but=profil/confidentialite.jsp&msg=Parametres+enregistres");
+            } else {
+                response.sendRedirect(contextPath + "/pages/module.jsp?but=profil/confidentialite.jsp&erreur=Erreur+lors+de+la+sauvegarde");
+            }
         }
 
     } catch (Exception e) {
-        if (conn != null) try { conn.rollback(); } catch (Exception rx) {}
         e.printStackTrace();
-        System.err.println("traitement-confidentialite.jsp ERROR: " + e.getClass().getName());
-        System.err.println("Message: " + e.getMessage());
-        
         String msg = e.getClass().getName() + ": " + (e.getMessage() != null
             ? e.getMessage().replace("\"", "'").replace("\n", " ")
             : "Erreur inconnue");
-        
+
         if (isAjax) {
             out.print("{\"success\":false,\"error\":\"" + msg + "\"}");
         } else {
             response.sendRedirect(contextPath + "/pages/module.jsp?but=profil/confidentialite.jsp&erreur=" + java.net.URLEncoder.encode(msg, "UTF-8"));
         }
-    } finally {
-        if (conn != null) try { conn.close(); } catch (Exception ex) {}
     }
 %>

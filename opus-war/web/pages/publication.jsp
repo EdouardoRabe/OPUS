@@ -6,9 +6,6 @@
 <%@ page import="alumni.Reactiontype" %>
 <%@ page import="alumni.Typepublication" %>
 <%@ page import="alumni.Identification" %>
-<%@ page import="alumni.Publicationenregistrement" %>
-<%@ page import="bean.CGenUtil" %>
-<%@ page import="java.sql.Connection" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
 <%
@@ -27,7 +24,13 @@
          _pub_initialConnecte -> String
          _pub_connPhotoUrl    -> String
          _pub_ctx             -> String   (context path)
-         _pub_conn            -> Connection (pas fermee ici)
+         _pub_pubMedias       -> Map  (String idpub -> Media[])
+         _pub_pubReactions    -> Map  (String idpub -> Publicationreaction[])
+         _pub_pubComments     -> Map  (String idpub -> Publicationcommentaire[])
+         _pub_pubIdents       -> Map  (String idpub -> Identification[])
+         _pub_pubSaved        -> Map  (String idpub -> Boolean)
+         _pub_origPubs        -> Map  (String origId -> Publication)
+         _pub_origMedias      -> Map  (String origId -> Media[])
        ============================================================ */
 
     Publication[] _pubPubs        = (Publication[]) request.getAttribute("_pub_pubs");
@@ -41,7 +44,13 @@
     String _pubInitialConnecte    = (String) request.getAttribute("_pub_initialConnecte");
     String _pubConnPhotoUrl       = (String) request.getAttribute("_pub_connPhotoUrl");
     String _pubCtx                = (String) request.getAttribute("_pub_ctx");
-    Connection _pubConn           = (Connection) request.getAttribute("_pub_conn");
+    Map _pubPubMedias             = (Map) request.getAttribute("_pub_pubMedias");
+    Map _pubPubReactions          = (Map) request.getAttribute("_pub_pubReactions");
+    Map _pubPubComments           = (Map) request.getAttribute("_pub_pubComments");
+    Map _pubPubIdents             = (Map) request.getAttribute("_pub_pubIdents");
+    Map _pubPubSaved              = (Map) request.getAttribute("_pub_pubSaved");
+    Map _pubOrigPubs              = (Map) request.getAttribute("_pub_origPubs");
+    Map _pubOrigMedias            = (Map) request.getAttribute("_pub_origMedias");
 
     // Valeurs par defaut
     if (_pubPubs == null) _pubPubs = new Publication[0];
@@ -54,6 +63,13 @@
     if (_pubInitialConnecte == null) _pubInitialConnecte = "U";
     if (_pubConnPhotoUrl == null) _pubConnPhotoUrl = "";
     if (_pubCtx == null) _pubCtx = request.getContextPath();
+    if (_pubPubMedias == null) _pubPubMedias = new HashMap();
+    if (_pubPubReactions == null) _pubPubReactions = new HashMap();
+    if (_pubPubComments == null) _pubPubComments = new HashMap();
+    if (_pubPubIdents == null) _pubPubIdents = new HashMap();
+    if (_pubPubSaved == null) _pubPubSaved = new HashMap();
+    if (_pubOrigPubs == null) _pubOrigPubs = new HashMap();
+    if (_pubOrigMedias == null) _pubOrigMedias = new HashMap();
 
     // Variables curseur pour infinite scroll
     String _lastId = "";
@@ -97,20 +113,14 @@
         if (_authorBanned) { _authorPhoto = null; }
 
         // --- Enregistrement (saved/bookmark) ---
-        boolean _isSaved = false;
-        Publicationenregistrement[] _enrArr = (Publicationenregistrement[]) CGenUtil.rechercher(
-                new Publicationenregistrement(), null, null, _pubConn,
-                " and idpublication = '" + idpub + "' and idutilisateur = " + _pubRefuser);
-        if (_enrArr != null && _enrArr.length > 0) _isSaved = true;
+        boolean _isSaved = _pubPubSaved.containsKey(idpub);
 
         // --- Medias ---
-        Media[] medias = (Media[]) CGenUtil.rechercher(
-                new Media(), null, null, _pubConn, " and idpublication = '" + idpub + "'");
+        Media[] medias = (Media[]) _pubPubMedias.get(idpub);
         if (medias == null) medias = new Media[0];
 
         // --- Reactions ---
-        Publicationreaction[] reactions = (Publicationreaction[]) CGenUtil.rechercher(
-                new Publicationreaction(), null, null, _pubConn, " and idpublication = '" + idpub + "'");
+        Publicationreaction[] reactions = (Publicationreaction[]) _pubPubReactions.get(idpub);
         if (reactions == null) reactions = new Publicationreaction[0];
 
         Map reactCounts = new HashMap();
@@ -147,15 +157,12 @@
         }
 
         // --- Commentaires ---
-        Publicationcommentaire[] comments = (Publicationcommentaire[]) CGenUtil.rechercher(
-                new Publicationcommentaire(), null, null, _pubConn,
-                " and idpublication = '" + idpub + "' and etat = 1");
+        Publicationcommentaire[] comments = (Publicationcommentaire[]) _pubPubComments.get(idpub);
         if (comments == null) comments = new Publicationcommentaire[0];
         int nbComm = comments.length;
 
         // --- Personnes identifiees ---
-        Identification[] identTags = (Identification[]) CGenUtil.rechercher(
-                new Identification(), null, null, _pubConn, " and idpublication = '" + idpub + "'");
+        Identification[] identTags = (Identification[]) _pubPubIdents.get(idpub);
         if (identTags == null) identTags = new Identification[0];
         String taggedNames = "";
         if (identTags.length > 0) {
@@ -187,10 +194,8 @@
         Media[] origMedias = new Media[0];
         String origIdpuborigine = isSharedPost ? pub.getIdpuborigine().trim() : "";
         if (isSharedPost) {
-            Publication[] origPubs = (Publication[]) CGenUtil.rechercher(
-                new Publication(), null, null, _pubConn, " and idpublication = '" + origIdpuborigine + "'");
-            if (origPubs != null && origPubs.length > 0) {
-                Publication orig = origPubs[0];
+            Publication orig = (Publication) _pubOrigPubs.get(origIdpuborigine);
+            if (orig != null) {
                 String od = orig.getDescritpion();
                 origDesc = od != null ? od.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;").replace("\n","<br>") : "";
                 origDesc = origDesc.replaceAll("(https?://[^\\s<]+)", "<a href=\"$1\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color:#0a66c2;font-weight:500;\" onclick=\"event.stopPropagation();\">$1</a>");
@@ -203,19 +208,6 @@
                 String oAuteur = (String) _pubUserNames.get(new Integer(orig.getIdutilisateur()));
                 origAuteurPhoto = (String) _pubUserPhotos.get(new Integer(orig.getIdutilisateur()));
                 String origAuteurIdprofil = (String) _pubUserProfils.get(new Integer(orig.getIdutilisateur()));
-                if (oAuteur == null) {
-                    alumni.ProfilLib[] op2 = (alumni.ProfilLib[]) CGenUtil.rechercher(
-                        new alumni.ProfilLib(), null, null, _pubConn, " and refuser = " + orig.getIdutilisateur());
-                    if (op2 != null && op2.length > 0) {
-                        oAuteur = (op2[0].getNom() != null ? op2[0].getNom() : "") + (op2[0].getPrenom() != null ? " " + op2[0].getPrenom() : "");
-                        if (origAuteurPhoto == null && op2[0].getPhotoProfil() != null) {
-                            origAuteurPhoto = _pubCtx + "/" + op2[0].getPhotoProfil();
-                        }
-                        if (origAuteurIdprofil == null && op2[0].getIdprofil() != null) {
-                            origAuteurIdprofil = op2[0].getIdprofil();
-                        }
-                    }
-                }
                 origAuteur = oAuteur != null ? oAuteur.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;") : "Utilisateur";
                 // Initiales de l'auteur original
                 String[] _origPartsA = origAuteur.trim().split("\\s+");
@@ -227,8 +219,8 @@
                 } else if (origAuteurIdprofil != null && !origAuteurIdprofil.isEmpty()) {
                     origProfileUrl = _pubCtx + "/pages/module.jsp?but=annuaire/fiche-utilisateur.jsp?idprofil=" + origAuteurIdprofil;
                 }
-                // Charger TOUS les medias de la pub originale
-                origMedias = (Media[]) CGenUtil.rechercher(new Media(), null, null, _pubConn, " and idpublication = '" + origIdpuborigine + "'");
+                // Medias de la pub originale (pre-charges par le service)
+                origMedias = (Media[]) _pubOrigMedias.get(origIdpuborigine);
                 if (origMedias == null) origMedias = new Media[0];
             } else { isSharedPost = false; } // pub originale supprimee
         }
