@@ -8,6 +8,48 @@
 <%@ page import="org.apache.commons.fileupload.disk.DiskFileItemFactory" %>
 <%@ page import="org.apache.commons.fileupload.servlet.ServletFileUpload" %>
 <%@ page import="org.apache.commons.fileupload.FileUploadBase" %>
+<%@ page import="java.awt.image.BufferedImage" %>
+<%@ page import="java.awt.Graphics2D" %>
+<%@ page import="java.awt.RenderingHints" %>
+<%@ page import="javax.imageio.ImageIO" %>
+<%@ page import="java.io.ByteArrayInputStream" %>
+<%!
+    // Dimensions maximales pour les images de publication
+    private static final int PUB_MAX_WIDTH = 1200;
+    private static final int PUB_MAX_HEIGHT = 1200;
+
+    /**
+     * Redimensionne une image si elle depasse les dimensions maximales
+     * Conserve le ratio d'aspect
+     */
+    private BufferedImage resizePublicationImage(BufferedImage original) {
+        int origWidth = original.getWidth();
+        int origHeight = original.getHeight();
+
+        // Si image deja dans les limites, retourner null pour garder l'original
+        if (origWidth <= PUB_MAX_WIDTH && origHeight <= PUB_MAX_HEIGHT) {
+            return null;
+        }
+
+        // Calculer les nouvelles dimensions en conservant le ratio
+        double ratio = Math.min(
+            (double) PUB_MAX_WIDTH / origWidth,
+            (double) PUB_MAX_HEIGHT / origHeight
+        );
+        int newWidth = (int) (origWidth * ratio);
+        int newHeight = (int) (origHeight * ratio);
+
+        BufferedImage resized = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = resized.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.drawImage(original, 0, 0, newWidth, newHeight, null);
+        g2d.dispose();
+
+        return resized;
+    }
+%>
 <%
     // POST multipart: Creer publication + upload image dans table media
     // Utilise Commons FileUpload (meme lib que UploadDownloadFileServlet)
@@ -117,15 +159,45 @@
             if (origName.contains("\\")) origName = origName.substring(origName.lastIndexOf("\\") + 1);
             if (origName.contains("/")) origName = origName.substring(origName.lastIndexOf("/") + 1);
             String safeName = origName.replaceAll("[^a-zA-Z0-9._-]", "_");
-            String fileName = System.currentTimeMillis() + "_" + mi + "_" + safeName;
-            File dest = new File(basePath + File.separator + fileName);
-            mediaFile.write(dest);
+
+            String contentType = mediaFile.getContentType();
+            boolean isImage = contentType != null && contentType.startsWith("image/");
+            boolean isVideo = contentType != null && contentType.startsWith("video/");
+
+            String fileName;
+            File dest;
+
+            if (isImage) {
+                // Redimensionner l'image si necessaire
+                BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(mediaFile.get()));
+                if (originalImage != null) {
+                    BufferedImage resized = resizePublicationImage(originalImage);
+                    // Forcer extension .jpg pour images redimensionnees
+                    String baseName = safeName.replaceAll("\\.[^.]+$", "");
+                    fileName = System.currentTimeMillis() + "_" + mi + "_" + baseName + ".jpg";
+                    dest = new File(basePath + File.separator + fileName);
+                    if (resized != null) {
+                        ImageIO.write(resized, "jpg", dest);
+                    } else {
+                        ImageIO.write(originalImage, "jpg", dest);
+                    }
+                } else {
+                    // Fallback si ImageIO ne peut pas lire
+                    fileName = System.currentTimeMillis() + "_" + mi + "_" + safeName;
+                    dest = new File(basePath + File.separator + fileName);
+                    mediaFile.write(dest);
+                }
+            } else {
+                // Video ou autre: sauvegarder tel quel
+                fileName = System.currentTimeMillis() + "_" + mi + "_" + safeName;
+                dest = new File(basePath + File.separator + fileName);
+                mediaFile.write(dest);
+            }
 
             // Stocker [relativePath, mediaTypeId]
             String[] info = new String[2];
             info[0] = "/async/publications/" + fileName;
-            String contentType = mediaFile.getContentType();
-            info[1] = (contentType != null && contentType.startsWith("video/")) ? "MDT000002" : "MDT000001";
+            info[1] = isVideo ? "MDT000002" : "MDT000001";
             savedMediaFiles.add(info);
         }
 

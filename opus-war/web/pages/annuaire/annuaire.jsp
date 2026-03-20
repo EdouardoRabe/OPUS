@@ -136,8 +136,8 @@
         if (hasSearch) {
             String safe = qSearch.trim().toLowerCase().replace("'", "''");
             where.append(" and (LOWER(COALESCE(nom,'') || ' ' || COALESCE(prenom,'')) LIKE '%").append(safe).append("%'")
-                 .append(" or LOWER(COALESCE(prenom,'') || ' ' || COALESCE(nom,'')) LIKE '%").append(safe).append("%'")
-                 .append(" or LOWER(loginuser) LIKE '%").append(safe).append("%')");
+                .append(" or LOWER(COALESCE(prenom,'') || ' ' || COALESCE(nom,'')) LIKE '%").append(safe).append("%'")
+                .append(" or LOWER(loginuser) LIKE '%").append(safe).append("%')");
         }
         if (hasPromotion) {
             where.append(" and idpromotion='").append(qPromotion.trim().replace("'","''")).append("'");
@@ -644,6 +644,10 @@
                 (nom.isEmpty() ? (p.getNom() != null ? ""+p.getNom().charAt(0) : "?") : ""+nom.charAt(0))
             ).toUpperCase();
 
+            // Photo de couverture
+            String coverPath = p.getPhotoCouverture() != null ? p.getPhotoCouverture().trim() : "";
+            String coverUrl  = !coverPath.isEmpty() ? (ctx + "/" + coverPath) : "";
+
             // Experience
             ExperienceLib exp = vExp ? (ExperienceLib) expMap.get(pid) : null;
             String expPoste      = (exp != null && exp.getPostelib() != null)  ? exp.getPostelib()  : "";
@@ -673,7 +677,9 @@
         %>
             <div class="an-card">
                 <div class="an-card-header">
-                    <div class="an-card-cover" style="background:<%= grad %>;"></div>
+                    <div class="an-card-cover" style="background:<%= grad %>;">
+                        <% if (!coverUrl.isEmpty()) { %><img src="<%= h(coverUrl) %>" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"><% } %>
+                    </div>
                     <span class="an-card-refuser"><%= h(!loginuser.isEmpty() ? loginuser : "REF " + refuser) %></span>
             <%
                 // Couleur et libelle de statut pour l'anneau et le titre

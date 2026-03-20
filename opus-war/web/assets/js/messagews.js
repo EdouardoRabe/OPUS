@@ -1,21 +1,27 @@
 var mySound;
-soundManager.setup({
-    onready: function () {
-        mySound = soundManager.createSound({
-            id: 'notify',
-            url: '../assets/audio/notify.mp3'
-        });
-    },
-    ontimeout: function () {
-    }
-});
+if (typeof soundManager !== 'undefined') {
+    soundManager.setup({
+        onready: function () {
+            mySound = soundManager.createSound({
+                id: 'notify',
+                url: '../assets/audio/notify.mp3'
+            });
+        },
+        ontimeout: function () {
+        }
+    });
+}
 function messageSound() {
-    mySound.play();
+    if (mySound) mySound.play();
 }
 
 var wsUri = location.protocol+'://'+location.hostname+':'+location.port+'?iduser=';
 var socket;
 function runWScommunication(iduser) {
+    if (typeof io === 'undefined') {
+        console.log('Socket.IO not loaded - real-time messaging disabled');
+        return;
+    }
     socket = io.connect(wsUri + iduser);
     socket.on('connect', function () {
     });
