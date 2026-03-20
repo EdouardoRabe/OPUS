@@ -1,0 +1,138 @@
+/* ============================================================
+   ACCUEIL-PAGE.CSS — Styles spécifiques à la page d'accueil
+   (filter panel, modales share/detail/reactions,
+    publication partagée embed)
+   ============================================================ */
+
+/* ---- Panneau filtre sidebar ---- */
+.fa-filter-panel { background:var(--fa-card-bg); border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.12); overflow:hidden; margin-top:12px; }
+.fa-filter-panel-header { display:flex; align-items:center; justify-content:space-between; padding:13px 16px 11px; border-bottom:1px solid var(--fa-border); }
+.fa-filter-panel-title { display:flex; align-items:center; gap:8px; font-weight:700; font-size:15px; color:var(--fa-text); }
+.fa-filter-reset-icon { background:none; border:none; font-size:16px; color:var(--fa-text-secondary); cursor:pointer; padding:5px 8px; border-radius:6px; display:flex; align-items:center; justify-content:center; transition:all .2s cubic-bezier(.4,0,.2,1); }
+.fa-filter-reset-icon:hover { background:rgba(0,139,255,.1); color:var(--itu-blue,#008BFF); transform:rotate(15deg); }
+.fa-filter-reset-icon:active { transform:rotate(20deg) scale(.95); }
+.fa-filter-panel-body { padding:12px 14px; display:flex; flex-direction:column; gap:12px; }
+.fa-filter-group { display:flex; flex-direction:column; gap:5px; }
+.fa-filter-group-label { font-size:11px; font-weight:700; color:var(--fa-text-secondary); text-transform:uppercase; letter-spacing:.5px; display:flex; align-items:center; gap:5px; }
+.fa-filter-group-input { padding:9px 12px; border:1.5px solid #e5e7eb; border-radius:10px; font-size:13px; background:linear-gradient(135deg,#f9fafb 0%,#f5f6f8 100%); color:var(--fa-text); outline:none; width:100%; box-sizing:border-box; transition:all .2s cubic-bezier(.4,0,.2,1); box-shadow:0 1px 2px rgba(0,0,0,.04); }
+.fa-filter-group-input::placeholder { color:#9ca3af; }
+.fa-filter-group-input:hover { border-color:#d1d5db; background:linear-gradient(135deg,#fff 0%,#f9fafb 100%); box-shadow:0 2px 6px rgba(0,139,255,.08); }
+.fa-filter-group-input:focus { border-color:var(--itu-blue,#008BFF); background:#fff; box-shadow:0 0 0 3px rgba(0,139,255,.12), 0 2px 8px rgba(0,139,255,.15); }
+
+/* Custom dropdown styles */
+.fa-filter-dropdown { position:relative; }
+.fa-filter-dropdown-trigger { display:flex; align-items:center; justify-content:space-between; padding:9px 12px; border:1.5px solid #e5e7eb; border-radius:10px; font-size:13px; background:linear-gradient(135deg,#f9fafb 0%,#f5f6f8 100%); color:var(--fa-text); cursor:pointer; width:100%; box-sizing:border-box; transition:all .2s cubic-bezier(.4,0,.2,1); box-shadow:0 1px 2px rgba(0,0,0,.04); user-select:none; }
+.fa-filter-dropdown-trigger:hover { border-color:#d1d5db; background:linear-gradient(135deg,#fff 0%,#f9fafb 100%); box-shadow:0 2px 6px rgba(0,139,255,.08); }
+.fa-filter-dropdown-trigger.active { border-color:var(--itu-blue,#008BFF); background:#fff; box-shadow:0 0 0 3px rgba(0,139,255,.12), 0 2px 8px rgba(0,139,255,.15); }
+.fa-filter-dropdown-icon { color:#9ca3af; transition:transform .2s; font-size:12px; }
+.fa-filter-dropdown-trigger.active .fa-filter-dropdown-icon { transform:rotate(180deg); color:var(--itu-blue,#008BFF); }
+.fa-filter-dropdown-menu { position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1.5px solid #e5e7eb; border-radius:10px; box-shadow:0 10px 32px rgba(0,0,0,.12); z-index:1000; display:none; flex-direction:column; max-height:260px; overflow-y:auto; overflow-x:hidden; }
+.fa-filter-dropdown-menu.active { display:flex; animation:slideDown .2s cubic-bezier(.4,0,.2,1); }
+@keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+.fa-filter-dropdown-menu::-webkit-scrollbar { width:4px; }
+.fa-filter-dropdown-menu::-webkit-scrollbar-track { background:transparent; }
+.fa-filter-dropdown-menu::-webkit-scrollbar-thumb { background:rgba(0,139,255,.2); border-radius:3px; }
+.fa-filter-dropdown-menu::-webkit-scrollbar-thumb:hover { background:rgba(0,139,255,.4); }
+.fa-filter-dropdown-item { padding:10px 12px; cursor:pointer; font-size:13px; color:var(--fa-text); border-bottom:1px solid #f3f4f6; transition:all .15s; display:flex; align-items:center; gap:8px; }
+.fa-filter-dropdown-item:last-child { border-bottom:none; }
+.fa-filter-dropdown-item:hover { background:#f0f4ff; color:var(--itu-blue,#008BFF); padding-left:16px; }
+.fa-filter-dropdown-item.selected { background:#e7f3ff; color:var(--itu-blue,#008BFF); font-weight:600; }
+.fa-filter-dropdown-item::before { content:''; width:12px; height:12px; border-radius:3px; border:1.5px solid #d1d5db; transition:all .2s; }
+.fa-filter-dropdown-item.selected::before { background:var(--itu-blue,#008BFF); border-color:var(--itu-blue,#008BFF); }
+
+/* Type publication : liste radio moderne */
+.fa-typepub-list { display:flex; flex-direction:column; gap:3px; max-height:220px; overflow-y:auto; }
+.fa-typepub-item { display:flex; align-items:center; gap:9px; padding:7px 10px; border-radius:8px; cursor:pointer; font-size:13px; color:var(--fa-text); border:1.5px solid transparent; transition:background .15s,border-color .15s; user-select:none; }
+.fa-typepub-item:hover { background:#e7f3ff; border-color:#b8dbff; }
+.fa-typepub-item.active { background:#e7f3ff; border-color:var(--itu-blue,#008BFF); color:var(--itu-blue,#008BFF); font-weight:600; }
+.fa-typepub-dot { width:14px; height:14px; border-radius:50%; border:2px solid #ccc; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:border-color .15s,background .15s; }
+.fa-typepub-item.active .fa-typepub-dot { border-color:var(--itu-blue,#008BFF); background:var(--itu-blue,#008BFF); }
+.fa-typepub-item.active .fa-typepub-dot::after { content:''; width:5px; height:5px; border-radius:50%; background:#fff; display:block; }
+
+/* Lier critères */
+.fa-filter-lier-row { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--fa-text-secondary); cursor:pointer; padding:2px 0; }
+
+/* Footer bouttons */
+.fa-filter-panel-footer { padding:8px 14px 14px; display:flex; gap:8px; }
+.fa-filter-btn-apply { flex:1; padding:9px 12px; background:var(--itu-blue,#008BFF); color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px; transition:background .15s; }
+.fa-filter-btn-apply:hover { background:#0069cc; }
+.fa-filter-btn-reset { padding:9px 10px; background:#e4e6eb; border:none; border-radius:8px; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s; }
+.fa-filter-btn-reset:hover { background:#d8dadf; }
+
+/* ---- Modale detail reactions ---- */
+#react-detail-modal { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.45); align-items:center; justify-content:center; }
+.react-detail-box { background:#fff; border-radius:14px; width:min(420px,95vw); max-height:80vh; display:flex; flex-direction:column; box-shadow:0 10px 40px rgba(0,0,0,.25); overflow:hidden; }
+.rdm-header { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--fa-border); }
+.rdm-title { margin:0; font-size:16px; font-weight:700; color:var(--fa-text); }
+.rdm-close { background:none; border:none; font-size:24px; cursor:pointer; color:var(--fa-text-secondary); line-height:1; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+.rdm-close:hover { background:#f0f2f5; }
+.rdm-tabs { display:flex; gap:2px; padding:6px 12px 0; border-bottom:1px solid var(--fa-border); flex-wrap:wrap; }
+.rdm-tab { background:none; border:none; border-bottom:3px solid transparent; margin-bottom:-1px; padding:8px 14px; font-size:14px; cursor:pointer; color:var(--fa-text-secondary); font-weight:500; display:flex; align-items:center; gap:4px; border-radius:4px 4px 0 0; }
+.rdm-tab:hover { background:#f0f2f5; }
+.rdm-tab--active { color:var(--itu-blue,#008BFF); border-bottom-color:var(--itu-blue,#008BFF); }
+.rdm-tab-count { font-size:12px; }
+#react-detail-content { overflow-y:auto; flex:1; min-height:60px; }
+.rdm-panel--hidden { display:none; }
+.rdm-user-row { display:flex; align-items:center; gap:10px; padding:10px 16px; text-decoration:none; color:var(--fa-text); transition:background .15s; }
+.rdm-user-row:hover { background:#f0f2f5; }
+.rdm-avatar { width:40px; height:40px; border-radius:50%; background:var(--itu-blue,#008BFF); color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; flex-shrink:0; overflow:hidden; }
+.rdm-user-name { flex:1; font-size:14px; font-weight:500; }
+.rdm-reaction-emoji { font-size:20px; }
+
+/* ---- Publication partagee : bloc original embedded ---- */
+.fa-shared-embed { border:1.5px solid var(--fa-border); border-radius:10px; margin:10px 0 4px; padding:12px 14px; background:#f8f9fb; cursor:default; }
+.fa-shared-embed--clickable { cursor:pointer; transition:border-color .2s, box-shadow .2s; }
+.fa-shared-embed--clickable:hover { border-color:var(--itu-blue,#008BFF); box-shadow:0 2px 12px rgba(0,139,255,.15); }
+.fa-shared-embed-header { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:6px; font-size:13px; }
+.fa-shared-embed-author { font-weight:700; }
+.fa-shared-embed-date { color:#888; font-size:12px; }
+.fa-shared-embed-text { font-size:13px; color:var(--fa-text); word-break:break-word; line-height:1.5; max-height:160px; overflow:hidden; }
+.fa-shared-embed img { max-width:100%; border-radius:8px; margin-top:8px; max-height:200px; object-fit:cover; cursor:pointer; pointer-events:auto; width:100%; }
+
+/* ---- Modale partage ---- */
+#share-modal { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.45); align-items:center; justify-content:center; }
+.share-box { background:#fff; border-radius:14px; width:min(500px,96vw); max-height:90vh; display:flex; flex-direction:column; box-shadow:0 10px 40px rgba(0,0,0,.25); overflow:hidden; }
+.share-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--fa-border); }
+.share-title { margin:0; font-size:16px; font-weight:700; }
+.share-body { padding:16px 18px; overflow-y:auto; flex:1; }
+.share-textarea { width:100%; min-height:80px; border:1.5px solid #dde3ec; border-radius:10px; padding:10px 12px; font-size:14px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; }
+.share-textarea:focus { border-color:var(--itu-blue,#008BFF); }
+.share-original { border:1.5px solid #dde3ec; border-radius:10px; padding:12px 14px; margin-top:12px; background:#f8f9fb; max-height:220px; overflow:hidden; pointer-events:none; }
+.share-orig-author { font-weight:700; font-size:13px; margin-bottom:4px; }
+.share-orig-date { font-size:11px; color:#888; margin-bottom:8px; }
+.share-orig-text { font-size:13px; color:var(--fa-text); white-space:pre-wrap; word-break:break-word; max-height:120px; overflow:hidden; }
+.share-footer { display:flex; justify-content:flex-end; gap:10px; padding:12px 18px; border-top:1px solid var(--fa-border); }
+.share-cancel-btn { background:transparent; border:1.5px solid var(--fa-border); border-radius:20px; padding:7px 18px; font-size:14px; font-weight:600; cursor:pointer; }
+.share-cancel-btn:hover { background:#f0f2f5; }
+.share-submit-btn { background:var(--itu-blue,#008BFF); color:#fff; border:none; border-radius:20px; padding:7px 18px; font-size:14px; font-weight:700; cursor:pointer; }
+.share-submit-btn:hover { opacity:.88; }
+.share-submit-btn:disabled { opacity:.5; cursor:default; }
+
+/* ---- Facebook-style publication detail modal ---- */
+#pub-detail-modal { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.85); align-items:center; justify-content:center; }
+.pub-fb-box { display:flex; width:min(95vw,1200px); height:min(92vh,800px); border-radius:12px; overflow:hidden; box-shadow:0 10px 50px rgba(0,0,0,.5); position:relative; }
+.pub-fb-close { position:absolute; top:10px; right:10px; z-index:10; background:rgba(255,255,255,.15); border:none; color:#fff; font-size:26px; width:38px; height:38px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .2s; line-height:1; }
+.pub-fb-close:hover { background:rgba(255,255,255,.3); }
+.pub-fb-media { flex:1; background:#1c1c1c; display:flex; align-items:center; justify-content:center; position:relative; min-width:0; overflow:hidden; }
+.pub-fb-media-content { width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; }
+.pub-fb-media-content img { max-width:100%; max-height:100%; object-fit:contain; border-radius:4px; user-select:none; }
+.pub-fb-media-content video { max-width:100%; max-height:100%; object-fit:contain; border-radius:4px; }
+.pub-fb-nav { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,.12); border:none; color:#fff; font-size:22px; width:44px; height:44px; border-radius:50%; cursor:pointer; display:none; align-items:center; justify-content:center; transition:background .2s; z-index:5; }
+.pub-fb-nav:hover { background:rgba(255,255,255,.3); }
+.pub-fb-nav--visible { display:flex !important; }
+.pub-fb-nav-prev { left:14px; }
+.pub-fb-nav-next { right:14px; }
+.pub-fb-media-counter { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.55); color:#fff; padding:4px 16px; border-radius:16px; font-size:13px; font-weight:600; display:none; }
+.pub-fb-details { width:420px; min-width:420px; max-width:420px; background:#fff; overflow-y:auto; display:flex; flex-direction:column; }
+.pub-fb-details .fa-post-card { border-radius:0; box-shadow:none; cursor:default; }
+.pub-fb-details .fa-post-card:hover { box-shadow:none; }
+.pub-fb-box--no-media { width:min(620px,96vw); height:auto; max-height:92vh; }
+.pub-fb-box--no-media .pub-fb-media { display:none; }
+.pub-fb-box--no-media .pub-fb-details { width:100%; min-width:0; max-width:none; }
+.pub-fb-box--no-media .pub-fb-close { color:#333; background:rgba(0,0,0,.06); }
+.pub-fb-box--no-media .pub-fb-close:hover { background:rgba(0,0,0,.12); }
+@media(max-width:900px) {
+    .pub-fb-box { flex-direction:column; width:96vw; height:auto; max-height:95vh; }
+    .pub-fb-media { max-height:50vh; flex:none; }
+    .pub-fb-details { width:100%; min-width:0; max-width:none; }
+}

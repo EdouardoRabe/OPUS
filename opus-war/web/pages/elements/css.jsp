@@ -55,8 +55,7 @@ folder instead of downloading all of them to reduce the load. -->
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />-->
 <link href='https://fonts.googleapis.com/css?family=Lato:900,300' rel='stylesheet' type='text/css'>
-<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
-
+<!-- Font Awesome 4.1.0 CDN retiré (doublon avec la 4.4.0 locale chargée plus haut) -->
 
 <!-- end of legend and print-->
 
@@ -134,50 +133,13 @@ folder instead of downloading all of them to reduce the load. -->
 <!-- Chart.js: garder une seule version locale pour éviter les conflits -->
 <script src="${pageContext.request.contextPath}/plugins/chartjs/Chart.min.js"></script>
 
-<style>
-    #mapid {
-        height: 450px;
-        width: 40%;
-    }
-    #dialog{
-        height: 380px;
-        width: 100%;
-    }
-    .ui-dialog {z-index:1000 !important;}
+<!-- SIG : carte / légende (externalisé) -->
+<link href="${pageContext.request.contextPath}/assets/css/map-legend.css" rel="stylesheet" type="text/css" />
 
-    .legend {
-        padding: 6px 8px;
-        font: 14px Arial, Helvetica, sans-serif;
-        background: white;
-        background: rgba(255, 255, 255, 0.8);
-        line-height: 24px;
-        color: #555;
-    }
-    .legend h4 {
-        text-align: center;
-        font-size: 16px;
-        margin: 2px 12px 8px;
-        color: #777;
-    }
-
-    .legend span {
-        position: relative;
-        bottom: 3px;
-    }
-
-    .legend i {
-        width: 5px;
-        height: 18px;
-        float: left;
-        margin: 0 8px 0 0;
-        opacity: 0.7;
-    }
-
-    .legend img {
-        width: 20px;
-        height: 20px;
-        background-color: rgba(255, 255, 255, 1);
-    }
-
-</style>
+<!-- ═══ CSS partagés (feed, composants réutilisables) ═══ -->
+<link href="${pageContext.request.contextPath}/assets/css/fa-variables.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/assets/css/fa-avatar.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/assets/css/fa-feed-layout.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/assets/css/fa-post-card.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/assets/css/fa-composer.css" rel="stylesheet" type="text/css" />
 <!--end SIG-->

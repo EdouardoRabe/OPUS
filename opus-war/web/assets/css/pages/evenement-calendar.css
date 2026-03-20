@@ -1,0 +1,351 @@
+/* ============================================================
+   EVENEMENT-CALENDAR.CSS — Styles du calendrier d'événements
+   (stats strip, layout, side panel, FullCalendar overrides,
+    modale détail événement)
+   ============================================================ */
+
+/* ── STATS STRIP ── */
+.cal-stats-strip {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0 1.25rem;
+    flex-wrap: wrap;
+}
+.cal-stat-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 0.7rem 1.2rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    min-width: 130px;
+}
+.cal-stat-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.9rem;
+}
+.cal-stat-text { display: flex; flex-direction: column; }
+.cal-stat-val { font-size: 1.25rem; font-weight: 800; color: var(--itu-dark); line-height: 1.2; }
+.cal-stat-label { font-size: 0.72rem; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+
+/* ── LAYOUT ── */
+.cal-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 1.5rem;
+    align-items: start;
+}
+@media (max-width: 960px) {
+    .cal-layout { grid-template-columns: 1fr; }
+}
+.cal-main-card {
+    padding: 2rem !important;
+    overflow: hidden;
+}
+
+/* ── SIDE PANEL ── */
+.cal-side-panel {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+.cal-side-header {
+    padding: 1rem 1.15rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--itu-dark);
+    border-bottom: 1px solid var(--gray-100);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.cal-upcoming-list {
+    max-height: 480px;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+}
+.cal-upcoming-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.7rem 1.15rem;
+    cursor: pointer;
+    transition: background .15s;
+    border-left: 3px solid transparent;
+}
+.cal-upcoming-item:hover {
+    background: #EFF6FF;
+    border-left-color: #1E40AF;
+}
+.cal-upcoming-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+}
+.cal-upcoming-info { flex: 1; min-width: 0; }
+.cal-upcoming-title {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--itu-dark);
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.cal-upcoming-date {
+    font-size: 0.72rem;
+    color: var(--gray-400);
+    margin-top: 2px;
+}
+.cal-upcoming-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--gray-400);
+    font-size: 0.85rem;
+}
+
+/* ── FULLCALENDAR OVERRIDES ── */
+#fullCalendar .fc-toolbar {
+    margin-bottom: 1.5rem !important;
+}
+#fullCalendar .fc-toolbar h2 {
+    font-size: 1.15rem !important;
+    font-weight: 700 !important;
+    color: var(--itu-dark) !important;
+    text-transform: capitalize;
+}
+#fullCalendar .fc-button {
+    background: var(--white) !important;
+    border: 1.5px solid var(--gray-200) !important;
+    color: var(--gray-600) !important;
+    border-radius: 8px !important;
+    padding: 0.4rem 0.85rem !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    text-transform: capitalize !important;
+    box-shadow: none !important;
+    transition: all .15s ease !important;
+    outline: none !important;
+}
+#fullCalendar .fc-button:hover {
+    background: #EFF6FF !important;
+    border-color: #3B82F6 !important;
+    color: #1E40AF !important;
+}
+#fullCalendar .fc-button.fc-state-active,
+#fullCalendar .fc-state-active {
+    background: #1E40AF !important;
+    border-color: #1E40AF !important;
+    color: #fff !important;
+}
+#fullCalendar .fc-button-group .fc-button {
+    border-radius: 0 !important;
+    margin-left: -1px;
+}
+#fullCalendar .fc-button-group .fc-button:first-child { border-radius: 8px 0 0 8px !important; }
+#fullCalendar .fc-button-group .fc-button:last-child  { border-radius: 0 8px 8px 0 !important; }
+#fullCalendar .fc-prev-button,
+#fullCalendar .fc-next-button {
+    border-radius: 8px !important;
+    width: 36px;
+    padding: 0.4rem 0 !important;
+    text-align: center;
+}
+
+/* Table heads */
+#fullCalendar th {
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    color: var(--gray-500) !important;
+    padding: 0.6rem 0 !important;
+    border-color: var(--gray-100) !important;
+    background: transparent !important;
+}
+#fullCalendar td {
+    border-color: var(--gray-100) !important;
+}
+#fullCalendar .fc-today {
+    background: rgba(30,64,175,0.04) !important;
+}
+#fullCalendar .fc-day-number {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    padding: 6px 8px !important;
+}
+#fullCalendar .fc-today .fc-day-number {
+    background: #1E40AF;
+    color: #fff;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+#fullCalendar .fc-other-month .fc-day-number {
+    color: var(--gray-300);
+}
+
+/* Events */
+#fullCalendar .fc-event {
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 2px 7px !important;
+    font-size: 0.76rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: transform .12s, box-shadow .12s !important;
+    margin-bottom: 2px !important;
+    line-height: 1.5 !important;
+    background: #1E40AF !important;
+    color: #fff !important;
+}
+#fullCalendar .fc-event-inner {
+    background: transparent !important;
+    color: #fff !important;
+}
+#fullCalendar .fc-event.fc-bg {
+    background: rgba(30,64,175,0.06) !important;
+}
+#fullCalendar .fc-event:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 12px rgba(30,64,175,0.25);
+}
+#fullCalendar .fc-day-grid-event .fc-content {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Week / Day views */
+#fullCalendar .fc-time-grid .fc-event {
+    border-radius: 8px !important;
+    padding: 4px 8px !important;
+}
+#fullCalendar .fc-unthemed .fc-divider,
+#fullCalendar .fc-unthemed .fc-popover .fc-header {
+    background: var(--gray-50, #f9fafb);
+}
+
+/* ── EVENT MODAL ── */
+.evt-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    animation: evtFadeIn .2s ease;
+}
+@keyframes evtFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+.evt-modal-card {
+    background: var(--white);
+    border-radius: 18px;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    overflow: hidden;
+    animation: evtSlideUp .25s ease;
+}
+@keyframes evtSlideUp {
+    from { opacity: 0; transform: translateY(30px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.evt-modal-banner {
+    height: 90px;
+    background: #1E40AF;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.evt-modal-banner-icon {
+    width: 50px; height: 50px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; color: #fff;
+}
+.evt-modal-close {
+    position: absolute;
+    top: 10px; right: 14px;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+    line-height: 1;
+}
+.evt-modal-close:hover { background: rgba(255,255,255,0.4); }
+.evt-modal-body { padding: 1.5rem 1.75rem 1.75rem; }
+.evt-modal-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--itu-dark);
+    margin: 0 0 0.25rem;
+    line-height: 1.35;
+}
+.evt-modal-id {
+    font-size: 0.72rem;
+    color: var(--gray-400);
+    margin-bottom: 1.25rem;
+}
+.evt-modal-dates {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    margin-bottom: 1.5rem;
+}
+.evt-modal-date-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.evt-modal-date-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+.evt-modal-date-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--gray-400);
+}
+.evt-modal-date-val {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--itu-dark);
+}
+.evt-modal-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+.evt-modal-actions .btn {
+    font-size: 0.85rem;
+    padding: 0.55rem 1rem;
+}

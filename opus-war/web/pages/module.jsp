@@ -50,8 +50,7 @@
     <link href="${pageContext.request.contextPath}/assets/css/alumni-navbar-module.css" rel="stylesheet" type="text/css" />
     <!-- Alumni Theme (card grids, page layouts, specialité, etc.) -->
     <link href="${pageContext.request.contextPath}/assets/css/alumni-theme.css" rel="stylesheet" type="text/css" />
-    <!-- OPUS Global Theme (must be last) -->
-    <link href="${pageContext.request.contextPath}/assets/css/opus-theme.css" rel="stylesheet" type="text/css" />
+    <!-- opus-theme.css déjà chargé dans css.jsp — ne pas dupliquer -->
     <script>
         const _CONTEXT_PATH = '<%= request.getContextPath() %>';
     </script>
