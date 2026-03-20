@@ -15,7 +15,7 @@
     // Dimensions pour photo de profil (carree)
     private static final int PROFILE_SIZE = 200;
     // Dimensions pour photo de couverture
-    private static final int COVER_WIDTH = 700;
+    private static final int COVER_WIDTH = 814;
     private static final int COVER_HEIGHT = 200;
 
     /**

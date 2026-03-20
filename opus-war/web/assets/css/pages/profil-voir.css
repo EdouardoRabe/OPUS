@@ -19,15 +19,14 @@
 
 /* ── Cover ── */
 .pv-cover {
+    width: 814px;
     height: 200px;
+    margin: 0 auto;
     background: linear-gradient(135deg, #003366 0%, #0a66c2 60%, #378fe9 100%);
     border-radius: 10px 10px 0 0;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
-.pv-cover-img { width:100%; height:100%; object-fit:contain; display:block; }
+.pv-cover-img { width:814px; height:200px; object-fit:cover; display:block; }
 
 /* ── Edit buttons ── */
 .pv-cover-edit {
