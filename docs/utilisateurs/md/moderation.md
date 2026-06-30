@@ -1,17 +1,24 @@
 # Moderation des Publications
 
-## Acces
+## Modifier ou supprimer sa propre publication
 
-Les fonctionnalites de moderation sont reservees au role moderateur (`md`).
+Comme tout utilisateur, le moderateur peut modifier ou supprimer ses propres publications depuis leur fiche.
 
-## Modifier une publication
+## Supprimer la publication d'un autre utilisateur
 
-En tant que moderateur, un bouton de modification est disponible sur toutes les publications, y compris celles des autres membres.
+Cette action est reservee au moderateur et se fait uniquement depuis la page de detail d'un signalement :
 
-Cliquer sur "Modifier", changer le texte ou le type de publication, puis valider. La modification est enregistree avec un historique.
+1. Aller dans Moderation > Signalements.
+2. Cliquer sur "Voir le detail" sur le signalement concerne.
+3. La publication signalee est affichee. Si elle existe encore, un bouton "Supprimer la publication" est disponible.
+4. Confirmer la suppression. La publication disparait du feed pour tous les membres.
 
-## Supprimer une publication
+> La suppression est un soft delete (etat = 0 en base). La publication n'est plus visible mais les donnees restent.
 
-Cliquer sur "Supprimer" sur la publication ciblee. La suppression est logique (soft delete) : la publication disparait du feed mais reste en base de donnees avec l'etat "annule".
+## Flux typique de traitement d'un signalement
 
-> Un signalement de la part d'un membre peut alerter le moderateur sur une publication a verifier.
+1. Un membre signale une publication inappropriee (bouton de signalement dans le feed).
+2. Le signalement apparait dans Moderation > Signalements.
+3. Le moderateur consulte le detail et visualise la publication.
+4. Si la publication est effectivement inappropriee, le moderateur la supprime.
+5. Si necessaire, le moderateur peut aussi bannir l'auteur depuis Moderation > Utilisateurs.
