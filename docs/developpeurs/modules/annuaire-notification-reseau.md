@@ -55,6 +55,40 @@ Fonctions cles:
 	- `action=all`: mark all unread via SQL prepare.
 	- Sinon mark one by id avec verification d'appartenance utilisateur.
 
+## WebSocket temps reel (`NotificationSocket`)
+
+Fichier: `opus-ejb/src/java/web/socket/NotificationSocket.java`
+
+Endpoint: `@ServerEndpoint("/ws/notifications")`
+
+### Protocole client
+
+Le client JS se connecte a `ws://<host>/opus/ws/notifications` et envoie immediatement:
+
+```
+register:<userId>
+```
+
+Cela lie la session WebSocket a l'utilisateur. Un meme utilisateur peut avoir plusieurs sessions (plusieurs onglets ouverts).
+
+### Envoi de notifications
+
+`Notification.creerEtEnvoyer()` est la methode centrale pour persister une notification ET envoyer le push WebSocket. Elle utilise `NotificationSocket.broadcast()` — ce qui signifie que **tous** les clients connectes recoivent le message. C'est le front-end JS qui filtre par `refUser` pour n'afficher que les notifications qui lui sont destinees.
+
+Format du message WebSocket envoye:
+
+```json
+{"refUser":"<idutilisateur>","message":"<objet>","type":"<typenotif>"}
+```
+
+Types de notification (`Notification.TYPE_*`): `COMMENT`, `REPLY`, `PUB_REACTION`, `COMM_REACTION`, `MENTION`, `IDENTIFICATION`, `EVENEMENT`, `HASHTAG`.
+
+### Point de vigilance relais
+
+- `NotificationSocket.broadcastToUser(userId, message)` existe mais n'est pas utilise actuellement. Si les volumes augmentent, remplacer `broadcast()` par `broadcastToUser()` dans `Notification.creerEtEnvoyer()` pour eviter que chaque client recoive toutes les notifications du systeme.
+- Ne jamais appeler `NotificationSocket` depuis les JSP. Le push doit transiter par la methode `Notification.creerEtEnvoyer()` dans l'EJB.
+- Si le WebSocket n'est pas declenche, verifier que le client a bien envoye `register:<userId>` apres connexion.
+
 ## Reseau professionnel
 
 Page:

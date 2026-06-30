@@ -30,6 +30,7 @@ Build/deploiement principal : `build.xml` racine (Ant) qui compile EJB puis WAR,
 | Entites metier (mapping table) | `opus-ejb/src/java/alumni/*.java` |
 | EJB facade session | `opus-ejb/src/java/user/UserEJBBean.java` (stocke en session HTTP comme `"u"`) |
 | WebSocket notifications | `opus-ejb/src/java/web/socket/NotificationSocket.java` (`/ws/notifications`) |
+| Taches planifiees | `opus-ejb/src/java/web/alert/AlerteSchedulerEJB.java` (chaque minute) |
 | Scripts SQL | `BDD/` |
 
 ## Framework APJ — Conventions
@@ -92,8 +93,18 @@ ant buildEjbJar   # compile EJB seulement (verification rapide d'erreurs Java)
 ant clean         # nettoie les artefacts
 ```
 
+## Taches planifiees (`AlerteSchedulerEJB`)
+
+Fichier: `opus-ejb/src/java/web/alert/AlerteSchedulerEJB.java`
+
+- `@Singleton @Startup` — instancie automatiquement au demarrage WildFly.
+- `@Schedule(second="0", minute="*", hour="*", persistent=false)` — methode `verifierAlertes()` declenchee chaque minute.
+- Le corps de `verifierAlertes()` est actuellement vide (stub). C'est le point d'entree pour ajouter des taches cron futures (alertes automatiques, nettoyage, envoi de rappels).
+- Connexion DB via `SingletonConn.getInstance().getConnection()` — connexion singleton partagee, differente de `new UtilDB().GetConn()` utilise dans les services `alumni.*`. Ne pas melanger les deux dans ce EJB.
+
 ## Raccourcis de comprehension
 
 - Modifier un comportement metier → commencer par `alumni.*Service`.
 - Modifier l'affichage → commencer par JSP dans `opus-war/web/pages/`.
 - Modifier les donnees persistees → verifier classe `alumni.*` + script SQL dans `BDD/`.
+- Ajouter une tache planifiee → `AlerteSchedulerEJB.verifierAlertes()`.
