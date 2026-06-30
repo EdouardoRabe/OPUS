@@ -1,18 +1,25 @@
 # Mon Profil
 
-## Acceder a son profil
+## Voir son propre profil
 
-Cliquer sur son nom ou son avatar dans le menu pour ouvrir la page de profil.
+Cliquer sur son nom ou son avatar dans le menu pour ouvrir la page de profil. Elle affiche toutes les informations publiques et privees : photo, nom, statut, experiences, specialites, reseaux sociaux, localisation.
+
+> La page "Mon profil" (`profil/voir.jsp`) est differente de la fiche annuaire d'un autre membre (`annuaire/fiche-utilisateur.jsp`). Sur sa propre page, on voit aussi les champs prives et les boutons de modification.
 
 ## Modifier ses informations personnelles
 
 Dans la section informations, renseigner ou modifier :
 - Nom et prenom
+- Email
+- Date de naissance
 - Numero de telephone
-- Statut (ex : en poste, en recherche d'emploi)
 - Localisation (ville, pays) — utilisee pour apparaitre sur la carte alumni
 
 Valider avec le bouton de sauvegarde.
+
+## Statut professionnel
+
+Renseigner son statut actuel (ex : En poste, En recherche d'emploi, Etudiant, etc.) depuis la section statut du profil. Ce statut est visible sur la fiche annuaire selon les reglages de confidentialite.
 
 ## Photo de profil
 
@@ -42,7 +49,7 @@ Ajouter ou retirer des specialites depuis la liste disponible. Elles sont utilis
 
 ## Confidentialite
 
-Dans les parametres de confidentialite, choisir qui peut voir chaque information du profil (telephone, localisation, experiences, etc.). Chaque champ peut etre rendu visible ou cache independamment.
+Dans les parametres de confidentialite (`profil/confidentialite.jsp`), choisir qui peut voir chaque information du profil (telephone, localisation, experiences, etc.). Chaque champ peut etre rendu visible ou cache independamment.
 
 ## Changer de mot de passe
 

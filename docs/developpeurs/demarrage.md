@@ -49,6 +49,16 @@
 - Ne jamais modifier le schema sans script versionne dans `BDD/`.
 - Conserver les noms de fichiers et conventions existantes pour rester compatible avec les ecrans actuels.
 
+## Flux d'inscription d'un nouvel utilisateur
+
+1. L'utilisateur remplit le formulaire sur `inscription.jsp` (login ETU/nom, email, telephone, role, promotion, parcours).
+2. Son compte est cree avec l'etat "En attente" (`attenteValidation.jsp` lui est affiche).
+3. Le moderateur voit le compte dans Moderation > Utilisateurs et clique "Valider".
+4. L'utilisateur peut alors se connecter.
+
+Pages impliquees : `inscription.jsp` → `detailsInscription.jsp` → `attenteValidation.jsp` → `mod/gestion-utilisateurs.jsp` (validation md).
+Methode EJB : `UserEJBBean.createUtilisateurs()` pour la creation, `UserEJBBean.activeUtilisateur()` pour la validation.
+
 ## Points d'attention
 
 - Beaucoup de logique de validation est dans les JSP AJAX : verifier ces fichiers en priorite.

@@ -69,6 +69,14 @@ But : passer d'un bug/feature a la bonne methode Java en moins de 5 minutes.
 | Modifier specialite | `alumni.SpecialiteAdminService.modifier` |
 | Modifier limite role | `alumni.LimiteroleService.modifier` |
 
+## Autocompletion et Mentions (creation de publication)
+
+| Action | Methode |
+|--------|---------|
+| Autocompletion hashtags (`#promotion`, `#specialite`, `#parcours`) | `alumni.HashtagSuggestService.suggest` |
+| Autocompletion mentions (`@utilisateur`) | `alumni.UtilisateurSearchService.rechercher` |
+| Enregistrer les mentions d'une publication | `alumni.IdentificationService.identifier` |
+
 ## Procedure de triage bug
 
 1. Identifier l'endpoint JSP appele depuis la page.

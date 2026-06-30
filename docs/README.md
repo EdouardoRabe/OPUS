@@ -39,6 +39,7 @@ Seul le moderateur (`md`) a des fonctionnalites differentes des autres roles. To
 | `utilisateurs/communs/notifications.md` | Gestion des notifications |
 | `utilisateurs/communs/reseau-professionnel.md` | Graphe de reseau professionnel |
 | `utilisateurs/communs/carte.md` | Carte de localisation des membres |
+| `utilisateurs/communs/recherche-globale.md` | Recherche multi-onglets (personnes + publications) |
 
 ### Moderateur (md)
 
