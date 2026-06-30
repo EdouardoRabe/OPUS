@@ -24,32 +24,25 @@ docs/
 
 ## Utilisateurs
 
-| Dossier | Public cible |
-|---------|-------------|
-| `utilisateurs/communs/` | Fonctionnalites accessibles a tous (md, alu, etu) |
-| `utilisateurs/md/` | Fonctionnalites specifiques au moderateur |
-| `utilisateurs/alu/` | Fonctionnalites specifiques aux alumni |
-| `utilisateurs/etu/` | Fonctionnalites specifiques aux etudiants |
+Seul le moderateur (`md`) a des fonctionnalites differentes des autres roles. Tous les autres membres (alu, etu) ont acces aux memes pages — la seule difference est le quota de publications par jour (alu : 4, etu : 10).
 
 ### Communs (md + alu + etu)
 
-- `utilisateurs/communs/feed.md` — fil d'actualite, reactions, commentaires
-- `utilisateurs/communs/profil.md` — modifier son profil, photo, CV, confidentialite
-- `utilisateurs/communs/evenements.md` — calendrier, participation aux evenements
-- `utilisateurs/communs/annuaire.md` — recherche d'alumni
-- `utilisateurs/communs/notifications.md` — gestion des notifications
+| Fichier | Contenu |
+|---------|---------|
+| `utilisateurs/communs/feed.md` | Fil d'actualite, reactions, commentaires, partage, signalement |
+| `utilisateurs/communs/publications.md` | Creer une publication, limites par role |
+| `utilisateurs/communs/publications-enregistrees.md` | Sauvegarder et retrouver des publications |
+| `utilisateurs/communs/profil.md` | Modifier son profil, photo, CV, experiences, confidentialite |
+| `utilisateurs/communs/evenements.md` | Calendrier, participation aux evenements |
+| `utilisateurs/communs/annuaire.md` | Recherche de membres |
+| `utilisateurs/communs/notifications.md` | Gestion des notifications |
+| `utilisateurs/communs/reseau-professionnel.md` | Graphe de reseau professionnel |
+| `utilisateurs/communs/carte.md` | Carte de localisation des membres |
 
 ### Moderateur (md)
 
-- `utilisateurs/md/moderation.md` — moderation des publications
-- `utilisateurs/md/administration.md` — specialites, limites de role, menus, dashboard
-
-### Alumni (alu)
-
-- `utilisateurs/alu/publications.md` — creer une publication (limite: 4/jour)
-- `utilisateurs/alu/reseau-professionnel.md` — graphe de reseau professionnel
-- `utilisateurs/alu/carte.md` — carte de localisation des alumni
-
-### Etudiants (etu)
-
-- `utilisateurs/etu/publications.md` — creer une publication (limite: 10/jour)
+| Fichier | Contenu |
+|---------|---------|
+| `utilisateurs/md/moderation.md` | Moderation des publications (soft delete, modification) |
+| `utilisateurs/md/administration.md` | Gestion utilisateurs, signalements, evenements, specialites, limites, menus |

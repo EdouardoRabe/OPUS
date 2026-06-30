@@ -2,11 +2,11 @@
 
 ## Acceder au reseau
 
-Le menu "Reseau" ouvre le graphe de reseau professionnel. Il represente les connexions et affinites entre les membres du reseau alumni.
+Le menu "Reseau" ouvre le graphe de reseau professionnel. Il represente les affinites et compatibilites entre les membres.
 
 ## Score de compatibilite
 
-Chaque lien entre deux profils est calcule a partir d'un score sur 100 base sur :
+Chaque lien entre deux profils est calcule sur 100 base sur :
 
 | Critere | Poids |
 |---------|-------|
@@ -17,9 +17,7 @@ Chaque lien entre deux profils est calcule a partir d'un score sur 100 base sur 
 
 ## Lire le graphe
 
-Les noeuds representent les membres. Les liens representent les affinites. Un lien plus epais ou plus colore indique un score de compatibilite plus eleve.
-
-Cliquer sur un noeud pour afficher la fiche du membre correspondant.
+Les noeuds representent les membres. Cliquer sur un noeud pour afficher la fiche du membre correspondant.
 
 ## Ameliorer son score de reseau
 
