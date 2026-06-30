@@ -49,14 +49,35 @@ Classe: `CreerPublicationService`
   - Retourne `null` si autorise, sinon message metier bloquant.
 
 - `creerPublication(...)`
+  - Toute la methode est dans une seule transaction (`setAutoCommit(false)` / `commit`). Un echec partiel rollback tout.
   - Cree la publication (`publication`) avec type par defaut `TPB000001`.
   - Ajoute medias (`media`) deja uploades par JSP.
   - Ajoute identifications (`identification`) et declenche notifications cibles.
   - Parse hashtags de `description` et cree des liens dans `publicationhashtag`.
+  - Point technique: `publicationhashtag` est en PK SERIAL, insertion via SQL raw avec `ON CONFLICT DO NOTHING`.
   - Cree notifications "hashtag" en ciblant les utilisateurs concernes.
   - Persiste regles de visibilite dans `publicationvisibilite` (SPECIALITE/PARCOURS/PROMOTION).
   - Gere la logique de visibilite `AND` via `publication.logique_visibilite`.
-  - Point technique important: `publicationhashtag` est en PK SERIAL, insertion via SQL raw dediee.
+
+**Logique de matching hashtag (important):**
+- Regex : `#([A-Za-z0-9]+)`, normalise en majuscules sans caracteres speciaux.
+- **Les caracteres accentues sont supprimes silencieusement** : `#Génie` → token `GNIE`. Un utilisateur qui tape `#Genie` sans accent arrive au meme token, mais `#Génie` avec accent rate le match si le libelle contient l'accent et est normalise differemment.
+- Specialite : match flou (prefixe OU suffixe suffisant — `sNorm.startsWith(tok) || tok.startsWith(sNorm)`).
+- Promotion : match EXACT uniquement.
+- Parcours : match flou (meme logique que specialite).
+- Consequence : `#DEV` peut matcher "DEVELOPPEMENT" (prefixe), et inversement.
+- **Notifications de masse** : un hashtag SPECIALITE envoie une notification a TOUS les utilisateurs ayant cette specialite. Aucune limite de destinataires. Pour une specialite populaire, une seule publication peut generer des centaines d'inserts DB + WebSocket pushes en une seule transaction.
+- Message de notification hashtag hardcode : `"a publie une offre qui vous concerne"` — utilise ce texte pour tous les types de publication, y compris les evenements ou questions.
+
+**Logique de visibilite dans le feed (`FeedHtmlService.buildVisibiliteClause`):**
+- Une publication EST visible si : auteur = connecte, OU aucune regle dans `publicationvisibilite`, OU regles matchent.
+- Logique OR (defaut) : ANY des criteres (SPECIALITE ou PARCOURS ou PROMOTION) suffit.
+- Logique AND (`logique_visibilite='AND'`) : TOUS les criteres **presents** doivent matcher. Si une dimension est absente (ex: pas de ligne PROMOTION), cette dimension est considered comme satisfaite. Exemple : AND avec seulement une ligne SPECIALITE est visible a toutes les promotions et tous les parcours.
+- Critere PROMOTION : compare l'annee (`promotion.annee`) de l'utilisateur connecte contre `anneeref` et `anneedirection` ('+' = annee >= anneeref, '-' = annee <= anneeref) — pas par idpromotion.
+- Le feed exclut automatiquement les publications des utilisateurs bannis (`estactif=0`). L'auteur voit toujours SES propres publications meme si elles seraient exclues par la visibilite pour les autres.
+
+**Filtre multi-hashtag dans le feed (`buildHashtagClause`):**
+- Plusieurs filtres actifs en meme temps : combines en AND si `filterLier=1`, sinon OR.
 
 Classe: `FeedHtmlService`
 
@@ -74,7 +95,9 @@ Classe: `FeedHtmlService`
   - Charge une publication unique + toutes donnees associees de rendu.
 
 - `publicationsProfil(...)`
-  - Resout cible via `paramIdUser` ou `paramIdProfil`, puis pagination par `cursorId`.
+  - Tri **chronologique** par `idpublication DESC` — pas de score. La page profil n'utilise PAS la formule de ranking.
+  - Ne filtre PAS les publications des utilisateurs bannis (contrairement au feed principal). Un moderateur qui consulte le profil d'un banni peut voir toutes ses publications.
+  - Pagination par `cursorId` uniquement (pas de cursorScore).
 
 Classe: `CommentaireService`
 
@@ -88,14 +111,16 @@ Classe: `CommentaireService`
 Classe: `ReactionService`
 
 - `reagirPublication(...)`
-  - Toggle reaction utilisateur sur publication (delete + optional insert si changement).
-  - Notifie le proprietaire de publication.
+  - Toggle : supprime reaction existante, re-insere seulement si type DIFFERENT (clic sur meme type = suppression pure).
+  - Notification envoyee UNIQUEMENT sur NOUVELLE reaction (pas sur changement de type, pas sur suppression).
+  - Auto-reaction interdite : proprietaire de la publication n'est jamais notifie de sa propre reaction.
 
 - `reagirCommentaire(...)`
-  - Meme logique pour commentaire, notification au proprietaire du commentaire.
+  - Meme logique que reagirPublication, notification au proprietaire du commentaire.
 
 - `detailReactions(...)`
   - Retourne detail par type: emoji, count, liste utilisateurs reacteurs.
+  - Emojis derives du libelle : mots-cles `adore/love` → ❤️, `haha/humour` → 😂, `surprise/wow` → 😮, `triste/sad` → 😢, `grrr/ang` → 😠, sinon 👍.
 
 Classe: `PublicationActionService`
 
@@ -106,18 +131,60 @@ Classe: `PublicationActionService`
   - Toggle bookmark dans `publicationenregistrement`.
 
 - `reportPublication(...)`
-  - Cree une entree `signalementpublication` par type selectionne.
+  - Signalement multi-types : cree UNE ligne dans `signalementpublication` par type de motif coche. Un signalement avec 3 motifs = 3 inserts.
+  - Au moins un type requis, sinon retourne erreur metier.
 
 - `partagerPublication(...)`
-  - Cree nouvelle publication partagee (`idpuborigine`), interdit auto-partage, notifie auteur original.
+  - Interdit auto-partage (`origPub.idutilisateur == refuser` → erreur).
+  - Interdit partage d'une publication inactive (`etat != 1`).
+  - Copie le `idtypepublication` de la publication originale (pas TPB000001 par defaut).
+  - Notification a l'auteur original via `TYPE_MENTION` (pas un TYPE_SHARE dedie — a retenir pour triage de bugs notifications).
 
 Classe: `PublicationAdminService`
 
 - `supprimer(...)`
-  - Soft delete via `etat=0` apres verification de propriete.
+  - Verification de propriete via `CGenUtil.rechercher(critere, null, null, "")` SANS connexion passee (APJ ouvre la sienne).
+  - Soft delete via `updateToTableDirecte` (raw SQL UPDATE) — PAS via `updateToTableWithHisto` : la suppression n'est PAS historisee.
 
 - `modifier(...)`
-  - Met a jour description/type apres verification de propriete.
+  - Meme verification de propriete sans connexion.
+  - Mise a jour via `updateToTableWithHisto` (historisee, contrairement a supprimer).
+  - **Ne reprocesse pas les hashtags ni la visibilite** : si l'utilisateur retire un hashtag de la description modifiee, les anciennes lignes `publicationhashtag` restent en base.
+
+Classe: `PublicationActionService` — points supplementaires
+
+- `marquerVue` : compteur `nbvue` incremente a chaque appel (`ON CONFLICT DO UPDATE SET nbvue = nbvue + 1`). Ouvrir la meme publication plusieurs fois augmente la penalite de score dans le feed de cet utilisateur.
+- `partagerPublication` : ne verifie pas si l'auteur du partage peut voir la publication originale. Un utilisateur peut partager une publication dont il ne fait pas partie du public cible, s'il en connait l'ID.
+- `reportPublication` : aucun check de doublon — un meme utilisateur peut signaler la meme publication avec le meme motif plusieurs fois.
+
+**Upload media (JSP `creer-publication.jsp`) — details techniques :**
+- Taille max : **50 Mo par fichier** ET **50 Mo total** (les deux limites sont identiques en pratique).
+- Toutes les images (PNG, GIF, WEBP, etc.) sont **recompressees en JPEG** : les transparences PNG sont perdues, le format d'origine est abandonne.
+- Redimensionnement seulement si > 1200×1200 px ; en dessous, l'image est quand meme recodee en JPEG.
+- Les fichiers sont stockes dans **`dossier.war/async/publications/`**, PAS sous `opus.war`. Le deploiement doit inclure `dossier.war` en parallele sinon les uploads echouent silencieusement.
+- Types media hardcodes : `MDT000001` (image), `MDT000002` (video si `contentType.startsWith("video/")`). Tout autre type est traite comme image.
+- Le `idtypepublication` par defaut `TPB000001` est defini DEUX fois : dans le JSP ET dans `CreerPublicationService`. Si on change la valeur, modifier les deux endroits.
+
+Classe: `CommentaireService`
+
+- Anti-doublon notifications : utilise un `Set notifiedUsers`. Si le propriétaire de la pub est aussi l'auteur du commentaire parent, il ne reçoit qu'une notification (reply), pas deux.
+- `chargerCommentaires` : commentaires tries par `idpublicationcommentaire ASC` (ordre chronologique insertion).
+
+Classe: `HashtagSuggestService`
+
+- `suggest(String query)`
+  - Recherche insensible a la casse et aux espaces (`UPPER(REPLACE(libelle,' ',''))`).
+  - Retourne max 5 resultats par categorie (5 promotions + 5 specialites + 5 parcours = 15 suggestions max).
+  - Tags specialite et parcours tronques a **21 caracteres** (hashtag compris). Si un libelle depasse 20 chars, le hashtag sera coupe.
+  - Promotions triees par annee DESC, specialites/parcours par libelle ASC.
+
+Classe: `IdentificationService`
+
+- `identifier(int refuser, String idpublication, String idsUtilisateurs)`
+  - Anti-doublon : n'insere pas si l'utilisateur est deja identifie dans cette publication.
+  - Envoie notification `TYPE_IDENTIFICATION` uniquement pour les NOUVELLES identifications.
+  - Retourne `nbIdentifies` (nb nouvelles identifications, pas le total).
+  - Le lien de notification utilise `#pub-<id>` (ancre HTML), different de `&scrollTo=pub-` utilise par `creerPublication`.
 
 ## Entites/tables frequentes
 

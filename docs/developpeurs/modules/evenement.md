@@ -41,20 +41,29 @@ Classe: `EvenementService`
   - Enrichit chaque evenement avec:
     - `participating` (si user connecte participe)
     - `nbParticipants`
-    - `color` genere
+    - `color` : couleur issue d'un tableau de 8 codes hex hardcodes, cyclee par index (`i % 8`). Si on ajoute plus de 8 evenements simultanement, les couleurs se repetent.
+  - Charge TOUTES les participations de la base en memoire (`CGenUtil.rechercher(..., "")`) pour calculer `nbParticipants`. A surveiller si la table grossit.
 
 - `insererEvenement(...)`
   - Cree l'evenement.
-  - Notifie tous les autres profils du systeme.
+  - Notifie TOUS les autres profils du systeme (une notification par profil, hors createur). Peut generer beaucoup de notifications si la base est large.
+  - `datefin` est optionnel (peut etre `null`).
 
 - `updateEvenement(...)`
   - Met a jour description/date debut/date fin.
+  - Si `datefin` est vide, il est remis a `null` (suppression de la date de fin).
+  - **Aucun controle de propriete** : n'importe quel utilisateur authentifie peut modifier n'importe quel evenement. Le controle doit etre fait dans le JSP appelant.
+  - **Ne met pas a jour la publication associee** : si un evenement a deja ete publie via `publierEvenement`, modifier l'evenement ne met pas a jour le texte de la publication sur le feed. Les deux divergent silencieusement.
 
 - `participer(...)`
-  - Insere participation dans `participation_evenement`.
+  - **Aucun check de doublon avant insert** : si la participation existe deja, une exception DB est levee (erreur non geree proprement). Toujours appeler `checkParticipation` avant.
+  - **Aucun check que l'evenement existe** : un `idevenement` fantaisiste insere une participation orpheline jusqu'a echec FK.
+
+- `participer(...)`
+  - Insere participation dans `participation_evenement` via `insertToTableWithHisto` (historisee).
 
 - `annulerParticipation(...)`
-  - Supprime la participation existante.
+  - Supprime via `deleteToTable` (PAS `deleteToTableWithHisto`) — annulation NON historisee, asymetrique avec `participer`.
 
 - `publierEvenement(...)`
   - Verifie existence evenement.

@@ -37,12 +37,14 @@ Classe: `ProfilService`
 
 - `updateConfidentialite(int refuser, String idprofil, Map statusMap)`
   - Resout `idprofil` automatiquement si absent via `Profil.findByRefUser`.
-  - Parcourt 12 champs (`nom`, `prenom`, `dtn`, `experience`, `specialite`, `promotion`, `email`, `parcours`, `telephone`, `genre`, `socialmedia`, `localisation`).
+  - Parcourt 12 champs : `nom`, `prenom`, `dtn`, `experience`, `specialite`, `promotion`, `email`, `parcours`, `telephone`, `genre`, `socialmedia`, `localisation`.
   - Fait un upsert logique dans `visibilite` (update si existe, sinon insert) avec historisation.
+  - `status=1` = visible, `status=0` = cache. Si le parametre `status_<champ>` est absent du formulaire, le champ est mis a 0 (cache).
   - Retour JSON: `{"success":true}` ou erreur explicite.
 
 - `deleteCv(int refuser)`
-  - Supprime physiquement le fichier CV sur disque sous `jboss.server.base.dir/deployments/opus.war/...`.
+  - Supprime physiquement le fichier CV sur disque via `jboss.server.base.dir + "/deployments/opus.war/" + oldCv`.
+  - Le nom `opus.war` est **hardcode** dans le chemin. Renommer le WAR casse la suppression physique silencieusement (la ligne DB est effacee mais le fichier reste sur disque).
   - Met ensuite `profil.cv` a `null` et historise.
 
 - `uploadCv(int refuser, String cvRelPath)`
@@ -58,15 +60,18 @@ Classe: `ProfilService`
   - Persiste latitude/longitude dans `profilemplacement`.
 
 - `changePassword(...)`
-  - Verifie ancien mot de passe via `Paramcrypt` + `Utilitaire.cryptWord`.
-  - Fait un `UPDATE utilisateur SET pwduser = ?` en SQL prepare.
-  - Retourne `_pwdCrypt` pour permettre au JSP de resynchroniser la session.
+  - Mot de passe minimum : **3 caracteres** (valide cote service, pas uniquement UI).
+  - Le mot de passe est **mis en minuscules avant chiffrement** (`oldPassword.trim().toLowerCase()`). Les mots de passe sont donc insensibles a la casse — "Secret123" et "secret123" sont equivalents.
+  - Verifie ancien mot de passe via `Paramcrypt` (niveau + croissante) + `Utilitaire.cryptWord`.
+  - Fait un `UPDATE utilisateur SET pwduser = ?` en SQL prepare (contournement probleme de type APJ sur `refuser` integer).
+  - Retourne `_pwdCrypt` dans le JSON : le JSP DOIT l'utiliser pour mettre a jour `mu.setPwduser()` en session, sinon la prochaine action sera rejetee (session obsolete).
 
 - `uploadPhoto(int refuser, int photoType, String photoRelPath)`
-  - Inserte une nouvelle ligne dans `photo` (pas un update in-place), avec date/heure.
+  - Inserte une NOUVELLE ligne dans `photo` (pas un update in-place). L'ancien fichier physique n'est PAS supprime du disque.
+  - Le chemin relatif est sauvegarde ; la construction de l'URL complete (avec `contextPath`) est faite cote JSP.
 
 - `updateProfilInfo(int refuser, String nom, String prenom, String telephone)`
-  - Met a jour `utilisateur.nomuser` et `utilisateur.teluser`.
+  - `utilisateur.nomuser` est stocke comme `nom + " " + prenom` (concatene). C'est ce champ qui apparait partout dans le systeme (feed, notifications, annuaire).
   - Utilise SQL prepare (contournement de probleme de type sur `refuser` integer).
 
 - `updateStatut(...)`

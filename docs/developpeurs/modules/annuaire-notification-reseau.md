@@ -22,12 +22,14 @@ Service:
 Fonction cle:
 
 - `AnnuaireService.rechercher(...)`
-	- Filtres supportes: nom, promotion, parcours, specialite, entreprise, poste, annee.
-	- Pagination: page numerique, taille fixe 12.
-	- Filtrage entreprise/poste base sur derniere experience (`ExperienceLib`).
-	- Filtrage specialite via `specialiteprofil`.
-	- Exclut profils inactifs (`estactif = 1`).
-	- Retour JSON avec `total`, `page`, `totalPages`, `resultats`.
+  - Filtres supportes: nom, promotion, parcours, specialite, entreprise, poste, annee.
+  - Exclut profils inactifs (`estactif = 1`).
+  - **Filtre nom bidirectionnel** : cherche `LOWER(nom || ' ' || prenom) LIKE '%query%'` ET `LOWER(prenom || ' ' || nom) LIKE '%query%'` — ordre prenom/nom ne bloque pas la recherche.
+  - **Filtres entreprise/poste** : post-filtrage en Java (pas en SQL). Charge toutes les `ExperienceLib` per profil puis filtre en Java sur la DERNIERE experience (`debut DESC`). Si la base est large et ces filtres actifs, c'est couteux (N requetes).
+  - **Filtre specialite** : second post-filtrage en Java via `CGenUtil.rechercher(Specialiteprofil)`.
+  - **Pagination Java** : le `total` retourne est le nombre de resultats APRES filtrage complet, pas la taille brute en DB. La pagination est calculee sur cette liste.
+  - **Specialites dans resultats** : affiche max 3 specialites par profil.
+  - Retour JSON avec `total`, `page`, `totalPages`, `resultats`.
 
 ## Notifications
 
@@ -106,12 +108,15 @@ Service:
 Fonction cle:
 
 - `ReseauService.calculerReseau(int refuser, String nomuser)`
-	- Calcule un score de compatibilite /100:
-		- tags specialites (Jaccard, max 50)
-		- parcours commun (20)
-		- poste commun (15)
-		- proximite annee promo (15)
-	- Retourne graphe JSON `nodes` + `edges` pour rendu reseau.
+  - **LIMITE HARDCODEE : 20 autres profils maximum** (`LIMIT 20` en SQL). Le graphe ne montre jamais plus de 20 membres.
+  - Calcule un score de compatibilite /100 :
+    - **Specialites (max 50)** : similarite Jaccard = `|intersection| / |union| * 50`. Si aucune specialite commune = 0.
+    - **Parcours (20)** : 20 si `idparcours` identique, sinon 0.
+    - **Poste (15)** : compare le `idposte` (pas le libelle) de la DERNIERE experience active (`fin DESC LIMIT 1`). 15 si identique, sinon 0.
+    - **Annee promo (max 15)** : graduation par ecart d'annees — ecart=0 → 15, ecart≤1 → 12, ecart≤3 → 8, ecart≤5 → 3, ecart>5 → 0.
+  - **Aretes (edges)** : une arete n'est creee que si `score >= 20` OU au moins une specialite en commun. Un profil avec score < 20 et 0 specialite commune apparait comme nœud isole sans lien.
+  - Retourne graphe JSON `nodes` + `edges` pour rendu reseau.
+  - Charge specialites et postes de tous les 20 profils en 2 requetes batch (IN) — ne pas modifier en boucle N+1.
 
 ## Carte alumni
 
@@ -130,9 +135,9 @@ Service:
 Fonction cle:
 
 - `MapService.getAlumni(String contextPath)`
-	- Retourne un JSON array brut (pas d'enveloppe `success`).
-	- Charge profils localises actifs (`v_profil_localisation`).
-	- Enrichit avec specialites, photo, initiales, promo, parcours.
+  - **Retourne un JSON array brut** (`[...]`) sans enveloppe `{success:true, data:[...]}` — comportement different de TOUS les autres services. Le JSP consommateur ne doit pas chercher un champ `success`.
+  - N'affiche que les utilisateurs avec une entree dans `profilemplacement` via la vue `v_profil_localisation`. Les utilisateurs sans coordonnees sont invisibles sur la carte.
+  - Photo : si `photo.startsWith("http")`, utilisee telle quelle (URL absolue) ; sinon `contextPath + "/" + photo` est prepende.
 
 ## Entites/tables frequentes
 
@@ -143,7 +148,7 @@ Fonction cle:
 
 ## Points de vigilance relais
 
-- La recherche annuaire combine filtres APJ + post-filtrage Java; bien tester cumul de filtres.
-- Notifications: attention au `limitParam` cote front pour eviter surcharge inutile.
+- Annuaire : le filtre specialite utilise un pattern N+1 (une requete APJ par profil). Tres couteux si beaucoup de profils passent les filtres precedents. Ne pas ajouter de filtres supplementaires en Java sans evaluer l'impact.
+- Notifications : `getIconeType` ne gere pas `TYPE_EVENEMENT` et `TYPE_HASHTAG` — ces deux types affichent l'icone generique `bi-bell`. Ajouter les cas manquants dans `NotificationAlumniService` si des icones specifiques sont souhaitees.
 - Reseau: la methode fait plusieurs requetes batch SQL; verifier performances si volumetrie augmente.
-- Carte: verifier que `contextPath` est correct, sinon photos cassent.
+- Carte: `MapService` retourne un tableau brut (pas d'enveloppe `success`) — ne pas adapter le JSP consommateur au format standard sans modifier le service.
