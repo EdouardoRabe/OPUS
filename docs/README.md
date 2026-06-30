@@ -1,39 +1,55 @@
-# Documentation de Relais - OPUS
+# Documentation OPUS
 
-Objectif: permettre a une nouvelle equipe de reprendre rapidement le projet sans devoir reverse-engineerer tout le code.
+## Structure
 
-## Point d'entree de la documentation
-
-1. Lire `02-relai-rapide.md` pour la prise en main immediate.
-2. Lire `01-architecture.md` pour la carte technique globale.
-3. Lire `03-cartographie-fonctions.md` pour retrouver rapidement la bonne methode Java.
-4. Aller dans `modules/` selon la fonctionnalite a modifier.
-5. Verifier `database.md` avant toute modif de schema ou de data.
-
-## Arborescence docs
-
-- `01-architecture.md`: architecture applicative et conventions de navigation.
-- `02-relai-rapide.md`: checklist de reprise (jour 1).
-- `03-cartographie-fonctions.md`: index rapide fonction -> classe.
-- `database.md`: scripts SQL de reference et strategie DB.
-- `modules/publication.md`: feed, reactions, commentaires, partages, signalements.
-- `modules/profil.md`: profil utilisateur, experiences, cv, social, confidentialite.
-- `modules/evenement.md`: calendrier, publication evenement, participation.
-- `modules/annuaire-notification-reseau.md`: annuaire, notifications, reseau, carte.
-- `modules/admin-reference.md`: administration publication/specialite/roles/menu.
-
-## Convention de recherche rapide
-
-Pour localiser un point de code, utiliser `rg`:
-
-```bash
-rg "nomMethodeService" opus-war/web/pages opus-ejb/src/java
-rg "module.jsp?but=" opus-war/web/pages
-rg "setNomTable\(" opus-ejb/src/java/alumni
+```
+docs/
+  developpeurs/   — documentation technique pour les developpeurs
+  utilisateurs/   — modes d'emploi fonctionnels par profil
 ```
 
-## Definition de done (pour transfert)
+## Developpeurs
 
-- Chaque ticket de correction mentionne: page JSP impactee + endpoint AJAX + service Java + table SQL.
-- Les scripts SQL sont versionnes dans `BDD/` (pas de modif manuelle silencieuse en base).
-- Toute nouvelle fonctionnalite ajoute sa fiche dans `docs/modules/`.
+| Fichier | Contenu |
+|---------|---------|
+| `developpeurs/demarrage.md` | Checklist de prise en main jour 1, config de base |
+| `developpeurs/architecture.md` | Architecture applicative, flux d'execution, chemins importants |
+| `developpeurs/cartographie.md` | Index rapide fonction -> classe Java |
+| `developpeurs/base-de-donnees.md` | Scripts SQL de reference, strategie de migration |
+| `developpeurs/modules/publication.md` | Feed, reactions, commentaires, partages, signalements |
+| `developpeurs/modules/profil.md` | Profil utilisateur, experiences, CV, social, confidentialite |
+| `developpeurs/modules/evenement.md` | Calendrier, publication evenement, participation |
+| `developpeurs/modules/annuaire-notification-reseau.md` | Annuaire, notifications, reseau, carte |
+| `developpeurs/modules/admin-reference.md` | Administration publication, specialite, roles, menus |
+
+## Utilisateurs
+
+| Dossier | Public cible |
+|---------|-------------|
+| `utilisateurs/communs/` | Fonctionnalites accessibles a tous (md, alu, etu) |
+| `utilisateurs/md/` | Fonctionnalites specifiques au moderateur |
+| `utilisateurs/alu/` | Fonctionnalites specifiques aux alumni |
+| `utilisateurs/etu/` | Fonctionnalites specifiques aux etudiants |
+
+### Communs (md + alu + etu)
+
+- `utilisateurs/communs/feed.md` — fil d'actualite, reactions, commentaires
+- `utilisateurs/communs/profil.md` — modifier son profil, photo, CV, confidentialite
+- `utilisateurs/communs/evenements.md` — calendrier, participation aux evenements
+- `utilisateurs/communs/annuaire.md` — recherche d'alumni
+- `utilisateurs/communs/notifications.md` — gestion des notifications
+
+### Moderateur (md)
+
+- `utilisateurs/md/moderation.md` — moderation des publications
+- `utilisateurs/md/administration.md` — specialites, limites de role, menus, dashboard
+
+### Alumni (alu)
+
+- `utilisateurs/alu/publications.md` — creer une publication (limite: 4/jour)
+- `utilisateurs/alu/reseau-professionnel.md` — graphe de reseau professionnel
+- `utilisateurs/alu/carte.md` — carte de localisation des alumni
+
+### Etudiants (etu)
+
+- `utilisateurs/etu/publications.md` — creer une publication (limite: 10/jour)
