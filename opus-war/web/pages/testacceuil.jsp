@@ -452,7 +452,9 @@
                 <div class="fa-reaction-wrap" id="reaction-wrap-<%= idpub %>">
                     <button class="fa-action-btn <%= !myReaction.isEmpty() ? "fa-action-btn--reacted" : "" %>"
                             id="react-btn-<%= idpub %>"
-                            onclick="toggleReactionBar('<%= idpub %>', event)">
+                            data-react-main="1" data-idpub="<%= idpub %>"
+                            data-myreaction="<%= myReaction %>" data-default="<%= defaultReactId %>"
+                            onclick="quickReact('<%= idpub %>', event)">
                         <i class="bi bi-hand-thumbs-up<%= !myReaction.isEmpty() ? "-fill" : "" %>"></i>
                         <span><%= !myReaction.isEmpty() ? myReactLib : "J&apos;aime" %></span>
                     </button>

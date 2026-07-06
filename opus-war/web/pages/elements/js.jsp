@@ -443,3 +443,103 @@
 
     })();
 </script>
+
+<!-- ================= REACTIONS PUBLICATION : interaction partagee =================
+     Clic sur le bouton principal  = ajoute / retire (toggle) la reaction.
+     Survol (web, souris)          = ouvre la barre de choix (gere en CSS).
+     Appui maintenu (mobile)       = ouvre la barre de choix (long-press ci-dessous).
+     Chaque page definit son propre window.toggleReaction (rafraichissement).
+     Ce bloc ne fait qu'orchestrer l'ouverture de la barre et le toggle. -->
+<script type="text/javascript">
+(function () {
+    // Contexte pour les pages qui n'en definissent pas (ex: fragments isoles)
+    var CTX_REACT = (typeof CTX !== 'undefined' && CTX)
+        ? CTX : '${pageContext.request.contextPath}';
+
+    // Ferme toutes les barres ouvertes (partage avec les definitions inline des pages)
+    if (typeof window.closeAllReactionBars !== 'function') {
+        window.closeAllReactionBars = function () {
+            document.querySelectorAll('.fa-reaction-bar--open').forEach(function (bar) {
+                bar.classList.remove('fa-reaction-bar--open');
+            });
+        };
+    }
+
+    // Ouvre la barre d'une publication (utilise par le long-press mobile)
+    window.openReactionBar = function (idpub) {
+        var bar = document.getElementById('reaction-bar-' + idpub);
+        if (!bar) return;
+        window.closeAllReactionBars();
+        bar.classList.add('fa-reaction-bar--open');
+    };
+
+    // Fallback AJAX si la page hote n'a pas defini toggleReaction
+    if (typeof window.toggleReaction !== 'function') {
+        window.toggleReaction = function (idpub, idreactiontype) {
+            fetch(CTX_REACT + '/pages/alumni/ajax/reagir-publication.jsp?idpublication='
+                    + encodeURIComponent(idpub) + '&idreactiontype=' + encodeURIComponent(idreactiontype || ''))
+                .then(function (r) { return r.text(); })
+                .then(function (body) {
+                    var data; try { data = JSON.parse(body); } catch (e) { return; }
+                    if (data.success) { location.reload(); }
+                    else { alert('Erreur reaction: ' + (data.error || 'Inconnue')); }
+                })
+                .catch(function (e) { alert('Erreur reseau (reaction): ' + e); });
+        };
+    }
+    if (typeof window.selectReaction !== 'function') {
+        window.selectReaction = function (idpub, idreactiontype, event) {
+            if (event) event.stopPropagation();
+            window.closeAllReactionBars();
+            window.toggleReaction(idpub, idreactiontype);
+        };
+    }
+
+    // Clic sur le bouton principal : toggle direct (ajout defaut / retrait)
+    window.quickReact = function (idpub, event) {
+        // Un long-press vient d'ouvrir la barre : on ignore le clic synthetique
+        if (window.__reactLongPressFired) {
+            window.__reactLongPressFired = false;
+            if (event) event.preventDefault();
+            return;
+        }
+        if (event) event.stopPropagation();
+        var btn = document.getElementById('react-btn-' + idpub);
+        if (!btn) return;
+        var mine = btn.getAttribute('data-myreaction') || '';
+        window.closeAllReactionBars();
+        if (mine) {
+            // J'ai deja une reaction -> retrait (envoi vide = suppression cote serveur)
+            window.toggleReaction(idpub, '');
+        } else {
+            // Aucune reaction -> ajout de la reaction par defaut (1er type, ex: J'aime)
+            var def = btn.getAttribute('data-default') || '';
+            if (def) window.toggleReaction(idpub, def);
+        }
+    };
+
+    // ===== Long-press mobile : maintenir le bouton principal ouvre la barre =====
+    var _lpTimer = null;
+    function _clearLp() { if (_lpTimer) { clearTimeout(_lpTimer); _lpTimer = null; } }
+
+    document.addEventListener('touchstart', function (e) {
+        var btn = e.target.closest ? e.target.closest('[data-react-main]') : null;
+        if (!btn) return;
+        window.__reactLongPressFired = false;
+        var idpub = btn.getAttribute('data-idpub');
+        if (!idpub) return;
+        _clearLp();
+        _lpTimer = setTimeout(function () {
+            window.__reactLongPressFired = true;
+            window.openReactionBar(idpub);
+        }, 450);
+    }, { passive: true });
+
+    document.addEventListener('touchend', _clearLp, { passive: true });
+    document.addEventListener('touchmove', _clearLp, { passive: true });
+    document.addEventListener('touchcancel', _clearLp, { passive: true });
+
+    // Fermer les barres au clic ailleurs (complete les listeners inline des pages)
+    document.addEventListener('click', function () { window.closeAllReactionBars(); });
+})();
+</script>
