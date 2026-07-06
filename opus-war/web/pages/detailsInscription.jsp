@@ -154,18 +154,17 @@
                     </select>
                   </div>
                 </div>
-                <div class="col-xs-5 form-group">
+                <div class="col-xs-5 form-group" style="position:relative;">
                   <label class="field-label">Promotion <span style="color:red">*</span></label>
+                  <input type="hidden" name="idpromotion" id="hdnPromotion" value="<%= savedPromo != null ? savedPromo : "" %>" />
                   <div class="input-icon-wrap">
                     <span class="glyphicon glyphicon-calendar input-icon"></span>
-                    <select name="idpromotion" class="form-control-custom with-icon" required <%= (promoList == null || promoList.length==0) ? "disabled" : "" %>>
-                      <option value="">-- d'abord --</option>
-                      <% if(promoList != null && promoList.length > 0) {
-                          for(alumni.Promotion promo : promoList){ %>
-                        <option value="<%=promo.getIdpromotion()%>" <%= (savedPromo != null && savedPromo.equals(promo.getIdpromotion())) ? "selected" : "" %>><%=promo.getLibelle()%></option>
-                      <% } } %>
-                    </select>
+                    <input type="text" id="promoSearchInput" class="form-control-custom with-icon"
+                           placeholder="<%= (promoList == null || promoList.length == 0) ? "parcours d'abord" : "Rechercher..." %>"
+                           <%= (promoList == null || promoList.length == 0) ? "disabled" : "" %>
+                           autocomplete="off" />
                   </div>
+                  <div id="promoDropdown" style="display:none;position:absolute;z-index:9999;width:100%;background:#fff;border:1px solid #ddd;border-top:none;border-radius:0 0 4px 4px;max-height:180px;overflow-y:auto;box-shadow:0 4px 10px rgba(0,0,0,0.1);"></div>
                 </div>
               </div>
 
@@ -244,17 +243,31 @@
 
     <script src="${pageContext.request.contextPath}/assets/js/timer-flottant.js"></script>
 
+    <style>
+      .promo-option {
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: #333;
+      }
+      .promo-option:hover, .promo-option.active {
+        background: #f0f4ff;
+        color: var(--itu-primary, #0a66c2);
+      }
+      .promo-option-empty {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        color: #999;
+        font-style: italic;
+      }
+    </style>
+
     <script>
-      // when parcours changes, submit the form via POST back to detailsInscription.jsp
       function reloadWithParcours(val) {
         var form = document.getElementById('detailsForm');
-        // ensure the selected value is set (already done automatically)
         form.idparcours.value = val;
-        // submit to self to reload promotions without exposing password
         form.action = 'detailsInscription.jsp';
         form.submit();
-        // restore target for the final registration step
-        form.action = 'testRegister.jsp';
       }
     </script>
 
