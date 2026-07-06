@@ -29,10 +29,21 @@ public class ReactionService {
         return "\uD83D\uDC4D";
     }
 
-    /* ======== REAGIR PUBLICATION ======== */
+    /* ======== REAGIR PUBLICATION ========
+     * Toggle complet gere par le clic :
+     *  - idreactiontype vide/null  -> retrait pur (aucune reaction apres)
+     *  - meme type que l'existant   -> retrait (toggle off)
+     *  - type different             -> changement de reaction
+     *  - aucune reaction existante  -> ajout
+     * La contrainte unique (idutilisateur, idpublication) garantit une seule
+     * reaction par user/publication : on supprime toujours avant de reinserer.
+     */
     public static String reagirPublication(int refuser, String idpublication, String idreactiontype) throws Exception {
-        if (idpublication == null || idreactiontype == null)
+        if (idpublication == null)
             return "{\"success\":false,\"error\":\"Parametres manquants\"}";
+
+        boolean removeOnly = (idreactiontype == null || idreactiontype.trim().isEmpty());
+        if (!removeOnly) idreactiontype = idreactiontype.trim();
 
         String userId = String.valueOf(refuser);
         boolean isNewReaction = false;
@@ -47,8 +58,10 @@ public class ReactionService {
 
             if (existing != null && existing.length > 0) {
                 String existingType = existing[0].getIdreactiontype();
+                // On retire systematiquement la reaction courante
                 existing[0].deleteToTableWithHisto(userId, conn);
-                if (!existingType.equals(idreactiontype)) {
+                // On la recree seulement si c'est un changement de type (pas un retrait, pas le meme type)
+                if (!removeOnly && !existingType.equals(idreactiontype)) {
                     Publicationreaction newR = new Publicationreaction();
                     newR.setIdreactiontype(idreactiontype);
                     newR.setIdutilisateur(Integer.parseInt(userId));
@@ -57,7 +70,7 @@ public class ReactionService {
                     newR.insertToTableWithHisto(userId, conn);
                     isNewReaction = true;
                 }
-            } else {
+            } else if (!removeOnly) {
                 Publicationreaction newR = new Publicationreaction();
                 newR.setIdreactiontype(idreactiontype);
                 newR.setIdutilisateur(Integer.parseInt(userId));
@@ -99,10 +112,16 @@ public class ReactionService {
         }
     }
 
-    /* ======== REAGIR COMMENTAIRE ======== */
+    /* ======== REAGIR COMMENTAIRE ========
+     * Meme logique de toggle que reagirPublication (voir ci-dessus).
+     * idreactiontype vide/null = retrait pur.
+     */
     public static String reagirCommentaire(int refuser, String idcommentaire, String idreactiontype) throws Exception {
-        if (idcommentaire == null || idreactiontype == null)
+        if (idcommentaire == null)
             return "{\"success\":false,\"error\":\"Parametres manquants\"}";
+
+        boolean removeOnly = (idreactiontype == null || idreactiontype.trim().isEmpty());
+        if (!removeOnly) idreactiontype = idreactiontype.trim();
 
         String userId = String.valueOf(refuser);
         boolean isNewReaction = false;
@@ -118,7 +137,7 @@ public class ReactionService {
             if (existing != null && existing.length > 0) {
                 String existingType = existing[0].getIdreactiontype();
                 existing[0].deleteToTableWithHisto(userId, conn);
-                if (!existingType.equals(idreactiontype)) {
+                if (!removeOnly && !existingType.equals(idreactiontype)) {
                     Commentairereaction newR = new Commentairereaction();
                     newR.setIdutilisateur(Integer.parseInt(userId));
                     newR.setIdpublicationcommentaire(idcommentaire);
@@ -127,7 +146,7 @@ public class ReactionService {
                     newR.insertToTableWithHisto(userId, conn);
                     isNewReaction = true;
                 }
-            } else {
+            } else if (!removeOnly) {
                 Commentairereaction newR = new Commentairereaction();
                 newR.setIdutilisateur(Integer.parseInt(userId));
                 newR.setIdpublicationcommentaire(idcommentaire);
