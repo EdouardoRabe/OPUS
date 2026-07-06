@@ -175,41 +175,15 @@
 
   <!-- ═══════ SIDEBAR GAUCHE ═══════ -->
   <aside class="pvl-sidebar">
-    <div class="pvl-profile-card">
-      <div class="pvl-cover" id="pvlCover">
-        <% if (!_photoCoverUrl.isEmpty()) { %><img class="pvl-cover-img" src="<%= _photoCoverUrl %>" alt=""><% } %>
+    <div class="pvl-loc-box">
+      <div class="pvl-loc-title">Localisation</div>
+      <div class="pvl-loc-val">
+        <i class="bi bi-geo-alt-fill"></i>
+        <span id="sidebarLocText"><%= _empId.isEmpty() ? "Non définie" : String.format("%.4f, %.4f", _empLat, _empLng) %></span>
       </div>
-      <div class="pvl-body">
-        <div class="pvl-avatar-wrap">
-          <div class="pvl-avatar" id="pvlAvatar">
-            <% if (!_photoUrl.isEmpty()) { %><img src="<%= _photoUrl %>" alt=""><% } else { %><%= _pvInitials %><% } %>
-          </div>
-        </div>
-        <div class="pvl-name"><%= _fullName.isEmpty() ? "—" : _fullName %></div>
-        <hr class="pvl-divider">
-        <nav class="pvl-nav">
-          <a href="<%= _lien %>?but=profil/voir.jsp" class="pvl-nav-link pvl-nav-link--active">
-            <i class="bi bi-person-fill"></i> Mon profil
-          </a>
-          <a href="<%= _lien %>?but=accueil.jsp" class="pvl-nav-link">
-            <i class="bi bi-newspaper"></i> Fil d'actualité
-          </a>
-          <a href="<%= _lien %>?but=alumni/notifications.jsp" class="pvl-nav-link">
-            <i class="bi bi-bell-fill"></i> Notifications
-          </a>
-        </nav>
-        
-        <div class="pvl-loc-box">
-          <div class="pvl-loc-title">Localisation</div>
-          <div class="pvl-loc-val">
-            <i class="bi bi-geo-alt-fill"></i>
-            <span id="sidebarLocText"><%= _empId.isEmpty() ? "Non définie" : String.format("%.4f, %.4f", _empLat, _empLng) %></span>
-          </div>
-          <button onclick="pvOpenLocModal()" style="margin-top:8px; width:100%; padding:6px; background:#fff; border:1px solid #008BFF; color:#008BFF; border-radius:15px; font-size:11px; font-weight:700; cursor:pointer;">
-            <i class="bi bi-pencil"></i> Modifier ma position
-          </button>
-        </div>
-      </div>
+      <button onclick="pvOpenLocModal()" style="margin-top:8px; width:100%; padding:6px; background:#fff; border:1px solid #008BFF; color:#008BFF; border-radius:15px; font-size:11px; font-weight:700; cursor:pointer;">
+        <i class="bi bi-pencil"></i> Modifier ma position
+      </button>
     </div>
   </aside>
 

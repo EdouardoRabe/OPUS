@@ -329,7 +329,7 @@
 
 /* ── Leaflet map ── */
 #locMap { height: 300px; border-radius: 12px; margin-top: 10px; border: 1px solid #ddd; }
-.pvl-loc-box   { margin-top: 15px; padding: 12px; background: #f0f7ff; border-radius: 10px; border-left: 4px solid #008BFF; }
+.pvl-loc-box   { margin-top: 15px; padding: 12px; background: #fff; border-radius: 10px; border: 1px solid #dce0e4; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
 .pvl-loc-title { font-size: 11px; font-weight: 700; color: #008BFF; text-transform: uppercase; margin-bottom: 4px; }
 .pvl-loc-val   { font-size: 13px; color: #333; display: flex; align-items: center; gap: 5px; }
 
