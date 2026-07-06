@@ -539,6 +539,43 @@
     document.addEventListener('touchmove', _clearLp, { passive: true });
     document.addEventListener('touchcancel', _clearLp, { passive: true });
 
+    // ===== Survol web : ouvre le picker de facon fiable (hover-intent) =====
+    // On pilote la classe --open en JS (avec un petit delai a la sortie pour
+    // absorber l'ecart bouton<->barre), plus robuste que le :hover CSS seul.
+    var _canHover = false;
+    try { _canHover = window.matchMedia('(any-hover: hover)').matches; } catch (e) {}
+    if (_canHover) {
+        var _hoverCloseTimer = null;
+
+        document.addEventListener('mouseover', function (e) {
+            var wrap = e.target.closest ? e.target.closest('[id^="reaction-wrap-"]') : null;
+            if (!wrap) return;
+            var bar = wrap.querySelector('.fa-reaction-bar');
+            if (!bar) return;
+            if (_hoverCloseTimer) { clearTimeout(_hoverCloseTimer); _hoverCloseTimer = null; }
+            // Fermer les autres barres, ouvrir celle survolee
+            document.querySelectorAll('.fa-reaction-bar--open').forEach(function (b) {
+                if (b !== bar) b.classList.remove('fa-reaction-bar--open');
+            });
+            bar.classList.add('fa-reaction-bar--open');
+        });
+
+        document.addEventListener('mouseout', function (e) {
+            var wrap = e.target.closest ? e.target.closest('[id^="reaction-wrap-"]') : null;
+            if (!wrap) return;
+            // Si le curseur reste dans le meme wrap (bouton <-> barre <-> pont), ne pas fermer
+            var to = e.relatedTarget;
+            if (to && wrap.contains(to)) return;
+            var bar = wrap.querySelector('.fa-reaction-bar');
+            if (!bar) return;
+            if (_hoverCloseTimer) clearTimeout(_hoverCloseTimer);
+            _hoverCloseTimer = setTimeout(function () {
+                bar.classList.remove('fa-reaction-bar--open');
+                _hoverCloseTimer = null;
+            }, 220);
+        });
+    }
+
     // Fermer les barres au clic ailleurs (complete les listeners inline des pages)
     document.addEventListener('click', function () { window.closeAllReactionBars(); });
 })();

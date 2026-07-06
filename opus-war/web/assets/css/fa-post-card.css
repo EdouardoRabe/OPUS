@@ -76,9 +76,10 @@
 /* Pont invisible qui comble l'ecart de 8px entre le bouton et la barre,
    pour que le survol reste continu quand la souris passe du bouton a la barre. */
 .fa-reaction-bar::before { content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 10px; }
-/* Ouverture au SURVOL sur le web uniquement (souris fine), pas sur mobile tactile
-   ou l'ouverture se fait par appui maintenu (long-press). */
-@media (hover: hover) and (pointer: fine) {
+/* Ouverture au SURVOL des qu'un dispositif capable de survol est present
+   (souris/trackpad, y compris PC hybrides tactiles). Sur mobile purement
+   tactile, any-hover vaut none -> ouverture par appui maintenu (long-press). */
+@media (any-hover: hover) {
     .fa-reaction-wrap:hover .fa-reaction-bar {
         opacity: 1; pointer-events: all; transform: scale(1) translateY(0);
     }
