@@ -269,6 +269,106 @@
         form.action = 'detailsInscription.jsp';
         form.submit();
       }
+
+      (function() {
+        var promos = [
+          <% if(promoList != null) { for(int i = 0; i < promoList.length; i++) { %>
+          {id:"<%=promoList[i].getIdpromotion()%>",lib:"<%=promoList[i].getLibelle()%>"}<%=i < promoList.length - 1 ? "," : ""%>
+          <% } } %>
+        ];
+
+        var input    = document.getElementById('promoSearchInput');
+        var hidden   = document.getElementById('hdnPromotion');
+        var dropdown = document.getElementById('promoDropdown');
+
+        if (!input || promos.length === 0) return;
+
+        // pre-fill display if a promo is already selected (error restore)
+        <% if(savedPromo != null && !savedPromo.isEmpty()) { %>
+        for (var k = 0; k < promos.length; k++) {
+          if (promos[k].id === "<%=savedPromo%>") { input.value = promos[k].lib; break; }
+        }
+        <% } %>
+
+        var activeIdx = -1;
+
+        function renderList(q) {
+          q = (q || '').trim().toLowerCase();
+          if (!q) {
+            dropdown.style.display = 'none';
+            return;
+          }
+          var items = promos.filter(function(p) {
+            return p.lib.toLowerCase().indexOf(q) !== -1;
+          });
+          if (items.length === 0) {
+            dropdown.innerHTML = '<div class="promo-option-empty">Aucun résultat</div>';
+          } else {
+            dropdown.innerHTML = items.map(function(p) {
+              return '<div class="promo-option" data-id="' + p.id + '" data-lib="' + p.lib + '">' + p.lib + '</div>';
+            }).join('');
+            dropdown.querySelectorAll('.promo-option').forEach(function(el) {
+              el.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                selectPromo(this.getAttribute('data-id'), this.getAttribute('data-lib'));
+              });
+            });
+          }
+          activeIdx = -1;
+          dropdown.style.display = 'block';
+        }
+
+        function selectPromo(id, lib) {
+          input.value  = lib;
+          hidden.value = id;
+          dropdown.style.display = 'none';
+        }
+
+        input.addEventListener('input', function() {
+          hidden.value = '';
+          renderList(this.value);
+        });
+
+        input.addEventListener('keydown', function(e) {
+          var opts = dropdown.querySelectorAll('.promo-option[data-id]');
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            activeIdx = Math.min(activeIdx + 1, opts.length - 1);
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            activeIdx = Math.max(activeIdx - 1, 0);
+          } else if (e.key === 'Enter' && activeIdx >= 0) {
+            e.preventDefault();
+            selectPromo(opts[activeIdx].getAttribute('data-id'), opts[activeIdx].getAttribute('data-lib'));
+            return;
+          } else if (e.key === 'Escape') {
+            dropdown.style.display = 'none';
+            return;
+          }
+          opts.forEach(function(o, i) {
+            o.classList.toggle('active', i === activeIdx);
+          });
+          if (activeIdx >= 0) opts[activeIdx].scrollIntoView({block:'nearest'});
+        });
+
+        document.addEventListener('click', function(e) {
+          if (e.target !== input && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
+            if (input.value && !hidden.value) input.value = '';
+          }
+        });
+
+        // block submit if no promotion selected
+        document.getElementById('detailsForm').addEventListener('submit', function(e) {
+          if (!hidden.value) {
+            e.preventDefault();
+            input.focus();
+            input.style.borderColor = '#e74c3c';
+            setTimeout(function() { input.style.borderColor = ''; }, 2000);
+            Swal.fire({title:'Promotion requise', text:'Veuillez sélectionner une promotion.', icon:'warning', confirmButtonText:'OK'});
+          }
+        });
+      })();
     </script>
 
 
