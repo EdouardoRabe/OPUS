@@ -8354,8 +8354,8 @@ COPY public.profilstatut (id, idprofil, idprofiltypestatut, daty) FROM stdin;
 
 COPY public.profiltypestatut (idprofiltypestatut, libelle, couleur) FROM stdin;
 PTS00001	Open to work	#28a745
-PTS00002	Taken	#e69a45
-PTS00003	Neutre	#0a66c2
+PTS00002	Hiring	#e69a45
+PTS00003	Original	#0a66c2
 \.
 
 
