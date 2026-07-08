@@ -8313,6 +8313,7 @@ POS000010	Consultant Freelance IT
 --
 
 COPY public.profil (idprofil, email, nom, prenom, dtn, telephone, idpromotion, idparcours, idutilisateur, idgenre, cv) FROM stdin;
+PRF000001	admin@opus.edu	Admin	OPUS	2000-01-01	0340000000	PRM000001	PRC000001	1	GEN000001	\N
 \.
 
 
@@ -9328,7 +9329,7 @@ SELECT pg_catalog.setval('public.seq_poste', 15, true);
 -- Name: seq_profil; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.seq_profil', 1, false);
+SELECT pg_catalog.setval('public.seq_profil', 1, true);
 
 
 --
